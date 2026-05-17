@@ -1,0 +1,34 @@
+{
+    "schemaVersion": 1,
+    "id": "mercantile",
+    "version": "${version}",
+    "name": "Mercantile",
+    "description": "A comprehensive villager and trade overhaul — pick up villagers, random names, trade cycling, reputation system, and more.",
+    "authors": ["rfizzle"],
+    "contact": {},
+    "license": "MIT",
+    "icon": "assets/mercantile/icon.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": ["com.rfizzle.mercantile.Mercantile"],
+        "client": ["com.rfizzle.mercantile.client.MercantileClient"],
+        "modmenu": ["com.rfizzle.mercantile.compat.modmenu.ModMenuIntegration"]
+    },
+    "suggests": {
+        "modmenu": "*",
+        "jade": "*",
+        "wthit": "*",
+        "emi": "*",
+        "roughlyenoughitems": "*",
+        "jei": "*"
+    },
+    "mixins": [
+        "mercantile.mixins.json"
+    ],
+    "depends": {
+        "fabricloader": ">=0.16.10",
+        "minecraft": "~1.21.1",
+        "java": ">=21",
+        "fabric-api": "*"
+    }
+}

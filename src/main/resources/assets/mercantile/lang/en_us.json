@@ -1,0 +1,7 @@
+{
+    "item.mercantile.villager": "Villager",
+    "command.mercantile.reload": "Mercantile config reloaded",
+    "gui.mercantile.cycle_trades": "Cycle Trades",
+    "gui.mercantile.cycle_trades.cost": "Cost: %s levels",
+    "gui.mercantile.reputation": "Reputation: %s"
+}
