@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile;
 
+import com.rfizzle.mercantile.config.MercantileConfig;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
@@ -11,6 +12,7 @@ public class Mercantile implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        MercantileConfig.get();
         LOGGER.info("Mercantile initialized");
     }
 

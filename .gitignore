@@ -20,6 +20,10 @@ logs/
 .project
 *.launch
 
+# Dev
+.plan
+SPEC.md
+
 # OS junk
 .DS_Store
 Thumbs.db
