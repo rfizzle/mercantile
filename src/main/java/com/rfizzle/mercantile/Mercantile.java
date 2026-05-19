@@ -2,6 +2,7 @@ package com.rfizzle.mercantile;
 
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
+import com.rfizzle.mercantile.data.VillagerHeadTextures;
 import com.rfizzle.mercantile.network.MercantileNetworking;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.ResourceLocation;
@@ -16,6 +17,7 @@ public class Mercantile implements ModInitializer {
     public void onInitialize() {
         MercantileConfig.get();
         MercantileAttachments.init();
+        VillagerHeadTextures.init();
         MercantileNetworking.init();
         LOGGER.info("Mercantile initialized");
     }
