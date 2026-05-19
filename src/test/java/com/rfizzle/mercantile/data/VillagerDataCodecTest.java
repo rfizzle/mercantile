@@ -16,6 +16,7 @@ class VillagerDataCodecTest {
         assertFalse(data.isProfessionLocked());
         assertTrue(data.getLockedTrades().isEmpty());
         assertFalse(data.isNameAssigned());
+        assertFalse(data.isHealBoosted());
     }
 
     @Test
@@ -34,6 +35,7 @@ class VillagerDataCodecTest {
         assertTrue(decoded.isTradeLocked("hash_abc"));
         assertTrue(decoded.isTradeLocked("hash_def"));
         assertTrue(decoded.isNameAssigned());
+        assertFalse(decoded.isHealBoosted());
     }
 
     @Test
@@ -46,6 +48,7 @@ class VillagerDataCodecTest {
         assertTrue(decoded.isProfessionLocked());
         assertTrue(decoded.getLockedTrades().isEmpty());
         assertFalse(decoded.isNameAssigned());
+        assertFalse(decoded.isHealBoosted());
     }
 
     @Test
@@ -55,11 +58,12 @@ class VillagerDataCodecTest {
         assertFalse(decoded.isProfessionLocked());
         assertTrue(decoded.getLockedTrades().isEmpty());
         assertFalse(decoded.isNameAssigned());
+        assertFalse(decoded.isHealBoosted());
     }
 
     @Test
     void constructorWithValues() {
-        VillagerData data = new VillagerData(true, Set.of("h1", "h2"), true);
+        VillagerData data = new VillagerData(true, Set.of("h1", "h2"), true, false);
 
         assertTrue(data.isProfessionLocked());
         assertEquals(2, data.getLockedTrades().size());

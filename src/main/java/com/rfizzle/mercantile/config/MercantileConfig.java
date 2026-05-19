@@ -74,13 +74,19 @@ public class MercantileConfig {
     public boolean enableVillageBoundaryVis = true;
     public boolean enableInfoPanel = true;
 
+    public void clamp() {
+        healingMultiplier = Math.clamp(healingMultiplier, 1.0f, 10.0f);
+    }
+
     public String toJson() {
         return GSON.toJson(this);
     }
 
     public static MercantileConfig fromJson(String json) {
         MercantileConfig config = GSON.fromJson(json, MercantileConfig.class);
-        return config != null ? config : new MercantileConfig();
+        if (config == null) return new MercantileConfig();
+        config.clamp();
+        return config;
     }
 
     public static MercantileConfig get() {
@@ -122,6 +128,7 @@ public class MercantileConfig {
                 if (config == null) {
                     config = new MercantileConfig();
                 }
+                config.clamp();
                 return config;
             } catch (Exception e) {
                 Mercantile.LOGGER.error("Failed to load config, using defaults", e);

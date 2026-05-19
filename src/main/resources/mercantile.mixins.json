@@ -5,6 +5,9 @@
     "compatibilityLevel": "JAVA_21",
     "mixins": [
         "AbstractVillagerTradeMixin",
+        "AreaEffectCloudMixin",
+        "ThrownPotionSplashMixin",
+        "VillagerHealingMixin",
         "VillagerProfessionLockMixin",
         "VillagerTradeOpenMixin"
     ],

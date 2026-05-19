@@ -181,6 +181,56 @@ class MercantileConfigTest {
     }
 
     @Test
+    void healingMultiplierClampedBelowMinimum() {
+        MercantileConfig config = new MercantileConfig();
+        config.healingMultiplier = 0.5f;
+        config.clamp();
+        assertEquals(1.0f, config.healingMultiplier);
+    }
+
+    @Test
+    void healingMultiplierClampedAboveMaximum() {
+        MercantileConfig config = new MercantileConfig();
+        config.healingMultiplier = 15.0f;
+        config.clamp();
+        assertEquals(10.0f, config.healingMultiplier);
+    }
+
+    @Test
+    void healingMultiplierValidValueUnchanged() {
+        MercantileConfig config = new MercantileConfig();
+        config.healingMultiplier = 3.5f;
+        config.clamp();
+        assertEquals(3.5f, config.healingMultiplier);
+    }
+
+    @Test
+    void healingMultiplierClampedOnLoad(@TempDir Path tempDir) throws IOException {
+        Path configFile = tempDir.resolve("mercantile.json");
+        Files.writeString(configFile, """
+                {
+                  "healingMultiplier": 0.1
+                }
+                """);
+
+        MercantileConfig loaded = MercantileConfig.load(configFile);
+        assertEquals(1.0f, loaded.healingMultiplier);
+    }
+
+    @Test
+    void healingMultiplierClampedOnLoadAboveMax(@TempDir Path tempDir) throws IOException {
+        Path configFile = tempDir.resolve("mercantile.json");
+        Files.writeString(configFile, """
+                {
+                  "healingMultiplier": 99.0
+                }
+                """);
+
+        MercantileConfig loaded = MercantileConfig.load(configFile);
+        assertEquals(10.0f, loaded.healingMultiplier);
+    }
+
+    @Test
     void partialFilePreservesDefaults(@TempDir Path tempDir) throws IOException {
         Path configFile = tempDir.resolve("mercantile.json");
         Files.writeString(configFile, """
