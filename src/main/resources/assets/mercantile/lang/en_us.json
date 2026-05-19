@@ -96,5 +96,8 @@
     "mercantile.config.enableVillageBoundaryVis": "Village Boundary Visualization",
     "mercantile.config.enableVillageBoundaryVis.tooltip": "Show village boundary outline and POI markers",
     "mercantile.config.enableInfoPanel": "Info Panel",
-    "mercantile.config.enableInfoPanel.tooltip": "Show extended villager info panel in the trade GUI"
+    "mercantile.config.enableInfoPanel.tooltip": "Show extended villager info panel in the trade GUI",
+
+    "gui.mercantile.profession.locked": "Profession: Locked",
+    "gui.mercantile.profession.unlocked": "Profession: Unlocked"
 }

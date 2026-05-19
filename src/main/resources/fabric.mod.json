@@ -17,8 +17,12 @@
             "com.rfizzle.mercantile.gametest.AttachmentGameTest",
             "com.rfizzle.mercantile.gametest.NetworkingGameTest",
             "com.rfizzle.mercantile.gametest.CommandGameTest",
-            "com.rfizzle.mercantile.gametest.VillagerNameGameTest"
+            "com.rfizzle.mercantile.gametest.VillagerNameGameTest",
+            "com.rfizzle.mercantile.gametest.ProfessionLockGameTest"
         ]
+    },
+    "custom": {
+        "wthit:plugins": ["com.rfizzle.mercantile.compat.wthit.MercantileWthitPlugin"]
     },
     "suggests": {
         "modmenu": "*",
