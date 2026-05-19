@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile;
 
+import com.rfizzle.mercantile.command.MercantileCommands;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.VillagerHeadTextures;
@@ -19,6 +20,7 @@ public class Mercantile implements ModInitializer {
         MercantileAttachments.init();
         VillagerHeadTextures.init();
         MercantileNetworking.init();
+        MercantileCommands.init();
         LOGGER.info("Mercantile initialized");
     }
 

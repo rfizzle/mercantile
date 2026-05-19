@@ -13,7 +13,11 @@
         "main": ["com.rfizzle.mercantile.Mercantile"],
         "client": ["com.rfizzle.mercantile.client.MercantileClient"],
         "modmenu": ["com.rfizzle.mercantile.compat.modmenu.ModMenuIntegration"],
-        "fabric-gametest": ["com.rfizzle.mercantile.gametest.AttachmentGameTest"]
+        "fabric-gametest": [
+            "com.rfizzle.mercantile.gametest.AttachmentGameTest",
+            "com.rfizzle.mercantile.gametest.NetworkingGameTest",
+            "com.rfizzle.mercantile.gametest.CommandGameTest"
+        ]
     },
     "suggests": {
         "modmenu": "*",

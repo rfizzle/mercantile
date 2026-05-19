@@ -1,6 +1,12 @@
 {
     "item.mercantile.villager": "Villager",
     "command.mercantile.reload": "Mercantile config reloaded",
+    "command.mercantile.reputation.self": "Your reputation: %s (%s)",
+    "command.mercantile.reputation.other": "%s's reputation: %s (%s)",
+    "command.mercantile.reputation.set": "Set %s's reputation to %s (%s)",
+    "command.mercantile.reputation.add": "Added %s reputation to %s, now %s (%s)",
+    "command.mercantile.reputation.not_player": "This command must be run by a player",
+    "command.mercantile.village.not_player": "This command must be run by a player",
     "gui.mercantile.cycle_trades": "Cycle Trades",
     "gui.mercantile.cycle_trades.cost": "Cost: %s levels",
     "gui.mercantile.reputation": "Reputation: %s",
