@@ -12,7 +12,8 @@
     "entrypoints": {
         "main": ["com.rfizzle.mercantile.Mercantile"],
         "client": ["com.rfizzle.mercantile.client.MercantileClient"],
-        "modmenu": ["com.rfizzle.mercantile.compat.modmenu.ModMenuIntegration"]
+        "modmenu": ["com.rfizzle.mercantile.compat.modmenu.ModMenuIntegration"],
+        "fabric-gametest": ["com.rfizzle.mercantile.gametest.AttachmentGameTest"]
     },
     "suggests": {
         "modmenu": "*",
