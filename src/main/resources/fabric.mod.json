@@ -16,7 +16,8 @@
         "fabric-gametest": [
             "com.rfizzle.mercantile.gametest.AttachmentGameTest",
             "com.rfizzle.mercantile.gametest.NetworkingGameTest",
-            "com.rfizzle.mercantile.gametest.CommandGameTest"
+            "com.rfizzle.mercantile.gametest.CommandGameTest",
+            "com.rfizzle.mercantile.gametest.VillagerNameGameTest"
         ]
     },
     "suggests": {

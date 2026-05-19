@@ -12,13 +12,15 @@ import net.minecraft.world.entity.npc.Villager;
 public class AttachmentGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void villagerDataDefaultsOnFreshEntity(GameTestHelper helper) {
-        Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
+        Villager villager = EntityType.VILLAGER.create(helper.getLevel());
+        helper.assertTrue(villager != null, "villager entity should be created");
         VillagerData data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
 
         helper.assertFalse(data.isProfessionLocked(), "fresh villager should not be profession-locked");
         helper.assertTrue(data.getLockedTrades().isEmpty(), "fresh villager should have no locked trades");
         helper.assertFalse(data.isNameAssigned(), "fresh villager should not have name assigned");
 
+        villager.discard();
         helper.succeed();
     }
 
