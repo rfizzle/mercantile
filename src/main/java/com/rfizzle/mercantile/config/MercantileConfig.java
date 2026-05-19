@@ -74,6 +74,15 @@ public class MercantileConfig {
     public boolean enableVillageBoundaryVis = true;
     public boolean enableInfoPanel = true;
 
+    public String toJson() {
+        return GSON.toJson(this);
+    }
+
+    public static MercantileConfig fromJson(String json) {
+        MercantileConfig config = GSON.fromJson(json, MercantileConfig.class);
+        return config != null ? config : new MercantileConfig();
+    }
+
     public static MercantileConfig get() {
         if (INSTANCE == null) {
             INSTANCE = load();
