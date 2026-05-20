@@ -9,6 +9,7 @@
         "DoorBlockMixin",
         "FenceGateBlockAccessor",
         "GroundPathNavigationMixin",
+        "MerchantMenuMixin",
         "ThrownPotionSplashMixin",
         "VillagerGoalPackagesMixin",
         "VillagerHealingMixin",

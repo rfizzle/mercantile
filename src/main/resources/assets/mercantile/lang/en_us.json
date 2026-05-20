@@ -98,6 +98,8 @@
     "mercantile.config.enableInfoPanel": "Info Panel",
     "mercantile.config.enableInfoPanel.tooltip": "Show extended villager info panel in the trade GUI",
 
+    "gui.mercantile.bulk_trade.feedback": "Traded %sx %s",
+
     "gui.mercantile.profession.locked": "Profession: Locked",
     "gui.mercantile.profession.unlocked": "Profession: Unlocked"
 }
