@@ -13,6 +13,8 @@
         "ThrownPotionSplashMixin",
         "VillagerGoalPackagesMixin",
         "VillagerHealingMixin",
+        "VillagerPickupMixin",
+        "VillagerPlacementMixin",
         "VillagerProfessionLockMixin",
         "VillagerTradeOpenMixin",
         "WalkNodeEvaluatorMixin"
