@@ -4,6 +4,7 @@ import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
 import com.rfizzle.mercantile.reputation.ReputationManager;
+import com.rfizzle.mercantile.trade.OfferIdentityHash;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.npc.Villager;
@@ -22,11 +23,14 @@ public abstract class AbstractVillagerTradeMixin {
 
         MercantileConfig config = MercantileConfig.get();
 
-        if (config.enableProfessionLock) {
-            var villagerData = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
-            if (!villagerData.isProfessionLocked()) {
-                villagerData.setProfessionLocked(true);
-            }
+        var villagerData = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
+
+        if (config.enableProfessionLock && !villagerData.isProfessionLocked()) {
+            villagerData.setProfessionLocked(true);
+        }
+
+        if (config.enableTradeCycling) {
+            villagerData.addLockedTrade(OfferIdentityHash.compute(offer));
         }
 
         if (config.enableReputation && villager.getTradingPlayer() instanceof ServerPlayer serverPlayer) {

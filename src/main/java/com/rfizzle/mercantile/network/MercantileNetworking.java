@@ -2,6 +2,7 @@ package com.rfizzle.mercantile.network;
 
 import com.rfizzle.mercantile.Mercantile;
 import com.rfizzle.mercantile.config.MercantileConfig;
+import com.rfizzle.mercantile.trade.TradeCycleManager;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerPlayer;
@@ -67,7 +68,8 @@ public class MercantileNetworking {
             return;
         }
 
-        // TODO: Validate emerald cost, check for unlockable trades, perform cycle, sync offers
+        if (!TradeCycleManager.canCycle(player, villager)) return;
+        TradeCycleManager.cycle(player, villager);
     }
 
     private static void handleFollowVillager(ServerPlayer player, FollowVillagerC2SPayload payload) {

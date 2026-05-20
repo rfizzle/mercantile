@@ -6,6 +6,7 @@ import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.VillagerHeadTextures;
 import com.rfizzle.mercantile.data.VillagerNameManager;
 import com.rfizzle.mercantile.network.MercantileNetworking;
+import com.rfizzle.mercantile.particle.MercantileParticles;
 import com.rfizzle.mercantile.reputation.ExclusiveTradesManager;
 import com.rfizzle.mercantile.reputation.ReputationManager;
 import net.fabricmc.api.ModInitializer;
@@ -25,6 +26,7 @@ public class Mercantile implements ModInitializer {
         ExclusiveTradesManager.init();
         VillagerHeadTextures.init();
         VillagerNameManager.init();
+        MercantileParticles.init();
         MercantileNetworking.init();
         MercantileCommands.init();
         LOGGER.info("Mercantile initialized");

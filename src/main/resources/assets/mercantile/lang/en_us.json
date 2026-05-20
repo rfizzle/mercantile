@@ -8,6 +8,7 @@
     "command.mercantile.reputation.not_player": "This command must be run by a player",
     "command.mercantile.village.not_player": "This command must be run by a player",
     "gui.mercantile.cycle_trades": "Cycle Trades",
+    "gui.mercantile.cycle_trades.tooltip": "Re-roll unlocked trades (%s emeralds)",
     "gui.mercantile.cycle_trades.cost": "Cost: %s levels",
     "gui.mercantile.reputation": "Reputation: %s",
 
