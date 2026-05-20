@@ -19,7 +19,8 @@
             "com.rfizzle.mercantile.gametest.CommandGameTest",
             "com.rfizzle.mercantile.gametest.VillagerNameGameTest",
             "com.rfizzle.mercantile.gametest.ProfessionLockGameTest",
-            "com.rfizzle.mercantile.gametest.VillagerHealingGameTest"
+            "com.rfizzle.mercantile.gametest.VillagerHealingGameTest",
+            "com.rfizzle.mercantile.gametest.PathfindingGameTest"
         ]
     },
     "custom": {

@@ -6,10 +6,15 @@
     "mixins": [
         "AbstractVillagerTradeMixin",
         "AreaEffectCloudMixin",
+        "DoorBlockMixin",
+        "FenceGateBlockAccessor",
+        "GroundPathNavigationMixin",
         "ThrownPotionSplashMixin",
+        "VillagerGoalPackagesMixin",
         "VillagerHealingMixin",
         "VillagerProfessionLockMixin",
-        "VillagerTradeOpenMixin"
+        "VillagerTradeOpenMixin",
+        "WalkNodeEvaluatorMixin"
     ],
     "client": [
         "MerchantScreenMixin"
