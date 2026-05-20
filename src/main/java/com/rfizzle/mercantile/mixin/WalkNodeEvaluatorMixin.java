@@ -120,6 +120,7 @@ public abstract class WalkNodeEvaluatorMixin extends NodeEvaluator {
 
     @Unique
     private int mercantile$tryAddClimbNode(Node[] nodes, int count, BlockPos target) {
+        if (count >= nodes.length) return count;
         if (!this.currentContext.getBlockState(target).is(BlockTags.CLIMBABLE)) return count;
 
         Node node = this.getNode(target.getX(), target.getY(), target.getZ());
