@@ -85,7 +85,7 @@ class PlayerDataCodecTest {
     void constructorWithValues() {
         UUID cured = UUID.randomUUID();
         UUID trader = UUID.randomUUID();
-        PlayerData data = new PlayerData(100, 3000, Set.of(cured), Map.of(trader, 5));
+        PlayerData data = new PlayerData(100, 3000, -1L, Set.of(cured), Map.of(trader, 5));
 
         assertEquals(100, data.getScore());
         assertEquals(3000, data.getProximityTicks());

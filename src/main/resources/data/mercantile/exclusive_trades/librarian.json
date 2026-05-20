@@ -1,0 +1,18 @@
+{
+  "replace": false,
+  "min_tier": "trusted",
+  "trades": [
+    {
+      "input_1": { "item": "minecraft:emerald", "count": 48 },
+      "output": { "item": "minecraft:name_tag", "count": 1 },
+      "max_uses": 6
+    },
+    {
+      "input_1": { "item": "minecraft:emerald", "count": 32 },
+      "input_2": { "item": "minecraft:book", "count": 1 },
+      "output": { "item": "minecraft:writable_book", "count": 1 },
+      "max_uses": 12,
+      "min_tier_override": "honored"
+    }
+  ]
+}

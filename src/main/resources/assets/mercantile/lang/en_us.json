@@ -112,6 +112,8 @@
     "mercantile.pickup.lore.trade_count": "%1$s/%2$s trades unlocked",
     "mercantile.placement.newer_version": "Villager data is from a newer version of Mercantile",
 
+    "mercantile.trade.denied.reviled": "This villager refuses to trade with you",
+
     "gui.mercantile.bulk_trade.feedback": "Traded %sx %s",
 
     "gui.mercantile.profession.locked": "Profession: Locked",

@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "min_tier": "honored",
+  "trades": [
+    {
+      "input_1": { "item": "minecraft:emerald", "count": 64 },
+      "input_2": { "item": "minecraft:nether_star", "count": 1 },
+      "output": { "item": "minecraft:totem_of_undying", "count": 1 },
+      "max_uses": 1
+    }
+  ]
+}

@@ -17,6 +17,7 @@
         "VillagerPlacementMixin",
         "VillagerProfessionLockMixin",
         "VillagerTradeOpenMixin",
+        "ZombieVillagerCureMixin",
         "WalkNodeEvaluatorMixin"
     ],
     "client": [

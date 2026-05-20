@@ -6,6 +6,8 @@ import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.VillagerHeadTextures;
 import com.rfizzle.mercantile.data.VillagerNameManager;
 import com.rfizzle.mercantile.network.MercantileNetworking;
+import com.rfizzle.mercantile.reputation.ExclusiveTradesManager;
+import com.rfizzle.mercantile.reputation.ReputationManager;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
@@ -19,6 +21,8 @@ public class Mercantile implements ModInitializer {
     public void onInitialize() {
         MercantileConfig.get();
         MercantileAttachments.init();
+        ReputationManager.init();
+        ExclusiveTradesManager.init();
         VillagerHeadTextures.init();
         VillagerNameManager.init();
         MercantileNetworking.init();

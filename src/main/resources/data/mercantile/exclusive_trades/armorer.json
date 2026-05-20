@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "min_tier": "trusted",
+  "trades": [
+    {
+      "input_1": { "item": "minecraft:emerald", "count": 24 },
+      "input_2": { "item": "minecraft:netherite_scrap", "count": 1 },
+      "output": { "item": "minecraft:netherite_ingot", "count": 1 },
+      "max_uses": 3,
+      "min_tier_override": "honored"
+    }
+  ]
+}

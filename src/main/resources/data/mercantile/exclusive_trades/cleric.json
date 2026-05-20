@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "min_tier": "trusted",
+  "trades": [
+    {
+      "input_1": { "item": "minecraft:emerald", "count": 16 },
+      "output": { "item": "minecraft:echo_shard", "count": 1 },
+      "max_uses": 3
+    }
+  ]
+}

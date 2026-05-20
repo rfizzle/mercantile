@@ -2,6 +2,9 @@ package com.rfizzle.mercantile.mixin;
 
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
+import com.rfizzle.mercantile.data.PlayerData;
+import com.rfizzle.mercantile.reputation.ReputationManager;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.item.trading.MerchantOffer;
@@ -14,13 +17,22 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class AbstractVillagerTradeMixin {
 
     @Inject(method = "notifyTrade", at = @At("TAIL"))
-    private void mercantile$lockProfessionOnTrade(MerchantOffer offer, CallbackInfo ci) {
-        if (!MercantileConfig.get().enableProfessionLock) return;
+    private void mercantile$onTrade(MerchantOffer offer, CallbackInfo ci) {
         if (!((Object) this instanceof Villager villager)) return;
 
-        var data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
-        if (!data.isProfessionLocked()) {
-            data.setProfessionLocked(true);
+        MercantileConfig config = MercantileConfig.get();
+
+        if (config.enableProfessionLock) {
+            var villagerData = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
+            if (!villagerData.isProfessionLocked()) {
+                villagerData.setProfessionLocked(true);
+            }
+        }
+
+        if (config.enableReputation && villager.getTradingPlayer() instanceof ServerPlayer serverPlayer) {
+            PlayerData playerData = serverPlayer.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
+            playerData.incrementTradesWithVillager(villager.getUUID());
+            ReputationManager.modifyScore(serverPlayer, config.reputationTradeGain);
         }
     }
 }
