@@ -9,9 +9,11 @@ import net.minecraft.core.registries.BuiltInRegistries;
 public final class MercantileParticles {
 
     public static final SimpleParticleType CYCLE_GLINT = FabricParticleTypes.simple();
+    public static final SimpleParticleType PICKUP_SPARKLE = FabricParticleTypes.simple();
 
     public static void init() {
         Registry.register(BuiltInRegistries.PARTICLE_TYPE, Mercantile.id("cycle_glint"), CYCLE_GLINT);
+        Registry.register(BuiltInRegistries.PARTICLE_TYPE, Mercantile.id("pickup_sparkle"), PICKUP_SPARKLE);
     }
 
     private MercantileParticles() {

@@ -2,6 +2,7 @@ package com.rfizzle.mercantile.client;
 
 import com.rfizzle.mercantile.client.network.ClientNetworkHandler;
 import com.rfizzle.mercantile.client.particle.CycleGlintParticle;
+import com.rfizzle.mercantile.client.particle.PickupSparkleParticle;
 import com.rfizzle.mercantile.particle.MercantileParticles;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
@@ -11,5 +12,6 @@ public class MercantileClient implements ClientModInitializer {
     public void onInitializeClient() {
         ClientNetworkHandler.init();
         ParticleFactoryRegistry.getInstance().register(MercantileParticles.CYCLE_GLINT, CycleGlintParticle.Provider::new);
+        ParticleFactoryRegistry.getInstance().register(MercantileParticles.PICKUP_SPARKLE, PickupSparkleParticle.Provider::new);
     }
 }
