@@ -2,12 +2,15 @@ package com.rfizzle.mercantile.network;
 
 import com.rfizzle.mercantile.Mercantile;
 import com.rfizzle.mercantile.config.MercantileConfig;
+import com.rfizzle.mercantile.follow.FollowManager;
 import com.rfizzle.mercantile.trade.TradeCycleManager;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.npc.Villager;
+
+import java.util.UUID;
 
 public class MercantileNetworking {
 
@@ -78,7 +81,14 @@ public class MercantileNetworking {
         Villager villager = resolveVillager(player, payload.villagerEntityId());
         if (villager == null) return;
 
-        // TODO: Toggle follow state, validate follower limits, send FollowStateS2CPayload
+        if (FollowManager.isFollowing(villager)) {
+            UUID currentTarget = FollowManager.getFollowTarget(villager);
+            if (currentTarget != null && currentTarget.equals(player.getUUID())) {
+                FollowManager.stopFollowing(villager);
+            }
+        } else {
+            FollowManager.startFollowing(villager, player);
+        }
     }
 
     private static void handleRequestWorkstationMap(ServerPlayer player) {

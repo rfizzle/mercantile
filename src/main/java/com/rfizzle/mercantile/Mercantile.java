@@ -5,6 +5,7 @@ import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.VillagerHeadTextures;
 import com.rfizzle.mercantile.data.VillagerNameManager;
+import com.rfizzle.mercantile.follow.FollowManager;
 import com.rfizzle.mercantile.network.MercantileNetworking;
 import com.rfizzle.mercantile.particle.MercantileParticles;
 import com.rfizzle.mercantile.reputation.ExclusiveTradesManager;
@@ -26,6 +27,7 @@ public class Mercantile implements ModInitializer {
         ExclusiveTradesManager.init();
         VillagerHeadTextures.init();
         VillagerNameManager.init();
+        FollowManager.init();
         MercantileParticles.init();
         MercantileNetworking.init();
         MercantileCommands.init();

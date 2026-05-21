@@ -2,6 +2,7 @@ package com.rfizzle.mercantile.mixin;
 
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.VillagerPickupHelper;
+import com.rfizzle.mercantile.follow.FollowManager;
 import com.rfizzle.mercantile.particle.MercantileParticles;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -59,7 +60,17 @@ public abstract class VillagerPickupMixin {
             return;
         }
 
-        // Follow mode denial will be added when S-018 is implemented
+        if (FollowManager.isFollowing(self)) {
+            java.util.UUID followTarget = FollowManager.getFollowTarget(self);
+            if (followTarget != null && !followTarget.equals(player.getUUID())) {
+                serverPlayer.displayClientMessage(
+                        Component.translatable("mercantile.pickup.denied.following")
+                                .withStyle(ChatFormatting.RED), true);
+                cir.setReturnValue(InteractionResult.FAIL);
+                return;
+            }
+            FollowManager.stopFollowing(self);
+        }
 
         if (!player.getAbilities().instabuild && player.experienceLevel < config.pickupXpCost) {
             serverPlayer.displayClientMessage(

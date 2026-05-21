@@ -11,6 +11,8 @@
         "GroundPathNavigationMixin",
         "MerchantMenuMixin",
         "ThrownPotionSplashMixin",
+        "VillagerFollowMixin",
+        "VillagerFollowPushMixin",
         "VillagerGoalPackagesMixin",
         "VillagerHealingMixin",
         "VillagerPickupMixin",
