@@ -23,6 +23,8 @@ logs/
 # Dev
 .plan
 SPEC.md
+REVIEW.md
+.claude
 
 # OS junk
 .DS_Store
