@@ -6,6 +6,7 @@ import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
 import com.rfizzle.mercantile.network.SyncReputationS2CPayload;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerLevel;
@@ -27,6 +28,8 @@ public final class ReputationManager {
     }
 
     public static void init() {
+        ServerLifecycleEvents.SERVER_STARTING.register(server -> tickCounter = 0);
+
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             if (!MercantileConfig.get().enableReputation) return;
 

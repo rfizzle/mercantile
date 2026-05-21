@@ -17,6 +17,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.trading.MerchantOffers;
+import com.rfizzle.mercantile.trade.OfferIdentityHash;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,11 +83,12 @@ public class VillagerPickupHelper {
             lines.add(line("mercantile.pickup.lore.trades", ChatFormatting.GRAY));
 
             VillagerData data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
+            data.migrateLockedTrades(offers);
             Set<String> lockedTrades = data.getLockedTrades();
             int lockedCount = 0;
 
             for (MerchantOffer offer : offers) {
-                boolean locked = lockedTrades.contains(offerIdentityHash(offer));
+                boolean locked = lockedTrades.contains(OfferIdentityHash.compute(offer));
                 if (locked) lockedCount++;
                 lines.add(formatTradeLine(offer, locked));
             }
@@ -161,14 +163,4 @@ public class VillagerPickupHelper {
                 .withStyle(style -> style.withColor(color).withItalic(false));
     }
 
-    public static String offerIdentityHash(MerchantOffer offer) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(BuiltInRegistries.ITEM.getKey(offer.getBaseCostA().getItem()));
-        ItemStack costB = offer.getCostB();
-        if (!costB.isEmpty()) {
-            sb.append('+').append(BuiltInRegistries.ITEM.getKey(costB.getItem()));
-        }
-        sb.append('=').append(BuiltInRegistries.ITEM.getKey(offer.getResult().getItem()));
-        return sb.toString();
-    }
 }

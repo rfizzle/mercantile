@@ -31,6 +31,13 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+/**
+ * Intercepts {@code Villager#mobInteract} (HEAD, cancellable, priority 1100) to implement the
+ * emerald-toggle follow mode. Runs after {@link VillagerPickupMixin} (priority 900). The
+ * item-hand guards are mutually exclusive: this mixin requires an emerald in the main hand;
+ * VillagerPickupMixin requires an empty hand. Future authors must preserve this invariant so
+ * both injections cannot fire for the same interaction.
+ */
 @Mixin(Villager.class)
 public abstract class VillagerFollowMixin extends AbstractVillager implements FollowableVillager {
 

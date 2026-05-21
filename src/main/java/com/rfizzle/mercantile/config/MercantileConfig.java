@@ -10,7 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class MercantileConfig {
-    private static MercantileConfig INSTANCE;
+    private static volatile MercantileConfig INSTANCE;
 
     static final Gson GSON = new GsonBuilder().setPrettyPrinting().setLenient().create();
 
@@ -90,14 +90,23 @@ public class MercantileConfig {
     }
 
     public static MercantileConfig get() {
-        if (INSTANCE == null) {
-            INSTANCE = load();
+        MercantileConfig local = INSTANCE;
+        if (local == null) {
+            synchronized (MercantileConfig.class) {
+                local = INSTANCE;
+                if (local == null) {
+                    local = load();
+                    INSTANCE = local;
+                }
+            }
         }
-        return INSTANCE;
+        return local;
     }
 
     public static void reload() {
-        INSTANCE = load();
+        synchronized (MercantileConfig.class) {
+            INSTANCE = load();
+        }
     }
 
     public void save() {

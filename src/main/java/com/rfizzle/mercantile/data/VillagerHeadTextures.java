@@ -8,13 +8,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.component.ResolvableProfile;
 
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class VillagerHeadTextures {
-    private static final Map<ResourceLocation, String> TEXTURES = new HashMap<>();
-    private static final Map<ResourceLocation, ResolvableProfile> PROFILE_CACHE = new HashMap<>();
+    private static final Map<ResourceLocation, String> TEXTURES = new ConcurrentHashMap<>();
+    private static final Map<ResourceLocation, ResolvableProfile> PROFILE_CACHE = new ConcurrentHashMap<>();
 
     public static final ResourceLocation FALLBACK_ID = ResourceLocation.withDefaultNamespace("none");
     public static final ResourceLocation BABY = Mercantile.id("baby");

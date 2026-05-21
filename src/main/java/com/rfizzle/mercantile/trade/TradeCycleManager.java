@@ -34,6 +34,7 @@ public final class TradeCycleManager {
 
         VillagerData villagerData = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
         MerchantOffers offers = villager.getOffers();
+        villagerData.migrateLockedTrades(offers);
 
         boolean hasUnlocked = false;
         for (MerchantOffer offer : offers) {
@@ -54,6 +55,7 @@ public final class TradeCycleManager {
         MercantileConfig config = MercantileConfig.get();
         VillagerData villagerData = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
         MerchantOffers offers = villager.getOffers();
+        villagerData.migrateLockedTrades(offers);
 
         ExclusiveTradesManager.stripInjectedOffers(villager);
 

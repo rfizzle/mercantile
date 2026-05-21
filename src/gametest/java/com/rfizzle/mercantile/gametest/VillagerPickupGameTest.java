@@ -3,6 +3,7 @@ package com.rfizzle.mercantile.gametest;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.VillagerData;
 import com.rfizzle.mercantile.data.VillagerPickupHelper;
+import com.rfizzle.mercantile.trade.OfferIdentityHash;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.gametest.framework.GameTest;
@@ -221,14 +222,14 @@ public class VillagerPickupGameTest implements FabricGameTest {
                 new ItemStack(Items.DIAMOND, 1),
                 16, 1, 0.05f);
 
-        String hash1 = VillagerPickupHelper.offerIdentityHash(offer);
-        String hash2 = VillagerPickupHelper.offerIdentityHash(offer);
+        String hash1 = OfferIdentityHash.compute(offer);
+        String hash2 = OfferIdentityHash.compute(offer);
         helper.assertTrue(hash1.equals(hash2), "Same offer should produce same hash");
         helper.succeed();
     }
 
     @GameTest(template = EMPTY_STRUCTURE)
-    public void identityHashInvariantToCount(GameTestHelper helper) {
+    public void identityHashIncludesCount(GameTestHelper helper) {
         MerchantOffer small = new MerchantOffer(
                 new ItemCost(Items.EMERALD, 5),
                 new ItemStack(Items.DIAMOND, 1),
@@ -238,10 +239,9 @@ public class VillagerPickupGameTest implements FabricGameTest {
                 new ItemStack(Items.DIAMOND, 10),
                 16, 1, 0.05f);
 
-        helper.assertTrue(
-                VillagerPickupHelper.offerIdentityHash(small)
-                        .equals(VillagerPickupHelper.offerIdentityHash(large)),
-                "Hash should be the same regardless of item counts");
+        helper.assertFalse(
+                OfferIdentityHash.compute(small).equals(OfferIdentityHash.compute(large)),
+                "Hash should differ when item counts differ");
         helper.succeed();
     }
 
@@ -261,12 +261,10 @@ public class VillagerPickupGameTest implements FabricGameTest {
                 16, 1, 0.05f);
 
         helper.assertFalse(
-                VillagerPickupHelper.offerIdentityHash(diamond)
-                        .equals(VillagerPickupHelper.offerIdentityHash(iron)),
+                OfferIdentityHash.compute(diamond).equals(OfferIdentityHash.compute(iron)),
                 "Different result items should produce different hashes");
         helper.assertFalse(
-                VillagerPickupHelper.offerIdentityHash(diamond)
-                        .equals(VillagerPickupHelper.offerIdentityHash(goldCost)),
+                OfferIdentityHash.compute(diamond).equals(OfferIdentityHash.compute(goldCost)),
                 "Different cost items should produce different hashes");
         helper.succeed();
     }

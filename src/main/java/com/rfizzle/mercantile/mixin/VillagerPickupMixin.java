@@ -21,6 +21,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+/**
+ * Intercepts {@code Villager#mobInteract} (HEAD, cancellable, priority 900) to implement
+ * villager pickup via shift+right-click with an empty hand. Runs before
+ * {@link VillagerFollowMixin} (priority 1100) because pickup discards the entity and its
+ * early-exit guards (raid check, trading-player check) should evaluate first. The item-hand
+ * guards are mutually exclusive: this mixin requires an empty hand; VillagerFollowMixin
+ * requires an emerald. Future authors must preserve this invariant to avoid double-cancel.
+ */
 @Mixin(Villager.class)
 public abstract class VillagerPickupMixin {
 

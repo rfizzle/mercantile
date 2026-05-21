@@ -31,21 +31,21 @@ class OfferIdentityHashTest {
     }
 
     @Test
-    void invariantToInputCount() {
+    void differentInputCountProducesDifferentHash() {
         MerchantOffer one = new MerchantOffer(
                 new ItemCost(Items.EMERALD, 1), new ItemStack(Items.APPLE, 1), 16, 1, 0.0f);
         MerchantOffer ten = new MerchantOffer(
                 new ItemCost(Items.EMERALD, 10), new ItemStack(Items.APPLE, 1), 16, 1, 0.0f);
-        assertEquals(OfferIdentityHash.compute(one), OfferIdentityHash.compute(ten));
+        assertNotEquals(OfferIdentityHash.compute(one), OfferIdentityHash.compute(ten));
     }
 
     @Test
-    void invariantToOutputCount() {
+    void differentOutputCountProducesDifferentHash() {
         MerchantOffer one = new MerchantOffer(
                 new ItemCost(Items.EMERALD, 1), new ItemStack(Items.APPLE, 1), 16, 1, 0.0f);
         MerchantOffer stack = new MerchantOffer(
                 new ItemCost(Items.EMERALD, 1), new ItemStack(Items.APPLE, 16), 16, 1, 0.0f);
-        assertEquals(OfferIdentityHash.compute(one), OfferIdentityHash.compute(stack));
+        assertNotEquals(OfferIdentityHash.compute(one), OfferIdentityHash.compute(stack));
     }
 
     @Test
@@ -106,13 +106,68 @@ class OfferIdentityHashTest {
     }
 
     @Test
-    void secondInputCountInvariant() {
+    void differentSecondInputCountProducesDifferentHash() {
         MerchantOffer one = new MerchantOffer(
                 new ItemCost(Items.EMERALD, 1), Optional.of(new ItemCost(Items.BOOK, 1)),
                 new ItemStack(Items.ENCHANTED_BOOK, 1), 16, 1, 0.0f);
         MerchantOffer three = new MerchantOffer(
                 new ItemCost(Items.EMERALD, 1), Optional.of(new ItemCost(Items.BOOK, 3)),
                 new ItemStack(Items.ENCHANTED_BOOK, 1), 16, 1, 0.0f);
-        assertEquals(OfferIdentityHash.compute(one), OfferIdentityHash.compute(three));
+        assertNotEquals(OfferIdentityHash.compute(one), OfferIdentityHash.compute(three));
+    }
+
+    @Test
+    void hashAgreesAcrossCallsites() {
+        MerchantOffer offer1 = new MerchantOffer(
+                new ItemCost(Items.EMERALD, 5), new ItemStack(Items.BREAD, 6), 16, 1, 0.05f);
+        MerchantOffer offer2 = new MerchantOffer(
+                new ItemCost(Items.EMERALD, 5), new ItemStack(Items.BREAD, 6), 16, 1, 0.05f);
+        assertEquals(OfferIdentityHash.compute(offer1), OfferIdentityHash.compute(offer2));
+    }
+
+    @Test
+    void farmerLevel1BreadVsLevel2BreadAreDistinct() {
+        MerchantOffer level1 = new MerchantOffer(
+                new ItemCost(Items.EMERALD, 1), new ItemStack(Items.BREAD, 6), 16, 1, 0.05f);
+        MerchantOffer level2 = new MerchantOffer(
+                new ItemCost(Items.EMERALD, 1), new ItemStack(Items.BREAD, 12), 16, 1, 0.05f);
+        assertNotEquals(OfferIdentityHash.compute(level1), OfferIdentityHash.compute(level2));
+    }
+
+    @Test
+    void costACountChangeProducesDifferentHash() {
+        MerchantOffer cheap = new MerchantOffer(
+                new ItemCost(Items.WHEAT, 10), new ItemStack(Items.EMERALD, 1), 16, 1, 0.05f);
+        MerchantOffer expensive = new MerchantOffer(
+                new ItemCost(Items.WHEAT, 20), new ItemStack(Items.EMERALD, 1), 16, 1, 0.05f);
+        assertNotEquals(OfferIdentityHash.compute(cheap), OfferIdentityHash.compute(expensive));
+    }
+
+    @Test
+    void costBCountChangeProducesDifferentHash() {
+        MerchantOffer one = new MerchantOffer(
+                new ItemCost(Items.EMERALD, 1), Optional.of(new ItemCost(Items.PAPER, 1)),
+                new ItemStack(Items.ENCHANTED_BOOK, 1), 16, 1, 0.0f);
+        MerchantOffer five = new MerchantOffer(
+                new ItemCost(Items.EMERALD, 1), Optional.of(new ItemCost(Items.PAPER, 5)),
+                new ItemStack(Items.ENCHANTED_BOOK, 1), 16, 1, 0.0f);
+        assertNotEquals(OfferIdentityHash.compute(one), OfferIdentityHash.compute(five));
+    }
+
+    @Test
+    void emptyCostBHashStable() {
+        MerchantOffer noCostB1 = new MerchantOffer(
+                new ItemCost(Items.EMERALD, 1), new ItemStack(Items.APPLE, 3), 16, 1, 0.0f);
+        MerchantOffer noCostB2 = new MerchantOffer(
+                new ItemCost(Items.EMERALD, 1), new ItemStack(Items.APPLE, 3), 16, 1, 0.0f);
+        MerchantOffer noCostBDifferentResult = new MerchantOffer(
+                new ItemCost(Items.EMERALD, 1), new ItemStack(Items.APPLE, 6), 16, 1, 0.0f);
+        // empty costB segment is stable: same offer hashes identically
+        assertEquals(OfferIdentityHash.compute(noCostB1), OfferIdentityHash.compute(noCostB2));
+        // and different result counts still diverge even with no costB
+        assertNotEquals(OfferIdentityHash.compute(noCostB1), OfferIdentityHash.compute(noCostBDifferentResult));
+        // format sanity: no-costB hash contains || (empty middle segment)
+        String hash = OfferIdentityHash.compute(noCostB1);
+        assertTrue(hash.contains("||"), "Empty costB segment should produce || delimiter pair, got: " + hash);
     }
 }

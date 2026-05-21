@@ -12,11 +12,12 @@ import net.minecraft.world.entity.npc.Villager;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class FollowManager {
 
-    private static final Map<UUID, UUID> villagerToPlayer = new HashMap<>();
-    private static final Map<UUID, Set<UUID>> playerToVillagers = new HashMap<>();
+    private static final Map<UUID, UUID> villagerToPlayer = new ConcurrentHashMap<>();
+    private static final Map<UUID, Set<UUID>> playerToVillagers = new ConcurrentHashMap<>();
 
     public static boolean startFollowing(Villager villager, ServerPlayer player) {
         UUID villagerUuid = villager.getUUID();
@@ -31,15 +32,43 @@ public final class FollowManager {
             return false;
         }
 
-        int count = getFollowerCount(playerUuid);
-        if (count >= MercantileConfig.get().maxFollowingVillagers) {
+        int max = MercantileConfig.get().maxFollowingVillagers;
+        if (!tryRegister(villagerUuid, playerUuid, max)) {
             return false;
         }
 
-        villagerToPlayer.put(villagerUuid, playerUuid);
-        playerToVillagers.computeIfAbsent(playerUuid, k -> new HashSet<>()).add(villagerUuid);
         ((FollowableVillager) villager).mercantile$setFollowingSync(true);
         broadcastFollowState(villager, true);
+        return true;
+    }
+
+    // Package-private for unit testing — performs only the map work, no Villager interaction.
+    static boolean tryRegister(UUID villagerUuid, UUID playerUuid, int max) {
+        // Atomically claim this villager; fail fast if already owned by any player
+        if (villagerToPlayer.putIfAbsent(villagerUuid, playerUuid) != null) {
+            return false;
+        }
+        // Atomically add to the player set and check capacity; roll back on overflow
+        boolean[] accepted = {false};
+        playerToVillagers.compute(playerUuid, (k, set) -> {
+            if (set == null) set = ConcurrentHashMap.newKeySet();
+            if (set.size() < max) {
+                set.add(villagerUuid);
+                accepted[0] = true;
+            }
+            return set;
+        });
+        if (!accepted[0]) {
+            villagerToPlayer.remove(villagerUuid, playerUuid);
+            return false;
+        }
+        // If stopFollowing ran between putIfAbsent and compute, it removed villagerUuid from
+        // villagerToPlayer but couldn't yet remove it from playerToVillagers (not there yet).
+        // Detect and undo to maintain the two-map invariant.
+        if (!villagerToPlayer.containsKey(villagerUuid)) {
+            removeFromPlayerSet(playerUuid, villagerUuid);
+            return false;
+        }
         return true;
     }
 
@@ -49,13 +78,7 @@ public final class FollowManager {
         if (playerUuid == null) {
             return false;
         }
-        Set<UUID> followers = playerToVillagers.get(playerUuid);
-        if (followers != null) {
-            followers.remove(villagerUuid);
-            if (followers.isEmpty()) {
-                playerToVillagers.remove(playerUuid);
-            }
-        }
+        removeFromPlayerSet(playerUuid, villagerUuid);
         ((FollowableVillager) villager).mercantile$setFollowingSync(false);
         broadcastFollowState(villager, false);
         return true;
@@ -64,14 +87,17 @@ public final class FollowManager {
     public static void stopFollowing(UUID villagerUuid) {
         UUID playerUuid = villagerToPlayer.remove(villagerUuid);
         if (playerUuid != null) {
-            Set<UUID> followers = playerToVillagers.get(playerUuid);
-            if (followers != null) {
-                followers.remove(villagerUuid);
-                if (followers.isEmpty()) {
-                    playerToVillagers.remove(playerUuid);
-                }
-            }
+            removeFromPlayerSet(playerUuid, villagerUuid);
         }
+    }
+
+    // Atomically removes villagerUuid from the player's set; cleans up the outer entry if empty.
+    private static void removeFromPlayerSet(UUID playerUuid, UUID villagerUuid) {
+        playerToVillagers.compute(playerUuid, (k, set) -> {
+            if (set == null) return null;
+            set.remove(villagerUuid);
+            return set.isEmpty() ? null : set;
+        });
     }
 
     public static boolean isFollowing(Villager villager) {
@@ -97,7 +123,7 @@ public final class FollowManager {
 
     public static Set<UUID> getFollowers(UUID playerUuid) {
         Set<UUID> followers = playerToVillagers.get(playerUuid);
-        return followers == null ? Set.of() : Collections.unmodifiableSet(followers);
+        return followers == null ? Set.of() : Set.copyOf(followers);
     }
 
     public static void removePlayer(UUID playerUuid) {

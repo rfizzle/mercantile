@@ -15,6 +15,7 @@ public abstract class ThrownPotionSplashMixin {
 
     @Inject(method = "applySplash", at = @At("HEAD"))
     private void mercantile$enterHealingContext(Iterable<MobEffectInstance> iterable, @Nullable Entity entity, CallbackInfo ci) {
+        VillagerHealingContext.exit(); // reset any state leaked by a prior exception before RETURN
         VillagerHealingContext.enter();
     }
 

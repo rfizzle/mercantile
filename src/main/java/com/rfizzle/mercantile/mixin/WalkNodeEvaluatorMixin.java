@@ -25,6 +25,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+/**
+ * Two formerly separate RETURN injections on {@code WalkNodeEvaluator#getPathType} —
+ * fence-gate passability and water penalisation — have been merged into a single
+ * {@code mercantile$adjustPathType} method to eliminate injection-ordering ambiguity (BUG-042).
+ * The original value is snapshotted before any branch modifies the CIR so sub-config flags
+ * (enablePathfindingDoors, enablePathfindingWater) remain independently honoured.
+ */
 @Mixin(WalkNodeEvaluator.class)
 public abstract class WalkNodeEvaluatorMixin extends NodeEvaluator {
 
@@ -36,16 +43,22 @@ public abstract class WalkNodeEvaluatorMixin extends NodeEvaluator {
 
     @Inject(method = "getPathType(Lnet/minecraft/world/level/pathfinder/PathfindingContext;III)Lnet/minecraft/world/level/pathfinder/PathType;",
             at = @At("RETURN"), cancellable = true)
-    private void mercantile$treatFenceGateAsPassable(PathfindingContext ctx, int x, int y, int z,
-                                                     CallbackInfoReturnable<PathType> cir) {
-        if (cir.getReturnValue() != PathType.FENCE) return;
+    private void mercantile$adjustPathType(PathfindingContext ctx, int x, int y, int z,
+                                           CallbackInfoReturnable<PathType> cir) {
         if (!(this.mob instanceof Villager)) return;
         if (!MercantileConfig.get().enablePathfindingFixes) return;
-        if (!MercantileConfig.get().enablePathfindingDoors) return;
 
-        BlockState state = ctx.getBlockState(new BlockPos(x, y, z));
-        if (state.getBlock() instanceof FenceGateBlock && !state.getValue(FenceGateBlock.OPEN)) {
-            cir.setReturnValue(PathType.DOOR_WOOD_CLOSED);
+        PathType original = cir.getReturnValue();
+
+        if (original == PathType.FENCE && MercantileConfig.get().enablePathfindingDoors) {
+            BlockState state = ctx.getBlockState(new BlockPos(x, y, z));
+            if (state.getBlock() instanceof FenceGateBlock && !state.getValue(FenceGateBlock.OPEN)) {
+                cir.setReturnValue(PathType.DOOR_WOOD_CLOSED);
+            }
+        } else if (original == PathType.WATER && MercantileConfig.get().enablePathfindingWater) {
+            cir.setReturnValue(PathType.BLOCKED);
+        } else if (original == PathType.WATER_BORDER && MercantileConfig.get().enablePathfindingWater) {
+            cir.setReturnValue(PathType.DANGER_OTHER);
         }
     }
 
@@ -83,23 +96,6 @@ public abstract class WalkNodeEvaluatorMixin extends NodeEvaluator {
             return state.getValue(SlabBlock.TYPE) == SlabType.BOTTOM;
         }
         return false;
-    }
-
-    @Inject(method = "getPathType(Lnet/minecraft/world/level/pathfinder/PathfindingContext;III)Lnet/minecraft/world/level/pathfinder/PathType;",
-            at = @At("RETURN"), cancellable = true)
-    private void mercantile$penalizeWaterPaths(PathfindingContext ctx, int x, int y, int z,
-                                                CallbackInfoReturnable<PathType> cir) {
-        PathType type = cir.getReturnValue();
-        if (type != PathType.WATER_BORDER && type != PathType.WATER) return;
-        if (!(this.mob instanceof Villager)) return;
-        if (!MercantileConfig.get().enablePathfindingFixes) return;
-        if (!MercantileConfig.get().enablePathfindingWater) return;
-
-        if (type == PathType.WATER) {
-            cir.setReturnValue(PathType.BLOCKED);
-        } else {
-            cir.setReturnValue(PathType.DANGER_OTHER);
-        }
     }
 
     @Inject(method = "getNeighbors", at = @At("RETURN"), cancellable = true)

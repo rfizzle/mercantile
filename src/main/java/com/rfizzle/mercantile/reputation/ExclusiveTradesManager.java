@@ -30,10 +30,11 @@ public final class ExclusiveTradesManager {
     private static final String DATA_PATH = "exclusive_trades";
     private static final String CROSS_PROFESSION_KEY = "_mercantile";
 
-    private static final Map<String, List<ExclusiveTrade>> PROFESSION_TRADES = new HashMap<>();
-    private static final List<ExclusiveTrade> CROSS_PROFESSION_TRADES = new ArrayList<>();
+    private static volatile Map<String, List<ExclusiveTrade>> PROFESSION_TRADES = Map.of();
+    private static volatile List<ExclusiveTrade> CROSS_PROFESSION_TRADES = List.of();
 
-    private static final WeakHashMap<Villager, List<MerchantOffer>> INJECTED_OFFERS = new WeakHashMap<>();
+    private static final Map<Villager, List<MerchantOffer>> INJECTED_OFFERS =
+            Collections.synchronizedMap(new WeakHashMap<>());
 
     private ExclusiveTradesManager() {
     }
@@ -103,9 +104,10 @@ public final class ExclusiveTradesManager {
         };
     }
 
-    static void loadTrades(ResourceManager manager) {
-        PROFESSION_TRADES.clear();
-        CROSS_PROFESSION_TRADES.clear();
+    // @VisibleForTesting
+    public static void loadTrades(ResourceManager manager) {
+        Map<String, List<ExclusiveTrade>> nextProf = new HashMap<>();
+        List<ExclusiveTrade> nextCross = new ArrayList<>();
 
         Map<ResourceLocation, List<Resource>> found = manager.listResourceStacks(
                 DATA_PATH, id -> id.getPath().endsWith(".json"));
@@ -118,8 +120,8 @@ public final class ExclusiveTradesManager {
             boolean isCrossProfession = CROSS_PROFESSION_KEY.equals(professionName);
 
             List<ExclusiveTrade> merged = isCrossProfession
-                    ? CROSS_PROFESSION_TRADES
-                    : PROFESSION_TRADES.computeIfAbsent(professionName, k -> new ArrayList<>());
+                    ? nextCross
+                    : nextProf.computeIfAbsent(professionName, k -> new ArrayList<>());
 
             for (Resource resource : entry.getValue()) {
                 try (BufferedReader reader = new BufferedReader(
@@ -152,6 +154,14 @@ public final class ExclusiveTradesManager {
                 }
             }
         }
+
+        // Deep-copy list values before publishing immutable snapshot
+        Map<String, List<ExclusiveTrade>> immutableProf = new HashMap<>();
+        for (var e : nextProf.entrySet()) {
+            immutableProf.put(e.getKey(), List.copyOf(e.getValue()));
+        }
+        PROFESSION_TRADES = Map.copyOf(immutableProf);
+        CROSS_PROFESSION_TRADES = List.copyOf(nextCross);
 
         int profCount = PROFESSION_TRADES.values().stream().mapToInt(List::size).sum();
         int crossCount = CROSS_PROFESSION_TRADES.size();

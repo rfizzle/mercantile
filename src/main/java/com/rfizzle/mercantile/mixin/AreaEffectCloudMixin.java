@@ -12,6 +12,7 @@ public abstract class AreaEffectCloudMixin {
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void mercantile$enterHealingContext(CallbackInfo ci) {
+        VillagerHealingContext.exit(); // reset any state leaked by a prior exception before RETURN
         VillagerHealingContext.enter();
     }
 

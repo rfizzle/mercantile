@@ -1,20 +1,20 @@
 package com.rfizzle.mercantile.healing;
 
 public final class VillagerHealingContext {
-    private static boolean active;
+    private static final ThreadLocal<Boolean> ACTIVE = ThreadLocal.withInitial(() -> false);
 
     private VillagerHealingContext() {
     }
 
     public static void enter() {
-        active = true;
+        ACTIVE.set(true);
     }
 
     public static void exit() {
-        active = false;
+        ACTIVE.remove();
     }
 
     public static boolean isActive() {
-        return active;
+        return ACTIVE.get();
     }
 }

@@ -35,7 +35,7 @@ public class VillagerNameManager {
     );
 
     private static final Map<ResourceKey<Biome>, String> BIOME_TO_CATEGORY = new HashMap<>();
-    private static final Map<String, List<String>> NAME_POOLS = new HashMap<>();
+    private static volatile Map<String, List<String>> NAME_POOLS = Map.of();
 
     static {
         mapBiome(Biomes.PLAINS, "plains");
@@ -156,13 +156,12 @@ public class VillagerNameManager {
         villager.setCustomNameVisible(true);
     }
 
-    static void loadNamePools(ResourceManager manager) {
-        NAME_POOLS.clear();
+    public static void loadNamePools(ResourceManager manager) {
+        Map<String, List<String>> next = new HashMap<>();
 
         for (String category : CATEGORIES) {
             ResourceLocation id = Mercantile.id(DATA_PATH + "/" + category + ".json");
             List<String> merged = new ArrayList<>();
-            boolean replaced = false;
 
             List<Resource> resources = manager.getResourceStack(id);
             for (Resource resource : resources) {
@@ -174,7 +173,6 @@ public class VillagerNameManager {
                     boolean replace = json.has("replace") && json.get("replace").getAsBoolean();
                     if (replace) {
                         merged.clear();
-                        replaced = true;
                     }
 
                     if (json.has("names")) {
@@ -192,11 +190,14 @@ public class VillagerNameManager {
             }
 
             if (!merged.isEmpty()) {
-                NAME_POOLS.put(category, List.copyOf(merged));
+                next.put(category, List.copyOf(merged));
             }
         }
 
-        int total = NAME_POOLS.values().stream().mapToInt(List::size).sum();
-        Mercantile.LOGGER.info("Loaded {} villager names across {} pools", total, NAME_POOLS.size());
+        int total = next.values().stream().mapToInt(List::size).sum();
+        int poolCount = next.size();
+        NAME_POOLS = Map.copyOf(next);
+
+        Mercantile.LOGGER.info("Loaded {} villager names across {} pools", total, poolCount);
     }
 }

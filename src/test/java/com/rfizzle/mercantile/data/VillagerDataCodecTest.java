@@ -63,7 +63,7 @@ class VillagerDataCodecTest {
 
     @Test
     void constructorWithValues() {
-        VillagerData data = new VillagerData(true, Set.of("h1", "h2"), true, false);
+        VillagerData data = new VillagerData(true, Set.of("h1", "h2"), true, false, false);
 
         assertTrue(data.isProfessionLocked());
         assertEquals(2, data.getLockedTrades().size());
