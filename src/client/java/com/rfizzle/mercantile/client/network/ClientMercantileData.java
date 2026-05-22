@@ -11,7 +11,7 @@ import java.util.Map;
 public class ClientMercantileData {
 
     private static int reputationScore = 0;
-    private static String reputationTier = "Neutral";
+    private static String reputationTier = "mercantile.tier.neutral";
 
     private static @Nullable RestockTimerS2CPayload restockTimer;
     private static @Nullable DemandPriceS2CPayload demandPrice;
@@ -126,7 +126,7 @@ public class ClientMercantileData {
 
     public static void clear() {
         reputationScore = 0;
-        reputationTier = "Neutral";
+        reputationTier = "mercantile.tier.neutral";
         restockTimer = null;
         demandPrice = null;
         villagerInfo = null;

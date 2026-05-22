@@ -6,7 +6,10 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
-public record SyncReputationS2CPayload(int score, String tierName) implements CustomPacketPayload {
+public record SyncReputationS2CPayload(
+        int score,
+        String tierKey  // translation key; display via Component.translatable(tierKey)
+) implements CustomPacketPayload {
 
     public static final Type<SyncReputationS2CPayload> TYPE =
             new Type<>(Mercantile.id("sync_reputation_s2c"));
@@ -14,7 +17,7 @@ public record SyncReputationS2CPayload(int score, String tierName) implements Cu
     public static final StreamCodec<ByteBuf, SyncReputationS2CPayload> CODEC =
             StreamCodec.composite(
                     ByteBufCodecs.VAR_INT, SyncReputationS2CPayload::score,
-                    ByteBufCodecs.STRING_UTF8, SyncReputationS2CPayload::tierName,
+                    ByteBufCodecs.STRING_UTF8, SyncReputationS2CPayload::tierKey,
                     SyncReputationS2CPayload::new);
 
     @Override

@@ -1,6 +1,5 @@
 package com.rfizzle.mercantile.reputation;
 
-import com.rfizzle.mercantile.command.MercantileCommands;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
@@ -46,6 +45,7 @@ public final class ReputationManager {
             if (!MercantileConfig.get().enableReputation) return;
             if (!(entity instanceof Villager)) return;
             if (damageTaken <= 0) return;
+            if (!entity.isAlive() || entity.isDeadOrDying()) return;
             if (source.getEntity() instanceof ServerPlayer player) {
                 modifyScore(player, -MercantileConfig.get().reputationAttackLoss);
             }
@@ -74,24 +74,16 @@ public final class ReputationManager {
 
     private static void syncToClient(ServerPlayer player, PlayerData data) {
         if (player.connection == null) return;
-        String tier = MercantileCommands.getTierName(data.getScore());
-        ServerPlayNetworking.send(player, new SyncReputationS2CPayload(data.getScore(), tier));
+        String tierKey = ReputationTier.fromScore(data.getScore()).translationKey();
+        ServerPlayNetworking.send(player, new SyncReputationS2CPayload(data.getScore(), tierKey));
     }
 
     public static int getPriceModifier(int score, int basePrice) {
-        if (score >= 100) return -Math.round(basePrice * 0.15f);
-        if (score >= 50) return -Math.round(basePrice * 0.10f);
-        if (score >= 1) return -Math.round(basePrice * 0.05f);
-        if (score == 0) return 0;
-        if (score >= -49) {
-            float markupPercent = (10f + 15f * (-score - 1) / 48f) / 100f;
-            return Math.round(basePrice * markupPercent);
-        }
-        return 0;
+        return ReputationTier.priceModifierForScore(score, basePrice);
     }
 
     public static boolean isReviled(int score) {
-        return score <= -50;
+        return ReputationTier.fromScore(score) == ReputationTier.REVILED;
     }
 
     private static void tickProximity(ServerPlayer player) {
@@ -109,7 +101,7 @@ public final class ReputationManager {
             return;
         }
 
-        long currentDay = level.getDayTime() / 24_000L;
+        long currentDay = level.getGameTime() / 24_000L;
         if (data.getLastProximityDay() >= currentDay) {
             data.setProximityTicks(0);
             return;

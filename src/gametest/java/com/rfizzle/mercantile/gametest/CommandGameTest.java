@@ -1,10 +1,10 @@
 package com.rfizzle.mercantile.gametest;
 
 import com.mojang.authlib.GameProfile;
-import com.rfizzle.mercantile.command.MercantileCommands;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
+import com.rfizzle.mercantile.reputation.ReputationTier;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -64,7 +64,7 @@ public class CommandGameTest implements FabricGameTest {
         data.setScore(75);
 
         helper.assertTrue(data.getScore() == 75, "score should read back from attachment");
-        helper.assertTrue("Trusted".equals(MercantileCommands.getTierName(data.getScore())),
+        helper.assertTrue(ReputationTier.TRUSTED == ReputationTier.fromScore(data.getScore()),
                 "score 75 should map to Trusted tier");
 
         var source = player.createCommandSourceStack();
@@ -126,17 +126,17 @@ public class CommandGameTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void tierNameBoundaries(GameTestHelper helper) {
-        helper.assertTrue("Reviled".equals(MercantileCommands.getTierName(-100)), "-100 -> Reviled");
-        helper.assertTrue("Reviled".equals(MercantileCommands.getTierName(-50)), "-50 -> Reviled");
-        helper.assertTrue("Distrusted".equals(MercantileCommands.getTierName(-49)), "-49 -> Distrusted");
-        helper.assertTrue("Distrusted".equals(MercantileCommands.getTierName(-1)), "-1 -> Distrusted");
-        helper.assertTrue("Neutral".equals(MercantileCommands.getTierName(0)), "0 -> Neutral");
-        helper.assertTrue("Liked".equals(MercantileCommands.getTierName(1)), "1 -> Liked");
-        helper.assertTrue("Liked".equals(MercantileCommands.getTierName(49)), "49 -> Liked");
-        helper.assertTrue("Trusted".equals(MercantileCommands.getTierName(50)), "50 -> Trusted");
-        helper.assertTrue("Trusted".equals(MercantileCommands.getTierName(99)), "99 -> Trusted");
-        helper.assertTrue("Honored".equals(MercantileCommands.getTierName(100)), "100 -> Honored");
-        helper.assertTrue("Honored".equals(MercantileCommands.getTierName(200)), "200 -> Honored");
+        helper.assertTrue(ReputationTier.REVILED == ReputationTier.fromScore(-100), "-100 -> REVILED");
+        helper.assertTrue(ReputationTier.REVILED == ReputationTier.fromScore(-50), "-50 -> REVILED");
+        helper.assertTrue(ReputationTier.DISTRUSTED == ReputationTier.fromScore(-49), "-49 -> DISTRUSTED");
+        helper.assertTrue(ReputationTier.DISTRUSTED == ReputationTier.fromScore(-1), "-1 -> DISTRUSTED");
+        helper.assertTrue(ReputationTier.NEUTRAL == ReputationTier.fromScore(0), "0 -> NEUTRAL");
+        helper.assertTrue(ReputationTier.LIKED == ReputationTier.fromScore(1), "1 -> LIKED");
+        helper.assertTrue(ReputationTier.LIKED == ReputationTier.fromScore(49), "49 -> LIKED");
+        helper.assertTrue(ReputationTier.TRUSTED == ReputationTier.fromScore(50), "50 -> TRUSTED");
+        helper.assertTrue(ReputationTier.TRUSTED == ReputationTier.fromScore(99), "99 -> TRUSTED");
+        helper.assertTrue(ReputationTier.HONORED == ReputationTier.fromScore(100), "100 -> HONORED");
+        helper.assertTrue(ReputationTier.HONORED == ReputationTier.fromScore(200), "200 -> HONORED");
         helper.succeed();
     }
 

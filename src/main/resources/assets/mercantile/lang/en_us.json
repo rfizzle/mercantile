@@ -120,6 +120,13 @@
     "mercantile.follow.denied.baby": "Baby villagers cannot follow you",
     "mercantile.follow.released": "Villager stopped following — too far away",
 
+    "mercantile.tier.honored":    "Honored",
+    "mercantile.tier.trusted":    "Trusted",
+    "mercantile.tier.liked":      "Liked",
+    "mercantile.tier.neutral":    "Neutral",
+    "mercantile.tier.distrusted": "Distrusted",
+    "mercantile.tier.reviled":    "Reviled",
+
     "mercantile.trade.denied.reviled": "This villager refuses to trade with you",
 
     "gui.mercantile.bulk_trade.feedback": "Traded %sx %s",

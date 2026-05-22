@@ -6,6 +6,7 @@ import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
 import com.rfizzle.mercantile.network.ConfigSyncS2CPayload;
+import com.rfizzle.mercantile.reputation.ReputationTier;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.commands.CommandSourceStack;
@@ -56,7 +57,7 @@ public final class MercantileCommands {
         }
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         int score = data.getScore();
-        String tier = getTierName(score);
+        Component tier = ReputationTier.fromScore(score).displayName();
         source.sendSuccess(() -> Component.translatable("command.mercantile.reputation.self", score, tier), false);
         return score;
     }
@@ -64,7 +65,7 @@ public final class MercantileCommands {
     private static int showPlayerReputation(CommandSourceStack source, ServerPlayer target) {
         PlayerData data = target.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         int score = data.getScore();
-        String tier = getTierName(score);
+        Component tier = ReputationTier.fromScore(score).displayName();
         source.sendSuccess(() -> Component.translatable("command.mercantile.reputation.other",
                 target.getDisplayName(), score, tier), false);
         return score;
@@ -73,7 +74,7 @@ public final class MercantileCommands {
     private static int setReputation(CommandSourceStack source, ServerPlayer target, int value) {
         PlayerData data = target.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         data.setScore(value);
-        String tier = getTierName(value);
+        Component tier = ReputationTier.fromScore(value).displayName();
         source.sendSuccess(() -> Component.translatable("command.mercantile.reputation.set",
                 target.getDisplayName(), value, tier), true);
         return value;
@@ -83,7 +84,7 @@ public final class MercantileCommands {
         PlayerData data = target.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         int newScore = Math.max(-100, Math.min(200, data.getScore() + amount));
         data.setScore(newScore);
-        String tier = getTierName(newScore);
+        Component tier = ReputationTier.fromScore(newScore).displayName();
         source.sendSuccess(() -> Component.translatable("command.mercantile.reputation.add",
                 amount, target.getDisplayName(), newScore, tier), true);
         return newScore;
@@ -114,14 +115,5 @@ public final class MercantileCommands {
         }
         source.sendSuccess(() -> Component.translatable("command.mercantile.reload"), true);
         return 1;
-    }
-
-    public static String getTierName(int score) {
-        if (score >= 100) return "Honored";
-        if (score >= 50) return "Trusted";
-        if (score >= 1) return "Liked";
-        if (score == 0) return "Neutral";
-        if (score >= -49) return "Distrusted";
-        return "Reviled";
     }
 }

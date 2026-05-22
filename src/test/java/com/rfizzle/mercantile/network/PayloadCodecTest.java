@@ -57,13 +57,13 @@ class PayloadCodecTest {
 
     @Test
     void syncReputationS2C() {
-        var original = new SyncReputationS2CPayload(75, "Trusted");
+        var original = new SyncReputationS2CPayload(75, "mercantile.tier.trusted");
         assertEquals(original, roundTrip(SyncReputationS2CPayload.CODEC, original));
     }
 
     @Test
     void syncReputationS2CNegativeScore() {
-        var original = new SyncReputationS2CPayload(-80, "Reviled");
+        var original = new SyncReputationS2CPayload(-80, "mercantile.tier.reviled");
         assertEquals(original, roundTrip(SyncReputationS2CPayload.CODEC, original));
     }
 
@@ -116,14 +116,14 @@ class PayloadCodecTest {
     @Test
     void villagerInfoPanelS2C() {
         var original = new VillagerInfoPanelS2CPayload(
-                42, "farmer", 3, 150, 250, 75, "Trusted", 28, true, true);
+                42, "farmer", 3, 150, 250, 75, "mercantile.tier.trusted", 28, true, true);
         assertEquals(original, roundTrip(VillagerInfoPanelS2CPayload.CODEC, original));
     }
 
     @Test
     void villagerInfoPanelS2CDefaults() {
         var original = new VillagerInfoPanelS2CPayload(
-                1, "none", 1, 0, 10, 0, "Neutral", 0, false, false);
+                1, "none", 1, 0, 10, 0, "mercantile.tier.neutral", 0, false, false);
         assertEquals(original, roundTrip(VillagerInfoPanelS2CPayload.CODEC, original));
     }
 

@@ -5,6 +5,9 @@ import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -127,5 +130,57 @@ class PlayerDataCodecTest {
                 () -> data.getCuredVillagers().add(UUID.randomUUID()));
         assertThrows(UnsupportedOperationException.class,
                 () -> data.getTradeStats().put(UUID.randomUUID(), 1));
+    }
+
+    @Test
+    void curedVillagersCappedAtMax() {
+        PlayerData data = new PlayerData();
+        for (int i = 0; i < PlayerData.MAX_CURED_VILLAGERS + 100; i++) {
+            data.addCuredVillager(UUID.randomUUID());
+        }
+        assertEquals(PlayerData.MAX_CURED_VILLAGERS, data.getCuredVillagers().size(),
+                "curedVillagers must not exceed MAX_CURED_VILLAGERS");
+    }
+
+    @Test
+    void curedVillagersCapSurvivesRoundTrip() {
+        PlayerData original = new PlayerData();
+        List<UUID> inserted = new ArrayList<>();
+        for (int i = 0; i < PlayerData.MAX_CURED_VILLAGERS; i++) {
+            UUID id = new UUID(0L, i); // deterministic, ordered
+            original.addCuredVillager(id);
+            inserted.add(id);
+        }
+        assertEquals(PlayerData.MAX_CURED_VILLAGERS, original.getCuredVillagers().size());
+
+        JsonElement encoded = PlayerData.CODEC.encodeStart(JsonOps.INSTANCE, original).getOrThrow();
+        PlayerData decoded = PlayerData.CODEC.parse(JsonOps.INSTANCE, encoded).getOrThrow();
+
+        assertEquals(PlayerData.MAX_CURED_VILLAGERS, decoded.getCuredVillagers().size(),
+                "cap must be preserved after codec round-trip");
+
+        // FIFO eviction must survive the round-trip: the first-inserted UUID must be evicted
+        UUID overflow = new UUID(1L, 0L);
+        decoded.addCuredVillager(overflow);
+        assertEquals(PlayerData.MAX_CURED_VILLAGERS, decoded.getCuredVillagers().size(),
+                "adding beyond cap after round-trip must evict oldest");
+        assertFalse(decoded.hasCuredVillager(inserted.get(0)),
+                "FIFO eviction must remove the first-inserted entry after round-trip");
+        assertTrue(decoded.hasCuredVillager(inserted.get(PlayerData.MAX_CURED_VILLAGERS - 1)),
+                "most-recently-inserted entry must survive eviction");
+        assertTrue(decoded.hasCuredVillager(overflow),
+                "newly added entry must be present");
+    }
+
+    @Test
+    void curedVillagersConstructorClampsOversizedInput() {
+        Set<UUID> oversized = new LinkedHashSet<>();
+        for (int i = 0; i < PlayerData.MAX_CURED_VILLAGERS + 50; i++) {
+            oversized.add(UUID.randomUUID());
+        }
+
+        PlayerData data = new PlayerData(0, 0, -1L, oversized, Map.of());
+        assertEquals(PlayerData.MAX_CURED_VILLAGERS, data.getCuredVillagers().size(),
+                "constructor must clamp oversized curedVillagers input to MAX_CURED_VILLAGERS");
     }
 }

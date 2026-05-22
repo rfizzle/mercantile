@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.rfizzle.mercantile.Mercantile;
+import com.rfizzle.mercantile.config.MercantileConfig;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -66,12 +67,17 @@ public final class ExclusiveTradesManager {
     }
 
     public static void injectOffers(Villager villager, int playerScore) {
+        if (!MercantileConfig.get().enableReputation) return;
+
+        Map<String, List<ExclusiveTrade>> profTrades = PROFESSION_TRADES;
+        List<ExclusiveTrade> crossTrades = CROSS_PROFESSION_TRADES;
+
         String profession = BuiltInRegistries.VILLAGER_PROFESSION
                 .getKey(villager.getVillagerData().getProfession()).getPath();
 
         List<MerchantOffer> toInject = new ArrayList<>();
 
-        List<ExclusiveTrade> professionTrades = PROFESSION_TRADES.get(profession);
+        List<ExclusiveTrade> professionTrades = profTrades.get(profession);
         if (professionTrades != null) {
             for (ExclusiveTrade trade : professionTrades) {
                 if (playerScore >= trade.minScore()) {
@@ -80,7 +86,7 @@ public final class ExclusiveTradesManager {
             }
         }
 
-        for (ExclusiveTrade trade : CROSS_PROFESSION_TRADES) {
+        for (ExclusiveTrade trade : crossTrades) {
             if (playerScore >= trade.minScore()) {
                 toInject.add(trade.createOffer());
             }
@@ -90,18 +96,6 @@ public final class ExclusiveTradesManager {
 
         villager.getOffers().addAll(toInject);
         INJECTED_OFFERS.put(villager, toInject);
-    }
-
-    static int getMinScoreForTier(String tierName) {
-        return switch (tierName.toLowerCase(Locale.ROOT)) {
-            case "honored" -> 100;
-            case "trusted" -> 50;
-            case "liked" -> 1;
-            case "neutral" -> 0;
-            case "distrusted" -> -49;
-            case "reviled" -> -100;
-            default -> 0;
-        };
     }
 
     // @VisibleForTesting
@@ -133,8 +127,8 @@ public final class ExclusiveTradesManager {
                         merged.clear();
                     }
 
-                    int defaultMinScore = getMinScoreForTier(
-                            json.has("min_tier") ? json.get("min_tier").getAsString() : "trusted");
+                    int defaultMinScore = ReputationTier.fromName(
+                            json.has("min_tier") ? json.get("min_tier").getAsString() : "trusted").minScore();
 
                     if (!json.has("trades")) continue;
 
@@ -183,7 +177,7 @@ public final class ExclusiveTradesManager {
         float priceMultiplier = json.has("price_multiplier") ? json.get("price_multiplier").getAsFloat() : 0.05f;
 
         int minScore = json.has("min_tier_override")
-                ? getMinScoreForTier(json.get("min_tier_override").getAsString())
+                ? ReputationTier.fromName(json.get("min_tier_override").getAsString()).minScore()
                 : defaultMinScore;
 
         return new ExclusiveTrade(input1, input2, output, maxUses, xpGain, priceMultiplier, minScore);

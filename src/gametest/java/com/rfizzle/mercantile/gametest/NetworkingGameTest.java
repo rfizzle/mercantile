@@ -29,7 +29,7 @@ public class NetworkingGameTest implements FabricGameTest {
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
 
         var infoPayload = new VillagerInfoPanelS2CPayload(
-                villager.getId(), "farmer", 1, 0, 10, 0, "Neutral", 0, false, false);
+                villager.getId(), "farmer", 1, 0, 10, 0, "mercantile.tier.neutral", 0, false, false);
         VillagerInfoPanelS2CPayload.CODEC.encode(buf, infoPayload);
         VillagerInfoPanelS2CPayload decoded = VillagerInfoPanelS2CPayload.CODEC.decode(buf);
         helper.assertTrue(decoded.villagerEntityId() == villager.getId(),

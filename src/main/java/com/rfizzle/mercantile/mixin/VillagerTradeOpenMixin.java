@@ -1,7 +1,7 @@
 package com.rfizzle.mercantile.mixin;
 
-import com.rfizzle.mercantile.command.MercantileCommands;
 import com.rfizzle.mercantile.config.MercantileConfig;
+import com.rfizzle.mercantile.reputation.ReputationTier;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
 import com.rfizzle.mercantile.network.VillagerInfoPanelS2CPayload;
@@ -34,6 +34,7 @@ public abstract class VillagerTradeOpenMixin {
 
         if (!MercantileConfig.get().enableReputation) return;
         if (!(player instanceof ServerPlayer serverPlayer)) return;
+        if (serverPlayer.connection == null) return;
 
         PlayerData data = serverPlayer.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         if (!ReputationManager.isReviled(data.getScore())) return;
@@ -58,6 +59,7 @@ public abstract class VillagerTradeOpenMixin {
     private void mercantile$applyReputationEffects(Player player, CallbackInfo ci) {
         if (!MercantileConfig.get().enableReputation) return;
         if (!(player instanceof ServerPlayer serverPlayer)) return;
+        if (serverPlayer.connection == null) return;
 
         PlayerData data = serverPlayer.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         int score = data.getScore();
@@ -69,7 +71,8 @@ public abstract class VillagerTradeOpenMixin {
                 int basePrice = offer.getBaseCostA().getCount();
                 int modifier = ReputationManager.getPriceModifier(score, basePrice);
                 if (modifier != 0) {
-                    offer.setSpecialPriceDiff(offer.getSpecialPriceDiff() + modifier);
+                    // Intentional absolute set: mod fully owns reputation pricing, superseding vanilla's Hero-of-the-Village discount.
+                    offer.setSpecialPriceDiff(modifier);
                 }
             }
         }
@@ -80,6 +83,7 @@ public abstract class VillagerTradeOpenMixin {
     @Inject(method = "startTrading", at = @At("TAIL"))
     private void mercantile$sendInfoOnTradeOpen(Player player, CallbackInfo ci) {
         if (!(player instanceof ServerPlayer serverPlayer)) return;
+        if (serverPlayer.connection == null) return;
 
         Villager self = (Villager) (Object) this;
         net.minecraft.world.entity.npc.VillagerData vd = self.getVillagerData();
@@ -93,7 +97,7 @@ public abstract class VillagerTradeOpenMixin {
 
         PlayerData playerData = serverPlayer.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         int reputation = playerData.getScore();
-        String reputationTier = MercantileCommands.getTierName(reputation);
+        String reputationTier = ReputationTier.fromScore(reputation).translationKey();
 
         int totalTrades = self.getOffers().size();
         boolean hasWorkstation = self.getBrain()

@@ -12,7 +12,7 @@ public record VillagerInfoPanelS2CPayload(
         int xp,
         int xpToNextLevel,
         int reputation,
-        String reputationTier,
+        String reputationTier,  // translation key; display via Component.translatable(reputationTier)
         int totalTrades,
         boolean hasWorkstation,
         boolean professionLocked
