@@ -1,3 +1,5 @@
+import java.util.concurrent.TimeUnit
+
 plugins {
     id 'fabric-loom' version "${loom_version}"
 }
@@ -45,7 +47,11 @@ def runGitDescribe(String tagPrefix) {
                 .directory(rootDir)
                 .redirectErrorStream(true)
                 .start()
-        proc.waitFor()
+        def finished = proc.waitFor(10, TimeUnit.SECONDS)
+        if (!finished) {
+            proc.destroyForcibly()
+            return null
+        }
         def out = proc.inputStream.text.trim()
         if (proc.exitValue() != 0) return null
         return out
@@ -103,10 +109,6 @@ repositories {
     }
 }
 
-loom {
-    splitEnvironmentSourceSets()
-}
-
 sourceSets {
     gametest {
         compileClasspath += sourceSets.main.compileClasspath + sourceSets.main.output
@@ -120,6 +122,8 @@ configurations {
 }
 
 loom {
+    splitEnvironmentSourceSets()
+
     runs {
         gametest {
             server()
