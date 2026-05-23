@@ -8,6 +8,8 @@ import com.rfizzle.mercantile.client.particle.GolemShardParticle;
 import com.rfizzle.mercantile.client.particle.PickupSparkleParticle;
 import com.rfizzle.mercantile.client.particle.PylonMoteParticle;
 import com.rfizzle.mercantile.client.particle.PylonSparkParticle;
+import com.rfizzle.mercantile.client.visualization.BellGlowTracker;
+import com.rfizzle.mercantile.client.visualization.BellRadiusRenderer;
 import com.rfizzle.mercantile.client.visualization.WorkstationLinkRenderer;
 import com.rfizzle.mercantile.particle.MercantileParticles;
 import net.fabricmc.api.ClientModInitializer;
@@ -21,7 +23,11 @@ public class MercantileClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ClientNetworkHandler.init();
-        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ClientMercantileData.clear());
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+            ClientMercantileData.clear();
+            BellGlowTracker.clear();
+            BellRadiusRenderer.clearPending();
+        });
         ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
             if (screen instanceof MerchantScreen) {
                 ScreenEvents.remove(screen).register(s -> ClientMercantileData.clearMerchantScreenData());
@@ -34,5 +40,6 @@ public class MercantileClient implements ClientModInitializer {
         ParticleFactoryRegistry.getInstance().register(MercantileParticles.PYLON_SPARK, PylonSparkParticle.Provider::new);
         ParticleFactoryRegistry.getInstance().register(MercantileParticles.GOLEM_SHARD, GolemShardParticle.Provider::new);
         ClientTickEvents.END_CLIENT_TICK.register(WorkstationLinkRenderer::tick);
+        ClientTickEvents.END_CLIENT_TICK.register(BellRadiusRenderer::tick);
     }
 }

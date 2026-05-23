@@ -52,6 +52,7 @@ public class MercantileNetworking {
         PayloadTypeRegistry.playS2C().register(DemandPriceS2CPayload.TYPE, DemandPriceS2CPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(VillagerInfoPanelS2CPayload.TYPE, VillagerInfoPanelS2CPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(WorkstationMapS2CPayload.TYPE, WorkstationMapS2CPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(BellRingS2CPayload.TYPE, BellRingS2CPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(VillageBoundsS2CPayload.TYPE, VillageBoundsS2CPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(ConfigSyncS2CPayload.TYPE, ConfigSyncS2CPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(PylonStateS2CPayload.TYPE, PylonStateS2CPayload.CODEC);

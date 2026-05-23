@@ -29,7 +29,8 @@
             "com.rfizzle.mercantile.gametest.SentryGolemBehaviorGameTest",
             "com.rfizzle.mercantile.gametest.SentryPylonCraftingGameTest",
             "com.rfizzle.mercantile.gametest.WorkstationLinkGameTest",
-            "com.rfizzle.mercantile.gametest.WorkstationLinkClientGameTest"
+            "com.rfizzle.mercantile.gametest.WorkstationLinkClientGameTest",
+            "com.rfizzle.mercantile.gametest.BellRadiusGameTest"
         ]
     },
     "custom": {
