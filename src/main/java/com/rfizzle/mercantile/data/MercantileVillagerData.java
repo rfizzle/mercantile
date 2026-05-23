@@ -7,22 +7,23 @@ import net.minecraft.world.item.trading.MerchantOffer;
 
 import java.util.*;
 
-public class VillagerData {
-    public static final Codec<VillagerData> CODEC = RecordCodecBuilder.create(instance ->
+public class MercantileVillagerData {
+    public static final Codec<MercantileVillagerData> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
                     Codec.BOOL.optionalFieldOf("professionLocked", false)
-                            .forGetter(VillagerData::isProfessionLocked),
+                            .forGetter(MercantileVillagerData::isProfessionLocked),
                     Codec.STRING.listOf()
-                            .xmap(list -> (Set<String>) new HashSet<>(list), List::copyOf)
+                            .xmap(list -> (Set<String>) new HashSet<>(list),
+                                  set -> set.stream().sorted().toList())
                             .optionalFieldOf("lockedTrades", Set.of())
-                            .forGetter(VillagerData::getLockedTrades),
+                            .forGetter(MercantileVillagerData::getLockedTrades),
                     Codec.BOOL.optionalFieldOf("nameAssigned", false)
-                            .forGetter(VillagerData::isNameAssigned),
+                            .forGetter(MercantileVillagerData::isNameAssigned),
                     Codec.BOOL.optionalFieldOf("healBoosted", false)
-                            .forGetter(VillagerData::isHealBoosted),
+                            .forGetter(MercantileVillagerData::isHealBoosted),
                     Codec.BOOL.optionalFieldOf("tradesMigrated", false)
-                            .forGetter(VillagerData::isTradesMigrated)
-            ).apply(instance, VillagerData::new)
+                            .forGetter(MercantileVillagerData::isTradesMigrated)
+            ).apply(instance, MercantileVillagerData::new)
     );
 
     private boolean professionLocked;
@@ -31,11 +32,11 @@ public class VillagerData {
     private boolean healBoosted;
     private boolean tradesMigrated;
 
-    public VillagerData() {
+    public MercantileVillagerData() {
         this(false, Set.of(), false, false, false);
     }
 
-    public VillagerData(boolean professionLocked, Set<String> lockedTrades, boolean nameAssigned, boolean healBoosted, boolean tradesMigrated) {
+    public MercantileVillagerData(boolean professionLocked, Set<String> lockedTrades, boolean nameAssigned, boolean healBoosted, boolean tradesMigrated) {
         this.professionLocked = professionLocked;
         this.lockedTrades = new HashSet<>(lockedTrades);
         this.nameAssigned = nameAssigned;

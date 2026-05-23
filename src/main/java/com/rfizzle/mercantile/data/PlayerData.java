@@ -11,6 +11,8 @@ public class PlayerData {
     public static final int MAX_SCORE = 200;
     /** Max tracked cured villagers per player; ~32 KB serialized UUID footprint at this limit. */
     public static final int MAX_CURED_VILLAGERS = 1024;
+    /** Max tracked trade-stat entries per player; bounded to keep serialized footprint predictable. */
+    public static final int MAX_TRADE_STATS = 1024;
 
     public static final Codec<PlayerData> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
@@ -31,14 +33,14 @@ public class PlayerData {
     private int proximityTicks;
     private long lastProximityDay;
     private final LinkedHashSet<UUID> curedVillagers;
-    private final Map<UUID, Integer> tradeStats;
+    private final LinkedHashMap<UUID, Integer> tradeStats;
 
     public PlayerData() {
         this(0, 0, -1L, Set.of(), Map.of());
     }
 
     public PlayerData(int score, int proximityTicks, long lastProximityDay, Set<UUID> curedVillagers, Map<UUID, Integer> tradeStats) {
-        this.score = score;
+        this.score = Math.clamp(score, MIN_SCORE, MAX_SCORE);
         this.proximityTicks = proximityTicks;
         this.lastProximityDay = lastProximityDay;
         LinkedHashSet<UUID> cv = new LinkedHashSet<>(curedVillagers);
@@ -48,7 +50,13 @@ public class PlayerData {
             it.remove();
         }
         this.curedVillagers = cv;
-        this.tradeStats = new HashMap<>(tradeStats);
+        LinkedHashMap<UUID, Integer> ts = new LinkedHashMap<>(tradeStats);
+        Iterator<UUID> tsIt = ts.keySet().iterator();
+        while (ts.size() > MAX_TRADE_STATS && tsIt.hasNext()) {
+            tsIt.next();
+            tsIt.remove();
+        }
+        this.tradeStats = ts;
     }
 
     public int getScore() {
@@ -107,6 +115,13 @@ public class PlayerData {
     }
 
     public void incrementTradesWithVillager(UUID villagerUuid) {
-        tradeStats.merge(villagerUuid, 1, Integer::sum);
+        Integer existing = tradeStats.remove(villagerUuid);
+        if (existing == null && tradeStats.size() >= MAX_TRADE_STATS) {
+            Iterator<UUID> it = tradeStats.keySet().iterator();
+            it.next();
+            it.remove();
+        }
+        int newVal = (existing == null ? 0 : existing) + 1;
+        tradeStats.put(villagerUuid, newVal);
     }
 }

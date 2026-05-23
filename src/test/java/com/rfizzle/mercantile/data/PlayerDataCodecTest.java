@@ -183,4 +183,96 @@ class PlayerDataCodecTest {
         assertEquals(PlayerData.MAX_CURED_VILLAGERS, data.getCuredVillagers().size(),
                 "constructor must clamp oversized curedVillagers input to MAX_CURED_VILLAGERS");
     }
+
+    @Test
+    void scoreOutOfBoundsClampedOnDeserialization() {
+        JsonObject high = new JsonObject();
+        high.addProperty("score", 99999);
+        PlayerData decodedHigh = PlayerData.CODEC.parse(JsonOps.INSTANCE, high).getOrThrow();
+        assertEquals(PlayerData.MAX_SCORE, decodedHigh.getScore(),
+                "out-of-range high score must clamp to MAX_SCORE on deserialization");
+
+        JsonObject low = new JsonObject();
+        low.addProperty("score", -99999);
+        PlayerData decodedLow = PlayerData.CODEC.parse(JsonOps.INSTANCE, low).getOrThrow();
+        assertEquals(PlayerData.MIN_SCORE, decodedLow.getScore(),
+                "out-of-range low score must clamp to MIN_SCORE on deserialization");
+    }
+
+    @Test
+    void tradeStatsCappedAtMax() {
+        PlayerData data = new PlayerData();
+        for (int i = 0; i < PlayerData.MAX_TRADE_STATS + 50; i++) {
+            data.incrementTradesWithVillager(UUID.randomUUID());
+        }
+        assertEquals(PlayerData.MAX_TRADE_STATS, data.getTradeStats().size(),
+                "tradeStats must not exceed MAX_TRADE_STATS");
+    }
+
+    @Test
+    void tradeStatsCapSurvivesRoundTrip() {
+        PlayerData original = new PlayerData();
+        List<UUID> inserted = new ArrayList<>();
+        for (int i = 0; i < PlayerData.MAX_TRADE_STATS; i++) {
+            UUID id = new UUID(0L, i);
+            original.incrementTradesWithVillager(id);
+            inserted.add(id);
+        }
+        assertEquals(PlayerData.MAX_TRADE_STATS, original.getTradeStats().size());
+
+        JsonElement encoded = PlayerData.CODEC.encodeStart(JsonOps.INSTANCE, original).getOrThrow();
+        PlayerData decoded = PlayerData.CODEC.parse(JsonOps.INSTANCE, encoded).getOrThrow();
+
+        assertEquals(PlayerData.MAX_TRADE_STATS, decoded.getTradeStats().size(),
+                "tradeStats cap must be preserved after codec round-trip");
+
+        UUID overflow = new UUID(1L, 0L);
+        decoded.incrementTradesWithVillager(overflow);
+        assertEquals(PlayerData.MAX_TRADE_STATS, decoded.getTradeStats().size(),
+                "adding beyond cap after round-trip must evict eldest");
+        assertEquals(0, decoded.getTradesWithVillager(inserted.get(0)),
+                "FIFO eviction must remove the first-inserted entry after round-trip");
+        assertEquals(1, decoded.getTradesWithVillager(overflow),
+                "newly added entry must be present with count 1");
+    }
+
+    @Test
+    void tradeStatsConstructorClampsOversizedInput() {
+        java.util.LinkedHashMap<UUID, Integer> oversized = new java.util.LinkedHashMap<>();
+        for (int i = 0; i < PlayerData.MAX_TRADE_STATS + 50; i++) {
+            oversized.put(UUID.randomUUID(), i + 1);
+        }
+
+        PlayerData data = new PlayerData(0, 0, -1L, Set.of(), oversized);
+        assertEquals(PlayerData.MAX_TRADE_STATS, data.getTradeStats().size(),
+                "constructor must clamp oversized tradeStats input to MAX_TRADE_STATS");
+    }
+
+    @Test
+    void incrementTradesMovesEntryToEndForLruEviction() {
+        // Fill to cap, then increment the first-inserted entry — it should move to end
+        // so the *second*-inserted entry becomes the eviction candidate on overflow.
+        PlayerData data = new PlayerData();
+        UUID first = new UUID(0L, 1L);
+        UUID second = new UUID(0L, 2L);
+        data.incrementTradesWithVillager(first);
+        data.incrementTradesWithVillager(second);
+        for (int i = 3; i <= PlayerData.MAX_TRADE_STATS; i++) {
+            data.incrementTradesWithVillager(new UUID(0L, i));
+        }
+        assertEquals(PlayerData.MAX_TRADE_STATS, data.getTradeStats().size());
+
+        // Touch `first` again — move to end (LRU).
+        data.incrementTradesWithVillager(first);
+        assertEquals(2, data.getTradesWithVillager(first));
+
+        // New entry should now evict `second`, not `first`.
+        UUID overflow = new UUID(1L, 0L);
+        data.incrementTradesWithVillager(overflow);
+        assertEquals(2, data.getTradesWithVillager(first),
+                "Touched entry must survive eviction");
+        assertEquals(0, data.getTradesWithVillager(second),
+                "Eldest non-touched entry must be evicted");
+        assertEquals(1, data.getTradesWithVillager(overflow));
+    }
 }

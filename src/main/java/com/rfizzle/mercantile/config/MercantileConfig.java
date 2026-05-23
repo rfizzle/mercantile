@@ -6,8 +6,10 @@ import com.rfizzle.mercantile.Mercantile;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.IOException;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 public class MercantileConfig {
     private static volatile MercantileConfig INSTANCE;
@@ -75,7 +77,20 @@ public class MercantileConfig {
     public boolean enableInfoPanel = true;
 
     public void clamp() {
+        pickupXpCost = Math.clamp(pickupXpCost, 0, Integer.MAX_VALUE);
+        tradeCycleEmeraldCost = Math.clamp(tradeCycleEmeraldCost, 0, Integer.MAX_VALUE);
+        reputationTradeGain = Math.clamp(reputationTradeGain, 0, Integer.MAX_VALUE);
+        reputationCureGain = Math.clamp(reputationCureGain, 0, Integer.MAX_VALUE);
+        reputationAttackLoss = Math.clamp(reputationAttackLoss, 0, Integer.MAX_VALUE);
+        reputationKillLoss = Math.clamp(reputationKillLoss, 0, Integer.MAX_VALUE);
+        reputationCycleGain = Math.clamp(reputationCycleGain, 0, Integer.MAX_VALUE);
+        maxFollowingVillagers = Math.clamp(maxFollowingVillagers, 1, Integer.MAX_VALUE);
         healingMultiplier = Math.clamp(healingMultiplier, 1.0f, 10.0f);
+        pylonDetectionRadius = Math.clamp(pylonDetectionRadius, 8, 128);
+        pylonMaxFuel = Math.clamp(pylonMaxFuel, 1, Integer.MAX_VALUE);
+        pylonMaxGolems = Math.clamp(pylonMaxGolems, 1, Integer.MAX_VALUE);
+        sentryDespawnSeconds = Math.clamp(sentryDespawnSeconds, 5, Integer.MAX_VALUE);
+        villagerSoundVolume = Math.clamp(villagerSoundVolume, 0.0f, 1.0f);
     }
 
     public String toJson() {
@@ -114,10 +129,25 @@ public class MercantileConfig {
     }
 
     void save(Path path) {
+        Path tmp = path.resolveSibling(path.getFileName() + ".tmp");
         try {
-            Files.writeString(path, GSON.toJson(this));
+            Path parent = path.getParent();
+            if (parent != null) {
+                Files.createDirectories(parent);
+            }
+            Files.writeString(tmp, GSON.toJson(this));
+            try {
+                Files.move(tmp, path, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+            } catch (AtomicMoveNotSupportedException e) {
+                Files.move(tmp, path, StandardCopyOption.REPLACE_EXISTING);
+            }
         } catch (IOException e) {
             Mercantile.LOGGER.error("Failed to save config", e);
+            try {
+                Files.deleteIfExists(tmp);
+            } catch (IOException cleanup) {
+                Mercantile.LOGGER.warn("Failed to delete orphan config tmp file {}", tmp, cleanup);
+            }
         }
     }
 
@@ -140,9 +170,12 @@ public class MercantileConfig {
                 config.clamp();
                 return config;
             } catch (Exception e) {
-                Mercantile.LOGGER.error("Failed to load config, using defaults", e);
+                Mercantile.LOGGER.error("Failed to load config, using defaults (corrupted file preserved at {})", path, e);
+                return new MercantileConfig();
             }
         }
-        return new MercantileConfig();
+        MercantileConfig defaults = new MercantileConfig();
+        defaults.save(path);
+        return defaults;
     }
 }

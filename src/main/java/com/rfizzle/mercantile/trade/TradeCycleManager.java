@@ -2,7 +2,7 @@ package com.rfizzle.mercantile.trade;
 
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
-import com.rfizzle.mercantile.data.VillagerData;
+import com.rfizzle.mercantile.data.MercantileVillagerData;
 import com.rfizzle.mercantile.reputation.ExclusiveTradesManager;
 import com.rfizzle.mercantile.reputation.ReputationManager;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -32,7 +32,7 @@ public final class TradeCycleManager {
         MercantileConfig config = MercantileConfig.get();
         if (!config.enableTradeCycling) return false;
 
-        VillagerData villagerData = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
+        MercantileVillagerData villagerData = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
         MerchantOffers offers = villager.getOffers();
         villagerData.migrateLockedTrades(offers);
 
@@ -53,7 +53,7 @@ public final class TradeCycleManager {
 
     public static boolean cycle(ServerPlayer player, Villager villager) {
         MercantileConfig config = MercantileConfig.get();
-        VillagerData villagerData = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
+        MercantileVillagerData villagerData = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
         MerchantOffers offers = villager.getOffers();
         villagerData.migrateLockedTrades(offers);
 

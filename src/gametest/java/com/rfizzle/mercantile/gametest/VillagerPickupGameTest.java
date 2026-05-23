@@ -1,7 +1,7 @@
 package com.rfizzle.mercantile.gametest;
 
 import com.rfizzle.mercantile.data.MercantileAttachments;
-import com.rfizzle.mercantile.data.VillagerData;
+import com.rfizzle.mercantile.data.MercantileVillagerData;
 import com.rfizzle.mercantile.data.VillagerPickupHelper;
 import com.rfizzle.mercantile.trade.OfferIdentityHash;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
@@ -38,7 +38,7 @@ public class VillagerPickupGameTest implements FabricGameTest {
                 new ItemStack(Items.BOOKSHELF, 1),
                 16, 2, 0.05f));
 
-        VillagerData origData = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
+        MercantileVillagerData origData = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
         origData.setProfessionLocked(true);
 
         int origXp = villager.getVillagerXp();
@@ -74,7 +74,7 @@ public class VillagerPickupGameTest implements FabricGameTest {
         helper.assertTrue(hasBookshelfTrade,
                 "Custom trade should survive round-trip");
 
-        VillagerData restoredData = restored.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
+        MercantileVillagerData restoredData = restored.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
         helper.assertTrue(restoredData.isProfessionLocked(),
                 "Profession lock should survive round-trip");
 

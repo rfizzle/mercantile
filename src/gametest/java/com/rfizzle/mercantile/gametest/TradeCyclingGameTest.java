@@ -2,7 +2,7 @@ package com.rfizzle.mercantile.gametest;
 
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
-import com.rfizzle.mercantile.data.VillagerData;
+import com.rfizzle.mercantile.data.MercantileVillagerData;
 import com.rfizzle.mercantile.trade.OfferIdentityHash;
 import com.rfizzle.mercantile.trade.TradeCycleManager;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
@@ -37,7 +37,7 @@ public class TradeCyclingGameTest implements FabricGameTest {
         villager.setTradingPlayer(player);
         villager.notifyTrade(lockedOffer);
 
-        VillagerData vd = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
+        MercantileVillagerData vd = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
         String lockedHash = OfferIdentityHash.compute(lockedOffer);
         helper.assertTrue(vd.isTradeLocked(lockedHash),
                 "Traded offer should be locked");
@@ -85,7 +85,7 @@ public class TradeCyclingGameTest implements FabricGameTest {
         ServerPlayer player = helper.makeMockServerPlayerInLevel();
         player.getInventory().add(new ItemStack(Items.EMERALD, 64));
 
-        VillagerData vd = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
+        MercantileVillagerData vd = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
         vd.addLockedTrade(OfferIdentityHash.compute(offer));
 
         helper.assertFalse(TradeCycleManager.canCycle(player, villager),

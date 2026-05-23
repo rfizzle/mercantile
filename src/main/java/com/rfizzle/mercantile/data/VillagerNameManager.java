@@ -132,7 +132,7 @@ public class VillagerNameManager {
     }
 
     private static void assignName(Villager villager, ServerLevel world) {
-        VillagerData data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
+        MercantileVillagerData data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
 
         if (data.isNameAssigned()) {
             if (villager.hasCustomName()) {

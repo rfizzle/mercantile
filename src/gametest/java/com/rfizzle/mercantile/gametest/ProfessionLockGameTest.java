@@ -1,7 +1,7 @@
 package com.rfizzle.mercantile.gametest;
 
 import com.rfizzle.mercantile.data.MercantileAttachments;
-import com.rfizzle.mercantile.data.VillagerData;
+import com.rfizzle.mercantile.data.MercantileVillagerData;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
@@ -24,7 +24,7 @@ public class ProfessionLockGameTest implements FabricGameTest {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
         villager.setVillagerData(villager.getVillagerData().setProfession(VillagerProfession.FARMER));
 
-        VillagerData data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
+        MercantileVillagerData data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
         helper.assertFalse(data.isProfessionLocked(), "Should not be locked before any trade");
 
         MerchantOffer offer = new MerchantOffer(
@@ -43,7 +43,7 @@ public class ProfessionLockGameTest implements FabricGameTest {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
         villager.setVillagerData(villager.getVillagerData().setProfession(VillagerProfession.FARMER));
 
-        VillagerData data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
+        MercantileVillagerData data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
         data.setProfessionLocked(true);
 
         villager.setVillagerData(villager.getVillagerData().setProfession(VillagerProfession.NONE));
@@ -59,7 +59,7 @@ public class ProfessionLockGameTest implements FabricGameTest {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
         villager.setVillagerData(villager.getVillagerData().setProfession(VillagerProfession.FARMER));
 
-        VillagerData data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
+        MercantileVillagerData data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
         helper.assertFalse(data.isProfessionLocked(), "Should not be locked");
 
         villager.setVillagerData(villager.getVillagerData().setProfession(VillagerProfession.NONE));
@@ -75,7 +75,7 @@ public class ProfessionLockGameTest implements FabricGameTest {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
         villager.setVillagerData(villager.getVillagerData().setProfession(VillagerProfession.FARMER));
 
-        VillagerData data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
+        MercantileVillagerData data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
         data.setProfessionLocked(true);
 
         GlobalPos jobSite = GlobalPos.of(helper.getLevel().dimension(),
@@ -109,7 +109,7 @@ public class ProfessionLockGameTest implements FabricGameTest {
                 .setProfession(VillagerProfession.LIBRARIAN)
                 .setLevel(3));
 
-        VillagerData data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
+        MercantileVillagerData data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
         data.setProfessionLocked(true);
 
         CompoundTag saved = new CompoundTag();
@@ -127,7 +127,7 @@ public class ProfessionLockGameTest implements FabricGameTest {
                 loaded.getVillagerData().getLevel() == 3,
                 "Level should persist through save/load");
 
-        VillagerData loadedData = loaded.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
+        MercantileVillagerData loadedData = loaded.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
         helper.assertTrue(loadedData.isProfessionLocked(),
                 "Profession lock should persist through save/load");
 

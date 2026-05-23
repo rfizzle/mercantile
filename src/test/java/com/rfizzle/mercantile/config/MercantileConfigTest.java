@@ -231,6 +231,150 @@ class MercantileConfigTest {
     }
 
     @Test
+    void pickupXpCostClampedFromNegative(@TempDir Path tempDir) throws IOException {
+        Path configFile = tempDir.resolve("mercantile.json");
+        Files.writeString(configFile, """
+                {
+                  "pickupXpCost": -5
+                }
+                """);
+
+        MercantileConfig loaded = MercantileConfig.load(configFile);
+        assertEquals(0, loaded.pickupXpCost);
+    }
+
+    @Test
+    void pylonDetectionRadiusClampedAboveMax(@TempDir Path tempDir) throws IOException {
+        Path configFile = tempDir.resolve("mercantile.json");
+        Files.writeString(configFile, """
+                {
+                  "pylonDetectionRadius": 999999
+                }
+                """);
+
+        MercantileConfig loaded = MercantileConfig.load(configFile);
+        assertEquals(128, loaded.pylonDetectionRadius);
+    }
+
+    @Test
+    void pylonDetectionRadiusClampedBelowMin(@TempDir Path tempDir) throws IOException {
+        Path configFile = tempDir.resolve("mercantile.json");
+        Files.writeString(configFile, """
+                {
+                  "pylonDetectionRadius": 2
+                }
+                """);
+
+        MercantileConfig loaded = MercantileConfig.load(configFile);
+        assertEquals(8, loaded.pylonDetectionRadius);
+    }
+
+    @Test
+    void maxFollowingVillagersClampedFromZero(@TempDir Path tempDir) throws IOException {
+        Path configFile = tempDir.resolve("mercantile.json");
+        Files.writeString(configFile, """
+                {
+                  "maxFollowingVillagers": 0
+                }
+                """);
+
+        MercantileConfig loaded = MercantileConfig.load(configFile);
+        assertEquals(1, loaded.maxFollowingVillagers);
+    }
+
+    @Test
+    void villagerSoundVolumeClampedAboveMax(@TempDir Path tempDir) throws IOException {
+        Path configFile = tempDir.resolve("mercantile.json");
+        Files.writeString(configFile, """
+                {
+                  "villagerSoundVolume": 2.5
+                }
+                """);
+
+        MercantileConfig loaded = MercantileConfig.load(configFile);
+        assertEquals(1.0f, loaded.villagerSoundVolume);
+    }
+
+    @Test
+    void villagerSoundVolumeClampedFromNegative(@TempDir Path tempDir) throws IOException {
+        Path configFile = tempDir.resolve("mercantile.json");
+        Files.writeString(configFile, """
+                {
+                  "villagerSoundVolume": -1.0
+                }
+                """);
+
+        MercantileConfig loaded = MercantileConfig.load(configFile);
+        assertEquals(0.0f, loaded.villagerSoundVolume);
+    }
+
+    @Test
+    void sentryDespawnSecondsClampedBelowMin(@TempDir Path tempDir) throws IOException {
+        Path configFile = tempDir.resolve("mercantile.json");
+        Files.writeString(configFile, """
+                {
+                  "sentryDespawnSeconds": 1
+                }
+                """);
+
+        MercantileConfig loaded = MercantileConfig.load(configFile);
+        assertEquals(5, loaded.sentryDespawnSeconds);
+    }
+
+    @Test
+    void firstLoadCreatesDefaultsFile(@TempDir Path tempDir) throws IOException {
+        Path configFile = tempDir.resolve("mercantile.json");
+        assertFalse(Files.exists(configFile));
+
+        MercantileConfig loaded = MercantileConfig.load(configFile);
+
+        assertTrue(Files.exists(configFile), "load() should create defaults file when missing");
+
+        MercantileConfig defaults = new MercantileConfig();
+        assertEquals(defaults.enableVillagerPickup, loaded.enableVillagerPickup);
+        assertEquals(defaults.pickupXpCost, loaded.pickupXpCost);
+        assertEquals(defaults.healingMultiplier, loaded.healingMultiplier);
+
+        MercantileConfig roundTripped = MercantileConfig.load(configFile);
+        assertEquals(defaults.pickupXpCost, roundTripped.pickupXpCost);
+        assertEquals(defaults.tradeCycleEmeraldCost, roundTripped.tradeCycleEmeraldCost);
+        assertEquals(defaults.healingMultiplier, roundTripped.healingMultiplier);
+        assertEquals(defaults.pylonDetectionRadius, roundTripped.pylonDetectionRadius);
+    }
+
+    @Test
+    void saveIsAtomic(@TempDir Path tempDir) throws IOException {
+        Path configFile = tempDir.resolve("mercantile.json");
+        Files.writeString(configFile, "{ \"pickupXpCost\": 1 }");
+
+        MercantileConfig config = new MercantileConfig();
+        config.pickupXpCost = 42;
+        config.save(configFile);
+
+        String contents = Files.readString(configFile);
+        assertTrue(contents.contains("\"pickupXpCost\": 42"), "file should reflect new value, got: " + contents);
+
+        Path tmp = configFile.resolveSibling(configFile.getFileName() + ".tmp");
+        assertFalse(Files.exists(tmp), "atomic save should leave no orphan .tmp sibling");
+    }
+
+    @Test
+    void corruptedFileDoesNotOverwriteUserFile(@TempDir Path tempDir) throws IOException {
+        Path configFile = tempDir.resolve("mercantile.json");
+        String corrupted = "not json {{{";
+        Files.writeString(configFile, corrupted);
+
+        MercantileConfig loaded = MercantileConfig.load(configFile);
+        MercantileConfig defaults = new MercantileConfig();
+
+        assertEquals(defaults.pickupXpCost, loaded.pickupXpCost);
+        assertEquals(defaults.healingMultiplier, loaded.healingMultiplier);
+
+        assertEquals(corrupted, Files.readString(configFile),
+                "corrupted user file must be preserved for inspection, not overwritten with defaults");
+    }
+
+    @Test
     void partialFilePreservesDefaults(@TempDir Path tempDir) throws IOException {
         Path configFile = tempDir.resolve("mercantile.json");
         Files.writeString(configFile, """

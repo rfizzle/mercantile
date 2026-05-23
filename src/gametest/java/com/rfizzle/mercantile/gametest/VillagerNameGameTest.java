@@ -1,7 +1,7 @@
 package com.rfizzle.mercantile.gametest;
 
 import com.rfizzle.mercantile.data.MercantileAttachments;
-import com.rfizzle.mercantile.data.VillagerData;
+import com.rfizzle.mercantile.data.MercantileVillagerData;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
@@ -23,7 +23,7 @@ public class VillagerNameGameTest implements FabricGameTest {
         String name = villager.getCustomName().getString();
         helper.assertFalse(name.isEmpty(), "Villager name should not be empty");
 
-        VillagerData data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
+        MercantileVillagerData data =villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
         helper.assertTrue(data.isNameAssigned(), "nameAssigned should be true after spawn");
 
         helper.succeed();
@@ -40,7 +40,7 @@ public class VillagerNameGameTest implements FabricGameTest {
         helper.assertTrue("PlayerName".equals(villager.getCustomName().getString()),
                 "Nametag name should not be overwritten");
 
-        VillagerData data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
+        MercantileVillagerData data =villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
         helper.assertTrue(data.isNameAssigned(),
                 "nameAssigned should be set even for nametag-named villagers");
 
@@ -65,7 +65,7 @@ public class VillagerNameGameTest implements FabricGameTest {
                 "Name should be identical after save/load");
         helper.assertTrue(loaded.isCustomNameVisible(), "Name visibility should persist");
 
-        VillagerData data = loaded.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
+        MercantileVillagerData data =loaded.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
         helper.assertTrue(data.isNameAssigned(), "nameAssigned should persist through NBT");
 
         loaded.discard();

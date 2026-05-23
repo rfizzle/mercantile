@@ -11,9 +11,9 @@ public class MercantileAttachments {
             .initializer(PlayerData::new)
             .buildAndRegister(Mercantile.id("player_data"));
 
-    public static final AttachmentType<VillagerData> VILLAGER_DATA = AttachmentRegistry.<VillagerData>builder()
-            .persistent(VillagerData.CODEC)
-            .initializer(VillagerData::new)
+    public static final AttachmentType<MercantileVillagerData> VILLAGER_DATA = AttachmentRegistry.<MercantileVillagerData>builder()
+            .persistent(MercantileVillagerData.CODEC)
+            .initializer(MercantileVillagerData::new)
             .buildAndRegister(Mercantile.id("villager_data"));
 
     public static void init() {

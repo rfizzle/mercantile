@@ -82,7 +82,7 @@ public class VillagerPickupHelper {
             lines.add(Component.empty());
             lines.add(line("mercantile.pickup.lore.trades", ChatFormatting.GRAY));
 
-            VillagerData data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
+            MercantileVillagerData data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
             data.migrateLockedTrades(offers);
             Set<String> lockedTrades = data.getLockedTrades();
             int lockedCount = 0;

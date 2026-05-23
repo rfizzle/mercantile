@@ -18,7 +18,10 @@ public class ModMenuIntegration implements ModMenuApi {
             ConfigBuilder builder = ConfigBuilder.create()
                     .setParentScreen(parent)
                     .setTitle(Component.translatable("mercantile.config.title"))
-                    .setSavingRunnable(config::save);
+                    .setSavingRunnable(() -> {
+                        config.clamp();
+                        config.save();
+                    });
 
             ConfigEntryBuilder entry = builder.entryBuilder();
 
@@ -152,7 +155,7 @@ public class ModMenuIntegration implements ModMenuApi {
                     .build());
             trading.addEntry(entry.startFloatField(Component.translatable("mercantile.config.healingMultiplier"), config.healingMultiplier)
                     .setDefaultValue(defaults.healingMultiplier)
-                    .setMin(0.0f)
+                    .setMin(1.0f).setMax(10.0f)
                     .setTooltip(Component.translatable("mercantile.config.healingMultiplier.tooltip"))
                     .setSaveConsumer(v -> config.healingMultiplier = v)
                     .build());
