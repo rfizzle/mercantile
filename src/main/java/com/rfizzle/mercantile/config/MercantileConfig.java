@@ -65,6 +65,9 @@ public class MercantileConfig {
     // Breeding Tooltip (Jade/WTHIT)
     public boolean enableBreedingTooltip = true;
 
+    // State Indicators (Jade/WTHIT)
+    public boolean enableStateIndicators = true;
+
     // Sentry Pylon
     public boolean enableSentryPylon = true;
     public int pylonDetectionRadius = 32;
