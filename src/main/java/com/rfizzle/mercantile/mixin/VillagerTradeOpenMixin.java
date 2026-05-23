@@ -4,10 +4,12 @@ import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.reputation.ReputationTier;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
+import com.rfizzle.mercantile.network.DemandPriceS2CPayload;
 import com.rfizzle.mercantile.network.RestockTimerS2CPayload;
 import com.rfizzle.mercantile.network.VillagerInfoPanelS2CPayload;
 import com.rfizzle.mercantile.reputation.ExclusiveTradesManager;
 import com.rfizzle.mercantile.reputation.ReputationManager;
+import com.rfizzle.mercantile.trade.PriceBreakdownBuilder;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
@@ -109,6 +111,17 @@ public abstract class VillagerTradeOpenMixin {
                 self.getId(), profession, level, xp, xpToNextLevel,
                 reputation, reputationTier, totalTrades, hasWorkstation,
                 villagerData.isProfessionLocked()));
+    }
+
+    @Inject(method = "startTrading", at = @At("TAIL"))
+    private void mercantile$sendDemandPriceOnTradeOpen(Player player, CallbackInfo ci) {
+        if (!MercantileConfig.get().enableDemandTransparency) return;
+        if (!(player instanceof ServerPlayer serverPlayer)) return;
+        if (serverPlayer.connection == null) return;
+
+        Villager self = (Villager) (Object) this;
+        ServerPlayNetworking.send(serverPlayer, new DemandPriceS2CPayload(
+                self.getId(), PriceBreakdownBuilder.buildFor(self, serverPlayer)));
     }
 
     @Inject(method = "startTrading", at = @At("TAIL"))

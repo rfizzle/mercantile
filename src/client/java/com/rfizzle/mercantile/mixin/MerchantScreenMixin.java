@@ -4,6 +4,7 @@ import com.rfizzle.mercantile.Mercantile;
 import com.rfizzle.mercantile.client.network.ClientMercantileData;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.network.CycleTradesC2SPayload;
+import com.rfizzle.mercantile.network.DemandPriceS2CPayload;
 import com.rfizzle.mercantile.network.RestockTimerS2CPayload;
 import com.rfizzle.mercantile.network.VillagerInfoPanelS2CPayload;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -21,10 +22,14 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.trading.MerchantOffer;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Mixin(MerchantScreen.class)
 public abstract class MerchantScreenMixin extends AbstractContainerScreen<MerchantMenu> {
@@ -46,8 +51,16 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     @Unique
     private static final int CYCLE_BUTTON_SIZE = 18;
 
+    // Mirrors vanilla MerchantScreen.NUMBER_OF_OFFER_BUTTONS (private). If vanilla
+    // expands the visible offer count, update this constant.
+    @Unique
+    private static final int VISIBLE_TRADE_ROWS = 7;
+
     @Unique
     private ImageButton mercantile$cycleButton;
+
+    @Shadow
+    private int scrollOff;
 
     private MerchantScreenMixin(MerchantMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -160,8 +173,8 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     }
 
     @Inject(method = "removed", at = @At("HEAD"))
-    private void mercantile$clearRestockOnClose(CallbackInfo ci) {
-        ClientMercantileData.setRestockTimer(null);
+    private void mercantile$clearOnClose(CallbackInfo ci) {
+        ClientMercantileData.clearMerchantScreenData();
     }
 
     @Inject(method = "renderLabels", at = @At("TAIL"))
@@ -204,6 +217,65 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
             guiGraphics.renderTooltip(this.font,
                     Component.translatable("gui.mercantile.cycle_trades.tooltip", config.tradeCycleEmeraldCost),
                     mouseX, mouseY);
+        }
+
+        mercantile$renderPriceBreakdownTooltip(guiGraphics, mouseX, mouseY);
+    }
+
+    @Unique
+    private void mercantile$renderPriceBreakdownTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        MercantileConfig config = ClientMercantileData.getServerConfig();
+        if (config == null) config = MercantileConfig.get();
+        if (!config.enableDemandTransparency) return;
+
+        DemandPriceS2CPayload price = ClientMercantileData.getDemandPrice();
+        if (price == null) return;
+        VillagerInfoPanelS2CPayload info = ClientMercantileData.getVillagerInfo();
+        if (info == null || info.villagerEntityId() != price.villagerEntityId()) return;
+
+        // Cost A icon is rendered at (leftPos + 10, topPos + 19) with 20px row spacing
+        // (see MerchantScreen.render: n = k+5+5, p = (l+16+1)+2).
+        int slotX = this.leftPos + 10;
+        int slotY = this.topPos + 19;
+        if (mouseX < slotX || mouseX >= slotX + 16) return;
+
+        List<DemandPriceS2CPayload.PriceComponent> components = price.components();
+        for (int i = 0; i < VISIBLE_TRADE_ROWS; i++) {
+            int rowY = slotY + i * 20;
+            int componentIndex = this.scrollOff + i;
+            if (componentIndex < 0 || componentIndex >= components.size()) continue;
+            if (mouseY < rowY || mouseY >= rowY + 16) continue;
+
+            DemandPriceS2CPayload.PriceComponent c = components.get(componentIndex);
+            List<Component> lines = new ArrayList<>();
+            lines.add(Component.translatable("gui.mercantile.price.base", c.basePrice()));
+            if (c.demandAdjust() > 0) {
+                lines.add(Component.translatable("gui.mercantile.price.demand", c.demandAdjust())
+                        .withStyle(ChatFormatting.RED));
+            }
+            if (c.reputationModifier() != 0) {
+                ChatFormatting color = c.reputationModifier() < 0 ? ChatFormatting.GREEN : ChatFormatting.RED;
+                String value = (c.reputationModifier() > 0 ? "+" : "") + c.reputationModifier();
+                lines.add(Component.translatable("gui.mercantile.price.reputation", value)
+                        .withStyle(color));
+            }
+            if (c.gossipModifier() != 0) {
+                ChatFormatting color = c.gossipModifier() < 0 ? ChatFormatting.GREEN : ChatFormatting.RED;
+                String value = (c.gossipModifier() > 0 ? "+" : "") + c.gossipModifier();
+                lines.add(Component.translatable("gui.mercantile.price.gossip", value)
+                        .withStyle(color));
+            }
+            if (c.otherAdjust() != 0) {
+                ChatFormatting color = c.otherAdjust() < 0 ? ChatFormatting.GREEN : ChatFormatting.RED;
+                String value = (c.otherAdjust() > 0 ? "+" : "") + c.otherAdjust();
+                lines.add(Component.translatable("gui.mercantile.price.other", value)
+                        .withStyle(color));
+            }
+            lines.add(Component.empty());
+            lines.add(Component.translatable("gui.mercantile.price.final", c.finalPrice()));
+
+            guiGraphics.renderComponentTooltip(this.font, lines, mouseX, mouseY);
+            return;
         }
     }
 

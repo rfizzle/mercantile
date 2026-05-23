@@ -32,7 +32,8 @@
             "com.rfizzle.mercantile.gametest.WorkstationLinkClientGameTest",
             "com.rfizzle.mercantile.gametest.BellRadiusGameTest",
             "com.rfizzle.mercantile.gametest.VillageBoundsGameTest",
-            "com.rfizzle.mercantile.gametest.RestockIndicatorGameTest"
+            "com.rfizzle.mercantile.gametest.RestockIndicatorGameTest",
+            "com.rfizzle.mercantile.gametest.DemandTransparencyGameTest"
         ]
     },
     "custom": {

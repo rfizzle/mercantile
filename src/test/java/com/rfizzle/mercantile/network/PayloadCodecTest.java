@@ -98,8 +98,8 @@ class PayloadCodecTest {
     @Test
     void demandPriceS2CWithComponents() {
         var components = List.of(
-                new DemandPriceS2CPayload.PriceComponent(10, 2, -1, -3, 8),
-                new DemandPriceS2CPayload.PriceComponent(32, 0, -5, 0, 27)
+                new DemandPriceS2CPayload.PriceComponent(10, 2, -1, -3, 0, 8),
+                new DemandPriceS2CPayload.PriceComponent(32, 0, -5, 0, 0, 27)
         );
         var original = new DemandPriceS2CPayload(42, components);
         assertEquals(original, roundTrip(DemandPriceS2CPayload.CODEC, original));
@@ -113,8 +113,23 @@ class PayloadCodecTest {
 
     @Test
     void priceComponentDirect() {
-        var original = new DemandPriceS2CPayload.PriceComponent(64, 5, -10, -2, 57);
+        var original = new DemandPriceS2CPayload.PriceComponent(64, 5, -10, -2, 0, 57);
         assertEquals(original, roundTrip(DemandPriceS2CPayload.PriceComponent.STREAM_CODEC, original));
+    }
+
+    @Test
+    void priceComponentWithOtherAdjust() {
+        // Simulates Hero of the Village discount: finalPrice < basePrice with no other modifiers.
+        var original = new DemandPriceS2CPayload.PriceComponent(10, 0, 0, 0, -3, 7);
+        assertEquals(original, roundTrip(DemandPriceS2CPayload.PriceComponent.STREAM_CODEC, original));
+    }
+
+    @Test
+    void demandPriceS2CDecodeRejectsBogusSize() {
+        FriendlyByteBuf buf = buf();
+        buf.writeVarInt(42); // villagerEntityId
+        buf.writeVarInt(DemandPriceS2CPayload.MAX_OFFERS + 1);
+        assertThrows(DecoderException.class, () -> DemandPriceS2CPayload.CODEC.decode(buf));
     }
 
     @Test

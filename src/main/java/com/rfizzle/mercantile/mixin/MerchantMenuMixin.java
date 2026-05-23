@@ -1,10 +1,14 @@
 package com.rfizzle.mercantile.mixin;
 
 import com.rfizzle.mercantile.config.MercantileConfig;
+import com.rfizzle.mercantile.network.DemandPriceS2CPayload;
 import com.rfizzle.mercantile.reputation.ReputationManager;
 import com.rfizzle.mercantile.trade.BulkTradeContext;
+import com.rfizzle.mercantile.trade.PriceBreakdownBuilder;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MerchantContainer;
@@ -13,6 +17,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.trading.ItemCost;
+import net.minecraft.world.item.trading.Merchant;
 import net.minecraft.world.item.trading.MerchantOffer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -28,6 +33,10 @@ public abstract class MerchantMenuMixin extends AbstractContainerMenu {
     @Shadow
     @Final
     private MerchantContainer tradeContainer;
+
+    @Shadow
+    @Final
+    private Merchant trader;
 
     @Shadow
     private void playTradeSound() {}
@@ -106,6 +115,14 @@ public abstract class MerchantMenuMixin extends AbstractContainerMenu {
                     Component.translatable("gui.mercantile.bulk_trade.feedback", tradeCount, firstResult.getHoverName()),
                     true
             );
+        }
+
+        if (tradeCount > 0 && config.enableDemandTransparency
+                && this.trader instanceof Villager villager
+                && player instanceof ServerPlayer serverPlayer
+                && serverPlayer.connection != null) {
+            ServerPlayNetworking.send(serverPlayer, new DemandPriceS2CPayload(
+                    villager.getId(), PriceBreakdownBuilder.buildFor(villager, serverPlayer)));
         }
 
         cir.setReturnValue(firstResult);

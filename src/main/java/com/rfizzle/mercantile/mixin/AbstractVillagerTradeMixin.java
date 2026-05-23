@@ -3,9 +3,12 @@ package com.rfizzle.mercantile.mixin;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
+import com.rfizzle.mercantile.network.DemandPriceS2CPayload;
 import com.rfizzle.mercantile.reputation.ReputationManager;
 import com.rfizzle.mercantile.trade.BulkTradeContext;
 import com.rfizzle.mercantile.trade.OfferIdentityHash;
+import com.rfizzle.mercantile.trade.PriceBreakdownBuilder;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.npc.Villager;
@@ -40,6 +43,14 @@ public abstract class AbstractVillagerTradeMixin {
             if (!BulkTradeContext.isActive()) {
                 ReputationManager.modifyScore(serverPlayer, config.reputationTradeGain);
             }
+        }
+
+        if (config.enableDemandTransparency
+                && !BulkTradeContext.isActive()
+                && villager.getTradingPlayer() instanceof ServerPlayer tradingPlayer
+                && tradingPlayer.connection != null) {
+            ServerPlayNetworking.send(tradingPlayer, new DemandPriceS2CPayload(
+                    villager.getId(), PriceBreakdownBuilder.buildFor(villager, tradingPlayer)));
         }
     }
 }

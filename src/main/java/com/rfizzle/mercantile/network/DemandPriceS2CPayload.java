@@ -14,11 +14,14 @@ public record DemandPriceS2CPayload(
         List<PriceComponent> components
 ) implements CustomPacketPayload {
 
+    public static final int MAX_OFFERS = 32;
+
     public record PriceComponent(
             int basePrice,
             int demandAdjust,
             int reputationModifier,
             int gossipModifier,
+            int otherAdjust,
             int finalPrice
     ) {
         public static final StreamCodec<ByteBuf, PriceComponent> STREAM_CODEC =
@@ -27,6 +30,7 @@ public record DemandPriceS2CPayload(
                         ByteBufCodecs.VAR_INT, PriceComponent::demandAdjust,
                         ByteBufCodecs.VAR_INT, PriceComponent::reputationModifier,
                         ByteBufCodecs.VAR_INT, PriceComponent::gossipModifier,
+                        ByteBufCodecs.VAR_INT, PriceComponent::otherAdjust,
                         ByteBufCodecs.VAR_INT, PriceComponent::finalPrice,
                         PriceComponent::new);
     }
@@ -37,7 +41,7 @@ public record DemandPriceS2CPayload(
     public static final StreamCodec<ByteBuf, DemandPriceS2CPayload> CODEC =
             StreamCodec.composite(
                     ByteBufCodecs.VAR_INT, DemandPriceS2CPayload::villagerEntityId,
-                    ByteBufCodecs.collection(ArrayList::new, PriceComponent.STREAM_CODEC),
+                    ByteBufCodecs.collection(ArrayList::new, PriceComponent.STREAM_CODEC, MAX_OFFERS),
                     DemandPriceS2CPayload::components,
                     DemandPriceS2CPayload::new);
 

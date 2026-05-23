@@ -148,6 +148,13 @@
     "gui.mercantile.restock.fully_stocked": "Fully stocked",
     "gui.mercantile.restock.no_workstation": "No workstation",
 
+    "gui.mercantile.price.base": "Base: %s",
+    "gui.mercantile.price.demand": "Demand: +%s",
+    "gui.mercantile.price.reputation": "Reputation: %s",
+    "gui.mercantile.price.gossip": "Gossip: %s",
+    "gui.mercantile.price.other": "Other: %s",
+    "gui.mercantile.price.final": "Final: %s",
+
     "tooltip.mercantile.pylon.fuel": "Fuel: %s / %s",
     "tooltip.mercantile.pylon.sentries": "Active Sentries: %s / %s",
     "tooltip.mercantile.pylon.empty": "Out of fuel"
