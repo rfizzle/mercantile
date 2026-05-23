@@ -4,7 +4,9 @@ import com.mojang.authlib.GameProfile;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
+import com.rfizzle.mercantile.network.VillageBoundsS2CPayload;
 import com.rfizzle.mercantile.reputation.ReputationTier;
+import io.netty.channel.embedded.EmbeddedChannel;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -133,21 +135,57 @@ public class CommandGameTest implements FabricGameTest {
     }
 
     @GameTest(template = EMPTY_STRUCTURE)
-    public void showVillageReportsNotImplemented(GameTestHelper helper) {
+    public void showVillageSendsPayload(GameTestHelper helper) {
         var server = helper.getLevel().getServer();
         var dispatcher = server.getCommands().getDispatcher();
-        // Use makeMockServerPlayerInLevel so source.sendFailure has a real connection to write to.
         var player = helper.makeMockServerPlayerInLevel();
 
-        int result;
+        EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
+        channel.outboundMessages().clear();
+
+        boolean saved = MercantileConfig.get().enableVillageBoundaryVis;
         try {
-            result = dispatcher.execute("mercantile village", player.createCommandSourceStack());
-        } catch (com.mojang.brigadier.exceptions.CommandSyntaxException e) {
-            player.discard();
-            helper.fail("/mercantile village failed to parse: " + e.getMessage());
-            return;
+            MercantileConfig.get().enableVillageBoundaryVis = true;
+            int result;
+            try {
+                result = dispatcher.execute("mercantile village", player.createCommandSourceStack());
+            } catch (com.mojang.brigadier.exceptions.CommandSyntaxException e) {
+                helper.fail("/mercantile village failed to parse: " + e.getMessage());
+                return;
+            }
+            helper.assertTrue(result == 1, "/mercantile village should return 1 (success); got " + result);
+
+            int packetCount = GametestNetUtil.countPayloads(channel, VillageBoundsS2CPayload.class);
+            helper.assertTrue(packetCount == 1,
+                    "Exactly one VillageBoundsS2CPayload should be queued; saw " + packetCount);
+        } finally {
+            MercantileConfig.get().enableVillageBoundaryVis = saved;
         }
-        helper.assertTrue(result == 0, "/mercantile village should return 0 (not implemented)");
+
+        player.discard();
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void showVillageReturnsZeroWhenConfigDisabled(GameTestHelper helper) {
+        var server = helper.getLevel().getServer();
+        var dispatcher = server.getCommands().getDispatcher();
+        var player = helper.makeMockServerPlayerInLevel();
+
+        boolean saved = MercantileConfig.get().enableVillageBoundaryVis;
+        try {
+            MercantileConfig.get().enableVillageBoundaryVis = false;
+            int result;
+            try {
+                result = dispatcher.execute("mercantile village", player.createCommandSourceStack());
+            } catch (com.mojang.brigadier.exceptions.CommandSyntaxException e) {
+                helper.fail("/mercantile village failed to parse: " + e.getMessage());
+                return;
+            }
+            helper.assertTrue(result == 0, "/mercantile village should return 0 when disabled; got " + result);
+        } finally {
+            MercantileConfig.get().enableVillageBoundaryVis = saved;
+        }
 
         player.discard();
         helper.succeed();

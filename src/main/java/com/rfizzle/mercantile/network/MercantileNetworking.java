@@ -4,6 +4,7 @@ import com.rfizzle.mercantile.Mercantile;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.follow.FollowManager;
 import com.rfizzle.mercantile.trade.TradeCycleManager;
+import com.rfizzle.mercantile.visualization.VillageBoundsService;
 import com.rfizzle.mercantile.visualization.WorkstationMapService;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -79,7 +80,6 @@ public class MercantileNetworking {
 
         ServerPlayNetworking.registerGlobalReceiver(RequestVillageBoundsC2SPayload.TYPE, (payload, context) -> {
             ServerPlayer player = context.player();
-            if (!checkCooldown(LAST_VILLAGE_BOUNDS_MS, player.getUUID(), REQUEST_QUERY_COOLDOWN_MS)) return;
             player.server.execute(() -> handleRequestVillageBounds(player));
         });
     }
@@ -153,8 +153,16 @@ public class MercantileNetworking {
         ServerPlayNetworking.send(player, payload);
     }
 
-    private static void handleRequestVillageBounds(ServerPlayer player) {
-        // TODO: Query POI data, compute village bounds, send VillageBoundsS2CPayload
+    // Public so /mercantile village shares the same per-player cooldown as the C2S path —
+    // otherwise a macro'd command can outrun the rate limit that exists precisely because the
+    // POI query is expensive.
+    public static void handleRequestVillageBounds(ServerPlayer player) {
+        if (!MercantileConfig.get().enableVillageBoundaryVis) return;
+        if (player.connection == null) return;
+        if (!checkCooldown(LAST_VILLAGE_BOUNDS_MS, player.getUUID(), REQUEST_QUERY_COOLDOWN_MS)) return;
+        ServerLevel level = player.serverLevel();
+        VillageBoundsS2CPayload payload = VillageBoundsService.build(level, player.blockPosition());
+        ServerPlayNetworking.send(player, payload);
     }
 
     private static Villager resolveVillager(ServerPlayer player, int entityId) {

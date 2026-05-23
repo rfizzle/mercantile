@@ -297,7 +297,7 @@ Mercantile is part of a four-mod suite. Each mod overhauls a different Minecraft
 | **Meridian** | Enchanting | Violet / Gold | Compass rose |
 | **Mercantile** | Villagers & Trade | Green / Emerald | Market stall / scales |
 | **Tribulation** | Difficulty & Scaling | Crimson / Red | Hourglass with hearts |
-| **Prosperity** | Loot & Containers | Gold / Green | Trophy chalice |
+| **Prosperity** | Loot & Containers | Gold / Diamond Cyan | Trophy chalice |
 
 All four share:
 - Minecraft 1.21.1, Java 21, Fabric
