@@ -25,6 +25,8 @@ import java.util.Set;
 
 public final class TradeCycleManager {
 
+    private static final int CANDIDATE_REROLL_ATTEMPTS = 10;
+
     private TradeCycleManager() {
     }
 
@@ -35,6 +37,9 @@ public final class TradeCycleManager {
         MercantileVillagerData villagerData = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
         MerchantOffers offers = villager.getOffers();
         villagerData.migrateLockedTrades(offers);
+
+        int playerScore = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA).getScore();
+        evictInaccessibleExclusiveLocks(villager, villagerData, playerScore);
 
         boolean hasUnlocked = false;
         for (MerchantOffer offer : offers) {
@@ -53,11 +58,16 @@ public final class TradeCycleManager {
 
     public static boolean cycle(ServerPlayer player, Villager villager) {
         MercantileConfig config = MercantileConfig.get();
+        if (!config.enableTradeCycling) return false;
+
         MercantileVillagerData villagerData = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
         MerchantOffers offers = villager.getOffers();
         villagerData.migrateLockedTrades(offers);
 
         ExclusiveTradesManager.stripInjectedOffers(villager);
+
+        int playerScore = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA).getScore();
+        evictInaccessibleExclusiveLocks(villager, villagerData, playerScore);
 
         List<MerchantOffer> locked = new ArrayList<>();
         Set<String> lockedHashes = new HashSet<>();
@@ -70,16 +80,16 @@ public final class TradeCycleManager {
         }
 
         if (locked.size() == offers.size()) {
-            ExclusiveTradesManager.injectOffers(villager,
-                    player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA).getScore());
+            ExclusiveTradesManager.injectOffers(villager, playerScore);
+            syncOffers(player, villager);
             return false;
         }
 
         if (!player.isCreative()) {
             int cost = config.tradeCycleEmeraldCost;
             if (countEmeralds(player) < cost) {
-                ExclusiveTradesManager.injectOffers(villager,
-                        player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA).getScore());
+                ExclusiveTradesManager.injectOffers(villager, playerScore);
+                syncOffers(player, villager);
                 return false;
             }
             removeEmeralds(player, cost);
@@ -97,15 +107,19 @@ public final class TradeCycleManager {
             int slotsToFill = originalSize - locked.size();
 
             List<MerchantOffer> candidates = new ArrayList<>();
-            for (int lvl = 1; lvl <= level; lvl++) {
-                VillagerTrades.ItemListing[] listings = tradeMap.get(lvl);
-                if (listings == null || listings.length == 0) continue;
-                for (VillagerTrades.ItemListing listing : listings) {
-                    MerchantOffer offer = listing.getOffer(villager, villager.getRandom());
-                    if (offer == null) continue;
-                    String hash = OfferIdentityHash.compute(offer);
-                    if (!lockedHashes.contains(hash)) {
-                        candidates.add(offer);
+            Set<String> seenHashes = new HashSet<>(lockedHashes);
+
+            for (int attempt = 0; attempt < CANDIDATE_REROLL_ATTEMPTS && candidates.size() < slotsToFill; attempt++) {
+                for (int lvl = 1; lvl <= level; lvl++) {
+                    VillagerTrades.ItemListing[] listings = tradeMap.get(lvl);
+                    if (listings == null || listings.length == 0) continue;
+                    for (VillagerTrades.ItemListing listing : listings) {
+                        MerchantOffer offer = listing.getOffer(villager, villager.getRandom());
+                        if (offer == null) continue;
+                        String hash = OfferIdentityHash.compute(offer);
+                        if (seenHashes.add(hash)) {
+                            candidates.add(offer);
+                        }
                     }
                 }
             }
@@ -129,12 +143,18 @@ public final class TradeCycleManager {
                     15, 0.4, 0.6, 0.4, 0.02);
         }
 
+        ExclusiveTradesManager.injectOffers(villager, playerScore);
         syncOffers(player, villager);
 
-        ExclusiveTradesManager.injectOffers(villager,
-                player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA).getScore());
-
         return true;
+    }
+
+    private static void evictInaccessibleExclusiveLocks(Villager villager, MercantileVillagerData villagerData, int playerScore) {
+        Set<String> inaccessible = ExclusiveTradesManager.getInaccessibleExclusiveHashes(villager, playerScore);
+        if (inaccessible.isEmpty()) return;
+        for (String hash : inaccessible) {
+            villagerData.removeLockedTrade(hash);
+        }
     }
 
     private static void syncOffers(ServerPlayer player, Villager villager) {
@@ -155,12 +175,25 @@ public final class TradeCycleManager {
                 count += stack.getCount();
             }
         }
+        for (ItemStack stack : player.getInventory().offhand) {
+            if (stack.is(Items.EMERALD)) {
+                count += stack.getCount();
+            }
+        }
         return count;
     }
 
     private static void removeEmeralds(ServerPlayer player, int amount) {
         int remaining = amount;
         for (ItemStack stack : player.getInventory().items) {
+            if (remaining <= 0) break;
+            if (stack.is(Items.EMERALD)) {
+                int take = Math.min(remaining, stack.getCount());
+                stack.shrink(take);
+                remaining -= take;
+            }
+        }
+        for (ItemStack stack : player.getInventory().offhand) {
             if (remaining <= 0) break;
             if (stack.is(Items.EMERALD)) {
                 int take = Math.min(remaining, stack.getCount());

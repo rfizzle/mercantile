@@ -1,7 +1,10 @@
 package com.rfizzle.mercantile.mixin;
 
 import com.rfizzle.mercantile.config.MercantileConfig;
+import com.rfizzle.mercantile.reputation.ReputationManager;
+import com.rfizzle.mercantile.trade.BulkTradeContext;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MerchantContainer;
@@ -54,38 +57,48 @@ public abstract class MerchantMenuMixin extends AbstractContainerMenu {
         ItemStack firstResult = ItemStack.EMPTY;
         int tradeCount = 0;
 
-        for (int t = 0; t < 64; t++) {
-            offer.setSpecialPriceDiff(lockedPrice);
+        BulkTradeContext.enter();
+        try {
+            for (int t = 0; t < 64; t++) {
+                offer.setSpecialPriceDiff(lockedPrice);
 
-            MerchantOffer currentOffer = this.tradeContainer.getActiveOffer();
-            if (currentOffer != offer || currentOffer.isOutOfStock()) break;
-            if (!resultSlot.hasItem()) break;
+                MerchantOffer currentOffer = this.tradeContainer.getActiveOffer();
+                if (currentOffer != offer || currentOffer.isOutOfStock()) break;
+                if (!resultSlot.hasItem()) break;
 
-            ItemStack resultItem = resultSlot.getItem();
-            ItemStack resultCopy = resultItem.copy();
+                ItemStack resultItem = resultSlot.getItem();
+                ItemStack resultCopy = resultItem.copy();
 
-            if (!this.moveItemStackTo(resultItem, 3, 39, true)) break;
+                if (!this.moveItemStackTo(resultItem, 3, 39, true)) break;
 
-            resultSlot.onQuickCraft(resultItem, resultCopy);
+                resultSlot.onQuickCraft(resultItem, resultCopy);
 
-            if (resultItem.isEmpty()) {
-                resultSlot.setByPlayer(ItemStack.EMPTY);
-            } else {
-                resultSlot.setChanged();
+                if (resultItem.isEmpty()) {
+                    resultSlot.setByPlayer(ItemStack.EMPTY);
+                } else {
+                    resultSlot.setChanged();
+                }
+
+                resultSlot.onTake(player, resultItem);
+
+                if (firstResult.isEmpty()) {
+                    firstResult = resultCopy;
+                }
+                tradeCount++;
+
+                mercantile$refillPaymentSlots(offer);
             }
-
-            resultSlot.onTake(player, resultItem);
-
-            if (firstResult.isEmpty()) {
-                firstResult = resultCopy;
-            }
-            tradeCount++;
-
-            mercantile$refillPaymentSlots(offer);
+        } finally {
+            BulkTradeContext.exit();
         }
 
         if (tradeCount > 0) {
             this.playTradeSound();
+        }
+
+        MercantileConfig config = MercantileConfig.get();
+        if (tradeCount > 0 && config.enableReputation && player instanceof ServerPlayer serverPlayer) {
+            ReputationManager.modifyScore(serverPlayer, config.reputationTradeGain);
         }
 
         if (tradeCount > 1) {
@@ -107,22 +120,22 @@ public abstract class MerchantMenuMixin extends AbstractContainerMenu {
     @Unique
     private void mercantile$refillSlot(int paymentSlotIndex, ItemCost cost) {
         ItemStack current = this.tradeContainer.getItem(paymentSlotIndex);
-        int maxStackSize = cost.itemStack().getMaxStackSize();
+        int targetCount = cost.count();
         boolean changed = false;
 
         for (int i = 3; i < 39; i++) {
-            if (current.getCount() >= maxStackSize) break;
+            if (current.getCount() >= targetCount) break;
 
             ItemStack invItem = this.slots.get(i).getItem();
             if (invItem.isEmpty() || !cost.test(invItem)) continue;
 
             if (current.isEmpty()) {
-                int toMove = Math.min(invItem.getCount(), maxStackSize);
+                int toMove = Math.min(invItem.getCount(), targetCount);
                 current = invItem.copyWithCount(toMove);
                 invItem.shrink(toMove);
                 changed = true;
             } else if (ItemStack.isSameItemSameComponents(current, invItem)) {
-                int toMove = Math.min(invItem.getCount(), maxStackSize - current.getCount());
+                int toMove = Math.min(invItem.getCount(), targetCount - current.getCount());
                 current.grow(toMove);
                 invItem.shrink(toMove);
                 changed = true;

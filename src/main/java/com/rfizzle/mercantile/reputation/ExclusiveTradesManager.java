@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.rfizzle.mercantile.Mercantile;
 import com.rfizzle.mercantile.config.MercantileConfig;
+import com.rfizzle.mercantile.trade.OfferIdentityHash;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -96,6 +97,39 @@ public final class ExclusiveTradesManager {
 
         villager.getOffers().addAll(toInject);
         INJECTED_OFFERS.put(villager, toInject);
+    }
+
+    /**
+     * Computes the set of identity hashes for every exclusive trade available to {@code villager}'s
+     * profession plus all cross-profession trades that the player CANNOT currently access
+     * ({@code playerScore < trade.minScore()}). Used to evict stale lock-hash entries when the
+     * player's reputation drops below an exclusive trade's threshold.
+     */
+    public static Set<String> getInaccessibleExclusiveHashes(Villager villager, int playerScore) {
+        Map<String, List<ExclusiveTrade>> profTrades = PROFESSION_TRADES;
+        List<ExclusiveTrade> crossTrades = CROSS_PROFESSION_TRADES;
+
+        String profession = BuiltInRegistries.VILLAGER_PROFESSION
+                .getKey(villager.getVillagerData().getProfession()).getPath();
+
+        Set<String> inaccessible = new HashSet<>();
+
+        List<ExclusiveTrade> professionTrades = profTrades.get(profession);
+        if (professionTrades != null) {
+            for (ExclusiveTrade trade : professionTrades) {
+                if (playerScore < trade.minScore()) {
+                    inaccessible.add(OfferIdentityHash.compute(trade.createOffer()));
+                }
+            }
+        }
+
+        for (ExclusiveTrade trade : crossTrades) {
+            if (playerScore < trade.minScore()) {
+                inaccessible.add(OfferIdentityHash.compute(trade.createOffer()));
+            }
+        }
+
+        return inaccessible;
     }
 
     // @VisibleForTesting

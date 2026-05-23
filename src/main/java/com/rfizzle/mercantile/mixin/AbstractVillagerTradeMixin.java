@@ -4,6 +4,7 @@ import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
 import com.rfizzle.mercantile.reputation.ReputationManager;
+import com.rfizzle.mercantile.trade.BulkTradeContext;
 import com.rfizzle.mercantile.trade.OfferIdentityHash;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.npc.AbstractVillager;
@@ -36,7 +37,9 @@ public abstract class AbstractVillagerTradeMixin {
         if (config.enableReputation && villager.getTradingPlayer() instanceof ServerPlayer serverPlayer) {
             PlayerData playerData = serverPlayer.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
             playerData.incrementTradesWithVillager(villager.getUUID());
-            ReputationManager.modifyScore(serverPlayer, config.reputationTradeGain);
+            if (!BulkTradeContext.isActive()) {
+                ReputationManager.modifyScore(serverPlayer, config.reputationTradeGain);
+            }
         }
     }
 }

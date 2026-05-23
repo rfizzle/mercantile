@@ -56,6 +56,10 @@ public class MercantileVillagerData {
         return lockedTrades.add(identityHash);
     }
 
+    public boolean removeLockedTrade(String identityHash) {
+        return lockedTrades.remove(identityHash);
+    }
+
     public boolean isTradeLocked(String identityHash) {
         return lockedTrades.contains(identityHash);
     }

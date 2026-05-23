@@ -1,8 +1,12 @@
 package com.rfizzle.mercantile.gametest;
 
+import com.rfizzle.mercantile.config.MercantileConfig;
+import com.rfizzle.mercantile.data.MercantileAttachments;
+import com.rfizzle.mercantile.data.PlayerData;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
@@ -14,6 +18,8 @@ import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.trading.MerchantOffers;
 import net.minecraft.world.level.GameType;
+
+import java.util.Optional;
 
 public class BulkTradingGameTest implements FabricGameTest {
 
@@ -144,6 +150,92 @@ public class BulkTradingGameTest implements FabricGameTest {
         helper.assertTrue(total == 10,
                 "No item loss: expected 10 accounted items, got " + total);
         helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void dualCostBulkExecution(GameTestHelper helper) {
+        MerchantOffer offer = new MerchantOffer(
+                new ItemCost(Items.EMERALD, 2), Optional.of(new ItemCost(Items.PAPER, 1)),
+                new ItemStack(Items.BOOK, 1), 16, 1, 0.0f);
+        Villager villager = spawnTrader(helper, offer);
+
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        villager.setTradingPlayer(player);
+        // Enough emeralds for many trades but paper only for 8 — paper runs out first.
+        player.getInventory().add(new ItemStack(Items.EMERALD, 64));
+        player.getInventory().add(new ItemStack(Items.PAPER, 8));
+
+        MerchantMenu menu = new MerchantMenu(0, player.getInventory(), villager);
+        menu.setSelectionHint(0);
+        menu.tryMoveItems(0);
+        menu.quickMoveStack(player, 2);
+
+        helper.assertTrue(offer.getUses() == 8,
+                "Expected 8 trades (paper-limited), got " + offer.getUses());
+        helper.assertTrue(countItems(player, Items.BOOK) == 8,
+                "Expected 8 books, got " + countItems(player, Items.BOOK));
+
+        int emeraldsInPayment = countSlotItem(menu, 0, Items.EMERALD);
+        int emeraldsInInventory = countItems(player, Items.EMERALD);
+        int emeraldsTotal = emeraldsInPayment + emeraldsInInventory;
+        helper.assertTrue(emeraldsTotal == 64 - (8 * 2),
+                "Expected " + (64 - 16) + " emeralds remaining, got " + emeraldsTotal);
+
+        int paperInPayment = countSlotItem(menu, 1, Items.PAPER);
+        int paperInInventory = countItems(player, Items.PAPER);
+        helper.assertTrue(paperInPayment + paperInInventory == 0,
+                "Expected 0 paper remaining, got " + (paperInPayment + paperInInventory));
+
+        // B-047: payment slots must hold at most cost.count() residue after the loop ends.
+        helper.assertTrue(emeraldsInPayment <= 2,
+                "Payment slot 0 over-filled (B-047): " + emeraldsInPayment + " > 2");
+        helper.assertTrue(paperInPayment <= 1,
+                "Payment slot 1 over-filled (B-047): " + paperInPayment + " > 1");
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void bulkReputationCappedAtOnePerOperation(GameTestHelper helper) {
+        boolean savedRep = MercantileConfig.get().enableReputation;
+        boolean savedBulk = MercantileConfig.get().enableBulkTrading;
+        try {
+            MercantileConfig.get().enableReputation = true;
+            MercantileConfig.get().enableBulkTrading = true;
+
+            MerchantOffer offer = new MerchantOffer(
+                    new ItemCost(Items.EMERALD, 1), new ItemStack(Items.APPLE, 1), 16, 1, 0.0f);
+            Villager villager = spawnTrader(helper, offer);
+
+            ServerPlayer player = helper.makeMockServerPlayerInLevel();
+            PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
+            data.setScore(0);
+
+            villager.setTradingPlayer(player);
+            player.getInventory().add(new ItemStack(Items.EMERALD, 10));
+
+            MerchantMenu menu = new MerchantMenu(0, player.getInventory(), villager);
+            menu.setSelectionHint(0);
+            menu.tryMoveItems(0);
+            menu.quickMoveStack(player, 2);
+
+            helper.assertTrue(offer.getUses() == 10,
+                    "Expected 10 trades, got " + offer.getUses());
+
+            int expected = MercantileConfig.get().reputationTradeGain;
+            helper.assertTrue(data.getScore() == expected,
+                    "Bulk rep should be capped to " + expected + " (one gain), got " + data.getScore());
+
+            // Counter is per-trade and not capped by BulkTradeContext.
+            helper.assertTrue(data.getTradesWithVillager(villager.getUUID()) == 10,
+                    "Trade counter should record all 10 trades, got "
+                            + data.getTradesWithVillager(villager.getUUID()));
+
+            player.discard();
+            helper.succeed();
+        } finally {
+            MercantileConfig.get().enableReputation = savedRep;
+            MercantileConfig.get().enableBulkTrading = savedBulk;
+        }
     }
 
     private Villager spawnTrader(GameTestHelper helper, MerchantOffer offer) {

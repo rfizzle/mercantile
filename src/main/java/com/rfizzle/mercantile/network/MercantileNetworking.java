@@ -95,8 +95,6 @@ public class MercantileNetworking {
     }
 
     private static void handleCycleTrades(ServerPlayer player, CycleTradesC2SPayload payload) {
-        if (!MercantileConfig.get().enableTradeCycling) return;
-
         Villager villager = resolveVillager(player, payload.villagerEntityId());
         if (villager == null) return;
 
@@ -105,7 +103,6 @@ public class MercantileNetworking {
             return;
         }
 
-        if (!TradeCycleManager.canCycle(player, villager)) return;
         TradeCycleManager.cycle(player, villager);
     }
 
