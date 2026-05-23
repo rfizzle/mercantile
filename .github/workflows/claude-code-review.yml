@@ -1,0 +1,39 @@
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
+
+concurrency:
+  group: claude-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: read
+  id-token: write
+
+jobs:
+  review:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Claude Code Review
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Review this pull request for the Mercantile Minecraft mod. Focus on:
+            - Correctness bugs and logic errors
+            - Thread safety issues (client/server boundaries, shared state)
+            - Adherence to project conventions in CLAUDE.md (Mojang mappings, mod ID usage, vanilla-first assets, source set boundaries)
+            - Missing tests for non-trivial logic
+            - Mixin safety (injection points, return handling)
+
+            Provide a concise review with inline comments where appropriate. Skip nitpicks and style-only feedback.
