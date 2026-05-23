@@ -51,6 +51,7 @@ class MercantileConfigTest {
         assertTrue(config.enableBellRadiusVis);
         assertTrue(config.enableVillageBoundaryVis);
         assertTrue(config.enableInfoPanel);
+        assertTrue(config.enableReputationHud);
     }
 
     @Test
@@ -65,6 +66,7 @@ class MercantileConfigTest {
         original.villagerSoundVolume = 0.25f;
         original.enablePathfindingLadders = false;
         original.pylonDetectionRadius = 64;
+        original.enableReputationHud = false;
 
         String json = GSON.toJson(original);
         MercantileConfig restored = GSON.fromJson(json, MercantileConfig.class);
@@ -78,6 +80,7 @@ class MercantileConfigTest {
         assertEquals(0.25f, restored.villagerSoundVolume);
         assertFalse(restored.enablePathfindingLadders);
         assertEquals(64, restored.pylonDetectionRadius);
+        assertFalse(restored.enableReputationHud);
     }
 
     @Test
@@ -396,5 +399,36 @@ class MercantileConfigTest {
         assertTrue(loaded.enableVillagerPickup);
         assertEquals(defaults.tradeCycleEmeraldCost, loaded.tradeCycleEmeraldCost);
         assertEquals(defaults.reputationTradeGain, loaded.reputationTradeGain);
+    }
+
+    @Test
+    void enableReputationHudPartialFilePreservesDefault(@TempDir Path tempDir) throws IOException {
+        Path configFile = tempDir.resolve("mercantile.json");
+        Files.writeString(configFile, """
+                {
+                  "pickupXpCost": 7
+                }
+                """);
+
+        MercantileConfig loaded = MercantileConfig.load(configFile);
+
+        assertEquals(7, loaded.pickupXpCost);
+        assertTrue(loaded.enableReputationHud,
+                "enableReputationHud should default to true when not in file");
+    }
+
+    @Test
+    void enableReputationHudExplicitFalseRoundTripsThroughFile(@TempDir Path tempDir) throws IOException {
+        Path configFile = tempDir.resolve("mercantile.json");
+        Files.writeString(configFile, """
+                {
+                  "enableReputationHud": false
+                }
+                """);
+
+        MercantileConfig loaded = MercantileConfig.load(configFile);
+
+        assertFalse(loaded.enableReputationHud,
+                "explicit false must survive file-load + clamp pipeline");
     }
 }

@@ -104,6 +104,8 @@
     "mercantile.config.enableVillageBoundaryVis.tooltip": "Show village boundary outline and POI markers",
     "mercantile.config.enableInfoPanel": "Info Panel",
     "mercantile.config.enableInfoPanel.tooltip": "Show extended villager info panel in the trade GUI",
+    "mercantile.config.enableReputationHud": "Reputation HUD",
+    "mercantile.config.enableReputationHud.tooltip": "Show a compact reputation indicator on the HUD when villagers are nearby",
 
     "mercantile.pickup.not_enough_xp": "Not enough experience",
     "mercantile.pickup.success": "Picked up villager",

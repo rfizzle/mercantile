@@ -82,6 +82,7 @@ public class MercantileConfig {
     public boolean enableBellRadiusVis = true;
     public boolean enableVillageBoundaryVis = true;
     public boolean enableInfoPanel = true;
+    public boolean enableReputationHud = true;
 
     public void clamp() {
         pickupXpCost = Math.clamp(pickupXpCost, 0, Integer.MAX_VALUE);

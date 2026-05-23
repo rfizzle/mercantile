@@ -245,6 +245,11 @@ public class ModMenuIntegration implements ModMenuApi {
                     .setTooltip(Component.translatable("mercantile.config.enableInfoPanel.tooltip"))
                     .setSaveConsumer(v -> config.enableInfoPanel = v)
                     .build());
+            client.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableReputationHud"), config.enableReputationHud)
+                    .setDefaultValue(defaults.enableReputationHud)
+                    .setTooltip(Component.translatable("mercantile.config.enableReputationHud.tooltip"))
+                    .setSaveConsumer(v -> config.enableReputationHud = v)
+                    .build());
 
             return builder.build();
         };

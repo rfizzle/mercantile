@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.client;
 
+import com.rfizzle.mercantile.client.hud.ReputationHudOverlay;
 import com.rfizzle.mercantile.client.network.ClientMercantileData;
 import com.rfizzle.mercantile.client.network.ClientNetworkHandler;
 import com.rfizzle.mercantile.client.particle.CycleGlintParticle;
@@ -24,6 +25,7 @@ public class MercantileClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ClientNetworkHandler.init();
+        ReputationHudOverlay.register();
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             ClientMercantileData.clear();
             BellGlowTracker.clear();

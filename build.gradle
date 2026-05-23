@@ -136,6 +136,11 @@ loom {
     }
 }
 
+// Expose client source set classes to JUnit tests (output only — no transitive deps).
+// Lets pure-math helpers on client-only classes be tested without enabling fabric-api at test runtime.
+sourceSets.test.compileClasspath += sourceSets.client.output
+sourceSets.test.runtimeClasspath += sourceSets.client.output
+
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings loom.officialMojangMappings()
