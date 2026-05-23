@@ -20,7 +20,6 @@ class MercantileVillagerDataCodecTest {
         assertFalse(data.isProfessionLocked());
         assertTrue(data.getLockedTrades().isEmpty());
         assertFalse(data.isNameAssigned());
-        assertFalse(data.isHealBoosted());
     }
 
     @Test
@@ -39,7 +38,6 @@ class MercantileVillagerDataCodecTest {
         assertTrue(decoded.isTradeLocked("hash_abc"));
         assertTrue(decoded.isTradeLocked("hash_def"));
         assertTrue(decoded.isNameAssigned());
-        assertFalse(decoded.isHealBoosted());
     }
 
     @Test
@@ -52,7 +50,6 @@ class MercantileVillagerDataCodecTest {
         assertTrue(decoded.isProfessionLocked());
         assertTrue(decoded.getLockedTrades().isEmpty());
         assertFalse(decoded.isNameAssigned());
-        assertFalse(decoded.isHealBoosted());
     }
 
     @Test
@@ -62,12 +59,11 @@ class MercantileVillagerDataCodecTest {
         assertFalse(decoded.isProfessionLocked());
         assertTrue(decoded.getLockedTrades().isEmpty());
         assertFalse(decoded.isNameAssigned());
-        assertFalse(decoded.isHealBoosted());
     }
 
     @Test
     void constructorWithValues() {
-        MercantileVillagerData data = new MercantileVillagerData(true, Set.of("h1", "h2"), true, false, false);
+        MercantileVillagerData data = new MercantileVillagerData(true, Set.of("h1", "h2"), true, false);
 
         assertTrue(data.isProfessionLocked());
         assertEquals(2, data.getLockedTrades().size());
@@ -149,12 +145,26 @@ class MercantileVillagerDataCodecTest {
         input.add("alpha");
         input.add("november");
 
-        MercantileVillagerData data = new MercantileVillagerData(false, input, false, false, false);
+        MercantileVillagerData data = new MercantileVillagerData(false, input, false, false);
         JsonElement encoded = MercantileVillagerData.CODEC.encodeStart(JsonOps.INSTANCE, data).getOrThrow();
         JsonArray arr = encoded.getAsJsonObject().getAsJsonArray("lockedTrades");
 
         assertEquals("alpha", arr.get(0).getAsString());
         assertEquals("november", arr.get(1).getAsString());
         assertEquals("xray", arr.get(2).getAsString());
+    }
+
+    @Test
+    void legacyHealBoostedFieldIgnored() {
+        // Old saves carried a "healBoosted" field; the new codec must accept and silently ignore it.
+        JsonObject legacy = new JsonObject();
+        legacy.addProperty("professionLocked", true);
+        legacy.addProperty("nameAssigned", true);
+        legacy.addProperty("healBoosted", true);
+
+        MercantileVillagerData decoded = MercantileVillagerData.CODEC.parse(JsonOps.INSTANCE, legacy).getOrThrow();
+
+        assertTrue(decoded.isProfessionLocked());
+        assertTrue(decoded.isNameAssigned());
     }
 }

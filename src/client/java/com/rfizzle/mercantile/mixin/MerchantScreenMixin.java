@@ -16,6 +16,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MerchantMenu;
 import net.minecraft.world.item.Items;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -71,7 +72,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     private void mercantile$updateCycleButtonState(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
         if (mercantile$cycleButton == null) return;
 
-        VillagerInfoPanelS2CPayload info = ClientMercantileData.getVillagerInfo();
+        VillagerInfoPanelS2CPayload info = mercantile$validInfo();
         MercantileConfig config = ClientMercantileData.getServerConfig();
         if (config == null) config = MercantileConfig.get();
 
@@ -96,7 +97,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
 
     @Inject(method = "renderLabels", at = @At("TAIL"))
     private void mercantile$renderLockIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, CallbackInfo ci) {
-        VillagerInfoPanelS2CPayload info = ClientMercantileData.getVillagerInfo();
+        VillagerInfoPanelS2CPayload info = mercantile$validInfo();
         if (info == null) return;
 
         Component titleComponent = mercantile$getTitleComponent();
@@ -111,7 +112,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
 
     @Inject(method = "render", at = @At("TAIL"))
     private void mercantile$renderTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
-        VillagerInfoPanelS2CPayload info = ClientMercantileData.getVillagerInfo();
+        VillagerInfoPanelS2CPayload info = mercantile$validInfo();
         if (info == null) return;
 
         Component titleComponent = mercantile$getTitleComponent();
@@ -139,9 +140,15 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
 
     @Unique
     private void mercantile$onCycleClick() {
-        VillagerInfoPanelS2CPayload info = ClientMercantileData.getVillagerInfo();
+        VillagerInfoPanelS2CPayload info = mercantile$validInfo();
         if (info == null) return;
         ClientPlayNetworking.send(new CycleTradesC2SPayload(info.villagerEntityId()));
+    }
+
+    @Unique
+    @Nullable
+    private VillagerInfoPanelS2CPayload mercantile$validInfo() {
+        return ClientMercantileData.getVillagerInfo();
     }
 
     @Unique

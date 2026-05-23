@@ -9,8 +9,12 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.LadderBlock;
 import net.minecraft.world.level.block.StairBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.DoorHingeSide;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.pathfinder.Path;
 
@@ -124,6 +128,37 @@ public class PathfindingGameTest implements FabricGameTest {
                 MercantileConfig.get().enablePathfindingFixes = orig;
             }
         });
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void doubleDoorBothHalvesOpen(GameTestHelper helper) {
+        buildFloor(helper);
+
+        BlockState leftLower = Blocks.OAK_DOOR.defaultBlockState()
+                .setValue(DoorBlock.FACING, Direction.NORTH)
+                .setValue(DoorBlock.HINGE, DoorHingeSide.LEFT)
+                .setValue(DoorBlock.HALF, DoubleBlockHalf.LOWER)
+                .setValue(DoorBlock.OPEN, false);
+        BlockState leftUpper = leftLower.setValue(DoorBlock.HALF, DoubleBlockHalf.UPPER);
+        BlockState rightLower = leftLower.setValue(DoorBlock.HINGE, DoorHingeSide.RIGHT);
+        BlockState rightUpper = leftUpper.setValue(DoorBlock.HINGE, DoorHingeSide.RIGHT);
+
+        BlockPos leftPos = new BlockPos(2, 1, 2);
+        BlockPos rightPos = new BlockPos(3, 1, 2);
+        helper.setBlock(leftPos, leftLower);
+        helper.setBlock(new BlockPos(2, 2, 2), leftUpper);
+        helper.setBlock(rightPos, rightLower);
+        helper.setBlock(new BlockPos(3, 2, 2), rightUpper);
+
+        Villager villager = helper.spawn(EntityType.VILLAGER, 2, 1, 0);
+        DoorBlock door = (DoorBlock) leftLower.getBlock();
+
+        door.setOpen(villager, helper.getLevel(), helper.getBlockState(leftPos),
+                helper.absolutePos(leftPos), true);
+
+        helper.assertBlockProperty(leftPos, DoorBlock.OPEN, true);
+        helper.assertBlockProperty(rightPos, DoorBlock.OPEN, true);
+        helper.succeed();
     }
 
     private void buildFloor(GameTestHelper helper) {

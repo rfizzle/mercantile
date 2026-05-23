@@ -55,6 +55,7 @@ public class MercantileConfig {
     public boolean enableProfessionLock = true;
 
     // Healing
+    public boolean enableHealing = true;
     public float healingMultiplier = 2.0f;
 
     // Trade GUI

@@ -55,6 +55,29 @@ public class ProfessionLockGameTest implements FabricGameTest {
     }
 
     @GameTest(template = EMPTY_STRUCTURE)
+    public void lockPreservesBundledLevelChange(GameTestHelper helper) {
+        Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
+        villager.setVillagerData(villager.getVillagerData()
+                .setProfession(VillagerProfession.FARMER)
+                .setLevel(1));
+
+        MercantileVillagerData data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
+        data.setProfessionLocked(true);
+
+        villager.setVillagerData(villager.getVillagerData()
+                .setProfession(VillagerProfession.NONE)
+                .setLevel(3));
+
+        helper.assertTrue(
+                villager.getVillagerData().getProfession() == VillagerProfession.FARMER,
+                "Locked profession should be preserved");
+        helper.assertTrue(
+                villager.getVillagerData().getLevel() == 3,
+                "Bundled level change should still apply when profession is locked");
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
     public void unlockedVillagerCanLoseProfession(GameTestHelper helper) {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
         villager.setVillagerData(villager.getVillagerData().setProfession(VillagerProfession.FARMER));

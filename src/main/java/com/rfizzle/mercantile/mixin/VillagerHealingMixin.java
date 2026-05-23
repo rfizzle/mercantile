@@ -1,57 +1,48 @@
 package com.rfizzle.mercantile.mixin;
 
 import com.rfizzle.mercantile.config.MercantileConfig;
-import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.healing.VillagerHealingContext;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.npc.Villager;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
 public abstract class VillagerHealingMixin {
 
     @ModifyVariable(method = "heal", at = @At("HEAD"), argsOnly = true)
     private float mercantile$boostHeal(float amount) {
-        if (!((Object) this instanceof Villager villager)) return amount;
-        if (VillagerHealingContext.isActive()) {
-            return amount * MercantileConfig.get().healingMultiplier;
-        }
-        var data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
-        if (data.isHealBoosted()) {
-            return amount * MercantileConfig.get().healingMultiplier;
-        }
-        return amount;
+        if (!((Object) this instanceof Villager)) return amount;
+        if (!MercantileConfig.get().enableHealing) return amount;
+        if (!VillagerHealingContext.isActive()) return amount;
+        return amount * MercantileConfig.get().healingMultiplier;
     }
 
-    @Inject(method = "addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z",
-            at = @At("HEAD"))
-    private void mercantile$trackBoostedRegen(MobEffectInstance effect, @Nullable Entity source, CallbackInfoReturnable<Boolean> cir) {
-        if (!((Object) this instanceof Villager villager)) return;
-        if (!effect.getEffect().is(MobEffects.REGENERATION)) return;
+    @ModifyVariable(method = "addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z",
+            at = @At("HEAD"), argsOnly = true)
+    private MobEffectInstance mercantile$doubleRegenDuration(MobEffectInstance effect) {
+        if (effect == null) return effect;
+        if (!((Object) this instanceof Villager)) return effect;
+        if (!MercantileConfig.get().enableHealing) return effect;
+        if (!VillagerHealingContext.isActive()) return effect;
+        if (!effect.getEffect().is(MobEffects.REGENERATION)) return effect;
+        if (effect.isInfiniteDuration()) return effect;
 
-        var data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
-        if (VillagerHealingContext.isActive()) {
-            data.setHealBoosted(true);
-        } else {
-            data.setHealBoosted(false);
-        }
-    }
-
-    @Inject(method = "onEffectRemoved", at = @At("HEAD"))
-    protected void mercantile$clearHealBoost(MobEffectInstance effect, CallbackInfo ci) {
-        if (!((Object) this instanceof Villager villager)) return;
-        if (!effect.getEffect().is(MobEffects.REGENERATION)) return;
-
-        var data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
-        data.setHealBoosted(false);
+        float multiplier = MercantileConfig.get().healingMultiplier;
+        long scaled = (long) (effect.getDuration() * multiplier);
+        int newDuration = scaled > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) scaled;
+        MobEffectInstance hidden = ((MobEffectInstanceAccessor) (Object) effect).mercantile$getHiddenEffect();
+        return new MobEffectInstance(
+                effect.getEffect(),
+                newDuration,
+                effect.getAmplifier(),
+                effect.isAmbient(),
+                effect.isVisible(),
+                effect.showIcon(),
+                hidden
+        );
     }
 }

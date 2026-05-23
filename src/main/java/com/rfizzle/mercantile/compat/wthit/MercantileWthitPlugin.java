@@ -10,6 +10,6 @@ public class MercantileWthitPlugin implements IWailaPlugin {
     @Override
     public void register(IRegistrar registrar) {
         registrar.addComponent(VillagerLockWthitProvider.INSTANCE, TooltipPosition.BODY, Villager.class);
-        registrar.addDataContext(VillagerLockWthitProvider.INSTANCE, Villager.class);
+        registrar.addEntityData(VillagerLockWthitDataProvider.INSTANCE, Villager.class);
     }
 }

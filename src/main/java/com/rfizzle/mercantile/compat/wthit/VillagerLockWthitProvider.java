@@ -1,8 +1,9 @@
 package com.rfizzle.mercantile.compat.wthit;
 
-import com.rfizzle.mercantile.config.MercantileConfig;
-import com.rfizzle.mercantile.data.MercantileAttachments;
-import mcp.mobius.waila.api.*;
+import mcp.mobius.waila.api.IEntityAccessor;
+import mcp.mobius.waila.api.IEntityComponentProvider;
+import mcp.mobius.waila.api.IPluginConfig;
+import mcp.mobius.waila.api.ITooltip;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerProfession;
@@ -10,16 +11,7 @@ import net.minecraft.world.entity.npc.VillagerProfession;
 public enum VillagerLockWthitProvider implements IEntityComponentProvider {
     INSTANCE;
 
-    private static final String KEY = "mercantile:professionLocked";
-
-    @Override
-    public void appendDataContext(IDataWriter data, IEntityAccessor accessor, IPluginConfig config) {
-        if (!MercantileConfig.get().enableProfessionLock) return;
-        if (!(accessor.<Villager>getEntity() instanceof Villager villager)) return;
-
-        var modData = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
-        data.raw().putBoolean(KEY, modData.isProfessionLocked());
-    }
+    static final String KEY = "mercantile:professionLocked";
 
     @Override
     public void appendBody(ITooltip tooltip, IEntityAccessor accessor, IPluginConfig config) {

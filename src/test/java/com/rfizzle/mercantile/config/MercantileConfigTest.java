@@ -37,6 +37,7 @@ class MercantileConfigTest {
         assertTrue(config.enablePathfindingWater);
         assertTrue(config.enableBulkTrading);
         assertTrue(config.enableProfessionLock);
+        assertTrue(config.enableHealing);
         assertEquals(2.0f, config.healingMultiplier);
         assertTrue(config.enableRestockIndicator);
         assertTrue(config.enableDemandTransparency);
@@ -59,6 +60,7 @@ class MercantileConfigTest {
         original.pickupXpCost = 10;
         original.tradeCycleEmeraldCost = 12;
         original.reputationKillLoss = 50;
+        original.enableHealing = false;
         original.healingMultiplier = 3.5f;
         original.villagerSoundVolume = 0.25f;
         original.enablePathfindingLadders = false;
@@ -71,6 +73,7 @@ class MercantileConfigTest {
         assertEquals(10, restored.pickupXpCost);
         assertEquals(12, restored.tradeCycleEmeraldCost);
         assertEquals(50, restored.reputationKillLoss);
+        assertFalse(restored.enableHealing);
         assertEquals(3.5f, restored.healingMultiplier);
         assertEquals(0.25f, restored.villagerSoundVolume);
         assertFalse(restored.enablePathfindingLadders);

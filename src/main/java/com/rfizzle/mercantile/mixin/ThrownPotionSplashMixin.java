@@ -1,26 +1,40 @@
 package com.rfizzle.mercantile.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.rfizzle.mercantile.healing.VillagerHealingContext;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.projectile.ThrownPotion;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(ThrownPotion.class)
 public abstract class ThrownPotionSplashMixin {
 
-    @Inject(method = "applySplash", at = @At("HEAD"))
-    private void mercantile$enterHealingContext(Iterable<MobEffectInstance> iterable, @Nullable Entity entity, CallbackInfo ci) {
-        VillagerHealingContext.exit(); // reset any state leaked by a prior exception before RETURN
+    @WrapMethod(method = "applySplash")
+    private void mercantile$wrapApplySplash(Iterable<MobEffectInstance> effects, @Nullable Entity entity, Operation<Void> original) {
+        if (!mercantile$containsHealingOrRegen(effects)) {
+            original.call(effects, entity);
+            return;
+        }
         VillagerHealingContext.enter();
+        try {
+            original.call(effects, entity);
+        } finally {
+            VillagerHealingContext.exit();
+        }
     }
 
-    @Inject(method = "applySplash", at = @At("RETURN"))
-    private void mercantile$exitHealingContext(Iterable<MobEffectInstance> iterable, @Nullable Entity entity, CallbackInfo ci) {
-        VillagerHealingContext.exit();
+    @Unique
+    private static boolean mercantile$containsHealingOrRegen(Iterable<MobEffectInstance> effects) {
+        for (MobEffectInstance effect : effects) {
+            if (effect.getEffect().is(MobEffects.HEAL) || effect.getEffect().is(MobEffects.REGENERATION)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

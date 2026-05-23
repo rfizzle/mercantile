@@ -9,12 +9,19 @@ import com.rfizzle.mercantile.particle.MercantileParticles;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
+import net.minecraft.client.gui.screens.inventory.MerchantScreen;
 
 public class MercantileClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ClientNetworkHandler.init();
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ClientMercantileData.clear());
+        ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
+            if (screen instanceof MerchantScreen) {
+                ScreenEvents.remove(screen).register(s -> ClientMercantileData.clearMerchantScreenData());
+            }
+        });
         ParticleFactoryRegistry.getInstance().register(MercantileParticles.CYCLE_GLINT, CycleGlintParticle.Provider::new);
         ParticleFactoryRegistry.getInstance().register(MercantileParticles.PICKUP_SPARKLE, PickupSparkleParticle.Provider::new);
         ParticleFactoryRegistry.getInstance().register(MercantileParticles.FOLLOW_TRAIL, FollowTrailParticle.Provider::new);

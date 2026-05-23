@@ -5,11 +5,13 @@
     "compatibilityLevel": "JAVA_21",
     "mixins": [
         "AbstractVillagerTradeMixin",
+        "AreaEffectCloudAccessor",
         "AreaEffectCloudMixin",
         "DoorBlockMixin",
         "FenceGateBlockAccessor",
         "GroundPathNavigationMixin",
         "MerchantMenuMixin",
+        "MobEffectInstanceAccessor",
         "ThrownPotionSplashMixin",
         "VillagerFollowMixin",
         "VillagerFollowPushMixin",

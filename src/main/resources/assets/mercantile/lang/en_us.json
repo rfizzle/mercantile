@@ -71,6 +71,8 @@
     "mercantile.config.enableBulkTrading.tooltip": "Shift-click to execute a trade multiple times",
     "mercantile.config.enableProfessionLock": "Enable Profession Lock",
     "mercantile.config.enableProfessionLock.tooltip": "Lock villager professions after trading",
+    "mercantile.config.enableHealing": "Enable Villager Healing",
+    "mercantile.config.enableHealing.tooltip": "Apply healing/regen multiplier to villagers hit by splash or lingering potions",
     "mercantile.config.healingMultiplier": "Healing Multiplier",
     "mercantile.config.healingMultiplier.tooltip": "Potion healing multiplier for villagers (1.0 = vanilla)",
     "mercantile.config.enableRestockIndicator": "Enable Restock Indicator",

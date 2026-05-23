@@ -31,6 +31,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * {@code mercantile$adjustPathType} method to eliminate injection-ordering ambiguity (BUG-042).
  * The original value is snapshotted before any branch modifies the CIR so sub-config flags
  * (enablePathfindingDoors, enablePathfindingWater) remain independently honoured.
+ *
+ * {@code mercantile$handleStairSlabStepUp} runs at RETURN (B-041): it only substitutes a
+ * stair/slab step-up node when vanilla's {@code findAcceptedNode} returned {@code null} or
+ * a {@code BLOCKED} node. This preserves vanilla's collision, hazard, swim, door, and
+ * fence-gate validation rather than short-circuiting it at HEAD.
  */
 @Mixin(WalkNodeEvaluator.class)
 public abstract class WalkNodeEvaluatorMixin extends NodeEvaluator {
@@ -62,13 +67,16 @@ public abstract class WalkNodeEvaluatorMixin extends NodeEvaluator {
         }
     }
 
-    @Inject(method = "findAcceptedNode", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "findAcceptedNode", at = @At("RETURN"), cancellable = true)
     private void mercantile$handleStairSlabStepUp(int i, int j, int k, int l, double d,
                                                   Direction direction, PathType pathType,
                                                   CallbackInfoReturnable<Node> cir) {
         if (!(this.mob instanceof Villager)) return;
         if (!MercantileConfig.get().enablePathfindingFixes) return;
         if (!MercantileConfig.get().enablePathfindingStairs) return;
+
+        Node existing = cir.getReturnValue();
+        if (existing != null && existing.type != PathType.BLOCKED) return;
 
         BlockState state = this.currentContext.getBlockState(new BlockPos(i, j, k));
         if (!mercantile$isSteppableBlock(state)) return;

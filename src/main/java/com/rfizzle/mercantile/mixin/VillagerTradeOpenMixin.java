@@ -82,6 +82,7 @@ public abstract class VillagerTradeOpenMixin {
 
     @Inject(method = "startTrading", at = @At("TAIL"))
     private void mercantile$sendInfoOnTradeOpen(Player player, CallbackInfo ci) {
+        if (!MercantileConfig.get().enableInfoPanel) return;
         if (!(player instanceof ServerPlayer serverPlayer)) return;
         if (serverPlayer.connection == null) return;
 

@@ -46,6 +46,12 @@ public class InteractWithFenceGate {
                     return false;
                 }
 
+                if (livingEntity.isRemoved() || !livingEntity.isAlive()) {
+                    closeGatesThatWeHavePassed(serverLevel, livingEntity, null, null, gatesToClose,
+                            instance.tryGet(nearbyAccessor));
+                    return false;
+                }
+
                 Path path = instance.get(pathAccessor);
                 if (path.notStarted() || path.isDone()) {
                     closeGatesThatWeHavePassed(serverLevel, livingEntity, null, null, gatesToClose,
@@ -54,9 +60,11 @@ public class InteractWithFenceGate {
                 }
 
                 if (Objects.equals(lastNode.getValue(), path.getNextNode())) {
+                    if (cooldown.decrementAndGet() > 0) {
+                        return false;
+                    }
+                } else {
                     cooldown.setValue(COOLDOWN_BEFORE_RERUNNING_IN_SAME_NODE);
-                } else if (cooldown.decrementAndGet() > 0) {
-                    return false;
                 }
 
                 lastNode.setValue(path.getNextNode());
@@ -119,7 +127,6 @@ public class InteractWithFenceGate {
             }
 
             if (areOtherMobsComingThrough(entity, pos, nearby)) {
-                it.remove();
                 continue;
             }
 

@@ -153,6 +153,11 @@ public class ModMenuIntegration implements ModMenuApi {
                     .setTooltip(Component.translatable("mercantile.config.enableProfessionLock.tooltip"))
                     .setSaveConsumer(v -> config.enableProfessionLock = v)
                     .build());
+            trading.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableHealing"), config.enableHealing)
+                    .setDefaultValue(defaults.enableHealing)
+                    .setTooltip(Component.translatable("mercantile.config.enableHealing.tooltip"))
+                    .setSaveConsumer(v -> config.enableHealing = v)
+                    .build());
             trading.addEntry(entry.startFloatField(Component.translatable("mercantile.config.healingMultiplier"), config.healingMultiplier)
                     .setDefaultValue(defaults.healingMultiplier)
                     .setMin(1.0f).setMax(10.0f)

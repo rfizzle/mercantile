@@ -19,8 +19,6 @@ public class MercantileVillagerData {
                             .forGetter(MercantileVillagerData::getLockedTrades),
                     Codec.BOOL.optionalFieldOf("nameAssigned", false)
                             .forGetter(MercantileVillagerData::isNameAssigned),
-                    Codec.BOOL.optionalFieldOf("healBoosted", false)
-                            .forGetter(MercantileVillagerData::isHealBoosted),
                     Codec.BOOL.optionalFieldOf("tradesMigrated", false)
                             .forGetter(MercantileVillagerData::isTradesMigrated)
             ).apply(instance, MercantileVillagerData::new)
@@ -29,18 +27,16 @@ public class MercantileVillagerData {
     private boolean professionLocked;
     private final Set<String> lockedTrades;
     private boolean nameAssigned;
-    private boolean healBoosted;
     private boolean tradesMigrated;
 
     public MercantileVillagerData() {
-        this(false, Set.of(), false, false, false);
+        this(false, Set.of(), false, false);
     }
 
-    public MercantileVillagerData(boolean professionLocked, Set<String> lockedTrades, boolean nameAssigned, boolean healBoosted, boolean tradesMigrated) {
+    public MercantileVillagerData(boolean professionLocked, Set<String> lockedTrades, boolean nameAssigned, boolean tradesMigrated) {
         this.professionLocked = professionLocked;
         this.lockedTrades = new HashSet<>(lockedTrades);
         this.nameAssigned = nameAssigned;
-        this.healBoosted = healBoosted;
         this.tradesMigrated = tradesMigrated;
     }
 
@@ -101,13 +97,5 @@ public class MercantileVillagerData {
 
     public void setNameAssigned(boolean assigned) {
         this.nameAssigned = assigned;
-    }
-
-    public boolean isHealBoosted() {
-        return healBoosted;
-    }
-
-    public void setHealBoosted(boolean boosted) {
-        this.healBoosted = boosted;
     }
 }
