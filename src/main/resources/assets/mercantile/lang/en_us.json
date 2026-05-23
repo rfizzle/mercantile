@@ -7,6 +7,7 @@
     "command.mercantile.reputation.add": "Added %s reputation to %s, now %s (%s)",
     "command.mercantile.reputation.not_player": "This command must be run by a player",
     "command.mercantile.village.not_player": "This command must be run by a player",
+    "command.mercantile.village.not_implemented": "Village boundary visualization is not implemented yet",
     "gui.mercantile.cycle_trades": "Cycle Trades",
     "gui.mercantile.cycle_trades.tooltip": "Re-roll unlocked trades (%s emeralds)",
     "gui.mercantile.cycle_trades.cost": "Cost: %s levels",

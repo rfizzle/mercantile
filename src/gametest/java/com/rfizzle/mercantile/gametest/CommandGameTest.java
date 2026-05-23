@@ -44,8 +44,19 @@ public class CommandGameTest implements FabricGameTest {
         helper.assertTrue(mercantile.getChild("reload").canUse(op),
                 "reload should allow ops");
 
-        var playerArg = mercantile.getChild("reputation").getChild("player");
-        helper.assertTrue(playerArg != null, "player argument node should exist");
+        var reputation = mercantile.getChild("reputation");
+        var setNode = reputation.getChild("set");
+        helper.assertTrue(setNode != null, "reputation set literal should exist");
+        helper.assertFalse(setNode.canUse(nonOp), "reputation set should deny non-ops");
+        helper.assertTrue(setNode.canUse(op), "reputation set should allow ops");
+
+        var addNode = reputation.getChild("add");
+        helper.assertTrue(addNode != null, "reputation add literal should exist");
+        helper.assertFalse(addNode.canUse(nonOp), "reputation add should deny non-ops");
+        helper.assertTrue(addNode.canUse(op), "reputation add should allow ops");
+
+        var playerArg = reputation.getChild("player");
+        helper.assertTrue(playerArg != null, "reputation <player> argument node should exist");
         helper.assertFalse(playerArg.canUse(nonOp),
                 "reputation <player> should deny non-ops");
         helper.assertTrue(playerArg.canUse(op),
@@ -106,19 +117,37 @@ public class CommandGameTest implements FabricGameTest {
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
 
         data.setScore(190);
-        int clamped = Math.max(-100, Math.min(200, data.getScore() + 50));
-        data.setScore(clamped);
+        data.addScore(50);
         helper.assertTrue(data.getScore() == 200, "should clamp to 200 max");
 
         data.setScore(-90);
-        clamped = Math.max(-100, Math.min(200, data.getScore() - 50));
-        data.setScore(clamped);
+        data.addScore(-50);
         helper.assertTrue(data.getScore() == -100, "should clamp to -100 min");
 
         data.setScore(50);
-        clamped = Math.max(-100, Math.min(200, data.getScore() + 10));
-        data.setScore(clamped);
+        data.addScore(10);
         helper.assertTrue(data.getScore() == 60, "should not clamp when in range");
+
+        player.discard();
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void showVillageReportsNotImplemented(GameTestHelper helper) {
+        var server = helper.getLevel().getServer();
+        var dispatcher = server.getCommands().getDispatcher();
+        // Use makeMockServerPlayerInLevel so source.sendFailure has a real connection to write to.
+        var player = helper.makeMockServerPlayerInLevel();
+
+        int result;
+        try {
+            result = dispatcher.execute("mercantile village", player.createCommandSourceStack());
+        } catch (com.mojang.brigadier.exceptions.CommandSyntaxException e) {
+            player.discard();
+            helper.fail("/mercantile village failed to parse: " + e.getMessage());
+            return;
+        }
+        helper.assertTrue(result == 0, "/mercantile village should return 0 (not implemented)");
 
         player.discard();
         helper.succeed();

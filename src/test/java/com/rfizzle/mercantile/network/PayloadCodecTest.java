@@ -1,11 +1,14 @@
 package com.rfizzle.mercantile.network;
 
 import io.netty.buffer.Unpooled;
+import io.netty.handler.codec.DecoderException;
+import io.netty.handler.codec.EncoderException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -208,6 +211,72 @@ class PayloadCodecTest {
     }
 
     // --- Payload type identity ---
+
+    // --- Size guards ---
+
+    @Test
+    void configSyncS2CAcceptsAtBoundary() {
+        String exact = "a".repeat(ConfigSyncS2CPayload.MAX_CONFIG_JSON_CHARS);
+        var original = new ConfigSyncS2CPayload(exact);
+        assertEquals(original, roundTrip(ConfigSyncS2CPayload.CODEC, original));
+    }
+
+    @Test
+    void configSyncS2CRejectsOversizedString() {
+        String oversized = "a".repeat(ConfigSyncS2CPayload.MAX_CONFIG_JSON_CHARS + 1);
+        var payload = new ConfigSyncS2CPayload(oversized);
+        FriendlyByteBuf buf = buf();
+        assertThrows(EncoderException.class, () -> ConfigSyncS2CPayload.CODEC.encode(buf, payload));
+    }
+
+    @Test
+    void villageBoundsS2CRejectsTooManyPois() {
+        List<VillageBoundsS2CPayload.PoiEntry> pois = new java.util.ArrayList<>(VillageBoundsS2CPayload.MAX_POIS + 1);
+        for (int i = 0; i < VillageBoundsS2CPayload.MAX_POIS + 1; i++) {
+            pois.add(new VillageBoundsS2CPayload.PoiEntry(new BlockPos(i, 64, i), "bed", Optional.empty()));
+        }
+        var payload = new VillageBoundsS2CPayload(BlockPos.ZERO, BlockPos.ZERO, BlockPos.ZERO, pois);
+        FriendlyByteBuf buf = buf();
+        assertThrows(EncoderException.class, () -> VillageBoundsS2CPayload.CODEC.encode(buf, payload));
+    }
+
+    @Test
+    void villageBoundsS2CRejectsOversizedPoiType() {
+        String hugeType = "x".repeat(VillageBoundsS2CPayload.MAX_POI_TYPE_LEN + 1);
+        var pois = List.of(new VillageBoundsS2CPayload.PoiEntry(
+                new BlockPos(0, 64, 0), hugeType, Optional.empty()));
+        var payload = new VillageBoundsS2CPayload(BlockPos.ZERO, BlockPos.ZERO, BlockPos.ZERO, pois);
+        FriendlyByteBuf buf = buf();
+        assertThrows(EncoderException.class, () -> VillageBoundsS2CPayload.CODEC.encode(buf, payload));
+    }
+
+    @Test
+    void villageBoundsS2CDecodeRejectsBogusSize() {
+        FriendlyByteBuf buf = buf();
+        buf.writeBlockPos(BlockPos.ZERO);
+        buf.writeBlockPos(BlockPos.ZERO);
+        buf.writeBlockPos(BlockPos.ZERO);
+        buf.writeVarInt(Integer.MAX_VALUE);
+        assertThrows(DecoderException.class, () -> VillageBoundsS2CPayload.CODEC.decode(buf));
+    }
+
+    @Test
+    void workstationMapS2CRejectsTooManyEntries() {
+        Map<UUID, BlockPos> entries = new HashMap<>(WorkstationMapS2CPayload.MAX_ENTRIES + 1);
+        for (int i = 0; i < WorkstationMapS2CPayload.MAX_ENTRIES + 1; i++) {
+            entries.put(new UUID(0, i), new BlockPos(i, 64, i));
+        }
+        var payload = new WorkstationMapS2CPayload(entries);
+        FriendlyByteBuf buf = buf();
+        assertThrows(EncoderException.class, () -> WorkstationMapS2CPayload.CODEC.encode(buf, payload));
+    }
+
+    @Test
+    void workstationMapS2CDecodeRejectsBogusSize() {
+        FriendlyByteBuf buf = buf();
+        buf.writeVarInt(Integer.MAX_VALUE);
+        assertThrows(DecoderException.class, () -> WorkstationMapS2CPayload.CODEC.decode(buf));
+    }
 
     @Test
     void allPayloadsReturnCorrectType() {

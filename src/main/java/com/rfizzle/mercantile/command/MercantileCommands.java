@@ -17,6 +17,11 @@ import net.minecraft.server.level.ServerPlayer;
 
 public final class MercantileCommands {
 
+    // Bound on /mercantile reputation add — wide enough to traverse the full score range in one call,
+    // narrow enough that Brigadier rejects Integer.MAX_VALUE / MIN_VALUE noise at parse time.
+    private static final int ADD_MIN_DELTA = PlayerData.MIN_SCORE - PlayerData.MAX_SCORE;
+    private static final int ADD_MAX_DELTA = PlayerData.MAX_SCORE - PlayerData.MIN_SCORE;
+
     private MercantileCommands() {
     }
 
@@ -29,19 +34,26 @@ public final class MercantileCommands {
         dispatcher.register(Commands.literal("mercantile")
                 .then(Commands.literal("reputation")
                         .executes(ctx -> showOwnReputation(ctx.getSource()))
-                        .then(Commands.argument("player", EntityArgument.player())
+                        .then(Commands.literal("set")
                                 .requires(src -> src.hasPermission(2))
-                                .executes(ctx -> showPlayerReputation(ctx.getSource(), EntityArgument.getPlayer(ctx, "player")))
-                                .then(Commands.literal("set")
-                                        .then(Commands.argument("value", IntegerArgumentType.integer(-100, 200))
+                                .then(Commands.argument("player", EntityArgument.player())
+                                        .then(Commands.argument("value",
+                                                        IntegerArgumentType.integer(PlayerData.MIN_SCORE, PlayerData.MAX_SCORE))
                                                 .executes(ctx -> setReputation(ctx.getSource(),
                                                         EntityArgument.getPlayer(ctx, "player"),
-                                                        IntegerArgumentType.getInteger(ctx, "value")))))
-                                .then(Commands.literal("add")
-                                        .then(Commands.argument("value", IntegerArgumentType.integer())
+                                                        IntegerArgumentType.getInteger(ctx, "value"))))))
+                        .then(Commands.literal("add")
+                                .requires(src -> src.hasPermission(2))
+                                .then(Commands.argument("player", EntityArgument.player())
+                                        .then(Commands.argument("value",
+                                                        IntegerArgumentType.integer(ADD_MIN_DELTA, ADD_MAX_DELTA))
                                                 .executes(ctx -> addReputation(ctx.getSource(),
                                                         EntityArgument.getPlayer(ctx, "player"),
-                                                        IntegerArgumentType.getInteger(ctx, "value")))))))
+                                                        IntegerArgumentType.getInteger(ctx, "value"))))))
+                        .then(Commands.argument("player", EntityArgument.player())
+                                .requires(src -> src.hasPermission(2))
+                                .executes(ctx -> showPlayerReputation(ctx.getSource(),
+                                        EntityArgument.getPlayer(ctx, "player")))))
                 .then(Commands.literal("village")
                         .executes(ctx -> showVillage(ctx.getSource())))
                 .then(Commands.literal("reload")
@@ -82,8 +94,8 @@ public final class MercantileCommands {
 
     private static int addReputation(CommandSourceStack source, ServerPlayer target, int amount) {
         PlayerData data = target.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
-        int newScore = Math.max(-100, Math.min(200, data.getScore() + amount));
-        data.setScore(newScore);
+        data.addScore(amount);
+        int newScore = data.getScore();
         Component tier = ReputationTier.fromScore(newScore).displayName();
         source.sendSuccess(() -> Component.translatable("command.mercantile.reputation.add",
                 amount, target.getDisplayName(), newScore, tier), true);
@@ -96,14 +108,8 @@ public final class MercantileCommands {
             source.sendFailure(Component.translatable("command.mercantile.village.not_player"));
             return 0;
         }
-        // Delegate to the same handler the client packet uses
-        handleRequestVillageBounds(player);
-        return 1;
-    }
-
-    private static void handleRequestVillageBounds(ServerPlayer player) {
-        // TODO: Query POI data, compute village bounds, send VillageBoundsS2CPayload
-        // This will be implemented alongside the village bounds feature
+        source.sendFailure(Component.translatable("command.mercantile.village.not_implemented"));
+        return 0;
     }
 
     private static int reloadConfig(CommandSourceStack source) {

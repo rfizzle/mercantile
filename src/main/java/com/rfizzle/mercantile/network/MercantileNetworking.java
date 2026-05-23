@@ -5,20 +5,34 @@ import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.follow.FollowManager;
 import com.rfizzle.mercantile.trade.TradeCycleManager;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.npc.Villager;
 
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MercantileNetworking {
 
     private static final double MAX_INTERACTION_DISTANCE_SQR = 100.0; // 10 blocks
 
+    // Per-player C2S cooldowns. Reads happen on the netty thread before scheduling
+    // work on the main thread, so a spammed packet is dropped before it can queue
+    // expensive POI queries or trade-pool regeneration.
+    private static final Map<UUID, Long> LAST_CYCLE_TRADES_MS = new ConcurrentHashMap<>();
+    private static final Map<UUID, Long> LAST_WORKSTATION_MAP_MS = new ConcurrentHashMap<>();
+    private static final Map<UUID, Long> LAST_VILLAGE_BOUNDS_MS = new ConcurrentHashMap<>();
+
+    private static final long CYCLE_TRADES_COOLDOWN_MS = 500;
+    private static final long REQUEST_QUERY_COOLDOWN_MS = 2000;
+
     public static void init() {
         registerPayloadTypes();
         registerServerHandlers();
+        registerDisconnectCleanup();
     }
 
     private static void registerPayloadTypes() {
@@ -41,6 +55,7 @@ public class MercantileNetworking {
     private static void registerServerHandlers() {
         ServerPlayNetworking.registerGlobalReceiver(CycleTradesC2SPayload.TYPE, (payload, context) -> {
             ServerPlayer player = context.player();
+            if (!checkCooldown(LAST_CYCLE_TRADES_MS, player.getUUID(), CYCLE_TRADES_COOLDOWN_MS)) return;
             player.server.execute(() -> handleCycleTrades(player, payload));
         });
 
@@ -51,13 +66,32 @@ public class MercantileNetworking {
 
         ServerPlayNetworking.registerGlobalReceiver(RequestWorkstationMapC2SPayload.TYPE, (payload, context) -> {
             ServerPlayer player = context.player();
+            if (!checkCooldown(LAST_WORKSTATION_MAP_MS, player.getUUID(), REQUEST_QUERY_COOLDOWN_MS)) return;
             player.server.execute(() -> handleRequestWorkstationMap(player));
         });
 
         ServerPlayNetworking.registerGlobalReceiver(RequestVillageBoundsC2SPayload.TYPE, (payload, context) -> {
             ServerPlayer player = context.player();
+            if (!checkCooldown(LAST_VILLAGE_BOUNDS_MS, player.getUUID(), REQUEST_QUERY_COOLDOWN_MS)) return;
             player.server.execute(() -> handleRequestVillageBounds(player));
         });
+    }
+
+    private static void registerDisconnectCleanup() {
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
+            UUID id = handler.getPlayer().getUUID();
+            LAST_CYCLE_TRADES_MS.remove(id);
+            LAST_WORKSTATION_MAP_MS.remove(id);
+            LAST_VILLAGE_BOUNDS_MS.remove(id);
+        });
+    }
+
+    private static boolean checkCooldown(Map<UUID, Long> map, UUID id, long cooldownMs) {
+        long now = System.currentTimeMillis();
+        Long last = map.get(id);
+        if (last != null && now - last < cooldownMs) return false;
+        map.put(id, now);
+        return true;
     }
 
     private static void handleCycleTrades(ServerPlayer player, CycleTradesC2SPayload payload) {
