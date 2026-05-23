@@ -22,8 +22,7 @@ logs/
 
 # Dev
 .plan
-SPEC.md
-REVIEW.md
+spec/
 .claude
 
 # OS junk
