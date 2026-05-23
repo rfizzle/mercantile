@@ -71,6 +71,8 @@ public class MercantileVillagerData {
      */
     public void migrateLockedTrades(Collection<MerchantOffer> currentOffers) {
         if (tradesMigrated) return;
+        // Don't burn the one-shot flag without a real chance to migrate (B-080)
+        if (currentOffers.isEmpty()) return;
         Set<String> toRemove = null;
         Set<String> toAdd = null;
         for (MerchantOffer offer : currentOffers) {

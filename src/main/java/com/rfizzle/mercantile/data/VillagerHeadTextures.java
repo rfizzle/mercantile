@@ -15,6 +15,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class VillagerHeadTextures {
     private static final Map<ResourceLocation, String> TEXTURES = new ConcurrentHashMap<>();
     private static final Map<ResourceLocation, ResolvableProfile> PROFILE_CACHE = new ConcurrentHashMap<>();
+    // Guards TEXTURES + PROFILE_CACHE as a coherent pair (B-083). A concurrent
+    // register/read otherwise interleaves the put + remove with computeIfAbsent
+    // and either caches a profile against the new texture only to immediately
+    // evict it, or serves a profile built from a stale texture.
+    private static final Object LOCK = new Object();
 
     public static final ResourceLocation FALLBACK_ID = ResourceLocation.withDefaultNamespace("none");
     public static final ResourceLocation BABY = Mercantile.id("baby");
@@ -43,22 +48,28 @@ public class VillagerHeadTextures {
     }
 
     public static void register(ResourceLocation professionId, String base64TextureValue) {
-        TEXTURES.put(professionId, base64TextureValue);
-        PROFILE_CACHE.remove(professionId);
+        synchronized (LOCK) {
+            TEXTURES.put(professionId, base64TextureValue);
+            PROFILE_CACHE.remove(professionId);
+        }
     }
 
     public static String getTextureValue(ResourceLocation professionId) {
-        return TEXTURES.getOrDefault(professionId, TEXTURES.get(FALLBACK_ID));
+        synchronized (LOCK) {
+            return TEXTURES.getOrDefault(professionId, TEXTURES.get(FALLBACK_ID));
+        }
     }
 
     public static ResolvableProfile getProfile(ResourceLocation professionId) {
-        ResourceLocation key = TEXTURES.containsKey(professionId) ? professionId : FALLBACK_ID;
-        return PROFILE_CACHE.computeIfAbsent(key, id -> {
-            UUID uuid = UUID.nameUUIDFromBytes(id.toString().getBytes(StandardCharsets.UTF_8));
-            GameProfile profile = new GameProfile(uuid, "");
-            profile.getProperties().put("textures", new Property("textures", TEXTURES.get(id)));
-            return new ResolvableProfile(profile);
-        });
+        synchronized (LOCK) {
+            ResourceLocation key = TEXTURES.containsKey(professionId) ? professionId : FALLBACK_ID;
+            return PROFILE_CACHE.computeIfAbsent(key, id -> {
+                UUID uuid = UUID.nameUUIDFromBytes(id.toString().getBytes(StandardCharsets.UTF_8));
+                GameProfile profile = new GameProfile(uuid, "");
+                profile.getProperties().put("textures", new Property("textures", TEXTURES.get(id)));
+                return new ResolvableProfile(profile);
+            });
+        }
     }
 
     public static Component getDisplayName(ResourceLocation professionId) {
