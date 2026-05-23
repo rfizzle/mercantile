@@ -18,7 +18,6 @@
         "VillagerGoalPackagesMixin",
         "VillagerHealingMixin",
         "VillagerPickupMixin",
-        "VillagerPlacementMixin",
         "VillagerProfessionLockMixin",
         "VillagerTradeOpenMixin",
         "ZombieVillagerCureMixin",

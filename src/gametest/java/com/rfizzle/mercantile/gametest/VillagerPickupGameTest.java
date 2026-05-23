@@ -19,7 +19,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
-import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.core.BlockPos;
@@ -56,6 +55,8 @@ public class VillagerPickupGameTest implements FabricGameTest {
         CompoundTag nbt = customData.copyTag();
         helper.assertTrue(nbt.contains("MercantileDataVersion"), "NBT should contain data version");
         helper.assertTrue(nbt.getInt("MercantileDataVersion") == 1, "Data version should be 1");
+        helper.assertFalse(nbt.contains("UUID"),
+                "Stored NBT should not include UUID to avoid collisions on placement");
 
         Villager restored = EntityType.VILLAGER.create(helper.getLevel());
         helper.assertTrue(restored != null, "Restored villager should be created");
@@ -129,26 +130,58 @@ public class VillagerPickupGameTest implements FabricGameTest {
     }
 
     @GameTest(template = EMPTY_STRUCTURE)
-    public void malformedNbtSpawnsDefault(GameTestHelper helper) {
+    public void malformedNbtKeepsItem(GameTestHelper helper) {
         CompoundTag badNbt = new CompoundTag();
         badNbt.putInt("MercantileDataVersion", 1);
-        badNbt.putString("Pos", "corrupt");
+        net.minecraft.nbt.ListTag posList = new net.minecraft.nbt.ListTag();
+        posList.add(net.minecraft.nbt.DoubleTag.valueOf(Double.NaN));
+        posList.add(net.minecraft.nbt.DoubleTag.valueOf(Double.NaN));
+        posList.add(net.minecraft.nbt.DoubleTag.valueOf(Double.NaN));
+        badNbt.put("Pos", posList);
 
-        Villager villager;
-        try {
-            villager = EntityType.VILLAGER.create(helper.getLevel());
-            if (villager == null) throw new IllegalStateException("Failed to create villager");
-            villager.load(badNbt);
-        } catch (Exception e) {
-            villager = EntityType.VILLAGER.create(helper.getLevel());
-        }
+        ItemStack headItem = new ItemStack(Items.PLAYER_HEAD);
+        headItem.set(DataComponents.CUSTOM_DATA, CustomData.of(badNbt));
 
-        helper.assertTrue(villager != null,
-                "Villager should be created even with malformed NBT");
-        helper.assertTrue(villager.getVillagerData().getProfession() == VillagerProfession.NONE,
-                "Fallback villager should have default profession");
+        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        player.setItemInHand(InteractionHand.MAIN_HAND, headItem);
 
-        villager.discard();
+        BlockPos target = helper.absolutePos(new BlockPos(0, 0, 0));
+        BlockHitResult hit = new BlockHitResult(
+                Vec3.atCenterOf(target), Direction.UP, target, false);
+
+        player.gameMode.useItemOn(player, helper.getLevel(), headItem, InteractionHand.MAIN_HAND, hit);
+
+        helper.assertTrue(player.getMainHandItem().is(Items.PLAYER_HEAD),
+                "Item should be kept when NBT is malformed");
+        helper.assertTrue(player.getMainHandItem().getCount() == 1,
+                "Item count should not decrease on malformed NBT");
+        helper.assertEntityNotPresent(EntityType.VILLAGER);
+
+        player.discard();
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void pickupReassignsUuid(GameTestHelper helper) {
+        Villager original = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
+        java.util.UUID originalUuid = original.getUUID();
+
+        ItemStack headItem = VillagerPickupHelper.createHeadItem(original);
+        original.discard();
+
+        CustomData customData = headItem.get(DataComponents.CUSTOM_DATA);
+        CompoundTag nbt = customData.copyTag();
+        helper.assertFalse(nbt.contains("UUID"),
+                "Stored NBT should not retain villager UUID");
+
+        Villager restored = EntityType.VILLAGER.create(helper.getLevel());
+        helper.assertTrue(restored != null, "Restored villager should be created");
+        restored.load(nbt);
+
+        helper.assertFalse(restored.getUUID().equals(originalUuid),
+                "Restored villager should have a fresh UUID");
+
+        restored.discard();
         helper.succeed();
     }
 
@@ -168,15 +201,13 @@ public class VillagerPickupGameTest implements FabricGameTest {
         BlockHitResult hit = new BlockHitResult(
                 Vec3.atCenterOf(target), Direction.UP, target, false);
 
-        net.minecraft.world.item.context.UseOnContext ctx =
-                new net.minecraft.world.item.context.UseOnContext(
-                        player, InteractionHand.MAIN_HAND, hit);
-        headItem.useOn(ctx);
+        player.gameMode.useItemOn(player, helper.getLevel(), headItem, InteractionHand.MAIN_HAND, hit);
 
         helper.assertTrue(player.getMainHandItem().is(Items.PLAYER_HEAD),
                 "Item should be kept when version is too new");
         helper.assertTrue(player.getMainHandItem().getCount() == 1,
                 "Item count should not decrease");
+        helper.assertEntityNotPresent(EntityType.VILLAGER);
 
         player.discard();
         helper.succeed();

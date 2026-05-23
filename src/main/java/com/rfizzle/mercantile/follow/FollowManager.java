@@ -84,6 +84,9 @@ public final class FollowManager {
         return true;
     }
 
+    // Map-only cleanup. Does NOT clear synced data or broadcast S2C state.
+    // Only use when the live Villager reference is unavailable (e.g. cross-map race cleanup
+    // where the villager has already been GC'd or unloaded).
     public static void stopFollowing(UUID villagerUuid) {
         UUID playerUuid = villagerToPlayer.remove(villagerUuid);
         if (playerUuid != null) {
@@ -146,8 +149,8 @@ public final class FollowManager {
         });
 
         ServerEntityEvents.ENTITY_UNLOAD.register((entity, world) -> {
-            if (entity instanceof Villager) {
-                stopFollowing(entity.getUUID());
+            if (entity instanceof Villager villager) {
+                stopFollowing(villager.getUUID());
             }
         });
 

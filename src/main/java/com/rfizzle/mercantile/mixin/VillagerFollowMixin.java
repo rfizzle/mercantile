@@ -16,20 +16,23 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.Brain;
+import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.schedule.Activity;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Intercepts {@code Villager#mobInteract} (HEAD, cancellable, priority 1100) to implement the
@@ -72,13 +75,20 @@ public abstract class VillagerFollowMixin extends AbstractVillager implements Fo
         }
     }
 
-    @SuppressWarnings("unchecked")
-    @Redirect(method = "customServerAiStep",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/ai/Brain;tick(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;)V"))
-    private void mercantile$suppressBrainWhenFollowing(Brain<?> brain, ServerLevel level, LivingEntity entity) {
-        if (!FollowManager.isFollowing((Villager) (Object) this)) {
-            ((Brain<LivingEntity>) brain).tick(level, entity);
+    @Unique
+    private static final Set<Activity> mercantile$SURVIVAL_ACTIVITIES = Set.of(
+            Activity.PANIC, Activity.HIDE, Activity.PRE_RAID, Activity.RAID);
+
+    @Inject(method = "customServerAiStep", at = @At("HEAD"))
+    private void mercantile$followClearScheduleTargets(CallbackInfo ci) {
+        Villager self = (Villager) (Object) this;
+        if (!FollowManager.isFollowing(self)) return;
+        Brain<?> brain = self.getBrain();
+        Optional<Activity> active = brain.getActiveNonCoreActivity();
+        boolean inSurvival = active.isPresent() && mercantile$SURVIVAL_ACTIVITIES.contains(active.get());
+        if (!inSurvival) {
+            brain.eraseMemory(MemoryModuleType.WALK_TARGET);
+            brain.eraseMemory(MemoryModuleType.LOOK_TARGET);
         }
     }
 
@@ -150,7 +160,14 @@ public abstract class VillagerFollowMixin extends AbstractVillager implements Fo
             return;
         }
 
-        FollowManager.startFollowing(self, serverPlayer);
+        boolean started = FollowManager.startFollowing(self, serverPlayer);
+        if (!started) {
+            serverPlayer.displayClientMessage(
+                    Component.translatable("mercantile.follow.denied.unavailable")
+                            .withStyle(ChatFormatting.RED), true);
+            cir.setReturnValue(InteractionResult.FAIL);
+            return;
+        }
 
         if (!player.getAbilities().instabuild) {
             player.getMainHandItem().shrink(1);

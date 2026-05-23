@@ -20,6 +20,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.phys.AABB;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -94,13 +95,27 @@ public class VillagerNameManager {
     }
 
     public static String getRandomName(ResourceKey<Biome> biome, RandomSource random) {
+        return getRandomNameAvoiding(biome, random, Set.of());
+    }
+
+    public static String getRandomNameAvoiding(ResourceKey<Biome> biome, RandomSource random, Set<String> taken) {
+        Map<String, List<String>> pools = NAME_POOLS;
         String category = biome != null ? getCategory(biome) : "fallback";
-        List<String> pool = NAME_POOLS.get(category);
+        List<String> pool = pools.get(category);
         if (pool == null || pool.isEmpty()) {
-            pool = NAME_POOLS.get("fallback");
+            pool = pools.get("fallback");
         }
         if (pool == null || pool.isEmpty()) {
             return "Villager";
+        }
+        if (!taken.isEmpty()) {
+            List<String> available = new ArrayList<>(pool.size());
+            for (String name : pool) {
+                if (!taken.contains(name)) available.add(name);
+            }
+            if (!available.isEmpty()) {
+                return available.get(random.nextInt(available.size()));
+            }
         }
         return pool.get(random.nextInt(pool.size()));
     }
@@ -150,10 +165,25 @@ public class VillagerNameManager {
 
         Holder<Biome> biomeHolder = world.getBiome(villager.blockPosition());
         Optional<ResourceKey<Biome>> biomeKey = biomeHolder.unwrapKey();
-        String name = getRandomName(biomeKey.orElse(null), villager.getRandom());
+        Set<String> taken = gatherNearbyNames(villager, world);
+        String name = getRandomNameAvoiding(biomeKey.orElse(null), villager.getRandom(), taken);
 
         villager.setCustomName(Component.literal(name));
         villager.setCustomNameVisible(true);
+    }
+
+    private static Set<String> gatherNearbyNames(Villager villager, ServerLevel world) {
+        // WHY: ~vanilla village dwell radius — caps the "perceptual village" without over-broad scans
+        AABB bounds = villager.getBoundingBox().inflate(24.0D);
+        List<Villager> nearby = world.getEntitiesOfClass(Villager.class, bounds,
+                v -> v != villager && v.hasCustomName());
+        if (nearby.isEmpty()) return Set.of();
+        Set<String> names = new HashSet<>(nearby.size());
+        for (Villager v : nearby) {
+            Component custom = v.getCustomName();
+            if (custom != null) names.add(custom.getString());
+        }
+        return names;
     }
 
     public static void loadNamePools(ResourceManager manager) {

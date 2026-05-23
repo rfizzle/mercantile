@@ -255,6 +255,60 @@ class VillagerNameManagerTest {
     }
 
     @Test
+    void dedupPicksAvailableNameWhenSomeTaken() {
+        Map<ResourceLocation, List<String>> resources = new LinkedHashMap<>();
+        resources.put(poolId("plains"),
+                List.of("{\"replace\":false,\"names\":[\"A\",\"B\",\"C\",\"D\",\"E\"]}"));
+        fillEmptyPools(resources, "plains");
+        VillagerNameManager.loadNamePools(createManager(resources));
+
+        Set<String> taken = Set.of("A", "B", "C");
+        Set<String> seen = new HashSet<>();
+        for (int seed = 0; seed < 50; seed++) {
+            String picked = VillagerNameManager.getRandomNameAvoiding(
+                    Biomes.PLAINS, RandomSource.create(seed), taken);
+            seen.add(picked);
+            assertFalse(taken.contains(picked),
+                    "Dedup should never return a taken name; got " + picked);
+        }
+        assertTrue(seen.contains("D") || seen.contains("E"),
+                "Should pick from available subset");
+    }
+
+    @Test
+    void dedupFallsBackToRandomWhenAllTaken() {
+        Map<ResourceLocation, List<String>> resources = new LinkedHashMap<>();
+        resources.put(poolId("plains"),
+                List.of("{\"replace\":false,\"names\":[\"A\",\"B\",\"C\"]}"));
+        fillEmptyPools(resources, "plains");
+        VillagerNameManager.loadNamePools(createManager(resources));
+
+        Set<String> taken = Set.of("A", "B", "C");
+        String picked = VillagerNameManager.getRandomNameAvoiding(
+                Biomes.PLAINS, RandomSource.create(42), taken);
+        assertTrue(taken.contains(picked),
+                "When all names taken, falls back to random pool pick; got " + picked);
+    }
+
+    @Test
+    void dedupEmptyTakenBehavesLikeRandomPick() {
+        Map<ResourceLocation, List<String>> resources = new LinkedHashMap<>();
+        resources.put(poolId("plains"),
+                List.of("{\"replace\":false,\"names\":[\"A\",\"B\",\"C\",\"D\",\"E\"]}"));
+        fillEmptyPools(resources, "plains");
+        VillagerNameManager.loadNamePools(createManager(resources));
+
+        for (int seed = 0; seed < 10; seed++) {
+            String fromRandom = VillagerNameManager.getRandomName(
+                    Biomes.PLAINS, RandomSource.create(seed));
+            String fromDedup = VillagerNameManager.getRandomNameAvoiding(
+                    Biomes.PLAINS, RandomSource.create(seed), Set.of());
+            assertEquals(fromRandom, fromDedup,
+                    "Empty taken set should produce same pick as getRandomName for seed " + seed);
+        }
+    }
+
+    @Test
     void namePoolsAreImmutable() {
         Map<ResourceLocation, List<String>> resources = new LinkedHashMap<>();
         resources.put(poolId("plains"), List.of("{\"replace\":false,\"names\":[\"Alice\"]}"));

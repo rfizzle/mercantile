@@ -29,6 +29,7 @@ public class VillagerPickupHelper {
     public static ItemStack createHeadItem(Villager villager) {
         CompoundTag nbt = new CompoundTag();
         villager.saveWithoutId(nbt);
+        nbt.remove("UUID");
         nbt.putString("id", BuiltInRegistries.ENTITY_TYPE.getKey(villager.getType()).toString());
         nbt.putInt("MercantileDataVersion", CURRENT_DATA_VERSION);
 
@@ -46,18 +47,23 @@ public class VillagerPickupHelper {
     }
 
     private static Component buildDisplayName(Villager villager, ResourceLocation professionId) {
-        MutableComponent name;
-        if (villager.hasCustomName()) {
-            name = Component.literal("\"").append(villager.getCustomName()).append("\"");
-        } else if (villager.isBaby()) {
-            name = Component.translatable("mercantile.pickup.baby_villager");
-        } else if (villager.getVillagerData().getProfession() == VillagerProfession.NONE) {
-            name = Component.translatable("mercantile.pickup.villager");
-        } else {
-            name = Component.translatable("mercantile.pickup.profession_villager",
-                    VillagerHeadTextures.getDisplayName(professionId));
-        }
+        Component suffix = professionSuffix(villager, professionId);
+        MutableComponent name = villager.hasCustomName()
+                ? Component.translatable("mercantile.pickup.named_profession_villager",
+                        villager.getCustomName(), suffix)
+                : suffix.copy();
         return name.withStyle(style -> style.withColor(ChatFormatting.YELLOW).withItalic(false));
+    }
+
+    private static Component professionSuffix(Villager villager, ResourceLocation professionId) {
+        if (villager.isBaby()) {
+            return Component.translatable("mercantile.pickup.baby_villager");
+        }
+        if (villager.getVillagerData().getProfession() == VillagerProfession.NONE) {
+            return Component.translatable("mercantile.pickup.villager");
+        }
+        return Component.translatable("mercantile.pickup.profession_villager",
+                VillagerHeadTextures.getDisplayName(professionId));
     }
 
     private static ItemLore buildLore(Villager villager) {

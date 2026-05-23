@@ -96,7 +96,6 @@ public abstract class VillagerPickupMixin {
 
         double x = self.getX(), y = self.getY(), z = self.getZ();
         double midY = y + self.getBbHeight() * 0.5;
-        self.discard();
 
         player.setItemInHand(InteractionHand.MAIN_HAND, headItem);
 
@@ -108,6 +107,8 @@ public abstract class VillagerPickupMixin {
         serverPlayer.displayClientMessage(
                 Component.translatable("mercantile.pickup.success")
                         .withStyle(ChatFormatting.GREEN), true);
+
+        self.discard();
 
         cir.setReturnValue(InteractionResult.SUCCESS);
     }

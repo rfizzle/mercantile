@@ -107,6 +107,7 @@
     "mercantile.pickup.baby_villager": "Baby Villager",
     "mercantile.pickup.villager": "Villager",
     "mercantile.pickup.profession_villager": "%s Villager",
+    "mercantile.pickup.named_profession_villager": "\"%1$s\" - %2$s",
     "mercantile.pickup.denied.raid": "Cannot pick up during a raid",
     "mercantile.pickup.denied.trading": "Villager is trading with another player",
     "mercantile.pickup.denied.following": "Villager is following another player",
@@ -115,12 +116,14 @@
     "mercantile.pickup.lore.profession_level": "%1$s — %2$s",
     "mercantile.pickup.lore.trade_count": "%1$s/%2$s trades unlocked",
     "mercantile.placement.newer_version": "Villager data is from a newer version of Mercantile",
+    "mercantile.placement.malformed_nbt": "Villager data is corrupted and cannot be restored",
 
     "mercantile.follow.start": "Villager is now following you",
     "mercantile.follow.stop": "Villager stopped following you",
     "mercantile.follow.denied.max": "You cannot have more than %s villagers following you",
     "mercantile.follow.denied.other_player": "This villager is following another player",
     "mercantile.follow.denied.baby": "Baby villagers cannot follow you",
+    "mercantile.follow.denied.unavailable": "Cannot follow right now",
     "mercantile.follow.released": "Villager stopped following — too far away",
 
     "mercantile.tier.honored":    "Honored",
