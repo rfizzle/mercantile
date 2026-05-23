@@ -29,11 +29,6 @@
         "ZombieVillagerCureMixin",
         "WalkNodeEvaluatorMixin"
     ],
-    "client": [
-        "ClientLevelVillagerSoundMixin",
-        "EntityIsCurrentlyGlowingMixin",
-        "MerchantScreenMixin"
-    ],
     "injectors": {
         "defaultRequire": 1
     }

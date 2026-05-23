@@ -54,7 +54,8 @@
         "jei": "*"
     },
     "mixins": [
-        "mercantile.mixins.json"
+        "mercantile.mixins.json",
+        { "config": "mercantile.client.mixins.json", "environment": "client" }
     ],
     "depends": {
         "fabricloader": ">=0.16.10",

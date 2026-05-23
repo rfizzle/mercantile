@@ -193,11 +193,6 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         return true;
     }
 
-    @Inject(method = "removed", at = @At("HEAD"))
-    private void mercantile$clearOnClose(CallbackInfo ci) {
-        ClientMercantileData.clearMerchantScreenData();
-    }
-
     @Inject(method = "renderLabels", at = @At("TAIL"))
     private void mercantile$renderLockIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, CallbackInfo ci) {
         VillagerInfoPanelS2CPayload info = mercantile$validInfo();

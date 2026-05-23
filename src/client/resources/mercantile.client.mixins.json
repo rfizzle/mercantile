@@ -1,0 +1,16 @@
+{
+    "required": true,
+    "minVersion": "0.8",
+    "package": "com.rfizzle.mercantile.mixin",
+    "compatibilityLevel": "JAVA_21",
+    "mixins": [],
+    "client": [
+        "AbstractContainerScreenRemovedMixin",
+        "ClientLevelVillagerSoundMixin",
+        "EntityIsCurrentlyGlowingMixin",
+        "MerchantScreenMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}
