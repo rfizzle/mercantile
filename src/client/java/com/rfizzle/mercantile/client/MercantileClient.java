@@ -8,8 +8,10 @@ import com.rfizzle.mercantile.client.particle.GolemShardParticle;
 import com.rfizzle.mercantile.client.particle.PickupSparkleParticle;
 import com.rfizzle.mercantile.client.particle.PylonMoteParticle;
 import com.rfizzle.mercantile.client.particle.PylonSparkParticle;
+import com.rfizzle.mercantile.client.visualization.WorkstationLinkRenderer;
 import com.rfizzle.mercantile.particle.MercantileParticles;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
@@ -31,5 +33,6 @@ public class MercantileClient implements ClientModInitializer {
         ParticleFactoryRegistry.getInstance().register(MercantileParticles.PYLON_MOTE, PylonMoteParticle.Provider::new);
         ParticleFactoryRegistry.getInstance().register(MercantileParticles.PYLON_SPARK, PylonSparkParticle.Provider::new);
         ParticleFactoryRegistry.getInstance().register(MercantileParticles.GOLEM_SHARD, GolemShardParticle.Provider::new);
+        ClientTickEvents.END_CLIENT_TICK.register(WorkstationLinkRenderer::tick);
     }
 }

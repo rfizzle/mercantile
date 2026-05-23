@@ -51,11 +51,15 @@ public class NetworkingGameTest implements FabricGameTest {
         buf.clear();
 
         var mapPayload = new WorkstationMapS2CPayload(
-                Map.of(villager.getUUID(), helper.absolutePos(new BlockPos(5, 1, 5))));
+                Map.of(villager.getUUID(), helper.absolutePos(new BlockPos(5, 1, 5))),
+                List.of(),
+                List.of(helper.absolutePos(new BlockPos(8, 1, 8))));
         WorkstationMapS2CPayload.CODEC.encode(buf, mapPayload);
         WorkstationMapS2CPayload decodedMap = WorkstationMapS2CPayload.CODEC.decode(buf);
-        helper.assertTrue(decodedMap.entries().containsKey(villager.getUUID()),
+        helper.assertTrue(decodedMap.bound().containsKey(villager.getUUID()),
                 "decoded map should contain villager UUID");
+        helper.assertTrue(decodedMap.unclaimedWorkstations().size() == 1,
+                "decoded map should contain one unclaimed workstation");
 
         buf.release();
         villager.discard();

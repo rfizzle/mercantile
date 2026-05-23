@@ -8,6 +8,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -136,14 +137,44 @@ class PayloadCodecTest {
                 UUID.fromString("12345678-1234-1234-1234-123456789abc"), new BlockPos(100, 64, -200),
                 UUID.fromString("abcdefab-abcd-abcd-abcd-abcdefabcdef"), new BlockPos(-50, 70, 300)
         );
-        var original = new WorkstationMapS2CPayload(entries);
+        var original = new WorkstationMapS2CPayload(entries, List.of(), List.of());
         assertEquals(original, roundTrip(WorkstationMapS2CPayload.CODEC, original));
     }
 
     @Test
     void workstationMapS2CEmptyMap() {
-        var original = new WorkstationMapS2CPayload(Map.of());
+        var original = new WorkstationMapS2CPayload(Map.of(), List.of(), List.of());
         assertEquals(original, roundTrip(WorkstationMapS2CPayload.CODEC, original));
+    }
+
+    @Test
+    void workstationMapS2CWithUnboundAndUnclaimed() {
+        var bound = Map.of(
+                UUID.fromString("11111111-1111-1111-1111-111111111111"), new BlockPos(1, 64, 1)
+        );
+        var unbound = List.of(
+                UUID.fromString("22222222-2222-2222-2222-222222222222"),
+                UUID.fromString("33333333-3333-3333-3333-333333333333")
+        );
+        var unclaimed = List.of(
+                new BlockPos(10, 64, 10),
+                new BlockPos(-5, 64, 5),
+                new BlockPos(0, 80, 0)
+        );
+        var original = new WorkstationMapS2CPayload(bound, unbound, unclaimed);
+        WorkstationMapS2CPayload decoded = roundTrip(WorkstationMapS2CPayload.CODEC, original);
+        assertEquals(bound, decoded.bound());
+        assertEquals(unbound, decoded.unboundVillagers());
+        assertEquals(unclaimed, decoded.unclaimedWorkstations());
+    }
+
+    @Test
+    void workstationMapS2CEmptyAllFields() {
+        var original = new WorkstationMapS2CPayload(Map.of(), List.of(), List.of());
+        WorkstationMapS2CPayload decoded = roundTrip(WorkstationMapS2CPayload.CODEC, original);
+        assertTrue(decoded.bound().isEmpty());
+        assertTrue(decoded.unboundVillagers().isEmpty());
+        assertTrue(decoded.unclaimedWorkstations().isEmpty());
     }
 
     @Test
@@ -266,7 +297,29 @@ class PayloadCodecTest {
         for (int i = 0; i < WorkstationMapS2CPayload.MAX_ENTRIES + 1; i++) {
             entries.put(new UUID(0, i), new BlockPos(i, 64, i));
         }
-        var payload = new WorkstationMapS2CPayload(entries);
+        var payload = new WorkstationMapS2CPayload(entries, List.of(), List.of());
+        FriendlyByteBuf buf = buf();
+        assertThrows(EncoderException.class, () -> WorkstationMapS2CPayload.CODEC.encode(buf, payload));
+    }
+
+    @Test
+    void workstationMapS2CRejectsTooManyUnbound() {
+        List<UUID> unbound = new ArrayList<>(WorkstationMapS2CPayload.MAX_UNBOUND + 1);
+        for (int i = 0; i < WorkstationMapS2CPayload.MAX_UNBOUND + 1; i++) {
+            unbound.add(new UUID(1, i));
+        }
+        var payload = new WorkstationMapS2CPayload(Map.of(), unbound, List.of());
+        FriendlyByteBuf buf = buf();
+        assertThrows(EncoderException.class, () -> WorkstationMapS2CPayload.CODEC.encode(buf, payload));
+    }
+
+    @Test
+    void workstationMapS2CRejectsTooManyUnclaimed() {
+        List<BlockPos> unclaimed = new ArrayList<>(WorkstationMapS2CPayload.MAX_UNCLAIMED + 1);
+        for (int i = 0; i < WorkstationMapS2CPayload.MAX_UNCLAIMED + 1; i++) {
+            unclaimed.add(new BlockPos(i, 64, i));
+        }
+        var payload = new WorkstationMapS2CPayload(Map.of(), List.of(), unclaimed);
         FriendlyByteBuf buf = buf();
         assertThrows(EncoderException.class, () -> WorkstationMapS2CPayload.CODEC.encode(buf, payload));
     }
@@ -275,6 +328,23 @@ class PayloadCodecTest {
     void workstationMapS2CDecodeRejectsBogusSize() {
         FriendlyByteBuf buf = buf();
         buf.writeVarInt(Integer.MAX_VALUE);
+        assertThrows(DecoderException.class, () -> WorkstationMapS2CPayload.CODEC.decode(buf));
+    }
+
+    @Test
+    void workstationMapS2CDecodeRejectsBogusUnboundSize() {
+        FriendlyByteBuf buf = buf();
+        buf.writeVarInt(0); // bound size
+        buf.writeVarInt(Integer.MAX_VALUE); // unbound size — bogus
+        assertThrows(DecoderException.class, () -> WorkstationMapS2CPayload.CODEC.decode(buf));
+    }
+
+    @Test
+    void workstationMapS2CDecodeRejectsBogusUnclaimedSize() {
+        FriendlyByteBuf buf = buf();
+        buf.writeVarInt(0); // bound size
+        buf.writeVarInt(0); // unbound size
+        buf.writeVarInt(Integer.MAX_VALUE); // unclaimed size — bogus
         assertThrows(DecoderException.class, () -> WorkstationMapS2CPayload.CODEC.decode(buf));
     }
 
@@ -290,7 +360,7 @@ class PayloadCodecTest {
         assertEquals(DemandPriceS2CPayload.TYPE, new DemandPriceS2CPayload(0, List.of()).type());
         assertEquals(VillagerInfoPanelS2CPayload.TYPE,
                 new VillagerInfoPanelS2CPayload(0, "", 0, 0, 0, 0, "", 0, false, false).type());
-        assertEquals(WorkstationMapS2CPayload.TYPE, new WorkstationMapS2CPayload(Map.of()).type());
+        assertEquals(WorkstationMapS2CPayload.TYPE, new WorkstationMapS2CPayload(Map.of(), List.of(), List.of()).type());
         assertEquals(VillageBoundsS2CPayload.TYPE,
                 new VillageBoundsS2CPayload(BlockPos.ZERO, BlockPos.ZERO, BlockPos.ZERO, List.of()).type());
         assertEquals(ConfigSyncS2CPayload.TYPE, new ConfigSyncS2CPayload("").type());

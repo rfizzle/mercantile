@@ -27,7 +27,9 @@
             "com.rfizzle.mercantile.gametest.SentryPylonFuelGameTest",
             "com.rfizzle.mercantile.gametest.SentryPylonScanGameTest",
             "com.rfizzle.mercantile.gametest.SentryGolemBehaviorGameTest",
-            "com.rfizzle.mercantile.gametest.SentryPylonCraftingGameTest"
+            "com.rfizzle.mercantile.gametest.SentryPylonCraftingGameTest",
+            "com.rfizzle.mercantile.gametest.WorkstationLinkGameTest",
+            "com.rfizzle.mercantile.gametest.WorkstationLinkClientGameTest"
         ]
     },
     "custom": {

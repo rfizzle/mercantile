@@ -4,9 +4,11 @@ import com.rfizzle.mercantile.Mercantile;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.follow.FollowManager;
 import com.rfizzle.mercantile.trade.TradeCycleManager;
+import com.rfizzle.mercantile.visualization.WorkstationMapService;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.npc.Villager;
@@ -143,7 +145,11 @@ public class MercantileNetworking {
     }
 
     private static void handleRequestWorkstationMap(ServerPlayer player) {
-        // TODO: Query villager-workstation POI bindings, build map, send WorkstationMapS2CPayload
+        if (!MercantileConfig.get().enableWorkstationVis) return;
+        if (player.connection == null) return;
+        ServerLevel level = player.serverLevel();
+        WorkstationMapS2CPayload payload = WorkstationMapService.build(level, player.blockPosition());
+        ServerPlayNetworking.send(player, payload);
     }
 
     private static void handleRequestVillageBounds(ServerPlayer player) {
