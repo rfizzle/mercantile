@@ -30,6 +30,7 @@
         "WalkNodeEvaluatorMixin"
     ],
     "client": [
+        "ClientLevelVillagerSoundMixin",
         "EntityIsCurrentlyGlowingMixin",
         "MerchantScreenMixin"
     ],
