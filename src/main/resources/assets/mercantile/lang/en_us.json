@@ -143,6 +143,11 @@
     "gui.mercantile.profession.locked": "Profession: Locked",
     "gui.mercantile.profession.unlocked": "Profession: Unlocked",
 
+    "gui.mercantile.restock.timer": "Restock in ~%s",
+    "gui.mercantile.restock.count": "Restocks: %s/%s today",
+    "gui.mercantile.restock.fully_stocked": "Fully stocked",
+    "gui.mercantile.restock.no_workstation": "No workstation",
+
     "tooltip.mercantile.pylon.fuel": "Fuel: %s / %s",
     "tooltip.mercantile.pylon.sentries": "Active Sentries: %s / %s",
     "tooltip.mercantile.pylon.empty": "Out of fuel"

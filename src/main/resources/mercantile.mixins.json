@@ -23,6 +23,7 @@
         "VillagerHealingMixin",
         "VillagerPickupMixin",
         "VillagerProfessionLockMixin",
+        "VillagerRestockAccessor",
         "VillagerTradeOpenMixin",
         "ZombieVillagerCureMixin",
         "WalkNodeEvaluatorMixin"

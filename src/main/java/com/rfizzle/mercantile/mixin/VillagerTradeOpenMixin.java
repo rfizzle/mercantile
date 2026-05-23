@@ -4,6 +4,7 @@ import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.reputation.ReputationTier;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
+import com.rfizzle.mercantile.network.RestockTimerS2CPayload;
 import com.rfizzle.mercantile.network.VillagerInfoPanelS2CPayload;
 import com.rfizzle.mercantile.reputation.ExclusiveTradesManager;
 import com.rfizzle.mercantile.reputation.ReputationManager;
@@ -108,5 +109,22 @@ public abstract class VillagerTradeOpenMixin {
                 self.getId(), profession, level, xp, xpToNextLevel,
                 reputation, reputationTier, totalTrades, hasWorkstation,
                 villagerData.isProfessionLocked()));
+    }
+
+    @Inject(method = "startTrading", at = @At("TAIL"))
+    private void mercantile$sendRestockOnTradeOpen(Player player, CallbackInfo ci) {
+        if (!MercantileConfig.get().enableRestockIndicator) return;
+        if (!(player instanceof ServerPlayer serverPlayer)) return;
+        if (serverPlayer.connection == null) return;
+
+        Villager self = (Villager) (Object) this;
+        VillagerRestockAccessor accessor = (VillagerRestockAccessor) self;
+        long lastRestockGameTime = accessor.mercantile$getLastRestockGameTime();
+        int restocksToday = accessor.mercantile$getNumberOfRestocksToday();
+        boolean hasWorkstation = self.getBrain()
+                .getMemory(MemoryModuleType.JOB_SITE).isPresent();
+
+        ServerPlayNetworking.send(serverPlayer, new RestockTimerS2CPayload(
+                self.getId(), lastRestockGameTime, restocksToday, hasWorkstation));
     }
 }

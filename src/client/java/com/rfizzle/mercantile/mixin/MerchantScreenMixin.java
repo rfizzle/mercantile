@@ -4,6 +4,7 @@ import com.rfizzle.mercantile.Mercantile;
 import com.rfizzle.mercantile.client.network.ClientMercantileData;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.network.CycleTradesC2SPayload;
+import com.rfizzle.mercantile.network.RestockTimerS2CPayload;
 import com.rfizzle.mercantile.network.VillagerInfoPanelS2CPayload;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphics;
@@ -11,11 +12,13 @@ import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.MerchantScreen;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MerchantMenu;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.trading.MerchantOffer;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -93,6 +96,72 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         }
 
         mercantile$cycleButton.active = enabled;
+    }
+
+    @Inject(method = "renderLabels", at = @At("TAIL"))
+    private void mercantile$renderRestockInfo(GuiGraphics guiGraphics, int mouseX, int mouseY, CallbackInfo ci) {
+        RestockTimerS2CPayload timer = ClientMercantileData.getRestockTimer();
+        if (timer == null) return;
+        MercantileConfig config = ClientMercantileData.getServerConfig();
+        if (config == null) config = MercantileConfig.get();
+        if (!config.enableRestockIndicator) return;
+
+        int x = 5;
+        int y = 4 + this.font.lineHeight + 2;
+
+        if (!timer.hasWorkstation()) {
+            guiGraphics.drawString(this.font,
+                    Component.translatable("gui.mercantile.restock.no_workstation")
+                            .withStyle(ChatFormatting.RED),
+                    x, y, 0xFFFFFF, false);
+            y += this.font.lineHeight + 1;
+            guiGraphics.drawString(this.font,
+                    Component.translatable("gui.mercantile.restock.count",
+                            timer.restockCountToday(), 2),
+                    x, y, 0x404040, false);
+            return;
+        }
+
+        boolean fullyStocked = mercantile$allOffersFresh();
+        if (fullyStocked) {
+            guiGraphics.drawString(this.font,
+                    Component.translatable("gui.mercantile.restock.fully_stocked")
+                            .withStyle(ChatFormatting.GREEN),
+                    x, y, 0xFFFFFF, false);
+            y += this.font.lineHeight + 1;
+        } else if (timer.restockCountToday() < 2) {
+            long now = this.minecraft.level == null ? 0L : this.minecraft.level.getGameTime();
+            long nextTick = timer.lastRestockGameTime() + 2400L;
+            long remaining = Math.max(0L, nextTick - now);
+            long totalSeconds = remaining / 20L;
+            long minutes = totalSeconds / 60L;
+            long seconds = totalSeconds % 60L;
+            String timeStr = String.format("%d:%02d", minutes, seconds);
+            guiGraphics.drawString(this.font,
+                    Component.translatable("gui.mercantile.restock.timer", timeStr),
+                    x, y, 0x404040, false);
+            y += this.font.lineHeight + 1;
+        }
+
+        guiGraphics.drawString(this.font,
+                Component.translatable("gui.mercantile.restock.count",
+                        timer.restockCountToday(), 2),
+                x, y, 0x404040, false);
+    }
+
+    @Unique
+    private boolean mercantile$allOffersFresh() {
+        var offers = this.menu.getOffers();
+        if (offers == null || offers.isEmpty()) return false;
+        for (MerchantOffer offer : offers) {
+            if (offer.getUses() != 0) return false;
+        }
+        return true;
+    }
+
+    @Inject(method = "removed", at = @At("HEAD"))
+    private void mercantile$clearRestockOnClose(CallbackInfo ci) {
+        ClientMercantileData.setRestockTimer(null);
     }
 
     @Inject(method = "renderLabels", at = @At("TAIL"))

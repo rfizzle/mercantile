@@ -8,7 +8,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
 public record RestockTimerS2CPayload(
         int villagerEntityId,
-        int lastRestockTick,
+        long lastRestockGameTime,
         int restockCountToday,
         boolean hasWorkstation
 ) implements CustomPacketPayload {
@@ -19,7 +19,7 @@ public record RestockTimerS2CPayload(
     public static final StreamCodec<ByteBuf, RestockTimerS2CPayload> CODEC =
             StreamCodec.composite(
                     ByteBufCodecs.VAR_INT, RestockTimerS2CPayload::villagerEntityId,
-                    ByteBufCodecs.VAR_INT, RestockTimerS2CPayload::lastRestockTick,
+                    ByteBufCodecs.VAR_LONG, RestockTimerS2CPayload::lastRestockGameTime,
                     ByteBufCodecs.VAR_INT, RestockTimerS2CPayload::restockCountToday,
                     ByteBufCodecs.BOOL, RestockTimerS2CPayload::hasWorkstation,
                     RestockTimerS2CPayload::new);
