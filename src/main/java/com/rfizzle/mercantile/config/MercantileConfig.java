@@ -62,6 +62,9 @@ public class MercantileConfig {
     public boolean enableRestockIndicator = true;
     public boolean enableDemandTransparency = true;
 
+    // Breeding Tooltip (Jade/WTHIT)
+    public boolean enableBreedingTooltip = true;
+
     // Sentry Pylon
     public boolean enableSentryPylon = true;
     public int pylonDetectionRadius = 32;

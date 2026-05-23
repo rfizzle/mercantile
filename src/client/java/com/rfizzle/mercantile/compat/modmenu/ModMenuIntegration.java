@@ -174,6 +174,11 @@ public class ModMenuIntegration implements ModMenuApi {
                     .setTooltip(Component.translatable("mercantile.config.enableDemandTransparency.tooltip"))
                     .setSaveConsumer(v -> config.enableDemandTransparency = v)
                     .build());
+            trading.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableBreedingTooltip"), config.enableBreedingTooltip)
+                    .setDefaultValue(defaults.enableBreedingTooltip)
+                    .setTooltip(Component.translatable("mercantile.config.enableBreedingTooltip.tooltip"))
+                    .setSaveConsumer(v -> config.enableBreedingTooltip = v)
+                    .build());
 
             // --- Sentry Pylon ---
             ConfigCategory pylon = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.pylon"));

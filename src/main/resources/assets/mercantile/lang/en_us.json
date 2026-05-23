@@ -165,5 +165,19 @@
 
     "tooltip.mercantile.pylon.fuel": "Fuel: %s / %s",
     "tooltip.mercantile.pylon.sentries": "Active Sentries: %s / %s",
-    "tooltip.mercantile.pylon.empty": "Out of fuel"
+    "tooltip.mercantile.pylon.empty": "Out of fuel",
+
+    "tooltip.mercantile.breeding.willing": "Willing to breed",
+    "tooltip.mercantile.breeding.not_willing": "Not willing",
+    "tooltip.mercantile.breeding.cooldown": "Can breed in: %s",
+    "tooltip.mercantile.breeding.baby_growup": "Grows up in: %s",
+    "tooltip.mercantile.breeding.reason.on_cooldown": "On cooldown",
+    "tooltip.mercantile.breeding.reason.no_bed": "Needs a bed",
+    "tooltip.mercantile.breeding.reason.not_enough_food": "Needs more food",
+    "tooltip.mercantile.breeding.food_header": "Food:",
+    "tooltip.mercantile.breeding.food_line": "  %1$s × %2$s",
+    "tooltip.mercantile.breeding.food_none": "  none",
+
+    "mercantile.config.enableBreedingTooltip": "Enable Breeding Tooltip",
+    "mercantile.config.enableBreedingTooltip.tooltip": "Show villager breeding status, cooldown, food, and baby age in Jade/WTHIT tooltips"
 }
