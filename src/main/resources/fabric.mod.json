@@ -13,6 +13,8 @@
         "main": ["com.rfizzle.mercantile.Mercantile"],
         "client": ["com.rfizzle.mercantile.client.MercantileClient"],
         "modmenu": ["com.rfizzle.mercantile.compat.modmenu.ModMenuIntegration"],
+        "emi": ["com.rfizzle.mercantile.compat.emi.MercantileEmiPlugin"],
+        "rei_client": ["com.rfizzle.mercantile.compat.rei.MercantileReiClientPlugin"],
         "fabric-gametest": [
             "com.rfizzle.mercantile.gametest.AttachmentGameTest",
             "com.rfizzle.mercantile.gametest.NetworkingGameTest",

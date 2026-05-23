@@ -12,6 +12,7 @@ import com.rfizzle.mercantile.particle.MercantileParticles;
 import com.rfizzle.mercantile.registry.MercantileRegistry;
 import com.rfizzle.mercantile.reputation.ExclusiveTradesManager;
 import com.rfizzle.mercantile.reputation.ReputationManager;
+import com.rfizzle.mercantile.trade.index.TradeIndexDataSource;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
@@ -28,6 +29,7 @@ public class Mercantile implements ModInitializer {
         MercantileAttachments.init();
         ReputationManager.init();
         ExclusiveTradesManager.init();
+        TradeIndexDataSource.init();
         VillagerHeadTextures.init();
         VillagerNameManager.init();
         FollowManager.init();

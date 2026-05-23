@@ -189,5 +189,16 @@
     "tooltip.mercantile.state.trading": "Trading with %s",
 
     "mercantile.config.enableStateIndicators": "Enable State Indicators",
-    "mercantile.config.enableStateIndicators.tooltip": "Show villager state icons (needs bed/workstation, hungry, breeding, panicking, trading) in Jade/WTHIT tooltips"
+    "mercantile.config.enableStateIndicators.tooltip": "Show villager state icons (needs bed/workstation, hungry, breeding, panicking, trading) in Jade/WTHIT tooltips",
+
+    "category.mercantile.villager_trades": "Villager Trades",
+    "mercantile.trade_index.level.1": "Novice",
+    "mercantile.trade_index.level.2": "Apprentice",
+    "mercantile.trade_index.level.3": "Journeyman",
+    "mercantile.trade_index.level.4": "Expert",
+    "mercantile.trade_index.level.5": "Master",
+    "mercantile.trade_index.exclusive": "Mercantile",
+    "mercantile.trade_index.exclusive_tooltip": "Requires %s reputation or higher",
+    "mercantile.trade_index.tooltip.sold_by": "Sold by %s",
+    "mercantile.trade_index.tooltip.level": "Level: %s"
 }

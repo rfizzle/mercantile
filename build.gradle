@@ -153,14 +153,18 @@ dependencies {
     modCompileOnly "mcp.mobius.waila:wthit-api:${project.wthit_version}"
 
     modCompileOnly "dev.emi:emi-fabric:${project.emi_version}:api"
+    "modClientCompileOnly"("dev.emi:emi-fabric:${project.emi_version}:api")
     modLocalRuntime "dev.emi:emi-fabric:${project.emi_version}"
 
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}"
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:${project.rei_version}"
+    "modClientCompileOnly"("me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}")
+    "modClientCompileOnly"("me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:${project.rei_version}")
     modLocalRuntime "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
     modLocalRuntime "dev.architectury:architectury-fabric:${project.architectury_version}"
 
     modCompileOnly "mezz.jei:jei-1.21.1-fabric-api:${project.jei_version}"
+    "modClientCompileOnly"("mezz.jei:jei-1.21.1-fabric-api:${project.jei_version}")
     modLocalRuntime "mezz.jei:jei-1.21.1-fabric:${project.jei_version}"
 
     testImplementation platform("org.junit:junit-bom:5.10.2")

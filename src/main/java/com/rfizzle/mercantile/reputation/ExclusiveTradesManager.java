@@ -20,6 +20,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
+import org.jetbrains.annotations.VisibleForTesting;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -247,9 +248,29 @@ public final class ExclusiveTradesManager {
         return item;
     }
 
-    record ExclusiveTrade(ItemCost input1, ItemCost input2, ItemStack output,
-                          int maxUses, int xpGain, float priceMultiplier, int minScore) {
-        MerchantOffer createOffer() {
+    public static Map<String, List<ExclusiveTrade>> professionTradesSnapshot() {
+        return Collections.unmodifiableMap(PROFESSION_TRADES);
+    }
+
+    public static List<ExclusiveTrade> crossProfessionTradesSnapshot() {
+        return Collections.unmodifiableList(CROSS_PROFESSION_TRADES);
+    }
+
+    @VisibleForTesting
+    public static void setSnapshotsForTesting(Map<String, List<ExclusiveTrade>> profession,
+                                              List<ExclusiveTrade> crossProfession) {
+        PROFESSION_TRADES = Map.copyOf(profession);
+        CROSS_PROFESSION_TRADES = List.copyOf(crossProfession);
+    }
+
+    public record ExclusiveTrade(ItemCost input1, ItemCost input2, ItemStack output,
+                                 int maxUses, int xpGain, float priceMultiplier, int minScore) {
+        @Override
+        public ItemStack output() {
+            return output.copy();
+        }
+
+        public MerchantOffer createOffer() {
             if (input2 != null) {
                 return new MerchantOffer(input1, Optional.of(input2), output.copy(), maxUses, xpGain, priceMultiplier);
             }
