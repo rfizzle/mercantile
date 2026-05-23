@@ -1,5 +1,7 @@
 package com.rfizzle.mercantile.compat.jade;
 
+import com.rfizzle.mercantile.block.SentryPylonBlock;
+import com.rfizzle.mercantile.block.SentryPylonBlockEntity;
 import net.minecraft.world.entity.npc.Villager;
 import snownee.jade.api.IWailaClientRegistration;
 import snownee.jade.api.IWailaCommonRegistration;
@@ -12,10 +14,12 @@ public class MercantileJadePlugin implements IWailaPlugin {
     @Override
     public void register(IWailaCommonRegistration registration) {
         registration.registerEntityDataProvider(VillagerLockDataProvider.INSTANCE, Villager.class);
+        registration.registerBlockDataProvider(SentryPylonDataProvider.INSTANCE, SentryPylonBlockEntity.class);
     }
 
     @Override
     public void registerClient(IWailaClientRegistration registration) {
         registration.registerEntityComponent(VillagerLockComponentProvider.INSTANCE, Villager.class);
+        registration.registerBlockComponent(SentryPylonComponentProvider.INSTANCE, SentryPylonBlock.class);
     }
 }

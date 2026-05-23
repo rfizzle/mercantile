@@ -1,4 +1,6 @@
 {
+    "itemGroup.mercantile": "Mercantile",
+    "block.mercantile.sentry_pylon": "Sentry Pylon",
     "item.mercantile.villager": "Villager",
     "command.mercantile.reload": "Mercantile config reloaded",
     "command.mercantile.reputation.self": "Your reputation: %s (%s)",
@@ -138,5 +140,9 @@
     "gui.mercantile.bulk_trade.feedback": "Traded %sx %s",
 
     "gui.mercantile.profession.locked": "Profession: Locked",
-    "gui.mercantile.profession.unlocked": "Profession: Unlocked"
+    "gui.mercantile.profession.unlocked": "Profession: Unlocked",
+
+    "tooltip.mercantile.pylon.fuel": "Fuel: %s / %s",
+    "tooltip.mercantile.pylon.sentries": "Active Sentries: %s / %s",
+    "tooltip.mercantile.pylon.empty": "Out of fuel"
 }

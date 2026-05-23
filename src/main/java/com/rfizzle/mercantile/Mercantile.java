@@ -9,6 +9,7 @@ import com.rfizzle.mercantile.data.VillagerPlacementHandler;
 import com.rfizzle.mercantile.follow.FollowManager;
 import com.rfizzle.mercantile.network.MercantileNetworking;
 import com.rfizzle.mercantile.particle.MercantileParticles;
+import com.rfizzle.mercantile.registry.MercantileRegistry;
 import com.rfizzle.mercantile.reputation.ExclusiveTradesManager;
 import com.rfizzle.mercantile.reputation.ReputationManager;
 import net.fabricmc.api.ModInitializer;
@@ -23,6 +24,7 @@ public class Mercantile implements ModInitializer {
     @Override
     public void onInitialize() {
         MercantileConfig.get();
+        MercantileRegistry.register();
         MercantileAttachments.init();
         ReputationManager.init();
         ExclusiveTradesManager.init();

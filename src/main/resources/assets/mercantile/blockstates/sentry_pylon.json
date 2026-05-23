@@ -1,0 +1,22 @@
+{
+    "variants": {
+        "state=empty,powered=false": {
+            "model": "mercantile:block/sentry_pylon"
+        },
+        "state=empty,powered=true": {
+            "model": "mercantile:block/sentry_pylon"
+        },
+        "state=idle,powered=false": {
+            "model": "mercantile:block/sentry_pylon"
+        },
+        "state=idle,powered=true": {
+            "model": "mercantile:block/sentry_pylon"
+        },
+        "state=active,powered=false": {
+            "model": "mercantile:block/sentry_pylon"
+        },
+        "state=active,powered=true": {
+            "model": "mercantile:block/sentry_pylon"
+        }
+    }
+}

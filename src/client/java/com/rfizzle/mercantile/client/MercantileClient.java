@@ -4,7 +4,10 @@ import com.rfizzle.mercantile.client.network.ClientMercantileData;
 import com.rfizzle.mercantile.client.network.ClientNetworkHandler;
 import com.rfizzle.mercantile.client.particle.CycleGlintParticle;
 import com.rfizzle.mercantile.client.particle.FollowTrailParticle;
+import com.rfizzle.mercantile.client.particle.GolemShardParticle;
 import com.rfizzle.mercantile.client.particle.PickupSparkleParticle;
+import com.rfizzle.mercantile.client.particle.PylonMoteParticle;
+import com.rfizzle.mercantile.client.particle.PylonSparkParticle;
 import com.rfizzle.mercantile.particle.MercantileParticles;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -25,5 +28,8 @@ public class MercantileClient implements ClientModInitializer {
         ParticleFactoryRegistry.getInstance().register(MercantileParticles.CYCLE_GLINT, CycleGlintParticle.Provider::new);
         ParticleFactoryRegistry.getInstance().register(MercantileParticles.PICKUP_SPARKLE, PickupSparkleParticle.Provider::new);
         ParticleFactoryRegistry.getInstance().register(MercantileParticles.FOLLOW_TRAIL, FollowTrailParticle.Provider::new);
+        ParticleFactoryRegistry.getInstance().register(MercantileParticles.PYLON_MOTE, PylonMoteParticle.Provider::new);
+        ParticleFactoryRegistry.getInstance().register(MercantileParticles.PYLON_SPARK, PylonSparkParticle.Provider::new);
+        ParticleFactoryRegistry.getInstance().register(MercantileParticles.GOLEM_SHARD, GolemShardParticle.Provider::new);
     }
 }

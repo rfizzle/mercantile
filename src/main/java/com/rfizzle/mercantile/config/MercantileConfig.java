@@ -87,7 +87,7 @@ public class MercantileConfig {
         reputationCycleGain = Math.clamp(reputationCycleGain, 0, Integer.MAX_VALUE);
         maxFollowingVillagers = Math.clamp(maxFollowingVillagers, 1, Integer.MAX_VALUE);
         healingMultiplier = Math.clamp(healingMultiplier, 1.0f, 10.0f);
-        pylonDetectionRadius = Math.clamp(pylonDetectionRadius, 8, 128);
+        pylonDetectionRadius = Math.clamp(pylonDetectionRadius, 4, 128);
         pylonMaxFuel = Math.clamp(pylonMaxFuel, 1, Integer.MAX_VALUE);
         pylonMaxGolems = Math.clamp(pylonMaxGolems, 1, Integer.MAX_VALUE);
         sentryDespawnSeconds = Math.clamp(sentryDespawnSeconds, 5, Integer.MAX_VALUE);

@@ -264,12 +264,12 @@ class MercantileConfigTest {
         Path configFile = tempDir.resolve("mercantile.json");
         Files.writeString(configFile, """
                 {
-                  "pylonDetectionRadius": 2
+                  "pylonDetectionRadius": 0
                 }
                 """);
 
         MercantileConfig loaded = MercantileConfig.load(configFile);
-        assertEquals(8, loaded.pylonDetectionRadius);
+        assertEquals(4, loaded.pylonDetectionRadius);
     }
 
     @Test

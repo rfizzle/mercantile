@@ -22,7 +22,12 @@
             "com.rfizzle.mercantile.gametest.VillagerHealingGameTest",
             "com.rfizzle.mercantile.gametest.PathfindingGameTest",
             "com.rfizzle.mercantile.gametest.VillagerPickupGameTest",
-            "com.rfizzle.mercantile.gametest.ReputationGameTest"
+            "com.rfizzle.mercantile.gametest.ReputationGameTest",
+            "com.rfizzle.mercantile.gametest.SentryPylonGameTest",
+            "com.rfizzle.mercantile.gametest.SentryPylonFuelGameTest",
+            "com.rfizzle.mercantile.gametest.SentryPylonScanGameTest",
+            "com.rfizzle.mercantile.gametest.SentryGolemBehaviorGameTest",
+            "com.rfizzle.mercantile.gametest.SentryPylonCraftingGameTest"
         ]
     },
     "custom": {
