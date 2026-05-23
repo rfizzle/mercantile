@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-ink text-bone font-mono">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FAQ — Mercantile | Villager Overhaul for Minecraft</title>
+  <meta name="description" content="Frequently asked questions about Mercantile: vanilla compatibility, performance, mod conflicts, datapack customization, server use, and platform support.">
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://mercantile.rfizzle.com/faq.html">
+
+  <!-- Theme -->
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="color-scheme" content="dark">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Mercantile">
+  <meta property="og:title" content="FAQ — Mercantile">
+  <meta property="og:description" content="Frequently asked questions about Mercantile: vanilla compatibility, performance, mod conflicts, datapack customization, server use, and platform support.">
+  <meta property="og:url" content="https://mercantile.rfizzle.com/faq.html">
+  <meta property="og:image" content="https://mercantile.rfizzle.com/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Mercantile — Villager Overhaul for Minecraft">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="FAQ — Mercantile">
+  <meta name="twitter:description" content="Frequently asked questions about Mercantile: vanilla compatibility, performance, mod conflicts, datapack customization, server use, and platform support.">
+  <meta name="twitter:image" content="https://mercantile.rfizzle.com/og-image.png">
+
+  <!-- Icons -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="stylesheet" href="/css/site.css">
+</head>
+<body class="bg-ink text-bone font-mono min-h-screen flex flex-col">
+
+  <!-- ===== HEADER ===== -->
+  <header class="border-b border-elevated bg-ink/95 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3 group">
+        <img src="/icon.png" alt="" class="pixelated w-8 h-8" aria-hidden="true">
+        <span class="text-lg font-semibold heading-gradient group-hover:brightness-125 transition">Mercantile</span>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-6 text-sm">
+        <a href="/" class="text-ash hover:text-bone transition">Home</a>
+        <a href="features.html" class="text-ash hover:text-bone transition">Features</a>
+        <a href="config.html" class="text-ash hover:text-bone transition">Config</a>
+        <a href="commands.html" class="text-ash hover:text-bone transition">Commands</a>
+        <a href="guide.html" class="text-ash hover:text-bone transition">Guide</a>
+        <a href="faq.html" class="text-emerald hover:text-emerald-bright transition" aria-current="page">FAQ</a>
+        <a href="changelog.html" class="text-ash hover:text-bone transition">Changelog</a>
+      </nav>
+
+      <details class="md:hidden relative">
+        <summary class="text-ash hover:text-bone p-2" aria-label="Open navigation menu">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </summary>
+        <nav class="absolute right-0 mt-2 w-48 bg-card border border-elevated rounded-md shadow-lg py-2 text-sm">
+          <a href="/" class="block px-4 py-2 text-ash hover:bg-elevated hover:text-bone">Home</a>
+          <a href="features.html" class="block px-4 py-2 text-ash hover:bg-elevated hover:text-bone">Features</a>
+          <a href="config.html" class="block px-4 py-2 text-ash hover:bg-elevated hover:text-bone">Config</a>
+          <a href="commands.html" class="block px-4 py-2 text-ash hover:bg-elevated hover:text-bone">Commands</a>
+          <a href="guide.html" class="block px-4 py-2 text-ash hover:bg-elevated hover:text-bone">Guide</a>
+          <a href="faq.html" class="block px-4 py-2 text-emerald hover:bg-elevated" aria-current="page">FAQ</a>
+          <a href="changelog.html" class="block px-4 py-2 text-ash hover:bg-elevated hover:text-bone">Changelog</a>
+        </nav>
+      </details>
+    </div>
+  </header>
+  <!-- ===== /HEADER ===== -->
+
+  <main class="flex-1">
+
+    <section class="px-4 py-12 md:py-16">
+      <div class="max-w-4xl mx-auto">
+
+        <header class="mb-12 text-center">
+          <h1 class="text-4xl md:text-5xl font-bold mb-3 heading-gradient">FAQ</h1>
+          <p class="text-ash text-sm md:text-base max-w-2xl mx-auto">Click any question to expand. If yours isn't here, <a href="https://github.com/rfizzle/mercantile/issues" rel="noopener noreferrer" target="_blank" class="text-emerald hover:text-emerald-bright underline">open an issue on GitHub</a>.</p>
+        </header>
+
+        <div class="space-y-3">
+
+          <details class="bg-card border border-elevated rounded-lg group">
+            <summary class="px-5 py-4 text-base font-semibold text-bone hover:text-emerald transition flex items-center justify-between">
+              Is Mercantile vanilla-compatible?
+              <span class="text-emerald text-xl ml-3 group-open:rotate-45 transition-transform">+</span>
+            </summary>
+            <div class="px-5 pb-5 text-sm text-ash leading-relaxed">
+              Yes. Mercantile follows a strict <strong class="text-bone">vanilla-first asset policy</strong> — every sound, particle, and most icons reuse vanilla assets. Villager pickup items are player heads with pre-existing skin textures, not custom items. The only custom texture is the Sentry Pylon block. New trades and behaviors stack additively with vanilla gossip and pricing; your existing world is fully playable on installation.
+            </div>
+          </details>
+
+          <details class="bg-card border border-elevated rounded-lg group">
+            <summary class="px-5 py-4 text-base font-semibold text-bone hover:text-emerald transition flex items-center justify-between">
+              Will this hurt my server's performance?
+              <span class="text-emerald text-xl ml-3 group-open:rotate-45 transition-transform">+</span>
+            </summary>
+            <div class="px-5 pb-5 text-sm text-ash leading-relaxed">
+              No major hits expected. Detection cycles (Sentry Pylon, reputation proximity) run on coarse tick intervals (every 40 ticks for pylons; reputation proximity counts in 10-minute chunks). Scan radii are tunable — drop <code class="text-bone">pylonDetectionRadius</code> from 32 to 16 if you have a lot of active pylons. Visualization particles are client-side and culled past 32–64 blocks. State managers (FollowManager, ClientMercantileData) clear on disconnect/unload to prevent unbounded growth. If you observe a regression, please file an issue with a profile/Spark report.
+            </div>
+          </details>
+
+          <details class="bg-card border border-elevated rounded-lg group">
+            <summary class="px-5 py-4 text-base font-semibold text-bone hover:text-emerald transition flex items-center justify-between">
+              Does it work with VillagerOptimizer, Easy Villagers, or other villager mods?
+              <span class="text-emerald text-xl ml-3 group-open:rotate-45 transition-transform">+</span>
+            </summary>
+            <div class="px-5 pb-5 text-sm text-ash leading-relaxed">
+              Compatibility hasn't been systematically tested. Mods that bulk-modify villager AI, replace trade generation, or alter the merchant menu may conflict with the pathfinding, follow-mode, and trade-cycling mixins. Known conflicts will be flagged in the <a href="https://github.com/rfizzle/mercantile/issues" rel="noopener noreferrer" target="_blank" class="text-emerald hover:text-emerald-bright underline">GitHub issue tracker</a> as they're reported. If you hit one, please open an issue with your full mod list.
+            </div>
+          </details>
+
+          <details class="bg-card border border-elevated rounded-lg group">
+            <summary class="px-5 py-4 text-base font-semibold text-bone hover:text-emerald transition flex items-center justify-between">
+              Can I disable individual features?
+              <span class="text-emerald text-xl ml-3 group-open:rotate-45 transition-transform">+</span>
+            </summary>
+            <div class="px-5 pb-5 text-sm text-ash leading-relaxed">
+              Yes. Every feature has an <code class="text-bone">enable*</code> flag in <code class="text-bone">mercantile.json</code>. Don't like trade cycling? Set <code class="text-bone">enableTradeCycling</code> to <code class="text-bone">false</code>. Want the visualizations off? Toggle the four <code class="text-bone">enable*Vis</code> client flags. See the <a href="config.html" class="text-emerald hover:text-emerald-bright underline">full config reference</a>. Use <code class="text-bone">/mercantile reload</code> to apply changes without restarting the server.
+            </div>
+          </details>
+
+          <details class="bg-card border border-elevated rounded-lg group">
+            <summary class="px-5 py-4 text-base font-semibold text-bone hover:text-emerald transition flex items-center justify-between">
+              Can I customize Mercantile via datapack?
+              <span class="text-emerald text-xl ml-3 group-open:rotate-45 transition-transform">+</span>
+            </summary>
+            <div class="px-5 pb-5 text-sm text-ash leading-relaxed">
+              Yes, in three places. <strong class="text-bone">Villager names</strong> — datapacks at <code class="text-bone">data/mercantile/villager_names/&lt;category&gt;.json</code> can replace or extend the biome name pools (set <code class="text-bone">"replace": true</code> to override). <strong class="text-bone">Reputation-tier exclusive trades</strong> — drop per-profession files at <code class="text-bone">data/mercantile/exclusive_trades/&lt;profession&gt;.json</code> with <code class="text-bone">min_tier</code> gates and standard 1.21.1 component-format trades. <strong class="text-bone">Sentry Pylon recipe</strong> — uses a vanilla-format recipe JSON; standard datapack recipe overrides apply. Vanilla loot tables, advancements, and other recipes are untouched.
+            </div>
+          </details>
+
+          <details class="bg-card border border-elevated rounded-lg group">
+            <summary class="px-5 py-4 text-base font-semibold text-bone hover:text-emerald transition flex items-center justify-between">
+              Does it work in singleplayer? On a server?
+              <span class="text-emerald text-xl ml-3 group-open:rotate-45 transition-transform">+</span>
+            </summary>
+            <div class="px-5 pb-5 text-sm text-ash leading-relaxed">
+              Both. In singleplayer (which runs an integrated server), everything works out of the box. On a dedicated server, install Mercantile on both server and client — server config syncs to every connected client at join time and after <code class="text-bone">/mercantile reload</code> via the <code class="text-bone">ConfigSyncS2CPayload</code>. Client-only settings (volume, visualizations, info panel, reputation HUD) stay local to each client.
+            </div>
+          </details>
+
+          <details class="bg-card border border-elevated rounded-lg group">
+            <summary class="px-5 py-4 text-base font-semibold text-bone hover:text-emerald transition flex items-center justify-between">
+              Where's the config file?
+              <span class="text-emerald text-xl ml-3 group-open:rotate-45 transition-transform">+</span>
+            </summary>
+            <div class="px-5 pb-5 text-sm text-ash leading-relaxed">
+              In your Minecraft instance at <code class="text-bone">.minecraft/config/mercantile.json</code> (or the equivalent path for your launcher). It's generated automatically on first launch with all defaults. You can edit it by hand — out-of-range values are clamped on load — then run <code class="text-bone">/mercantile reload</code> in-game to apply without restarting. Or install Mod Menu + Cloth Config for an in-game GUI.
+            </div>
+          </details>
+
+          <details class="bg-card border border-elevated rounded-lg group">
+            <summary class="px-5 py-4 text-base font-semibold text-bone hover:text-emerald transition flex items-center justify-between">
+              Is there a Forge or NeoForge version?
+              <span class="text-emerald text-xl ml-3 group-open:rotate-45 transition-transform">+</span>
+            </summary>
+            <div class="px-5 pb-5 text-sm text-ash leading-relaxed">
+              No. Mercantile is Fabric-only for Minecraft 1.21.1. A port to Forge/NeoForge isn't planned, but the source is MIT-licensed — feel free to fork and port.
+            </div>
+          </details>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="border-t border-elevated bg-card/40 mt-auto">
+    <div class="max-w-6xl mx-auto px-4 py-10">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        <div>
+          <div class="flex items-center gap-3 mb-3">
+            <img src="/logo.png" alt="" class="pixelated w-6 h-6" aria-hidden="true">
+            <span class="text-base font-semibold heading-gradient">Mercantile</span>
+          </div>
+          <p class="text-sm text-ash leading-relaxed">A villager and trade overhaul for Minecraft 1.21.1 (Fabric).</p>
+        </div>
+
+        <div>
+          <h4 class="text-sm font-semibold text-bone mb-3 uppercase tracking-wider">rfizzle mods</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="https://meridian.rfizzle.com" rel="noopener noreferrer" target="_blank" class="text-ash hover:text-emerald transition">Meridian</a></li>
+            <li><span class="text-emerald">Mercantile <span class="text-smoke text-xs">(you are here)</span></span></li>
+            <li><a href="https://tribulation.rfizzle.com" rel="noopener noreferrer" target="_blank" class="text-ash hover:text-emerald transition">Tribulation</a></li>
+            <li><a href="https://prosperity.rfizzle.com" rel="noopener noreferrer" target="_blank" class="text-ash hover:text-emerald transition">Prosperity</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-sm font-semibold text-bone mb-3 uppercase tracking-wider">Links</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="https://github.com/rfizzle/mercantile" rel="noopener noreferrer" target="_blank" class="text-ash hover:text-emerald transition">GitHub</a></li>
+            <li><a href="https://github.com/rfizzle/mercantile/issues" rel="noopener noreferrer" target="_blank" class="text-ash hover:text-emerald transition">Report an issue</a></li>
+            <li><a href="https://github.com/rfizzle/mercantile/blob/master/LICENSE" rel="noopener noreferrer" target="_blank" class="text-ash hover:text-emerald transition">License</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="border-t border-elevated pt-6 flex flex-col md:flex-row justify-between gap-2 text-xs text-smoke">
+        <p>© 2026 rfizzle. Mercantile is not affiliated with Mojang Studios or Microsoft.</p>
+        <p>Minecraft 1.21.1 · Fabric</p>
+      </div>
+    </div>
+  </footer>
+  <!-- ===== /FOOTER ===== -->
+
+  <script>
+    // Auto-close the mobile <details> menu when a nav link is tapped.
+    document.querySelectorAll('details nav a').forEach(function (a) {
+      a.addEventListener('click', function () {
+        var d = a.closest('details');
+        if (d) d.removeAttribute('open');
+      });
+    });
+  </script>
+</body>
+</html>
