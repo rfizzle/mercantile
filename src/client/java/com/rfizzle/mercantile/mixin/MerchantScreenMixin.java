@@ -51,6 +51,27 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     @Unique
     private static final int CYCLE_BUTTON_SIZE = 18;
 
+    @Unique
+    private static final int INFO_PANEL_WIDTH = 110;
+    @Unique
+    private static final int INFO_PANEL_HEIGHT = 134;
+    @Unique
+    private static final int INFO_PANEL_MARGIN = 4;
+    @Unique
+    private static final int INFO_PANEL_PAD = 6;
+    @Unique
+    private static final int INFO_PANEL_BG_COLOR = 0xC0101010;
+    @Unique
+    private static final int INFO_PANEL_BORDER_COLOR = 0xFF555555;
+    @Unique
+    private static final int INFO_PANEL_TEXT_COLOR = 0xFFFFFFFF;
+    @Unique
+    private static final int INFO_PANEL_DIM_COLOR = 0xFFA0A0A0;
+    @Unique
+    private static final int XP_BAR_BG_COLOR = 0xFF404040;
+    @Unique
+    private static final int XP_BAR_FG_COLOR = 0xFF4FC74F;
+
     // Mirrors vanilla MerchantScreen.NUMBER_OF_OFFER_BUTTONS (private). If vanilla
     // expands the visible offer count, update this constant.
     @Unique
@@ -190,6 +211,113 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
 
         ResourceLocation sprite = info.professionLocked() ? LOCKED_SPRITE : UNLOCKED_SPRITE;
         guiGraphics.blitSprite(sprite, iconX, iconY, ICON_SIZE, ICON_SIZE);
+    }
+
+    @Inject(method = "render", at = @At("TAIL"))
+    private void mercantile$renderInfoPanelInject(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
+        mercantile$renderInfoPanel(guiGraphics);
+    }
+
+    @Unique
+    private void mercantile$renderInfoPanel(GuiGraphics guiGraphics) {
+        MercantileConfig config = ClientMercantileData.getServerConfig();
+        if (config == null) config = MercantileConfig.get();
+        if (!config.enableInfoPanel) return;
+
+        VillagerInfoPanelS2CPayload info = ClientMercantileData.getVillagerInfo();
+        if (info == null) return;
+
+        int panelX = this.leftPos + this.imageWidth + INFO_PANEL_MARGIN;
+        if (panelX + INFO_PANEL_WIDTH + 2 > this.width) {
+            // Right edge would clip — clamp inside the screen.
+            panelX = Math.max(0, this.width - INFO_PANEL_WIDTH - 2);
+        }
+        int panelY = this.topPos;
+
+        // Background + 1-px border.
+        guiGraphics.fill(panelX, panelY, panelX + INFO_PANEL_WIDTH, panelY + INFO_PANEL_HEIGHT, INFO_PANEL_BG_COLOR);
+        guiGraphics.fill(panelX, panelY, panelX + INFO_PANEL_WIDTH, panelY + 1, INFO_PANEL_BORDER_COLOR);
+        guiGraphics.fill(panelX, panelY + INFO_PANEL_HEIGHT - 1, panelX + INFO_PANEL_WIDTH, panelY + INFO_PANEL_HEIGHT, INFO_PANEL_BORDER_COLOR);
+        guiGraphics.fill(panelX, panelY, panelX + 1, panelY + INFO_PANEL_HEIGHT, INFO_PANEL_BORDER_COLOR);
+        guiGraphics.fill(panelX + INFO_PANEL_WIDTH - 1, panelY, panelX + INFO_PANEL_WIDTH, panelY + INFO_PANEL_HEIGHT, INFO_PANEL_BORDER_COLOR);
+
+        int contentX = panelX + INFO_PANEL_PAD;
+        int contentWidth = INFO_PANEL_WIDTH - 2 * INFO_PANEL_PAD;
+        int y = panelY + INFO_PANEL_PAD;
+
+        // Title (villager display name), bold + centered.
+        Component title = this.title.copy().withStyle(ChatFormatting.BOLD);
+        int titleX = panelX + (INFO_PANEL_WIDTH - this.font.width(title)) / 2;
+        guiGraphics.drawString(this.font, title, titleX, y, INFO_PANEL_TEXT_COLOR, false);
+        y += this.font.lineHeight + 4;
+
+        // Profession + level.
+        String profession = info.profession();
+        Component professionLine;
+        if (profession == null || profession.isEmpty() || "none".equals(profession)) {
+            professionLine = Component.translatable("gui.mercantile.info.unemployed");
+        } else {
+            Component professionName = Component.translatable("entity.minecraft.villager." + profession);
+            Component levelName = Component.translatable("merchant.level." + info.level());
+            professionLine = Component.empty().append(professionName).append(" — ").append(levelName);
+        }
+        guiGraphics.drawString(this.font, professionLine, contentX, y, INFO_PANEL_TEXT_COLOR, false);
+        y += this.font.lineHeight + 4;
+
+        // XP bar (or "Master" at level 5).
+        if (info.level() >= 5) {
+            Component master = Component.translatable("gui.mercantile.info.master")
+                    .withStyle(ChatFormatting.GOLD);
+            guiGraphics.drawString(this.font, master, contentX, y, INFO_PANEL_TEXT_COLOR, false);
+            y += this.font.lineHeight + 4;
+        } else {
+            int barWidth = contentWidth;
+            int barHeight = 5;
+            int filled = info.xpToNextLevel() > 0
+                    ? Math.min(barWidth, (int) ((long) info.xp() * barWidth / info.xpToNextLevel()))
+                    : 0;
+            guiGraphics.fill(contentX, y, contentX + barWidth, y + barHeight, XP_BAR_BG_COLOR);
+            if (filled > 0) {
+                guiGraphics.fill(contentX, y, contentX + filled, y + barHeight, XP_BAR_FG_COLOR);
+            }
+            y += barHeight + 2;
+            Component xpText = Component.translatable("gui.mercantile.info.xp", info.xp(), info.xpToNextLevel());
+            guiGraphics.drawString(this.font, xpText, contentX, y, INFO_PANEL_DIM_COLOR, false);
+            y += this.font.lineHeight + 4;
+        }
+
+        // Reputation tier + score.
+        ChatFormatting tierColor = mercantile$colorForTier(info.reputationTier());
+        Component tier = Component.translatable(info.reputationTier()).withStyle(tierColor);
+        Component repLine = Component.translatable("gui.mercantile.info.reputation", tier, info.reputation());
+        guiGraphics.drawString(this.font, repLine, contentX, y, INFO_PANEL_TEXT_COLOR, false);
+        y += this.font.lineHeight + 4;
+
+        // Trade count.
+        Component trades = Component.translatable("gui.mercantile.info.trades", info.totalTrades());
+        guiGraphics.drawString(this.font, trades, contentX, y, INFO_PANEL_TEXT_COLOR, false);
+        y += this.font.lineHeight + 4;
+
+        // Workstation status.
+        String wsKey = info.hasWorkstation()
+                ? "gui.mercantile.info.workstation.bound"
+                : "gui.mercantile.info.workstation.missing";
+        ChatFormatting wsColor = info.hasWorkstation() ? ChatFormatting.GREEN : ChatFormatting.RED;
+        Component workstation = Component.translatable(wsKey).withStyle(wsColor);
+        guiGraphics.drawString(this.font, workstation, contentX, y, INFO_PANEL_TEXT_COLOR, false);
+    }
+
+    @Unique
+    private ChatFormatting mercantile$colorForTier(String tierKey) {
+        if (tierKey == null) return ChatFormatting.WHITE;
+        return switch (tierKey) {
+            case "mercantile.tier.honored" -> ChatFormatting.GOLD;
+            case "mercantile.tier.trusted" -> ChatFormatting.GREEN;
+            case "mercantile.tier.liked" -> ChatFormatting.DARK_GREEN;
+            case "mercantile.tier.distrusted" -> ChatFormatting.YELLOW;
+            case "mercantile.tier.reviled" -> ChatFormatting.RED;
+            default -> ChatFormatting.WHITE;
+        };
     }
 
     @Inject(method = "render", at = @At("TAIL"))

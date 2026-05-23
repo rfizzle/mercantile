@@ -93,8 +93,8 @@ public abstract class VillagerTradeOpenMixin {
         net.minecraft.world.entity.npc.VillagerData vd = self.getVillagerData();
         var villagerData = self.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
 
-        String profession = BuiltInRegistries.VILLAGER_PROFESSION
-                .getKey(vd.getProfession()).getPath();
+        var professionKey = BuiltInRegistries.VILLAGER_PROFESSION.getKey(vd.getProfession());
+        String profession = professionKey == null ? "none" : professionKey.getPath();
         int level = vd.getLevel();
         int xp = self.getVillagerXp();
         int xpToNextLevel = net.minecraft.world.entity.npc.VillagerData.getMaxXpPerLevel(level);
@@ -103,7 +103,7 @@ public abstract class VillagerTradeOpenMixin {
         int reputation = playerData.getScore();
         String reputationTier = ReputationTier.fromScore(reputation).translationKey();
 
-        int totalTrades = self.getOffers().size();
+        int totalTrades = playerData.getTradesWithVillager(self.getUUID());
         boolean hasWorkstation = self.getBrain()
                 .getMemory(MemoryModuleType.JOB_SITE).isPresent();
 

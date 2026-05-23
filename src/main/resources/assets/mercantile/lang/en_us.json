@@ -143,6 +143,14 @@
     "gui.mercantile.profession.locked": "Profession: Locked",
     "gui.mercantile.profession.unlocked": "Profession: Unlocked",
 
+    "gui.mercantile.info.trades": "Trades: %s",
+    "gui.mercantile.info.workstation.bound": "Workstation: Bound",
+    "gui.mercantile.info.workstation.missing": "Workstation: Missing",
+    "gui.mercantile.info.xp": "%s / %s XP",
+    "gui.mercantile.info.master": "Master",
+    "gui.mercantile.info.reputation": "%s (%s)",
+    "gui.mercantile.info.unemployed": "Unemployed",
+
     "gui.mercantile.restock.timer": "Restock in ~%s",
     "gui.mercantile.restock.count": "Restocks: %s/%s today",
     "gui.mercantile.restock.fully_stocked": "Fully stocked",
