@@ -42,6 +42,8 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
             ResourceLocation.withDefaultNamespace("widget/unlocked_button");
     @Unique
     private static final int ICON_SIZE = 11;
+    @Unique
+    private static final int LOCK_ICON_Y = 4;
 
     @Unique
     private static final WidgetSprites CYCLE_SPRITES = new WidgetSprites(
@@ -54,7 +56,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     @Unique
     private static final int INFO_PANEL_WIDTH = 110;
     @Unique
-    private static final int INFO_PANEL_HEIGHT = 134;
+    private static final int INFO_PANEL_HEIGHT = 160;
     @Unique
     private static final int INFO_PANEL_MARGIN = 4;
     @Unique
@@ -77,8 +79,26 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     @Unique
     private static final int VISIBLE_TRADE_ROWS = 7;
 
+    // Offer-row geometry, derived from MerchantScreen.render (n = k+5+5,
+    // p = (l+16+1)+2). Single source of truth — the hover hit-test and the
+    // tooltip exclusion bounds both derive from these.
+    @Unique
+    private static final int OFFER_SLOT_X_OFFSET = 10;
+    @Unique
+    private static final int OFFER_SLOT_Y_OFFSET = 19;
+    @Unique
+    private static final int OFFER_SLOT_SIZE = 16;
+    @Unique
+    private static final int OFFER_ROW_SPACING = 20;
+
     @Unique
     private ImageButton mercantile$cycleButton;
+
+    // Screen.init() runs on every window resize, not just on screen open. Guard
+    // the one-shot clear so resizing mid-trade does not wipe villagerInfo/restockTimer/
+    // demandPrice and blank the info panel until the server's next periodic resend.
+    @Unique
+    private boolean mercantile$initialized;
 
     @Shadow
     private int scrollOff;
@@ -87,14 +107,24 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         super(menu, inv, title);
     }
 
+    @Inject(method = "init", at = @At("HEAD"))
+    private void mercantile$clearStaleDataOnOpen(CallbackInfo ci) {
+        if (mercantile$initialized) return;
+        mercantile$initialized = true;
+        ClientMercantileData.clearMerchantScreenData();
+    }
+
     @Inject(method = "init", at = @At("TAIL"))
     private void mercantile$addCycleButton(CallbackInfo ci) {
         MercantileConfig config = ClientMercantileData.getServerConfig();
         if (config == null) config = MercantileConfig.get();
         if (!config.enableTradeCycling) return;
+        if (!mercantile$panelFits()) return;
 
-        int buttonX = this.leftPos + 5;
-        int buttonY = this.topPos + this.imageHeight + 2;
+        int panelX = mercantile$panelX();
+        int panelY = this.topPos;
+        int buttonX = panelX + (INFO_PANEL_WIDTH - CYCLE_BUTTON_SIZE) / 2;
+        int buttonY = panelY + INFO_PANEL_HEIGHT - INFO_PANEL_PAD - CYCLE_BUTTON_SIZE;
 
         mercantile$cycleButton = new ImageButton(
                 buttonX, buttonY,
@@ -109,15 +139,17 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     private void mercantile$updateCycleButtonState(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
         if (mercantile$cycleButton == null) return;
 
-        VillagerInfoPanelS2CPayload info = mercantile$validInfo();
         MercantileConfig config = ClientMercantileData.getServerConfig();
         if (config == null) config = MercantileConfig.get();
+        VillagerInfoPanelS2CPayload info = mercantile$validInfo();
+
+        boolean panelVisible = config.enableInfoPanel && info != null && mercantile$panelFits();
+        mercantile$cycleButton.visible = panelVisible;
+        if (!panelVisible) return;
 
         boolean enabled = true;
 
-        if (info == null) {
-            enabled = false;
-        } else if (!config.enableTradeCycling) {
+        if (!config.enableTradeCycling) {
             enabled = false;
         } else if (!this.minecraft.player.isCreative()) {
             int emeraldCount = 0;
@@ -130,57 +162,6 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         }
 
         mercantile$cycleButton.active = enabled;
-    }
-
-    @Inject(method = "renderLabels", at = @At("TAIL"))
-    private void mercantile$renderRestockInfo(GuiGraphics guiGraphics, int mouseX, int mouseY, CallbackInfo ci) {
-        RestockTimerS2CPayload timer = ClientMercantileData.getRestockTimer();
-        if (timer == null) return;
-        MercantileConfig config = ClientMercantileData.getServerConfig();
-        if (config == null) config = MercantileConfig.get();
-        if (!config.enableRestockIndicator) return;
-
-        int x = 5;
-        int y = 4 + this.font.lineHeight + 2;
-
-        if (!timer.hasWorkstation()) {
-            guiGraphics.drawString(this.font,
-                    Component.translatable("gui.mercantile.restock.no_workstation")
-                            .withStyle(ChatFormatting.RED),
-                    x, y, 0xFFFFFF, false);
-            y += this.font.lineHeight + 1;
-            guiGraphics.drawString(this.font,
-                    Component.translatable("gui.mercantile.restock.count",
-                            timer.restockCountToday(), 2),
-                    x, y, 0x404040, false);
-            return;
-        }
-
-        boolean fullyStocked = mercantile$allOffersFresh();
-        if (fullyStocked) {
-            guiGraphics.drawString(this.font,
-                    Component.translatable("gui.mercantile.restock.fully_stocked")
-                            .withStyle(ChatFormatting.GREEN),
-                    x, y, 0xFFFFFF, false);
-            y += this.font.lineHeight + 1;
-        } else if (timer.restockCountToday() < 2) {
-            long now = this.minecraft.level == null ? 0L : this.minecraft.level.getGameTime();
-            long nextTick = timer.lastRestockGameTime() + 2400L;
-            long remaining = Math.max(0L, nextTick - now);
-            long totalSeconds = remaining / 20L;
-            long minutes = totalSeconds / 60L;
-            long seconds = totalSeconds % 60L;
-            String timeStr = String.format("%d:%02d", minutes, seconds);
-            guiGraphics.drawString(this.font,
-                    Component.translatable("gui.mercantile.restock.timer", timeStr),
-                    x, y, 0x404040, false);
-            y += this.font.lineHeight + 1;
-        }
-
-        guiGraphics.drawString(this.font,
-                Component.translatable("gui.mercantile.restock.count",
-                        timer.restockCountToday(), 2),
-                x, y, 0x404040, false);
     }
 
     @Unique
@@ -197,15 +178,23 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     private void mercantile$renderLockIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, CallbackInfo ci) {
         VillagerInfoPanelS2CPayload info = mercantile$validInfo();
         if (info == null) return;
+        MercantileConfig config = ClientMercantileData.getServerConfig();
+        if (config == null) config = MercantileConfig.get();
+        if (!config.enableProfessionLock) return;
 
+        ResourceLocation sprite = info.professionLocked() ? LOCKED_SPRITE : UNLOCKED_SPRITE;
+        guiGraphics.blitSprite(sprite, mercantile$lockIconX(), LOCK_ICON_Y, ICON_SIZE, ICON_SIZE);
+    }
+
+    // Returns the lock icon's GUI-local x (origin at leftPos). Y is the constant
+    // LOCK_ICON_Y. Single source of truth so the hover hit-test stays aligned
+    // with the rendered icon.
+    @Unique
+    private int mercantile$lockIconX() {
         Component titleComponent = mercantile$getTitleComponent();
         int titleWidth = this.font.width(titleComponent);
         int titleX = 49 + this.imageWidth / 2 - titleWidth / 2;
-        int iconX = titleX + titleWidth + 3;
-        int iconY = 4;
-
-        ResourceLocation sprite = info.professionLocked() ? LOCKED_SPRITE : UNLOCKED_SPRITE;
-        guiGraphics.blitSprite(sprite, iconX, iconY, ICON_SIZE, ICON_SIZE);
+        return titleX + titleWidth + 3;
     }
 
     @Inject(method = "render", at = @At("TAIL"))
@@ -221,12 +210,9 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
 
         VillagerInfoPanelS2CPayload info = ClientMercantileData.getVillagerInfo();
         if (info == null) return;
+        if (!mercantile$panelFits()) return;
 
-        int panelX = this.leftPos + this.imageWidth + INFO_PANEL_MARGIN;
-        if (panelX + INFO_PANEL_WIDTH + 2 > this.width) {
-            // Right edge would clip — clamp inside the screen.
-            panelX = Math.max(0, this.width - INFO_PANEL_WIDTH - 2);
-        }
+        int panelX = mercantile$panelX();
         int panelY = this.topPos;
 
         // Background + 1-px border.
@@ -300,6 +286,42 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         ChatFormatting wsColor = info.hasWorkstation() ? ChatFormatting.GREEN : ChatFormatting.RED;
         Component workstation = Component.translatable(wsKey).withStyle(wsColor);
         guiGraphics.drawString(this.font, workstation, contentX, y, INFO_PANEL_TEXT_COLOR, false);
+        y += this.font.lineHeight + 4;
+
+        // Restock subsection.
+        RestockTimerS2CPayload timer = ClientMercantileData.getRestockTimer();
+        if (timer == null || !config.enableRestockIndicator) return;
+
+        if (!timer.hasWorkstation()) {
+            guiGraphics.drawString(this.font,
+                    Component.translatable("gui.mercantile.restock.no_workstation")
+                            .withStyle(ChatFormatting.RED),
+                    contentX, y, INFO_PANEL_TEXT_COLOR, false);
+            y += this.font.lineHeight + 4;
+        } else if (mercantile$allOffersFresh()) {
+            guiGraphics.drawString(this.font,
+                    Component.translatable("gui.mercantile.restock.fully_stocked")
+                            .withStyle(ChatFormatting.GREEN),
+                    contentX, y, INFO_PANEL_TEXT_COLOR, false);
+            y += this.font.lineHeight + 4;
+        } else if (timer.restockCountToday() < 2) {
+            long now = this.minecraft.level == null ? 0L : this.minecraft.level.getGameTime();
+            long nextTick = timer.lastRestockGameTime() + 2400L;
+            long remaining = Math.max(0L, nextTick - now);
+            long totalSeconds = remaining / 20L;
+            long minutes = totalSeconds / 60L;
+            long seconds = totalSeconds % 60L;
+            String timeStr = String.format("%d:%02d", minutes, seconds);
+            guiGraphics.drawString(this.font,
+                    Component.translatable("gui.mercantile.restock.timer", timeStr),
+                    contentX, y, INFO_PANEL_DIM_COLOR, false);
+            y += this.font.lineHeight + 4;
+        }
+
+        guiGraphics.drawString(this.font,
+                Component.translatable("gui.mercantile.restock.count",
+                        timer.restockCountToday(), 2),
+                contentX, y, INFO_PANEL_DIM_COLOR, false);
     }
 
     @Unique
@@ -320,23 +342,22 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         VillagerInfoPanelS2CPayload info = mercantile$validInfo();
         if (info == null) return;
 
-        Component titleComponent = mercantile$getTitleComponent();
-        int titleWidth = this.font.width(titleComponent);
-        int titleX = this.leftPos + 49 + this.imageWidth / 2 - titleWidth / 2;
-        int iconX = titleX + titleWidth + 3;
-        int iconY = this.topPos + 4;
+        MercantileConfig config = ClientMercantileData.getServerConfig();
+        if (config == null) config = MercantileConfig.get();
 
-        if (mouseX >= iconX && mouseX < iconX + ICON_SIZE
-                && mouseY >= iconY && mouseY < iconY + ICON_SIZE) {
-            String key = info.professionLocked()
-                    ? "gui.mercantile.profession.locked"
-                    : "gui.mercantile.profession.unlocked";
-            guiGraphics.renderTooltip(this.font, Component.translatable(key), mouseX, mouseY);
+        if (config.enableProfessionLock) {
+            int iconX = this.leftPos + mercantile$lockIconX();
+            int iconY = this.topPos + LOCK_ICON_Y;
+            if (mouseX >= iconX && mouseX < iconX + ICON_SIZE
+                    && mouseY >= iconY && mouseY < iconY + ICON_SIZE) {
+                String key = info.professionLocked()
+                        ? "gui.mercantile.profession.locked"
+                        : "gui.mercantile.profession.unlocked";
+                guiGraphics.renderTooltip(this.font, Component.translatable(key), mouseX, mouseY);
+            }
         }
 
         if (mercantile$cycleButton != null && mercantile$cycleButton.isHovered()) {
-            MercantileConfig config = ClientMercantileData.getServerConfig();
-            if (config == null) config = MercantileConfig.get();
             guiGraphics.renderTooltip(this.font,
                     Component.translatable("gui.mercantile.cycle_trades.tooltip", config.tradeCycleEmeraldCost),
                     mouseX, mouseY);
@@ -351,23 +372,27 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         if (config == null) config = MercantileConfig.get();
         if (!config.enableDemandTransparency) return;
 
+        int slotX = this.leftPos + OFFER_SLOT_X_OFFSET;
+        int slotY = this.topPos + OFFER_SLOT_Y_OFFSET;
+
+        // Belt-and-suspenders: no overlap with header band, info panel, or cycle button tooltip.
+        if (mouseY < slotY - 1) return;
+        if (mouseX < slotX - 1) return;
+        if (mercantile$cycleButton != null && mercantile$cycleButton.isHovered()) return;
+
         DemandPriceS2CPayload price = ClientMercantileData.getDemandPrice();
         if (price == null) return;
         VillagerInfoPanelS2CPayload info = ClientMercantileData.getVillagerInfo();
         if (info == null || info.villagerEntityId() != price.villagerEntityId()) return;
 
-        // Cost A icon is rendered at (leftPos + 10, topPos + 19) with 20px row spacing
-        // (see MerchantScreen.render: n = k+5+5, p = (l+16+1)+2).
-        int slotX = this.leftPos + 10;
-        int slotY = this.topPos + 19;
-        if (mouseX < slotX || mouseX >= slotX + 16) return;
+        if (mouseX < slotX || mouseX >= slotX + OFFER_SLOT_SIZE) return;
 
         List<DemandPriceS2CPayload.PriceComponent> components = price.components();
         for (int i = 0; i < VISIBLE_TRADE_ROWS; i++) {
-            int rowY = slotY + i * 20;
+            int rowY = slotY + i * OFFER_ROW_SPACING;
             int componentIndex = this.scrollOff + i;
             if (componentIndex < 0 || componentIndex >= components.size()) continue;
-            if (mouseY < rowY || mouseY >= rowY + 16) continue;
+            if (mouseY < rowY || mouseY >= rowY + OFFER_SLOT_SIZE) continue;
 
             DemandPriceS2CPayload.PriceComponent c = components.get(componentIndex);
             List<Component> lines = new ArrayList<>();
@@ -413,6 +438,18 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     @Nullable
     private VillagerInfoPanelS2CPayload mercantile$validInfo() {
         return ClientMercantileData.getVillagerInfo();
+    }
+
+    // Returns the panel's left x in screen coords. Only valid when mercantile$panelFits()
+    // is true; otherwise the panel would overlap the merchant UI and must be hidden.
+    @Unique
+    private int mercantile$panelX() {
+        return this.leftPos - INFO_PANEL_WIDTH - INFO_PANEL_MARGIN;
+    }
+
+    @Unique
+    private boolean mercantile$panelFits() {
+        return mercantile$panelX() >= 2;
     }
 
     @Unique

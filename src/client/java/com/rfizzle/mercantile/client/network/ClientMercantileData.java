@@ -46,7 +46,19 @@ public class ClientMercantileData {
         return restockTimer;
     }
 
+    /**
+     * Protocol invariant: when the user switches from villager A to B, the server
+     * MUST send {@link VillagerInfoPanelS2CPayload}(B) before any
+     * {@link RestockTimerS2CPayload}(B). Payloads whose villagerEntityId does not
+     * match the currently stored {@link #villagerInfo} are dropped — otherwise the
+     * panel would show B's info alongside A's restock timer. If info has not yet
+     * arrived (null), the payload is accepted and reconciled on info arrival.
+     */
     public static void setRestockTimer(@Nullable RestockTimerS2CPayload payload) {
+        if (payload != null && villagerInfo != null
+                && villagerInfo.villagerEntityId() != payload.villagerEntityId()) {
+            return;
+        }
         restockTimer = payload;
     }
 
@@ -54,7 +66,19 @@ public class ClientMercantileData {
         return demandPrice;
     }
 
+    /**
+     * Protocol invariant: when the user switches from villager A to B, the server
+     * MUST send {@link VillagerInfoPanelS2CPayload}(B) before any
+     * {@link DemandPriceS2CPayload}(B). Payloads whose villagerEntityId does not
+     * match the currently stored {@link #villagerInfo} are dropped — otherwise the
+     * panel would show B's info alongside A's price breakdown. If info has not yet
+     * arrived (null), the payload is accepted and reconciled on info arrival.
+     */
     public static void setDemandPrice(@Nullable DemandPriceS2CPayload payload) {
+        if (payload != null && villagerInfo != null
+                && villagerInfo.villagerEntityId() != payload.villagerEntityId()) {
+            return;
+        }
         demandPrice = payload;
     }
 
@@ -63,6 +87,14 @@ public class ClientMercantileData {
     }
 
     public static void setVillagerInfo(@Nullable VillagerInfoPanelS2CPayload payload) {
+        if (payload != null) {
+            if (restockTimer != null && restockTimer.villagerEntityId() != payload.villagerEntityId()) {
+                restockTimer = null;
+            }
+            if (demandPrice != null && demandPrice.villagerEntityId() != payload.villagerEntityId()) {
+                demandPrice = null;
+            }
+        }
         villagerInfo = payload;
     }
 
