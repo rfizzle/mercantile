@@ -246,6 +246,14 @@ public class ModMenuIntegration implements ModMenuApi {
                     .setSaveConsumer(v -> config.sentryDespawnSeconds = v)
                     .build());
 
+            // --- Quality of Life ---
+            ConfigCategory qol = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.qol"));
+            qol.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableStackRefill"), config.enableStackRefill)
+                    .setDefaultValue(defaults.enableStackRefill)
+                    .setTooltip(Component.translatable("mercantile.config.enableStackRefill.tooltip"))
+                    .setSaveConsumer(v -> config.enableStackRefill = v)
+                    .build());
+
             // --- Client ---
             ConfigCategory client = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.client"));
             client.addEntry(entry.startFloatField(Component.translatable("mercantile.config.villagerSoundVolume"), config.villagerSoundVolume)

@@ -67,6 +67,9 @@ public class MercantileConfig {
     public boolean enableRestockIndicator = true;
     public boolean enableDemandTransparency = true;
 
+    // Hotbar Stack Refill
+    public boolean enableStackRefill = true;
+
     // Breeding Tooltip (Jade/WTHIT)
     public boolean enableBreedingTooltip = true;
 

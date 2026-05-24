@@ -25,6 +25,7 @@
     "mercantile.config.category.pathfinding": "Pathfinding",
     "mercantile.config.category.trading": "Trading",
     "mercantile.config.category.pylon": "Sentry Pylon",
+    "mercantile.config.category.qol": "Quality of Life",
     "mercantile.config.category.client": "Client",
 
     "mercantile.config.enableVillagerPickup": "Enable Villager Pickup",
@@ -91,6 +92,8 @@
     "mercantile.config.enableRestockIndicator.tooltip": "Show restock timer in the trade GUI",
     "mercantile.config.enableDemandTransparency": "Enable Demand Transparency",
     "mercantile.config.enableDemandTransparency.tooltip": "Show price breakdown tooltip in the trade GUI",
+    "mercantile.config.enableStackRefill": "Enable Hotbar Stack Refill",
+    "mercantile.config.enableStackRefill.tooltip": "Automatically refill an empty hotbar slot from your inventory when a stack runs out",
 
     "mercantile.config.enableSentryPylon": "Enable Sentry Pylon",
     "mercantile.config.enableSentryPylon.tooltip": "Enable the sentry pylon block and crafting recipe",

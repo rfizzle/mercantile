@@ -46,6 +46,7 @@ class MercantileConfigTest {
         assertEquals(2.0f, config.healingMultiplier);
         assertTrue(config.enableRestockIndicator);
         assertTrue(config.enableDemandTransparency);
+        assertTrue(config.enableStackRefill);
         assertTrue(config.enableSentryPylon);
         assertEquals(32, config.pylonDetectionRadius);
         assertEquals(8, config.pylonMaxFuel);
