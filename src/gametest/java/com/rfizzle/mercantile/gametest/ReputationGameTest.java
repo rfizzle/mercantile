@@ -33,19 +33,28 @@ public class ReputationGameTest implements FabricGameTest {
 
         ServerPlayer player = helper.makeMockServerPlayerInLevel();
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
+        // S-040 introduced pulse-based gain: only every Nth trade awards rep. Pre-align the
+        // day so the implicit rollover in tryGainTradeRep doesn't reset our seeded state.
+        long currentDay = player.serverLevel().getGameTime() / 24_000L;
+        data.resetDailyCounters(currentDay);
+        data.setReputationMigrated(true);
         data.setScore(0);
 
+        MercantileConfig config = MercantileConfig.get();
+        int tradesPerGain = config.reputationTradesPerGain;
+        int trades = tradesPerGain; // one pulse worth of trades
+
         villager.setTradingPlayer(player);
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < trades; i++) {
             villager.notifyTrade(offer);
         }
 
-        int expectedGain = 5 * MercantileConfig.get().reputationTradeGain;
+        int expectedGain = config.reputationTradeGain; // one pulse = one gain
         helper.assertTrue(data.getScore() == expectedGain,
-                "Expected score " + expectedGain + " after 5 trades, got " + data.getScore());
+                "Expected score " + expectedGain + " after " + trades + " trades, got " + data.getScore());
 
-        helper.assertTrue(data.getTradesWithVillager(villager.getUUID()) == 5,
-                "Expected 5 trade stats, got " + data.getTradesWithVillager(villager.getUUID()));
+        helper.assertTrue(data.getTradesWithVillager(villager.getUUID()) == trades,
+                "Expected " + trades + " trade stats, got " + data.getTradesWithVillager(villager.getUUID()));
         helper.succeed();
     }
 
@@ -83,13 +92,15 @@ public class ReputationGameTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void priceModifierCalculation(GameTestHelper helper) {
+        // S-040 tier scale: HONORED >= 1000, TRUSTED 300..999, LIKED 75..299,
+        // NEUTRAL 0..74, DISTRUSTED -149..-1, REVILED -200..-150.
         int base = 20;
-        int honored = ReputationManager.getPriceModifier(100, base);
-        int trusted = ReputationManager.getPriceModifier(50, base);
-        int liked = ReputationManager.getPriceModifier(1, base);
+        int honored = ReputationManager.getPriceModifier(1000, base);
+        int trusted = ReputationManager.getPriceModifier(500, base);
+        int liked = ReputationManager.getPriceModifier(100, base);
         int neutral = ReputationManager.getPriceModifier(0, base);
-        int distrusted = ReputationManager.getPriceModifier(-25, base);
-        int reviled = ReputationManager.getPriceModifier(-100, base);
+        int distrusted = ReputationManager.getPriceModifier(-75, base);
+        int reviled = ReputationManager.getPriceModifier(-175, base);
 
         helper.assertTrue(honored < 0, "Honored should discount, got " + honored);
         helper.assertTrue(trusted < 0, "Trusted should discount, got " + trusted);
@@ -105,9 +116,11 @@ public class ReputationGameTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void reviledIsDetected(GameTestHelper helper) {
-        helper.assertTrue(ReputationManager.isReviled(-50), "-50 should be reviled");
-        helper.assertTrue(ReputationManager.isReviled(-100), "-100 should be reviled");
-        helper.assertFalse(ReputationManager.isReviled(-49), "-49 should not be reviled");
+        // S-040: REVILED is now -200..-150 (was -100..-50).
+        helper.assertTrue(ReputationManager.isReviled(-200), "-200 should be reviled");
+        helper.assertTrue(ReputationManager.isReviled(-150), "-150 should be reviled");
+        helper.assertFalse(ReputationManager.isReviled(-149), "-149 should not be reviled (DISTRUSTED)");
+        helper.assertFalse(ReputationManager.isReviled(-50), "-50 should not be reviled (DISTRUSTED)");
         helper.assertFalse(ReputationManager.isReviled(0), "0 should not be reviled");
         helper.succeed();
     }

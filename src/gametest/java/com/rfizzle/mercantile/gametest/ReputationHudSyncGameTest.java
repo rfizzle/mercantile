@@ -128,17 +128,25 @@ public class ReputationHudSyncGameTest implements FabricGameTest {
 
         ServerPlayer player = helper.makeMockServerPlayerInLevel();
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
+        // S-040 introduced pulse-based gain: only every Nth trade awards rep + sync. Pre-align
+        // the day so the implicit rollover in tryGainTradeRep doesn't reset our seeded state.
+        long currentDay = player.serverLevel().getGameTime() / 24_000L;
+        data.resetDailyCounters(currentDay);
+        data.setReputationMigrated(true);
         data.setScore(0);
 
         EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
         int before = GametestNetUtil.countPayloads(channel, SyncReputationS2CPayload.class);
 
         villager.setTradingPlayer(player);
-        villager.notifyTrade(offer);
+        int tradesPerGain = MercantileConfig.get().reputationTradesPerGain;
+        for (int i = 0; i < tradesPerGain; i++) {
+            villager.notifyTrade(offer);
+        }
 
         int after = GametestNetUtil.countPayloads(channel, SyncReputationS2CPayload.class);
         helper.assertTrue(after - before >= 1,
-                "trade should trigger at least 1 sync payload to the HUD; saw delta " + (after - before));
+                "pulse trade should trigger at least 1 sync payload to the HUD; saw delta " + (after - before));
 
         SyncReputationS2CPayload payload = findLastPayload(channel);
         helper.assertTrue(payload != null, "expected at least one SyncReputationS2CPayload after trade");

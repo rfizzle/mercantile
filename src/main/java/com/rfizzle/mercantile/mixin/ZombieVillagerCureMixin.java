@@ -35,7 +35,7 @@ public abstract class ZombieVillagerCureMixin {
 
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         if (data.addCuredVillager(villagerUuid)) {
-            ReputationManager.modifyScore(player, config.reputationCureGain);
+            ReputationManager.gainCureRep(player);
         }
     }
 }

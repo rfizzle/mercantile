@@ -32,10 +32,14 @@ public class MercantileConfig {
     // Reputation
     public boolean enableReputation = true;
     public int reputationTradeGain = 1;
-    public int reputationCureGain = 15;
-    public int reputationAttackLoss = 10;
-    public int reputationKillLoss = 25;
-    public int reputationCycleGain = 2;
+    public int reputationCureGain = 5;
+    public int reputationAttackLoss = 15;
+    public int reputationKillLoss = 40;
+    public int reputationCycleGain = 1;
+    public int reputationDailyCap = 5;
+    public int reputationTradesPerGain = 5;
+    public int reputationDailyMaxTradeRep = 2;
+    public int reputationDailyMaxCycleRep = 1;
 
     // Follow Mode
     public boolean enableFollowMode = true;
@@ -92,6 +96,10 @@ public class MercantileConfig {
         reputationAttackLoss = Math.clamp(reputationAttackLoss, 0, Integer.MAX_VALUE);
         reputationKillLoss = Math.clamp(reputationKillLoss, 0, Integer.MAX_VALUE);
         reputationCycleGain = Math.clamp(reputationCycleGain, 0, Integer.MAX_VALUE);
+        reputationDailyCap = Math.clamp(reputationDailyCap, 1, 50);
+        reputationTradesPerGain = Math.clamp(reputationTradesPerGain, 1, 20);
+        reputationDailyMaxTradeRep = Math.clamp(reputationDailyMaxTradeRep, 1, 10);
+        reputationDailyMaxCycleRep = Math.clamp(reputationDailyMaxCycleRep, 1, 10);
         maxFollowingVillagers = Math.clamp(maxFollowingVillagers, 1, Integer.MAX_VALUE);
         healingMultiplier = Math.clamp(healingMultiplier, 1.0f, 10.0f);
         pylonDetectionRadius = Math.clamp(pylonDetectionRadius, 4, 128);

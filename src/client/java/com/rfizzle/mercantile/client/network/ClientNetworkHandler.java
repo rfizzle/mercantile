@@ -13,7 +13,8 @@ public class ClientNetworkHandler {
     public static void init() {
         ClientPlayNetworking.registerGlobalReceiver(SyncReputationS2CPayload.TYPE, (payload, context) -> {
             context.client().execute(() ->
-                    ClientMercantileData.setReputation(payload.score(), payload.tierKey()));
+                    ClientMercantileData.setReputation(payload.score(), payload.tierKey(),
+                            payload.dailyEarned(), payload.dailyCap()));
         });
 
         ClientPlayNetworking.registerGlobalReceiver(FollowStateS2CPayload.TYPE, (payload, context) -> {

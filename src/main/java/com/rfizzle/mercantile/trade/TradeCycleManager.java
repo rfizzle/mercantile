@@ -131,7 +131,7 @@ public final class TradeCycleManager {
         }
 
         if (config.enableReputation) {
-            ReputationManager.modifyScore(player, config.reputationCycleGain);
+            ReputationManager.tryGainCycleRep(player);
         }
 
         villager.playSound(SoundEvents.VILLAGER_YES, 1.0f, villager.getVoicePitch());

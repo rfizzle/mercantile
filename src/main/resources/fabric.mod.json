@@ -26,6 +26,8 @@
             "com.rfizzle.mercantile.gametest.VillagerPickupGameTest",
             "com.rfizzle.mercantile.gametest.ReputationGameTest",
             "com.rfizzle.mercantile.gametest.ReputationHudSyncGameTest",
+            "com.rfizzle.mercantile.gametest.ReputationMigrationGameTest",
+            "com.rfizzle.mercantile.gametest.ReputationDailyCapGameTest",
             "com.rfizzle.mercantile.gametest.SentryPylonGameTest",
             "com.rfizzle.mercantile.gametest.SentryPylonFuelGameTest",
             "com.rfizzle.mercantile.gametest.SentryPylonScanGameTest",

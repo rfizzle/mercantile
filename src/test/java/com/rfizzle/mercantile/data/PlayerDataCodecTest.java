@@ -88,7 +88,12 @@ class PlayerDataCodecTest {
     void constructorWithValues() {
         UUID cured = UUID.randomUUID();
         UUID trader = UUID.randomUUID();
-        PlayerData data = new PlayerData(100, 3000, -1L, Set.of(cured), Map.of(trader, 5));
+        PlayerData data = PlayerData.builder()
+                .score(100)
+                .proximityTicks(3000)
+                .curedVillagers(Set.of(cured))
+                .tradeStats(Map.of(trader, 5))
+                .build();
 
         assertEquals(100, data.getScore());
         assertEquals(3000, data.getProximityTicks());
@@ -179,7 +184,9 @@ class PlayerDataCodecTest {
             oversized.add(UUID.randomUUID());
         }
 
-        PlayerData data = new PlayerData(0, 0, -1L, oversized, Map.of());
+        PlayerData data = PlayerData.builder()
+                .curedVillagers(oversized)
+                .build();
         assertEquals(PlayerData.MAX_CURED_VILLAGERS, data.getCuredVillagers().size(),
                 "constructor must clamp oversized curedVillagers input to MAX_CURED_VILLAGERS");
     }
@@ -243,9 +250,137 @@ class PlayerDataCodecTest {
             oversized.put(UUID.randomUUID(), i + 1);
         }
 
-        PlayerData data = new PlayerData(0, 0, -1L, Set.of(), oversized);
+        PlayerData data = PlayerData.builder()
+                .tradeStats(oversized)
+                .build();
         assertEquals(PlayerData.MAX_TRADE_STATS, data.getTradeStats().size(),
                 "constructor must clamp oversized tradeStats input to MAX_TRADE_STATS");
+    }
+
+    @Test
+    void defaultValuesForDailyFields() {
+        PlayerData data = new PlayerData();
+        assertEquals(0, data.getDailyReputationEarned());
+        assertEquals(-1L, data.getLastCapResetDay());
+        assertEquals(0, data.getDailyTradeRep());
+        assertEquals(0, data.getDailyCycleRep());
+        assertEquals(0, data.getTradesSinceLastRepGain());
+        assertFalse(data.isDailyCapNotified());
+    }
+
+    @Test
+    void dailyCapNotifiedRoundTripsAndResetsOnRollover() {
+        PlayerData original = new PlayerData();
+        original.resetDailyCounters(5L);
+        original.setDailyCapNotified(true);
+
+        JsonElement encoded = PlayerData.CODEC.encodeStart(JsonOps.INSTANCE, original).getOrThrow();
+        PlayerData decoded = PlayerData.CODEC.parse(JsonOps.INSTANCE, encoded).getOrThrow();
+
+        assertTrue(decoded.isDailyCapNotified(),
+                "dailyCapNotified flag must survive a codec round-trip");
+
+        decoded.resetDailyCounters(6L);
+        assertFalse(decoded.isDailyCapNotified(),
+                "resetDailyCounters must clear the notified flag so a new day can re-notify");
+    }
+
+    @Test
+    void roundTripWithDailyFields() {
+        PlayerData original = PlayerData.builder()
+                .score(100)
+                .proximityTicks(4000)
+                .lastProximityDay(7L)
+                .dailyReputationEarned(3)
+                .lastCapResetDay(12L)
+                .dailyTradeRep(2)
+                .dailyCycleRep(1)
+                .tradesSinceLastRepGain(4)
+                .build();
+
+        JsonElement encoded = PlayerData.CODEC.encodeStart(JsonOps.INSTANCE, original).getOrThrow();
+        PlayerData decoded = PlayerData.CODEC.parse(JsonOps.INSTANCE, encoded).getOrThrow();
+
+        assertEquals(3, decoded.getDailyReputationEarned());
+        assertEquals(12L, decoded.getLastCapResetDay());
+        assertEquals(2, decoded.getDailyTradeRep());
+        assertEquals(1, decoded.getDailyCycleRep());
+        assertEquals(4, decoded.getTradesSinceLastRepGain());
+    }
+
+    @Test
+    void preS040SaveDeserializesWithDailyDefaults() {
+        // Simulate a saved PlayerData from before S-040 (no daily-cap keys).
+        JsonObject legacy = new JsonObject();
+        legacy.addProperty("score", 250);
+        legacy.addProperty("proximityTicks", 1000);
+
+        PlayerData decoded = PlayerData.CODEC.parse(JsonOps.INSTANCE, legacy).getOrThrow();
+
+        assertEquals(250, decoded.getScore());
+        assertEquals(0, decoded.getDailyReputationEarned());
+        assertEquals(-1L, decoded.getLastCapResetDay());
+        assertEquals(0, decoded.getDailyTradeRep());
+        assertEquals(0, decoded.getDailyCycleRep());
+        assertEquals(0, decoded.getTradesSinceLastRepGain());
+    }
+
+    @Test
+    void resetDailyCountersZeroesAllAndSetsDay() {
+        PlayerData data = PlayerData.builder()
+                .score(500)
+                .dailyReputationEarned(5)
+                .lastCapResetDay(3L)
+                .dailyTradeRep(2)
+                .dailyCycleRep(1)
+                .tradesSinceLastRepGain(3)
+                .build();
+
+        data.resetDailyCounters(42L);
+
+        assertEquals(42L, data.getLastCapResetDay());
+        assertEquals(0, data.getDailyReputationEarned());
+        assertEquals(0, data.getDailyTradeRep());
+        assertEquals(0, data.getDailyCycleRep());
+        assertEquals(0, data.getTradesSinceLastRepGain());
+        assertEquals(500, data.getScore(), "resetDailyCounters must not touch the persistent score");
+    }
+
+    @Test
+    void addDailyTradeAndCycleIncrementBothCounters() {
+        PlayerData data = new PlayerData();
+        data.addDailyTradeRep(1);
+        assertEquals(1, data.getDailyTradeRep());
+        assertEquals(1, data.getDailyReputationEarned());
+
+        data.addDailyCycleRep(1);
+        assertEquals(1, data.getDailyCycleRep());
+        assertEquals(2, data.getDailyReputationEarned());
+    }
+
+    @Test
+    void reputationMigratedDefaultsFalseOnLegacyJson() {
+        // Legacy JSON (no reputationMigrated key) must decode with the flag set to false
+        // so the migration helper runs once on first JOIN.
+        JsonObject legacy = new JsonObject();
+        legacy.addProperty("score", 80);
+
+        PlayerData decoded = PlayerData.CODEC.parse(JsonOps.INSTANCE, legacy).getOrThrow();
+        assertFalse(decoded.isReputationMigrated());
+    }
+
+    @Test
+    void reputationMigratedRoundTrips() {
+        PlayerData original = new PlayerData();
+        original.setScore(305);
+        original.setReputationMigrated(true);
+
+        JsonElement encoded = PlayerData.CODEC.encodeStart(JsonOps.INSTANCE, original).getOrThrow();
+        PlayerData decoded = PlayerData.CODEC.parse(JsonOps.INSTANCE, encoded).getOrThrow();
+
+        assertTrue(decoded.isReputationMigrated(),
+                "reputationMigrated flag must survive a codec round-trip");
+        assertEquals(305, decoded.getScore());
     }
 
     @Test

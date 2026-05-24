@@ -11,22 +11,25 @@ class ReputationTierTest {
 
     @ParameterizedTest
     @CsvSource({
-            "-100, REVILED",
-            "-75,  REVILED",
-            "-50,  REVILED",
-            "-49,  DISTRUSTED",
-            "-25,  DISTRUSTED",
+            "-200, REVILED",
+            "-175, REVILED",
+            "-150, REVILED",
+            "-149, DISTRUSTED",
+            "-75,  DISTRUSTED",
             "-1,   DISTRUSTED",
             "0,    NEUTRAL",
-            "1,    LIKED",
-            "25,   LIKED",
-            "49,   LIKED",
-            "50,   TRUSTED",
-            "75,   TRUSTED",
-            "99,   TRUSTED",
-            "100,  HONORED",
-            "150,  HONORED",
-            "200,  HONORED"
+            "1,    NEUTRAL",
+            "50,   NEUTRAL",
+            "74,   NEUTRAL",
+            "75,   LIKED",
+            "200,  LIKED",
+            "299,  LIKED",
+            "300,  TRUSTED",
+            "700,  TRUSTED",
+            "999,  TRUSTED",
+            "1000, HONORED",
+            "1250, HONORED",
+            "1500, HONORED"
     })
     void tierBoundaries(int score, String expectedTier) {
         assertEquals(ReputationTier.valueOf(expectedTier), ReputationTier.fromScore(score));
@@ -64,7 +67,7 @@ class ReputationTierTest {
     @Test
     void addScoreClampsAtMax() {
         PlayerData data = new PlayerData();
-        data.setScore(190);
+        data.setScore(1490);
         data.addScore(20);
         assertEquals(PlayerData.MAX_SCORE, data.getScore());
     }
@@ -72,7 +75,7 @@ class ReputationTierTest {
     @Test
     void addScoreClampsAtMin() {
         PlayerData data = new PlayerData();
-        data.setScore(-90);
+        data.setScore(-190);
         data.addScore(-20);
         assertEquals(PlayerData.MIN_SCORE, data.getScore());
     }
@@ -80,14 +83,14 @@ class ReputationTierTest {
     @Test
     void setScoreClampsAboveMax() {
         PlayerData data = new PlayerData();
-        data.setScore(999);
+        data.setScore(99_999);
         assertEquals(PlayerData.MAX_SCORE, data.getScore());
     }
 
     @Test
     void setScoreClampsBelowMin() {
         PlayerData data = new PlayerData();
-        data.setScore(-999);
+        data.setScore(-99_999);
         assertEquals(PlayerData.MIN_SCORE, data.getScore());
     }
 
@@ -116,9 +119,9 @@ class ReputationTierTest {
 
     @Test
     void isReviledBoundary() {
-        assertTrue(ReputationManager.isReviled(-50));
-        assertTrue(ReputationManager.isReviled(-100));
-        assertFalse(ReputationManager.isReviled(-49));
+        assertTrue(ReputationManager.isReviled(-150));
+        assertTrue(ReputationManager.isReviled(-200));
+        assertFalse(ReputationManager.isReviled(-149));
         assertFalse(ReputationManager.isReviled(0));
     }
 }

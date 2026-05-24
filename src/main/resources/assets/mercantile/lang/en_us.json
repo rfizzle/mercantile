@@ -3,8 +3,8 @@
     "block.mercantile.sentry_pylon": "Sentry Pylon",
     "item.mercantile.villager": "Villager",
     "command.mercantile.reload": "Mercantile config reloaded",
-    "command.mercantile.reputation.self": "Your reputation: %s (%s)",
-    "command.mercantile.reputation.other": "%s's reputation: %s (%s)",
+    "command.mercantile.reputation.self": "Your reputation: %1$s (%2$s) — %3$s/%4$s today",
+    "command.mercantile.reputation.other": "%1$s's reputation: %2$s (%3$s) — %4$s/%5$s today",
     "command.mercantile.reputation.set": "Set %s's reputation to %s (%s)",
     "command.mercantile.reputation.add": "Added %s reputation to %s, now %s (%s)",
     "command.mercantile.reputation.not_player": "This command must be run by a player",
@@ -44,7 +44,7 @@
     "mercantile.config.enableReputation": "Enable Reputation",
     "mercantile.config.enableReputation.tooltip": "Enable the global reputation system",
     "mercantile.config.reputationTradeGain": "Trade Rep Gain",
-    "mercantile.config.reputationTradeGain.tooltip": "Reputation gained per completed trade",
+    "mercantile.config.reputationTradeGain.tooltip": "Reputation gained per N completed trades (N controlled by Trades Per Gain)",
     "mercantile.config.reputationCureGain": "Cure Rep Gain",
     "mercantile.config.reputationCureGain.tooltip": "Reputation gained for curing a zombie villager",
     "mercantile.config.reputationAttackLoss": "Attack Rep Loss",
@@ -53,6 +53,14 @@
     "mercantile.config.reputationKillLoss.tooltip": "Reputation lost for killing a villager",
     "mercantile.config.reputationCycleGain": "Cycle Rep Gain",
     "mercantile.config.reputationCycleGain.tooltip": "Reputation gained per trade cycle",
+    "mercantile.config.reputationDailyCap": "Daily Rep Cap",
+    "mercantile.config.reputationDailyCap.tooltip": "Maximum total reputation a player can earn from villager activity per Minecraft day",
+    "mercantile.config.reputationTradesPerGain": "Trades Per Gain",
+    "mercantile.config.reputationTradesPerGain.tooltip": "Number of completed trades required to earn one Trade Rep Gain",
+    "mercantile.config.reputationDailyMaxTradeRep": "Daily Max Trade Rep",
+    "mercantile.config.reputationDailyMaxTradeRep.tooltip": "Threshold at or above which no further reputation is awarded from trading that day (sub-cap within Daily Rep Cap). With a gain > 1, the awarded total may overshoot this threshold by up to one gain.",
+    "mercantile.config.reputationDailyMaxCycleRep": "Daily Max Cycle Rep",
+    "mercantile.config.reputationDailyMaxCycleRep.tooltip": "Threshold at or above which no further reputation is awarded from trade cycling that day (sub-cap within Daily Rep Cap). With a gain > 1, the awarded total may overshoot this threshold by up to one gain.",
 
     "mercantile.config.enableFollowMode": "Enable Follow Mode",
     "mercantile.config.enableFollowMode.tooltip": "Allow villagers to follow the player",
@@ -139,6 +147,7 @@
     "mercantile.tier.reviled":    "Reviled",
 
     "mercantile.trade.denied.reviled": "This villager refuses to trade with you",
+    "mercantile.message.reputation_daily_cap": "Daily reputation limit reached",
 
     "gui.mercantile.bulk_trade.feedback": "Traded %sx %s",
 

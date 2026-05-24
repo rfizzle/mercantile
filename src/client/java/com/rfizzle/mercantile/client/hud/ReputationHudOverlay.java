@@ -52,7 +52,7 @@ public final class ReputationHudOverlay {
         if (!shouldRender(mc)) return;
 
         Font font = mc.font;
-        Component label = Component.translatable(ClientMercantileData.getReputationTier());
+        Component label = buildLabel();
         int textWidth = font.width(label);
 
         int boxW = boxWidthFor(textWidth);
@@ -101,6 +101,10 @@ public final class ReputationHudOverlay {
 
     static int boxWidthFor(int textWidth) {
         return BOX_PAD_X + ICON_SIZE + ICON_TEXT_GAP + textWidth + BOX_PAD_X;
+    }
+
+    static Component buildLabel() {
+        return Component.translatable(ClientMercantileData.getReputationTier());
     }
 
     static int yOffsetFor(boolean tribulationLoaded) {

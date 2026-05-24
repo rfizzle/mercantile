@@ -98,6 +98,30 @@ public class ModMenuIntegration implements ModMenuApi {
                     .setTooltip(Component.translatable("mercantile.config.reputationCycleGain.tooltip"))
                     .setSaveConsumer(v -> config.reputationCycleGain = v)
                     .build());
+            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.reputationDailyCap"), config.reputationDailyCap)
+                    .setDefaultValue(defaults.reputationDailyCap)
+                    .setMin(1).setMax(50)
+                    .setTooltip(Component.translatable("mercantile.config.reputationDailyCap.tooltip"))
+                    .setSaveConsumer(v -> config.reputationDailyCap = v)
+                    .build());
+            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.reputationTradesPerGain"), config.reputationTradesPerGain)
+                    .setDefaultValue(defaults.reputationTradesPerGain)
+                    .setMin(1).setMax(20)
+                    .setTooltip(Component.translatable("mercantile.config.reputationTradesPerGain.tooltip"))
+                    .setSaveConsumer(v -> config.reputationTradesPerGain = v)
+                    .build());
+            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.reputationDailyMaxTradeRep"), config.reputationDailyMaxTradeRep)
+                    .setDefaultValue(defaults.reputationDailyMaxTradeRep)
+                    .setMin(1).setMax(10)
+                    .setTooltip(Component.translatable("mercantile.config.reputationDailyMaxTradeRep.tooltip"))
+                    .setSaveConsumer(v -> config.reputationDailyMaxTradeRep = v)
+                    .build());
+            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.reputationDailyMaxCycleRep"), config.reputationDailyMaxCycleRep)
+                    .setDefaultValue(defaults.reputationDailyMaxCycleRep)
+                    .setMin(1).setMax(10)
+                    .setTooltip(Component.translatable("mercantile.config.reputationDailyMaxCycleRep.tooltip"))
+                    .setSaveConsumer(v -> config.reputationDailyMaxCycleRep = v)
+                    .build());
 
             // --- Follow Mode ---
             ConfigCategory follow = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.follow"));

@@ -12,6 +12,8 @@ public class ClientMercantileData {
 
     private static int reputationScore = 0;
     private static String reputationTier = "mercantile.tier.neutral";
+    private static int reputationDailyEarned = 0;
+    private static int reputationDailyCap = 0;
 
     private static @Nullable RestockTimerS2CPayload restockTimer;
     private static @Nullable DemandPriceS2CPayload demandPrice;
@@ -35,9 +37,19 @@ public class ClientMercantileData {
         return reputationTier;
     }
 
-    public static void setReputation(int score, String tier) {
+    public static int getReputationDailyEarned() {
+        return reputationDailyEarned;
+    }
+
+    public static int getReputationDailyCap() {
+        return reputationDailyCap;
+    }
+
+    public static void setReputation(int score, String tier, int dailyEarned, int dailyCap) {
         reputationScore = score;
         reputationTier = tier;
+        reputationDailyEarned = dailyEarned;
+        reputationDailyCap = dailyCap;
     }
 
     // --- Merchant screen data ---
@@ -159,6 +171,8 @@ public class ClientMercantileData {
     public static void clear() {
         reputationScore = 0;
         reputationTier = "mercantile.tier.neutral";
+        reputationDailyEarned = 0;
+        reputationDailyCap = 0;
         restockTimer = null;
         demandPrice = null;
         villagerInfo = null;

@@ -41,7 +41,7 @@ public abstract class AbstractVillagerTradeMixin {
             PlayerData playerData = serverPlayer.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
             playerData.incrementTradesWithVillager(villager.getUUID());
             if (!BulkTradeContext.isActive()) {
-                ReputationManager.modifyScore(serverPlayer, config.reputationTradeGain);
+                ReputationManager.tryGainTradeRep(serverPlayer);
             }
         }
 

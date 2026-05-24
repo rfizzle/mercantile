@@ -8,7 +8,9 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
 public record SyncReputationS2CPayload(
         int score,
-        String tierKey  // translation key; display via Component.translatable(tierKey)
+        String tierKey,  // translation key; display via Component.translatable(tierKey)
+        int dailyEarned,
+        int dailyCap
 ) implements CustomPacketPayload {
 
     public static final Type<SyncReputationS2CPayload> TYPE =
@@ -18,6 +20,8 @@ public record SyncReputationS2CPayload(
             StreamCodec.composite(
                     ByteBufCodecs.VAR_INT, SyncReputationS2CPayload::score,
                     ByteBufCodecs.STRING_UTF8, SyncReputationS2CPayload::tierKey,
+                    ByteBufCodecs.VAR_INT, SyncReputationS2CPayload::dailyEarned,
+                    ByteBufCodecs.VAR_INT, SyncReputationS2CPayload::dailyCap,
                     SyncReputationS2CPayload::new);
 
     @Override

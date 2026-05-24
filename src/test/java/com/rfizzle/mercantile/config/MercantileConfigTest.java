@@ -24,10 +24,14 @@ class MercantileConfigTest {
         assertEquals(6, config.tradeCycleEmeraldCost);
         assertTrue(config.enableReputation);
         assertEquals(1, config.reputationTradeGain);
-        assertEquals(15, config.reputationCureGain);
-        assertEquals(10, config.reputationAttackLoss);
-        assertEquals(25, config.reputationKillLoss);
-        assertEquals(2, config.reputationCycleGain);
+        assertEquals(5, config.reputationCureGain);
+        assertEquals(15, config.reputationAttackLoss);
+        assertEquals(40, config.reputationKillLoss);
+        assertEquals(1, config.reputationCycleGain);
+        assertEquals(5, config.reputationDailyCap);
+        assertEquals(5, config.reputationTradesPerGain);
+        assertEquals(2, config.reputationDailyMaxTradeRep);
+        assertEquals(1, config.reputationDailyMaxCycleRep);
         assertTrue(config.enableFollowMode);
         assertEquals(3, config.maxFollowingVillagers);
         assertTrue(config.enablePathfindingFixes);
@@ -312,6 +316,102 @@ class MercantileConfigTest {
 
         MercantileConfig loaded = MercantileConfig.load(configFile);
         assertEquals(0.0f, loaded.villagerSoundVolume);
+    }
+
+    @Test
+    void reputationDailyCapClampedBelowMin(@TempDir Path tempDir) throws IOException {
+        Path configFile = tempDir.resolve("mercantile.json");
+        Files.writeString(configFile, """
+                {
+                  "reputationDailyCap": 0
+                }
+                """);
+        MercantileConfig loaded = MercantileConfig.load(configFile);
+        assertEquals(1, loaded.reputationDailyCap);
+    }
+
+    @Test
+    void reputationDailyCapClampedAboveMax(@TempDir Path tempDir) throws IOException {
+        Path configFile = tempDir.resolve("mercantile.json");
+        Files.writeString(configFile, """
+                {
+                  "reputationDailyCap": 9999
+                }
+                """);
+        MercantileConfig loaded = MercantileConfig.load(configFile);
+        assertEquals(50, loaded.reputationDailyCap);
+    }
+
+    @Test
+    void reputationTradesPerGainClampedBelowMin(@TempDir Path tempDir) throws IOException {
+        Path configFile = tempDir.resolve("mercantile.json");
+        Files.writeString(configFile, """
+                {
+                  "reputationTradesPerGain": 0
+                }
+                """);
+        MercantileConfig loaded = MercantileConfig.load(configFile);
+        assertEquals(1, loaded.reputationTradesPerGain);
+    }
+
+    @Test
+    void reputationTradesPerGainClampedAboveMax(@TempDir Path tempDir) throws IOException {
+        Path configFile = tempDir.resolve("mercantile.json");
+        Files.writeString(configFile, """
+                {
+                  "reputationTradesPerGain": 999
+                }
+                """);
+        MercantileConfig loaded = MercantileConfig.load(configFile);
+        assertEquals(20, loaded.reputationTradesPerGain);
+    }
+
+    @Test
+    void reputationDailyMaxTradeRepClampedBelowMin(@TempDir Path tempDir) throws IOException {
+        Path configFile = tempDir.resolve("mercantile.json");
+        Files.writeString(configFile, """
+                {
+                  "reputationDailyMaxTradeRep": 0
+                }
+                """);
+        MercantileConfig loaded = MercantileConfig.load(configFile);
+        assertEquals(1, loaded.reputationDailyMaxTradeRep);
+    }
+
+    @Test
+    void reputationDailyMaxTradeRepClampedAboveMax(@TempDir Path tempDir) throws IOException {
+        Path configFile = tempDir.resolve("mercantile.json");
+        Files.writeString(configFile, """
+                {
+                  "reputationDailyMaxTradeRep": 99
+                }
+                """);
+        MercantileConfig loaded = MercantileConfig.load(configFile);
+        assertEquals(10, loaded.reputationDailyMaxTradeRep);
+    }
+
+    @Test
+    void reputationDailyMaxCycleRepClampedBelowMin(@TempDir Path tempDir) throws IOException {
+        Path configFile = tempDir.resolve("mercantile.json");
+        Files.writeString(configFile, """
+                {
+                  "reputationDailyMaxCycleRep": 0
+                }
+                """);
+        MercantileConfig loaded = MercantileConfig.load(configFile);
+        assertEquals(1, loaded.reputationDailyMaxCycleRep);
+    }
+
+    @Test
+    void reputationDailyMaxCycleRepClampedAboveMax(@TempDir Path tempDir) throws IOException {
+        Path configFile = tempDir.resolve("mercantile.json");
+        Files.writeString(configFile, """
+                {
+                  "reputationDailyMaxCycleRep": 99
+                }
+                """);
+        MercantileConfig loaded = MercantileConfig.load(configFile);
+        assertEquals(10, loaded.reputationDailyMaxCycleRep);
     }
 
     @Test

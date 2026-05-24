@@ -61,14 +61,24 @@ class PayloadCodecTest {
 
     @Test
     void syncReputationS2C() {
-        var original = new SyncReputationS2CPayload(75, "mercantile.tier.trusted");
+        var original = new SyncReputationS2CPayload(75, "mercantile.tier.trusted", 3, 5);
         assertEquals(original, roundTrip(SyncReputationS2CPayload.CODEC, original));
     }
 
     @Test
     void syncReputationS2CNegativeScore() {
-        var original = new SyncReputationS2CPayload(-80, "mercantile.tier.reviled");
+        var original = new SyncReputationS2CPayload(-80, "mercantile.tier.reviled", 0, 5);
         assertEquals(original, roundTrip(SyncReputationS2CPayload.CODEC, original));
+    }
+
+    @Test
+    void syncReputationS2CCarriesDailyFields() {
+        var original = new SyncReputationS2CPayload(305, "mercantile.tier.trusted", 4, 5);
+        SyncReputationS2CPayload decoded = roundTrip(SyncReputationS2CPayload.CODEC, original);
+        assertEquals(305, decoded.score());
+        assertEquals("mercantile.tier.trusted", decoded.tierKey());
+        assertEquals(4, decoded.dailyEarned());
+        assertEquals(5, decoded.dailyCap());
     }
 
     @Test
@@ -369,7 +379,7 @@ class PayloadCodecTest {
         assertEquals(FollowVillagerC2SPayload.TYPE, new FollowVillagerC2SPayload(0).type());
         assertEquals(RequestWorkstationMapC2SPayload.TYPE, new RequestWorkstationMapC2SPayload().type());
         assertEquals(RequestVillageBoundsC2SPayload.TYPE, new RequestVillageBoundsC2SPayload().type());
-        assertEquals(SyncReputationS2CPayload.TYPE, new SyncReputationS2CPayload(0, "").type());
+        assertEquals(SyncReputationS2CPayload.TYPE, new SyncReputationS2CPayload(0, "", 0, 0).type());
         assertEquals(FollowStateS2CPayload.TYPE, new FollowStateS2CPayload(0, false).type());
         assertEquals(RestockTimerS2CPayload.TYPE, new RestockTimerS2CPayload(0, 0, 0, false).type());
         assertEquals(DemandPriceS2CPayload.TYPE, new DemandPriceS2CPayload(0, List.of()).type());

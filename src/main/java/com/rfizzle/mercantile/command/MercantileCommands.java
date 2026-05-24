@@ -7,6 +7,7 @@ import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
 import com.rfizzle.mercantile.network.ConfigSyncS2CPayload;
 import com.rfizzle.mercantile.network.MercantileNetworking;
+import com.rfizzle.mercantile.reputation.ReputationManager;
 import com.rfizzle.mercantile.reputation.ReputationTier;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -69,18 +70,27 @@ public final class MercantileCommands {
             return 0;
         }
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
+        long currentDay = player.serverLevel().getGameTime() / 24_000L;
+        ReputationManager.rolloverIfNewDay(data, currentDay);
         int score = data.getScore();
         Component tier = ReputationTier.fromScore(score).displayName();
-        source.sendSuccess(() -> Component.translatable("command.mercantile.reputation.self", score, tier), false);
+        int earned = data.getDailyReputationEarned();
+        int cap = MercantileConfig.get().reputationDailyCap;
+        source.sendSuccess(() -> Component.translatable("command.mercantile.reputation.self",
+                score, tier, earned, cap), false);
         return score;
     }
 
     private static int showPlayerReputation(CommandSourceStack source, ServerPlayer target) {
         PlayerData data = target.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
+        long currentDay = target.serverLevel().getGameTime() / 24_000L;
+        ReputationManager.rolloverIfNewDay(data, currentDay);
         int score = data.getScore();
         Component tier = ReputationTier.fromScore(score).displayName();
+        int earned = data.getDailyReputationEarned();
+        int cap = MercantileConfig.get().reputationDailyCap;
         source.sendSuccess(() -> Component.translatable("command.mercantile.reputation.other",
-                target.getDisplayName(), score, tier), false);
+                target.getDisplayName(), score, tier, earned, cap), false);
         return score;
     }
 

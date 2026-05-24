@@ -6,14 +6,15 @@ import net.minecraft.network.chat.Component;
 import java.util.Locale;
 
 public enum ReputationTier {
-    // Declared in descending minScore order so fromScore() can walk values() once
-    HONORED   ( 100, "mercantile.tier.honored",   -0.15f),
-    TRUSTED   (  50, "mercantile.tier.trusted",   -0.10f),
-    LIKED     (   1, "mercantile.tier.liked",     -0.05f),
+    // Declared in descending minScore order so fromScore() can walk values() once.
+    // minScore = lowest score in the tier's range (range extends up to the next tier's minScore - 1).
+    HONORED   (1000, "mercantile.tier.honored",   -0.15f),
+    TRUSTED   ( 300, "mercantile.tier.trusted",   -0.10f),
+    LIKED     (  75, "mercantile.tier.liked",     -0.05f),
     NEUTRAL   (   0, "mercantile.tier.neutral",    0.00f),
     // DISTRUSTED has no flat multiplier — linear markup is computed in priceModifierForScore
-    DISTRUSTED( -49, "mercantile.tier.distrusted", 0.00f),
-    REVILED   (-100, "mercantile.tier.reviled",    0.00f);
+    DISTRUSTED(-149, "mercantile.tier.distrusted", 0.00f),
+    REVILED   (-200, "mercantile.tier.reviled",    0.00f);
 
     private final int minScore;
     private final String translationKey;
@@ -65,7 +66,8 @@ public enum ReputationTier {
     public static int priceModifierForScore(int score, int basePrice) {
         ReputationTier tier = fromScore(score);
         if (tier == DISTRUSTED) {
-            float markupPercent = (10f + 15f * (-score - 1) / 48f) / 100f;
+            // DISTRUSTED span -1..-149 (148 steps): ramps from ~10% markup at -1 to ~25% at -149.
+            float markupPercent = (10f + 15f * (-score - 1) / 148f) / 100f;
             return Math.round(basePrice * markupPercent);
         }
         return tier.priceModifier(basePrice);

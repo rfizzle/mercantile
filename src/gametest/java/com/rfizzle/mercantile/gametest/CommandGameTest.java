@@ -8,11 +8,17 @@ import com.rfizzle.mercantile.network.VillageBoundsS2CPayload;
 import com.rfizzle.mercantile.reputation.ReputationTier;
 import io.netty.channel.embedded.EmbeddedChannel;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
+import net.minecraft.commands.CommandSource;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.phys.Vec2;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class CommandGameTest implements FabricGameTest {
@@ -74,11 +80,12 @@ public class CommandGameTest implements FabricGameTest {
                 new GameProfile(UUID.randomUUID(), "FlowPlayer"), ClientInformation.createDefault());
 
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
-        data.setScore(75);
+        // S-040 tier scale: TRUSTED starts at 300.
+        data.setScore(300);
 
-        helper.assertTrue(data.getScore() == 75, "score should read back from attachment");
+        helper.assertTrue(data.getScore() == 300, "score should read back from attachment");
         helper.assertTrue(ReputationTier.TRUSTED == ReputationTier.fromScore(data.getScore()),
-                "score 75 should map to Trusted tier");
+                "score 300 should map to Trusted tier");
 
         var source = player.createCommandSourceStack();
         helper.assertTrue(source.getPlayer() == player,
@@ -118,13 +125,16 @@ public class CommandGameTest implements FabricGameTest {
 
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
 
-        data.setScore(190);
+        // S-040 widened the range: MAX_SCORE=1500, MIN_SCORE=-200.
+        data.setScore(PlayerData.MAX_SCORE - 10);
         data.addScore(50);
-        helper.assertTrue(data.getScore() == 200, "should clamp to 200 max");
+        helper.assertTrue(data.getScore() == PlayerData.MAX_SCORE,
+                "should clamp to MAX_SCORE (" + PlayerData.MAX_SCORE + "), got " + data.getScore());
 
-        data.setScore(-90);
+        data.setScore(PlayerData.MIN_SCORE + 10);
         data.addScore(-50);
-        helper.assertTrue(data.getScore() == -100, "should clamp to -100 min");
+        helper.assertTrue(data.getScore() == PlayerData.MIN_SCORE,
+                "should clamp to MIN_SCORE (" + PlayerData.MIN_SCORE + "), got " + data.getScore());
 
         data.setScore(50);
         data.addScore(10);
@@ -193,17 +203,64 @@ public class CommandGameTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void tierNameBoundaries(GameTestHelper helper) {
-        helper.assertTrue(ReputationTier.REVILED == ReputationTier.fromScore(-100), "-100 -> REVILED");
-        helper.assertTrue(ReputationTier.REVILED == ReputationTier.fromScore(-50), "-50 -> REVILED");
-        helper.assertTrue(ReputationTier.DISTRUSTED == ReputationTier.fromScore(-49), "-49 -> DISTRUSTED");
+        // S-040 tier scale: REVILED -200..-150, DISTRUSTED -149..-1, NEUTRAL 0..74,
+        // LIKED 75..299, TRUSTED 300..999, HONORED 1000+.
+        helper.assertTrue(ReputationTier.REVILED == ReputationTier.fromScore(-200), "-200 -> REVILED");
+        helper.assertTrue(ReputationTier.REVILED == ReputationTier.fromScore(-150), "-150 -> REVILED");
+        helper.assertTrue(ReputationTier.DISTRUSTED == ReputationTier.fromScore(-149), "-149 -> DISTRUSTED");
         helper.assertTrue(ReputationTier.DISTRUSTED == ReputationTier.fromScore(-1), "-1 -> DISTRUSTED");
         helper.assertTrue(ReputationTier.NEUTRAL == ReputationTier.fromScore(0), "0 -> NEUTRAL");
-        helper.assertTrue(ReputationTier.LIKED == ReputationTier.fromScore(1), "1 -> LIKED");
-        helper.assertTrue(ReputationTier.LIKED == ReputationTier.fromScore(49), "49 -> LIKED");
-        helper.assertTrue(ReputationTier.TRUSTED == ReputationTier.fromScore(50), "50 -> TRUSTED");
-        helper.assertTrue(ReputationTier.TRUSTED == ReputationTier.fromScore(99), "99 -> TRUSTED");
-        helper.assertTrue(ReputationTier.HONORED == ReputationTier.fromScore(100), "100 -> HONORED");
-        helper.assertTrue(ReputationTier.HONORED == ReputationTier.fromScore(200), "200 -> HONORED");
+        helper.assertTrue(ReputationTier.NEUTRAL == ReputationTier.fromScore(74), "74 -> NEUTRAL");
+        helper.assertTrue(ReputationTier.LIKED == ReputationTier.fromScore(75), "75 -> LIKED");
+        helper.assertTrue(ReputationTier.LIKED == ReputationTier.fromScore(299), "299 -> LIKED");
+        helper.assertTrue(ReputationTier.TRUSTED == ReputationTier.fromScore(300), "300 -> TRUSTED");
+        helper.assertTrue(ReputationTier.TRUSTED == ReputationTier.fromScore(999), "999 -> TRUSTED");
+        helper.assertTrue(ReputationTier.HONORED == ReputationTier.fromScore(1000), "1000 -> HONORED");
+        helper.assertTrue(ReputationTier.HONORED == ReputationTier.fromScore(1500), "1500 -> HONORED");
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void reputationCommandIncludesDailyEarnedAndCap(GameTestHelper helper) {
+        var server = helper.getLevel().getServer();
+        var dispatcher = server.getCommands().getDispatcher();
+        var player = helper.makeMockServerPlayerInLevel();
+
+        PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
+        // Pre-align rollover so subsequent rolloverIfNewDay calls don't wipe our preset count.
+        long currentDay = player.serverLevel().getGameTime() / 24_000L;
+        data.resetDailyCounters(currentDay);
+        data.setReputationMigrated(true);
+        data.setScore(305);
+        data.addDailyTradeRep(3);  // -> dailyReputationEarned = 3
+        int cap = MercantileConfig.get().reputationDailyCap;
+
+        List<Component> captured = new ArrayList<>();
+        CommandSource src = new CommandSource() {
+            @Override public void sendSystemMessage(Component component) { captured.add(component); }
+            @Override public boolean acceptsSuccess() { return true; }
+            @Override public boolean acceptsFailure() { return true; }
+            @Override public boolean shouldInformAdmins() { return false; }
+        };
+        CommandSourceStack stack = new CommandSourceStack(
+                src, player.position(), Vec2.ZERO, player.serverLevel(),
+                4, "TestSource", Component.literal("TestSource"), server, player);
+
+        int result;
+        try {
+            result = dispatcher.execute("mercantile reputation", stack);
+        } catch (com.mojang.brigadier.exceptions.CommandSyntaxException e) {
+            helper.fail("/mercantile reputation failed to parse: " + e.getMessage());
+            return;
+        }
+        helper.assertTrue(result == 305, "command should return the score (305); got " + result);
+        helper.assertTrue(captured.size() == 1,
+                "expected 1 chat message; saw " + captured.size());
+        String text = captured.get(0).getString();
+        helper.assertTrue(text.contains("3/" + cap),
+                "command output should contain '3/" + cap + "'; got: " + text);
+
+        player.discard();
         helper.succeed();
     }
 
