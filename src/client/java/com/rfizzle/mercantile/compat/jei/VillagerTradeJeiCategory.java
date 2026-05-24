@@ -22,8 +22,8 @@ public class VillagerTradeJeiCategory implements IRecipeCategory<TradeIndexEntry
     public static final RecipeType<TradeIndexEntry> TYPE = new RecipeType<>(
             Mercantile.id("villager_trades"), TradeIndexEntry.class);
 
-    private static final int WIDTH = 140;
-    private static final int HEIGHT = 40;
+    private static final int WIDTH = 160;
+    private static final int HEIGHT = 60;
 
     private final IDrawable background;
     private final IDrawable icon;
@@ -74,6 +74,14 @@ public class VillagerTradeJeiCategory implements IRecipeCategory<TradeIndexEntry
                         tooltip.add(TradeIndexLabels.professionLabel(entry.profession())));
         x += 20;
 
+        if (!entry.workstation().isEmpty()) {
+            builder.addSlot(RecipeIngredientRole.CATALYST, x, y)
+                    .addItemStack(entry.workstation())
+                    .addRichTooltipCallback((slot, tooltip) ->
+                            tooltip.add(entry.workstation().getHoverName()));
+            x += 20;
+        }
+
         builder.addSlot(RecipeIngredientRole.INPUT, x, y).addItemStack(entry.inputA());
         x += 18;
         if (!entry.inputB().isEmpty()) {
@@ -95,6 +103,7 @@ public class VillagerTradeJeiCategory implements IRecipeCategory<TradeIndexEntry
         Component levelLabel = entry.level() > 0
                 ? TradeIndexLabels.levelLabel(entry.level())
                 : TradeIndexLabels.tierLabel(entry.minScore().orElse(0));
+        boolean hasWorkstation = !entry.workstation().isEmpty();
 
         int textY = HEIGHT - 22;
         graphics.drawString(font,
@@ -111,7 +120,14 @@ public class VillagerTradeJeiCategory implements IRecipeCategory<TradeIndexEntry
             graphics.drawString(font, badge, WIDTH - badgeWidth, textY + 10, 0xAA0000, false);
         }
 
-        int x = 38;
+        if (hasWorkstation) {
+            Component workstationLine = Component.translatable(
+                    "mercantile.trade_index.tooltip.workstation", entry.workstation().getHoverName());
+            graphics.drawString(font, workstationLine, 0, textY - 10, 0x404040, false);
+        }
+
+        int slotOffset = hasWorkstation ? 20 : 0;
+        int x = 38 + slotOffset;
         if (!entry.inputB().isEmpty()) {
             graphics.drawString(font, "+", x, 9, 0xFFFFFF, true);
         }

@@ -12,6 +12,7 @@ public record TradeIndexEntry(
         ItemStack inputA,
         ItemStack inputB,
         ItemStack output,
+        ItemStack workstation,
         int maxUses,
         int xpGain,
         float priceMultiplier,

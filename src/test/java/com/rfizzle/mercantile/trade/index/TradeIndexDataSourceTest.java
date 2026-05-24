@@ -5,6 +5,7 @@ import net.minecraft.SharedConstants;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.Bootstrap;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.trading.ItemCost;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,6 +33,7 @@ class TradeIndexDataSourceTest {
     @BeforeEach
     void resetExclusiveState() {
         ExclusiveTradesManager.setSnapshotsForTesting(Map.of(), List.of());
+        ProfessionWorkstations.invalidateForTesting();
     }
 
     @AfterEach
@@ -193,12 +196,100 @@ class TradeIndexDataSourceTest {
                 "snapshot must be immutable");
     }
 
+    @Test
+    void vanillaEntriesCarryWorkstationStack() {
+        TradeIndexDataSource.rebuild();
+
+        Map<ResourceLocation, Item> expected = new HashMap<>();
+        expected.put(ResourceLocation.parse("minecraft:farmer"), Items.COMPOSTER);
+        expected.put(ResourceLocation.parse("minecraft:librarian"), Items.LECTERN);
+        expected.put(ResourceLocation.parse("minecraft:butcher"), Items.SMOKER);
+
+        Map<ResourceLocation, ItemStack> seen = new HashMap<>();
+        for (TradeIndexEntry e : TradeIndexDataSource.snapshot()) {
+            if (e.source() != TradeIndexEntry.Source.VANILLA) continue;
+            if (expected.containsKey(e.profession())) {
+                seen.putIfAbsent(e.profession(), e.workstation());
+            }
+        }
+
+        for (Map.Entry<ResourceLocation, Item> exp : expected.entrySet()) {
+            ItemStack ws = seen.get(exp.getKey());
+            assertNotNull(ws, "expected at least one vanilla entry for " + exp.getKey());
+            assertFalse(ws.isEmpty(), "workstation must be non-empty for " + exp.getKey());
+            assertSame(exp.getValue(), ws.getItem(),
+                    "workstation item mismatch for " + exp.getKey() + ": " + ws);
+        }
+    }
+
+    @Test
+    void exclusiveProfessionEntriesAlsoCarryWorkstation() {
+        ExclusiveTradesManager.ExclusiveTrade trade = new ExclusiveTradesManager.ExclusiveTrade(
+                new ItemCost(Items.EMERALD, 10), null,
+                new ItemStack(Items.DIAMOND, 1), 4, 5, 0.0f, 100);
+        ExclusiveTradesManager.setSnapshotsForTesting(
+                Map.of("farmer", List.of(trade)),
+                List.of()
+        );
+
+        TradeIndexDataSource.rebuild();
+
+        ResourceLocation farmerId = ResourceLocation.parse("minecraft:farmer");
+        TradeIndexEntry found = TradeIndexDataSource.snapshot().stream()
+                .filter(e -> e.source() == TradeIndexEntry.Source.EXCLUSIVE_PROFESSION
+                        && e.profession().equals(farmerId))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(found, "expected an exclusive farmer entry");
+        assertFalse(found.workstation().isEmpty(), "exclusive farmer entry must carry workstation");
+        assertSame(Items.COMPOSTER, found.workstation().getItem(),
+                "exclusive farmer workstation should be composter, got: " + found.workstation());
+    }
+
+    @Test
+    void crossProfessionEntriesHaveEmptyWorkstation() {
+        ExclusiveTradesManager.ExclusiveTrade trade = new ExclusiveTradesManager.ExclusiveTrade(
+                new ItemCost(Items.EMERALD, 50), null,
+                new ItemStack(Items.NETHERITE_INGOT, 1), 2, 10, 0.0f, 500);
+        ExclusiveTradesManager.setSnapshotsForTesting(
+                Map.of(),
+                List.of(trade)
+        );
+
+        TradeIndexDataSource.rebuild();
+
+        TradeIndexEntry found = TradeIndexDataSource.snapshot().stream()
+                .filter(e -> e.source() == TradeIndexEntry.Source.EXCLUSIVE_CROSS_PROFESSION)
+                .findFirst()
+                .orElse(null);
+        assertNotNull(found, "expected a cross-profession exclusive entry");
+        assertTrue(found.workstation().isEmpty(),
+                "cross-profession entry must have empty workstation, got: " + found.workstation());
+    }
+
+    @Test
+    void leatherworkerWorkstationIsCauldronOrEmpty() {
+        TradeIndexDataSource.rebuild();
+        ResourceLocation leatherworkerId = ResourceLocation.parse("minecraft:leatherworker");
+        boolean sawAny = false;
+        for (TradeIndexEntry e : TradeIndexDataSource.snapshot()) {
+            if (e.source() != TradeIndexEntry.Source.VANILLA) continue;
+            if (!e.profession().equals(leatherworkerId)) continue;
+            sawAny = true;
+            ItemStack ws = e.workstation();
+            assertTrue(ws.isEmpty() || ws.getItem() == Items.CAULDRON,
+                    "leatherworker workstation should be cauldron or empty (filled-cauldron variants have no item), got: " + ws);
+        }
+        assertTrue(sawAny, "expected at least one vanilla leatherworker entry in snapshot");
+    }
+
     private static List<String> signatures(List<TradeIndexEntry> entries) {
         return entries.stream()
                 .map(e -> e.profession() + "|" + e.level() + "|" + e.source() + "|"
                         + stackSig(e.inputA()) + "|"
                         + stackSig(e.inputB()) + "|"
                         + stackSig(e.output()) + "|"
+                        + stackSig(e.workstation()) + "|"
                         + e.maxUses() + "|" + e.xpGain() + "|" + e.priceMultiplier() + "|"
                         + (e.minScore().isPresent() ? e.minScore().getAsInt() : "none"))
                 .toList();

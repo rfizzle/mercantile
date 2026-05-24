@@ -165,9 +165,12 @@ level; a redstone signal disables the pylon entirely.
 A unified, searchable catalog of every villager trade across every
 profession and level. Search "mending" in your recipe viewer to find the
 librarian trade that sells it. Filter by profession, by level, or by whether
-the trade is reputation-locked. Item lookup integrates naturally — the
-"Uses" and "Recipes" tabs on any item include matching villager trades.
-Works with **EMI**, **REI**, and **JEI**.
+the trade is reputation-locked. Each entry also shows the workstation block
+that unlocks the profession — click a workstation (lectern, composter,
+smoker, …) in your recipe viewer to list every trade for that profession.
+Item lookup integrates naturally — the "Uses" and "Recipes" tabs on any
+item include matching villager trades. Works with **EMI**, **REI**, and
+**JEI**.
 
 ## Optional integrations
 

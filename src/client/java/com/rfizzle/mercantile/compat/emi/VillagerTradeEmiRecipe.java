@@ -19,7 +19,7 @@ import java.util.List;
 
 public class VillagerTradeEmiRecipe implements EmiRecipe {
 
-    private static final int WIDTH = 140;
+    private static final int WIDTH = 158;
     private static final int HEIGHT = 30;
 
     private final TradeIndexEntry entry;
@@ -95,6 +95,17 @@ public class VillagerTradeEmiRecipe implements EmiRecipe {
                 .catalyst(true)
                 .appendTooltip(professionLabel);
         x += 20;
+
+        ItemStack workstation = entry.workstation();
+        if (!workstation.isEmpty()) {
+            widgets.addSlot(EmiStack.of(workstation), x, y)
+                    .drawBack(false)
+                    .catalyst(true)
+                    .appendTooltip(workstation.getHoverName());
+            tooltipLines.add(Component.translatable("mercantile.trade_index.tooltip.workstation",
+                    workstation.getHoverName()));
+            x += 20;
+        }
 
         widgets.addSlot(inputs.get(0), x, y);
         x += 18;

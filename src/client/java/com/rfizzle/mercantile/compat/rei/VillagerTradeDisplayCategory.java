@@ -12,6 +12,7 @@ import me.shedaniel.rei.api.client.registry.display.DisplayCategory;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,19 +36,22 @@ public class VillagerTradeDisplayCategory implements DisplayCategory<VillagerTra
 
     @Override
     public int getDisplayHeight() {
-        return 50;
+        return 60;
     }
 
     @Override
     public List<Widget> setupDisplay(VillagerTradeDisplay display, Rectangle bounds) {
         TradeIndexEntry entry = display.entry();
+        ItemStack workstation = entry.workstation();
+        boolean hasWorkstation = !workstation.isEmpty();
         Component professionLabel = TradeIndexLabels.professionLabel(entry.profession());
         Component levelLabel = entry.level() > 0
                 ? TradeIndexLabels.levelLabel(entry.level())
                 : TradeIndexLabels.tierLabel(entry.minScore().orElse(0));
         Component badge = TradeIndexLabels.sourceBadge(entry.source(), entry.minScore());
 
-        Point start = new Point(bounds.getCenterX() - 60, bounds.getCenterY() - 18);
+        int startOffset = hasWorkstation ? 70 : 60;
+        Point start = new Point(bounds.getCenterX() - startOffset, bounds.getCenterY() - 18);
         List<Widget> widgets = new ArrayList<>();
         widgets.add(Widgets.createRecipeBase(bounds));
 
@@ -61,6 +65,16 @@ public class VillagerTradeDisplayCategory implements DisplayCategory<VillagerTra
                         .notInteractable(),
                 professionLabel));
         x += 22;
+
+        if (hasWorkstation) {
+            widgets.add(Widgets.withTooltip(
+                    Widgets.createSlot(new Point(x, y))
+                            .entry(EntryStacks.of(workstation))
+                            .disableBackground()
+                            .notInteractable(),
+                    workstation.getHoverName()));
+            x += 20;
+        }
 
         widgets.add(Widgets.createSlot(new Point(x, y))
                 .entries(display.getInputEntries().get(0))
@@ -94,6 +108,13 @@ public class VillagerTradeDisplayCategory implements DisplayCategory<VillagerTra
         if (!badge.getString().isEmpty()) {
             widgets.add(Widgets.createLabel(
                     new Point(bounds.getCenterX(), bounds.getMaxY() - 22), badge).centered());
+        }
+
+        if (hasWorkstation) {
+            Component workstationLine = Component.translatable(
+                    "mercantile.trade_index.tooltip.workstation", workstation.getHoverName());
+            widgets.add(Widgets.createLabel(
+                    new Point(bounds.getCenterX(), bounds.getMaxY() - 32), workstationLine).centered());
         }
 
         return widgets;

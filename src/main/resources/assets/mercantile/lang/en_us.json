@@ -219,5 +219,6 @@
     "mercantile.trade_index.exclusive": "Mercantile",
     "mercantile.trade_index.exclusive_tooltip": "Requires %s reputation or higher",
     "mercantile.trade_index.tooltip.sold_by": "Sold by %s",
-    "mercantile.trade_index.tooltip.level": "Level: %s"
+    "mercantile.trade_index.tooltip.level": "Level: %s",
+    "mercantile.trade_index.tooltip.workstation": "Workstation: %s"
 }

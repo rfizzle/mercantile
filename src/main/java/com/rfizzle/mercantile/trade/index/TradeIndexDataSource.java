@@ -14,6 +14,7 @@ import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.trading.MerchantOffer;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.SingleThreadedRandomSource;
 
 import java.util.ArrayList;
@@ -78,7 +79,8 @@ public final class TradeIndexDataSource {
                     try {
                         MerchantOffer offer = listing.getOffer(null, random);
                         if (offer == null) continue;
-                        next.add(toEntry(profId, level, TradeIndexEntry.Source.VANILLA, offer, OptionalInt.empty()));
+                        next.add(toEntry(profId, level, TradeIndexEntry.Source.VANILLA, offer,
+                                OptionalInt.empty()));
                     } catch (Exception e) {
                         Mercantile.LOGGER.debug("Skipping listing {} for {} level {}: {}",
                                 listing.getClass().getSimpleName(), profId, level, e.getMessage());
@@ -119,6 +121,7 @@ public final class TradeIndexDataSource {
                 .map(c -> c.itemStack().copy())
                 .orElse(ItemStack.EMPTY);
         ItemStack output = offer.getResult().copy();
+        ItemStack workstation = resolveWorkstationStack(profession);
         return new TradeIndexEntry(
                 profession,
                 level,
@@ -126,10 +129,18 @@ public final class TradeIndexDataSource {
                 inputA,
                 inputB,
                 output,
+                workstation,
                 offer.getMaxUses(),
                 offer.getXp(),
                 offer.getPriceMultiplier(),
                 minScore
         );
+    }
+
+    private static ItemStack resolveWorkstationStack(ResourceLocation profession) {
+        Block block = ProfessionWorkstations.forProfession(profession);
+        if (block == null) return ItemStack.EMPTY;
+        ItemStack stack = new ItemStack(block);
+        return stack.isEmpty() ? ItemStack.EMPTY : stack;
     }
 }
