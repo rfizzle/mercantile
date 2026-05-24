@@ -215,6 +215,13 @@
           <h3 class="text-base font-semibold text-emerald mb-2 mt-6 uppercase tracking-wider">Added</h3>
           <ul class="list-disc list-inside text-sm text-ash leading-relaxed space-y-1 ml-2">
             <li>Jade/WTHIT tooltip for sentry golems showing parent pylon coordinates, despawn countdown, and a "No Drops" indicator (S-048).</li>
+            <li>Small-screen fallback for the villager info panel: when the window is too narrow to fit the side panel, an <code class="text-bone">i</code> icon appears in the merchant screen header and opens the info as a centered overlay (Esc or <code class="text-bone">x</code> to close) (S-049).</li>
+          </ul>
+
+          <h3 class="text-base font-semibold text-emerald mb-2 mt-6 uppercase tracking-wider">Changed</h3>
+          <ul class="list-disc list-inside text-sm text-ash leading-relaxed space-y-1 ml-2">
+            <li>Trade-cycling button renamed from "Cycle Trades" to <strong class="text-bone">"Re-roll Trades"</strong> and redrawn as a labeled text button inside the villager info panel — no more separate icon sprite, and the button is hidden entirely when the villager's profession is locked (S-049).</li>
+            <li>Price-breakdown tooltip (demand transparency) no longer overlaps the trade-cycling button tooltip or the info panel — hit-testing now sits on the trade-offer button itself instead of approximating slot bounds (S-049).</li>
           </ul>
         </article>
 

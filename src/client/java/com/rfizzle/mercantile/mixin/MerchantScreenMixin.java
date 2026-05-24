@@ -1,16 +1,13 @@
 package com.rfizzle.mercantile.mixin;
 
-import com.rfizzle.mercantile.Mercantile;
 import com.rfizzle.mercantile.client.network.ClientMercantileData;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.network.CycleTradesC2SPayload;
-import com.rfizzle.mercantile.network.DemandPriceS2CPayload;
 import com.rfizzle.mercantile.network.RestockTimerS2CPayload;
 import com.rfizzle.mercantile.network.VillagerInfoPanelS2CPayload;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.ImageButton;
-import net.minecraft.client.gui.components.WidgetSprites;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.MerchantScreen;
 import net.minecraft.ChatFormatting;
@@ -21,15 +18,13 @@ import net.minecraft.world.inventory.MerchantMenu;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.trading.MerchantOffer;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(MerchantScreen.class)
 public abstract class MerchantScreenMixin extends AbstractContainerScreen<MerchantMenu> {
@@ -46,12 +41,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     private static final int LOCK_ICON_Y = 4;
 
     @Unique
-    private static final WidgetSprites CYCLE_SPRITES = new WidgetSprites(
-            Mercantile.id("widget/cycle_trades"),
-            Mercantile.id("widget/cycle_trades_disabled"));
-
-    @Unique
-    private static final int CYCLE_BUTTON_SIZE = 18;
+    private static final int CYCLE_BUTTON_HEIGHT = 20;
 
     @Unique
     private static final int INFO_PANEL_WIDTH = 110;
@@ -74,25 +64,29 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     @Unique
     private static final int XP_BAR_FG_COLOR = 0xFF4FC74F;
 
-    // Mirrors vanilla MerchantScreen.NUMBER_OF_OFFER_BUTTONS (private). If vanilla
-    // expands the visible offer count, update this constant.
     @Unique
-    private static final int VISIBLE_TRADE_ROWS = 7;
+    private static final int OVERLAY_WIDTH = 130;
+    @Unique
+    private static final int OVERLAY_HEIGHT = 180;
+    @Unique
+    private static final int OVERLAY_PAD = 8;
+    @Unique
+    private static final int OVERLAY_DIM_COLOR = 0x80000000;
+    @Unique
+    private static final int CLOSE_BUTTON_SIZE = 11;
+    @Unique
+    private static final int INFO_ICON_SIZE = 11;
+    @Unique
+    private static final int INFO_ICON_BG_COLOR = 0xC0303030;
+    @Unique
+    private static final int INFO_ICON_HOVER_BG_COLOR = 0xC0606060;
+    @Unique
+    private static final int INFO_ICON_BORDER_COLOR = 0xFF888888;
+    @Unique
+    private static final int CLOSE_BUTTON_HOVER_BG_COLOR = 0xC0A03030;
 
-    // Offer-row geometry, derived from MerchantScreen.render (n = k+5+5,
-    // p = (l+16+1)+2). Single source of truth — the hover hit-test and the
-    // tooltip exclusion bounds both derive from these.
     @Unique
-    private static final int OFFER_SLOT_X_OFFSET = 10;
-    @Unique
-    private static final int OFFER_SLOT_Y_OFFSET = 19;
-    @Unique
-    private static final int OFFER_SLOT_SIZE = 16;
-    @Unique
-    private static final int OFFER_ROW_SPACING = 20;
-
-    @Unique
-    private ImageButton mercantile$cycleButton;
+    private Button mercantile$cycleButton;
 
     // Screen.init() runs on every window resize, not just on screen open. Guard
     // the one-shot clear so resizing mid-trade does not wipe villagerInfo/restockTimer/
@@ -100,8 +94,8 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     @Unique
     private boolean mercantile$initialized;
 
-    @Shadow
-    private int scrollOff;
+    @Unique
+    private boolean mercantile$overlayOpen;
 
     private MerchantScreenMixin(MerchantMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -109,6 +103,11 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
 
     @Inject(method = "init", at = @At("HEAD"))
     private void mercantile$clearStaleDataOnOpen(CallbackInfo ci) {
+        // init() also fires on resize — close any open overlay so its bounds get
+        // recomputed against the new this.width/this.height, and so that a resize
+        // back to a wide window (where the inline panel fits) doesn't leave a
+        // stale overlay covering the trade UI.
+        mercantile$overlayOpen = false;
         if (mercantile$initialized) return;
         mercantile$initialized = true;
         ClientMercantileData.clearMerchantScreenData();
@@ -119,19 +118,18 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         MercantileConfig config = ClientMercantileData.getServerConfig();
         if (config == null) config = MercantileConfig.get();
         if (!config.enableTradeCycling) return;
-        if (!mercantile$panelFits()) return;
 
         int panelX = mercantile$panelX();
         int panelY = this.topPos;
-        int buttonX = panelX + (INFO_PANEL_WIDTH - CYCLE_BUTTON_SIZE) / 2;
-        int buttonY = panelY + INFO_PANEL_HEIGHT - INFO_PANEL_PAD - CYCLE_BUTTON_SIZE;
+        int buttonX = panelX + INFO_PANEL_PAD;
+        int buttonY = panelY + INFO_PANEL_HEIGHT - INFO_PANEL_PAD - CYCLE_BUTTON_HEIGHT;
+        int buttonW = INFO_PANEL_WIDTH - 2 * INFO_PANEL_PAD;
 
-        mercantile$cycleButton = new ImageButton(
-                buttonX, buttonY,
-                CYCLE_BUTTON_SIZE, CYCLE_BUTTON_SIZE,
-                CYCLE_SPRITES,
-                btn -> mercantile$onCycleClick(),
-                Component.translatable("gui.mercantile.cycle_trades"));
+        mercantile$cycleButton = Button.builder(
+                        Component.translatable("gui.mercantile.reroll_trades"),
+                        btn -> mercantile$onCycleClick())
+                .bounds(buttonX, buttonY, buttonW, CYCLE_BUTTON_HEIGHT)
+                .build();
         this.addRenderableWidget(mercantile$cycleButton);
     }
 
@@ -144,14 +142,35 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         VillagerInfoPanelS2CPayload info = mercantile$validInfo();
 
         boolean panelVisible = config.enableInfoPanel && info != null && mercantile$panelFits();
-        mercantile$cycleButton.visible = panelVisible;
-        if (!panelVisible) return;
+        boolean overlayVisible = mercantile$overlayOpen && config.enableInfoPanel && info != null;
+        // Sprint S-049 / B-091: hide the re-roll button while the profession is locked.
+        // Re-rolling is technically independent of profession-lock (it re-rolls within the
+        // current profession), but the UX intent is that a "locked" villager looks frozen
+        // to the player — exposing a re-roll affordance would muddle that signal.
+        boolean lockedHidden = config.enableProfessionLock && info != null && info.professionLocked();
+        boolean visible = config.enableTradeCycling && !lockedHidden && (panelVisible || overlayVisible);
+        mercantile$cycleButton.visible = visible;
+        if (!visible) return;
+
+        // Reposition per frame so the button follows the active container (in-panel vs overlay).
+        if (overlayVisible) {
+            int ox = mercantile$overlayX();
+            int oy = mercantile$overlayY();
+            int buttonW = OVERLAY_WIDTH - 2 * OVERLAY_PAD;
+            mercantile$cycleButton.setX(ox + OVERLAY_PAD);
+            mercantile$cycleButton.setY(oy + OVERLAY_HEIGHT - OVERLAY_PAD - CYCLE_BUTTON_HEIGHT);
+            mercantile$cycleButton.setWidth(buttonW);
+        } else {
+            int panelX = mercantile$panelX();
+            int panelY = this.topPos;
+            int buttonW = INFO_PANEL_WIDTH - 2 * INFO_PANEL_PAD;
+            mercantile$cycleButton.setX(panelX + INFO_PANEL_PAD);
+            mercantile$cycleButton.setY(panelY + INFO_PANEL_HEIGHT - INFO_PANEL_PAD - CYCLE_BUTTON_HEIGHT);
+            mercantile$cycleButton.setWidth(buttonW);
+        }
 
         boolean enabled = true;
-
-        if (!config.enableTradeCycling) {
-            enabled = false;
-        } else if (!this.minecraft.player.isCreative()) {
+        if (!this.minecraft.player.isCreative()) {
             int emeraldCount = 0;
             for (var stack : this.minecraft.player.getInventory().items) {
                 if (stack.is(Items.EMERALD)) emeraldCount += stack.getCount();
@@ -180,10 +199,18 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         if (info == null) return;
         MercantileConfig config = ClientMercantileData.getServerConfig();
         if (config == null) config = MercantileConfig.get();
-        if (!config.enableProfessionLock) return;
 
-        ResourceLocation sprite = info.professionLocked() ? LOCKED_SPRITE : UNLOCKED_SPRITE;
-        guiGraphics.blitSprite(sprite, mercantile$lockIconX(), LOCK_ICON_Y, ICON_SIZE, ICON_SIZE);
+        if (config.enableProfessionLock) {
+            ResourceLocation sprite = info.professionLocked() ? LOCKED_SPRITE : UNLOCKED_SPRITE;
+            guiGraphics.blitSprite(sprite, mercantile$lockIconX(), LOCK_ICON_Y, ICON_SIZE, ICON_SIZE);
+        }
+
+        if (mercantile$infoIconVisible()) {
+            int ix = mercantile$infoIconX();
+            boolean hovered = mouseX >= ix && mouseX < ix + INFO_ICON_SIZE
+                    && mouseY >= LOCK_ICON_Y && mouseY < LOCK_ICON_Y + INFO_ICON_SIZE;
+            mercantile$drawInfoIcon(guiGraphics, ix, LOCK_ICON_Y, hovered);
+        }
     }
 
     // Returns the lock icon's GUI-local x (origin at leftPos). Y is the constant
@@ -197,9 +224,69 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         return titleX + titleWidth + 3;
     }
 
+    // GUI-local x for the info icon. Sits to the right of the lock icon when the
+    // lock icon is shown; otherwise occupies the same slot.
+    @Unique
+    private int mercantile$infoIconX() {
+        MercantileConfig config = ClientMercantileData.getServerConfig();
+        if (config == null) config = MercantileConfig.get();
+        int base = mercantile$lockIconX();
+        if (config.enableProfessionLock) {
+            return base + ICON_SIZE + 2;
+        }
+        return base;
+    }
+
+    @Unique
+    private boolean mercantile$infoIconVisible() {
+        MercantileConfig config = ClientMercantileData.getServerConfig();
+        if (config == null) config = MercantileConfig.get();
+        return config.enableInfoPanel
+                && mercantile$validInfo() != null
+                && !mercantile$panelFits()
+                && !mercantile$overlayOpen;
+    }
+
+    @Unique
+    private boolean mercantile$isPointInInfoIcon(double mouseX, double mouseY) {
+        int sx = this.leftPos + mercantile$infoIconX();
+        int sy = this.topPos + LOCK_ICON_Y;
+        return mouseX >= sx && mouseX < sx + INFO_ICON_SIZE
+                && mouseY >= sy && mouseY < sy + INFO_ICON_SIZE;
+    }
+
+    @Unique
+    private int mercantile$overlayX() {
+        return (this.width - OVERLAY_WIDTH) / 2;
+    }
+
+    @Unique
+    private int mercantile$overlayY() {
+        return (this.height - OVERLAY_HEIGHT) / 2;
+    }
+
+    @Unique
+    private int mercantile$closeButtonX() {
+        return mercantile$overlayX() + OVERLAY_WIDTH - OVERLAY_PAD / 2 - CLOSE_BUTTON_SIZE;
+    }
+
+    @Unique
+    private int mercantile$closeButtonY() {
+        return mercantile$overlayY() + OVERLAY_PAD / 2;
+    }
+
+    @Unique
+    private boolean mercantile$isPointInCloseButton(double mouseX, double mouseY) {
+        int cx = mercantile$closeButtonX();
+        int cy = mercantile$closeButtonY();
+        return mouseX >= cx && mouseX < cx + CLOSE_BUTTON_SIZE
+                && mouseY >= cy && mouseY < cy + CLOSE_BUTTON_SIZE;
+    }
+
     @Inject(method = "render", at = @At("TAIL"))
     private void mercantile$renderInfoPanelInject(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
         mercantile$renderInfoPanel(guiGraphics);
+        mercantile$renderOverlay(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     @Unique
@@ -214,21 +301,87 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
 
         int panelX = mercantile$panelX();
         int panelY = this.topPos;
+        mercantile$drawPanelFrame(guiGraphics, panelX, panelY, INFO_PANEL_WIDTH, INFO_PANEL_HEIGHT);
+        mercantile$drawInfoPanelContents(guiGraphics, config, info, panelX, panelY, INFO_PANEL_WIDTH);
+    }
 
-        // Background + 1-px border.
-        guiGraphics.fill(panelX, panelY, panelX + INFO_PANEL_WIDTH, panelY + INFO_PANEL_HEIGHT, INFO_PANEL_BG_COLOR);
-        guiGraphics.fill(panelX, panelY, panelX + INFO_PANEL_WIDTH, panelY + 1, INFO_PANEL_BORDER_COLOR);
-        guiGraphics.fill(panelX, panelY + INFO_PANEL_HEIGHT - 1, panelX + INFO_PANEL_WIDTH, panelY + INFO_PANEL_HEIGHT, INFO_PANEL_BORDER_COLOR);
-        guiGraphics.fill(panelX, panelY, panelX + 1, panelY + INFO_PANEL_HEIGHT, INFO_PANEL_BORDER_COLOR);
-        guiGraphics.fill(panelX + INFO_PANEL_WIDTH - 1, panelY, panelX + INFO_PANEL_WIDTH, panelY + INFO_PANEL_HEIGHT, INFO_PANEL_BORDER_COLOR);
+    @Unique
+    private void mercantile$renderOverlay(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        if (!mercantile$overlayOpen) return;
 
+        MercantileConfig config = ClientMercantileData.getServerConfig();
+        if (config == null) config = MercantileConfig.get();
+        VillagerInfoPanelS2CPayload info = ClientMercantileData.getVillagerInfo();
+        // Auto-close if the data we are showing went away mid-frame (e.g. villager despawn).
+        if (!config.enableInfoPanel || info == null) {
+            mercantile$overlayOpen = false;
+            return;
+        }
+
+        // Dim the trade screen.
+        guiGraphics.fill(0, 0, this.width, this.height, OVERLAY_DIM_COLOR);
+
+        int ox = mercantile$overlayX();
+        int oy = mercantile$overlayY();
+        mercantile$drawPanelFrame(guiGraphics, ox, oy, OVERLAY_WIDTH, OVERLAY_HEIGHT);
+        mercantile$drawInfoPanelContents(guiGraphics, config, info, ox, oy, OVERLAY_WIDTH);
+
+        // Re-render the cycle button on top of the dim — vanilla widget pass drew it
+        // BEFORE the TAIL injection, so without this it would be visually buried.
+        if (mercantile$cycleButton != null && mercantile$cycleButton.visible) {
+            mercantile$cycleButton.render(guiGraphics, mouseX, mouseY, partialTick);
+        }
+
+        // Close button (top-right).
+        int cx = mercantile$closeButtonX();
+        int cy = mercantile$closeButtonY();
+        boolean hovered = mercantile$isPointInCloseButton(mouseX, mouseY);
+        int bg = hovered ? CLOSE_BUTTON_HOVER_BG_COLOR : INFO_ICON_BG_COLOR;
+        guiGraphics.fill(cx, cy, cx + CLOSE_BUTTON_SIZE, cy + CLOSE_BUTTON_SIZE, bg);
+        guiGraphics.fill(cx, cy, cx + CLOSE_BUTTON_SIZE, cy + 1, INFO_ICON_BORDER_COLOR);
+        guiGraphics.fill(cx, cy + CLOSE_BUTTON_SIZE - 1, cx + CLOSE_BUTTON_SIZE, cy + CLOSE_BUTTON_SIZE, INFO_ICON_BORDER_COLOR);
+        guiGraphics.fill(cx, cy, cx + 1, cy + CLOSE_BUTTON_SIZE, INFO_ICON_BORDER_COLOR);
+        guiGraphics.fill(cx + CLOSE_BUTTON_SIZE - 1, cy, cx + CLOSE_BUTTON_SIZE, cy + CLOSE_BUTTON_SIZE, INFO_ICON_BORDER_COLOR);
+        int charW = this.font.width("x");
+        int charX = cx + (CLOSE_BUTTON_SIZE - charW) / 2;
+        int charY = cy + (CLOSE_BUTTON_SIZE - this.font.lineHeight) / 2 + 1;
+        guiGraphics.drawString(this.font, "x", charX, charY, 0xFFFFFFFF, false);
+    }
+
+    @Unique
+    private void mercantile$drawInfoIcon(GuiGraphics g, int x, int y, boolean hovered) {
+        int bg = hovered ? INFO_ICON_HOVER_BG_COLOR : INFO_ICON_BG_COLOR;
+        g.fill(x, y, x + INFO_ICON_SIZE, y + INFO_ICON_SIZE, bg);
+        g.fill(x, y, x + INFO_ICON_SIZE, y + 1, INFO_ICON_BORDER_COLOR);
+        g.fill(x, y + INFO_ICON_SIZE - 1, x + INFO_ICON_SIZE, y + INFO_ICON_SIZE, INFO_ICON_BORDER_COLOR);
+        g.fill(x, y, x + 1, y + INFO_ICON_SIZE, INFO_ICON_BORDER_COLOR);
+        g.fill(x + INFO_ICON_SIZE - 1, y, x + INFO_ICON_SIZE, y + INFO_ICON_SIZE, INFO_ICON_BORDER_COLOR);
+        int charW = this.font.width("i");
+        int charX = x + (INFO_ICON_SIZE - charW) / 2;
+        int charY = y + (INFO_ICON_SIZE - this.font.lineHeight) / 2 + 1;
+        g.drawString(this.font, "i", charX, charY, 0xFFFFFFFF, false);
+    }
+
+    @Unique
+    private void mercantile$drawPanelFrame(GuiGraphics g, int x, int y, int w, int h) {
+        g.fill(x, y, x + w, y + h, INFO_PANEL_BG_COLOR);
+        g.fill(x, y, x + w, y + 1, INFO_PANEL_BORDER_COLOR);
+        g.fill(x, y + h - 1, x + w, y + h, INFO_PANEL_BORDER_COLOR);
+        g.fill(x, y, x + 1, y + h, INFO_PANEL_BORDER_COLOR);
+        g.fill(x + w - 1, y, x + w, y + h, INFO_PANEL_BORDER_COLOR);
+    }
+
+    @Unique
+    private void mercantile$drawInfoPanelContents(GuiGraphics guiGraphics, MercantileConfig config,
+                                                  VillagerInfoPanelS2CPayload info,
+                                                  int panelX, int panelY, int panelWidth) {
         int contentX = panelX + INFO_PANEL_PAD;
-        int contentWidth = INFO_PANEL_WIDTH - 2 * INFO_PANEL_PAD;
+        int contentWidth = panelWidth - 2 * INFO_PANEL_PAD;
         int y = panelY + INFO_PANEL_PAD;
 
         // Title (villager display name), bold + centered.
         Component title = this.title.copy().withStyle(ChatFormatting.BOLD);
-        int titleX = panelX + (INFO_PANEL_WIDTH - this.font.width(title)) / 2;
+        int titleX = panelX + (panelWidth - this.font.width(title)) / 2;
         guiGraphics.drawString(this.font, title, titleX, y, INFO_PANEL_TEXT_COLOR, false);
         y += this.font.lineHeight + 4;
 
@@ -349,6 +502,22 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         MercantileConfig config = ClientMercantileData.getServerConfig();
         if (config == null) config = MercantileConfig.get();
 
+        if (mercantile$overlayOpen) {
+            // Suppress underlying lock-icon tooltip while the overlay is open; the lock
+            // icon is covered by the dim and the user's attention is on the overlay.
+            if (mercantile$isPointInCloseButton(mouseX, mouseY)) {
+                guiGraphics.renderTooltip(this.font,
+                        Component.translatable("gui.mercantile.info.overlay.close"),
+                        mouseX, mouseY);
+            } else if (mercantile$cycleButton != null && mercantile$cycleButton.visible
+                    && mercantile$cycleButton.isHovered()) {
+                guiGraphics.renderTooltip(this.font,
+                        Component.translatable("gui.mercantile.reroll_trades.tooltip", config.tradeCycleEmeraldCost),
+                        mouseX, mouseY);
+            }
+            return;
+        }
+
         if (config.enableProfessionLock) {
             int iconX = this.leftPos + mercantile$lockIconX();
             int iconY = this.topPos + LOCK_ICON_Y;
@@ -361,73 +530,16 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
             }
         }
 
-        if (mercantile$cycleButton != null && mercantile$cycleButton.isHovered()) {
+        if (mercantile$infoIconVisible() && mercantile$isPointInInfoIcon(mouseX, mouseY)) {
             guiGraphics.renderTooltip(this.font,
-                    Component.translatable("gui.mercantile.cycle_trades.tooltip", config.tradeCycleEmeraldCost),
+                    Component.translatable("gui.mercantile.info.button.tooltip"),
                     mouseX, mouseY);
         }
 
-        mercantile$renderPriceBreakdownTooltip(guiGraphics, mouseX, mouseY);
-    }
-
-    @Unique
-    private void mercantile$renderPriceBreakdownTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        MercantileConfig config = ClientMercantileData.getServerConfig();
-        if (config == null) config = MercantileConfig.get();
-        if (!config.enableDemandTransparency) return;
-
-        int slotX = this.leftPos + OFFER_SLOT_X_OFFSET;
-        int slotY = this.topPos + OFFER_SLOT_Y_OFFSET;
-
-        // Belt-and-suspenders: no overlap with header band, info panel, or cycle button tooltip.
-        if (mouseY < slotY - 1) return;
-        if (mouseX < slotX - 1) return;
-        if (mercantile$cycleButton != null && mercantile$cycleButton.isHovered()) return;
-
-        DemandPriceS2CPayload price = ClientMercantileData.getDemandPrice();
-        if (price == null) return;
-        VillagerInfoPanelS2CPayload info = ClientMercantileData.getVillagerInfo();
-        if (info == null || info.villagerEntityId() != price.villagerEntityId()) return;
-
-        if (mouseX < slotX || mouseX >= slotX + OFFER_SLOT_SIZE) return;
-
-        List<DemandPriceS2CPayload.PriceComponent> components = price.components();
-        for (int i = 0; i < VISIBLE_TRADE_ROWS; i++) {
-            int rowY = slotY + i * OFFER_ROW_SPACING;
-            int componentIndex = this.scrollOff + i;
-            if (componentIndex < 0 || componentIndex >= components.size()) continue;
-            if (mouseY < rowY || mouseY >= rowY + OFFER_SLOT_SIZE) continue;
-
-            DemandPriceS2CPayload.PriceComponent c = components.get(componentIndex);
-            List<Component> lines = new ArrayList<>();
-            lines.add(Component.translatable("gui.mercantile.price.base", c.basePrice()));
-            if (c.demandAdjust() > 0) {
-                lines.add(Component.translatable("gui.mercantile.price.demand", c.demandAdjust())
-                        .withStyle(ChatFormatting.RED));
-            }
-            if (c.reputationModifier() != 0) {
-                ChatFormatting color = c.reputationModifier() < 0 ? ChatFormatting.GREEN : ChatFormatting.RED;
-                String value = (c.reputationModifier() > 0 ? "+" : "") + c.reputationModifier();
-                lines.add(Component.translatable("gui.mercantile.price.reputation", value)
-                        .withStyle(color));
-            }
-            if (c.gossipModifier() != 0) {
-                ChatFormatting color = c.gossipModifier() < 0 ? ChatFormatting.GREEN : ChatFormatting.RED;
-                String value = (c.gossipModifier() > 0 ? "+" : "") + c.gossipModifier();
-                lines.add(Component.translatable("gui.mercantile.price.gossip", value)
-                        .withStyle(color));
-            }
-            if (c.otherAdjust() != 0) {
-                ChatFormatting color = c.otherAdjust() < 0 ? ChatFormatting.GREEN : ChatFormatting.RED;
-                String value = (c.otherAdjust() > 0 ? "+" : "") + c.otherAdjust();
-                lines.add(Component.translatable("gui.mercantile.price.other", value)
-                        .withStyle(color));
-            }
-            lines.add(Component.empty());
-            lines.add(Component.translatable("gui.mercantile.price.final", c.finalPrice()));
-
-            guiGraphics.renderComponentTooltip(this.font, lines, mouseX, mouseY);
-            return;
+        if (mercantile$cycleButton != null && mercantile$cycleButton.visible && mercantile$cycleButton.isHovered()) {
+            guiGraphics.renderTooltip(this.font,
+                    Component.translatable("gui.mercantile.reroll_trades.tooltip", config.tradeCycleEmeraldCost),
+                    mouseX, mouseY);
         }
     }
 
@@ -464,5 +576,86 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
                     Component.translatable("merchant.level." + level));
         }
         return this.title;
+    }
+
+    // ---- Input handling for the overlay ----
+    // Vanilla MerchantScreen overrides mouseClicked/mouseDragged/mouseScrolled itself,
+    // so @Override would collide. Use @Inject(HEAD, cancellable) for those three.
+    // mouseReleased/keyPressed/charTyped are inherited from Screen and not overridden
+    // in vanilla MerchantScreen, so @Override merges them in as fresh overrides.
+
+    @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
+    private void mercantile$onMouseClicked(double mouseX, double mouseY, int button,
+                                           CallbackInfoReturnable<Boolean> cir) {
+        if (mercantile$overlayOpen) {
+            if (button == 0 && mercantile$isPointInCloseButton(mouseX, mouseY)) {
+                mercantile$overlayOpen = false;
+                cir.setReturnValue(true);
+                return;
+            }
+            if (mercantile$cycleButton != null && mercantile$cycleButton.visible
+                    && mercantile$cycleButton.active
+                    && mercantile$cycleButton.isMouseOver(mouseX, mouseY)) {
+                // Dispatch only to the cycle button so the dimmed trade widgets behind
+                // the overlay do not also receive the click. The boolean return is
+                // intentionally ignored — overlay modality means we always consume.
+                mercantile$cycleButton.mouseClicked(mouseX, mouseY, button);
+                cir.setReturnValue(true);
+                return;
+            }
+            // Consume any other click so the underlying trade UI does not react.
+            cir.setReturnValue(true);
+            return;
+        }
+
+        if (button == 0 && mercantile$infoIconVisible() && mercantile$isPointInInfoIcon(mouseX, mouseY)) {
+            mercantile$overlayOpen = true;
+            cir.setReturnValue(true);
+        }
+    }
+
+    @Inject(method = "mouseDragged", at = @At("HEAD"), cancellable = true)
+    private void mercantile$onMouseDragged(double mouseX, double mouseY, int button,
+                                           double dragX, double dragY,
+                                           CallbackInfoReturnable<Boolean> cir) {
+        if (mercantile$overlayOpen) cir.setReturnValue(true);
+    }
+
+    @Inject(method = "mouseScrolled", at = @At("HEAD"), cancellable = true)
+    private void mercantile$onMouseScrolled(double mouseX, double mouseY,
+                                            double scrollX, double scrollY,
+                                            CallbackInfoReturnable<Boolean> cir) {
+        if (mercantile$overlayOpen) cir.setReturnValue(true);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        if (mercantile$overlayOpen) {
+            if (mercantile$cycleButton != null && mercantile$cycleButton.visible
+                    && mercantile$cycleButton.isMouseOver(mouseX, mouseY)) {
+                return super.mouseReleased(mouseX, mouseY, button);
+            }
+            return true;
+        }
+        return super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (mercantile$overlayOpen) {
+            if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+                mercantile$overlayOpen = false;
+                return true;
+            }
+            // Swallow other keys (hotbar slot swap, drop, etc.) while the overlay is open.
+            return true;
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean charTyped(char codePoint, int modifiers) {
+        if (mercantile$overlayOpen) return true;
+        return super.charTyped(codePoint, modifiers);
     }
 }

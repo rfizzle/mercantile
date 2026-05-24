@@ -11,9 +11,8 @@
     "command.mercantile.village.not_player": "This command must be run by a player",
     "command.mercantile.village.disabled": "Village boundary visualization is disabled in config",
     "command.mercantile.village.shown": "Showing village boundary",
-    "gui.mercantile.cycle_trades": "Cycle Trades",
-    "gui.mercantile.cycle_trades.tooltip": "Re-roll unlocked trades (%s emeralds)",
-    "gui.mercantile.cycle_trades.cost": "Cost: %s levels",
+    "gui.mercantile.reroll_trades": "Re-roll Trades",
+    "gui.mercantile.reroll_trades.tooltip": "Re-roll unlocked trades (%s emeralds)",
     "gui.mercantile.reputation": "Reputation: %s",
 
     "mercantile.config.title": "Mercantile Settings",
@@ -161,6 +160,8 @@
     "gui.mercantile.info.master": "Master",
     "gui.mercantile.info.reputation": "%s (%s)",
     "gui.mercantile.info.unemployed": "Unemployed",
+    "gui.mercantile.info.button.tooltip": "View villager info",
+    "gui.mercantile.info.overlay.close": "Close",
 
     "gui.mercantile.restock.timer": "Restock in ~%s",
     "gui.mercantile.restock.count": "Restocks: %s/%s today",

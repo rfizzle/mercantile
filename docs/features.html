@@ -156,7 +156,7 @@
             <article id="trade-cycling" class="bg-card border border-elevated rounded-lg p-5">
               <h3 class="text-lg font-semibold text-emerald mb-2">Trade Cycling</h3>
               <p class="text-sm text-ash leading-relaxed mb-2">Pay 6 emeralds (configurable) to re-roll a villager's unlocked trades from the profession pool — no more breaking and replacing workstations. Trades become locked once purchased; locked trades are preserved across cycles.</p>
-              <p class="text-sm text-ash leading-relaxed mb-2">The button is grayed out when all trades are locked, you have no emeralds, or the feature is disabled. Cycling also grants a small reputation gain.</p>
+              <p class="text-sm text-ash leading-relaxed mb-2">The <strong class="text-bone">"Re-roll Trades"</strong> button sits in the villager info panel. It's grayed out when all trades are locked or you have no emeralds, and hidden entirely when the villager's profession is locked (so a locked villager reads as fully frozen). Cycling also grants a small reputation gain.</p>
               <p class="text-smoke text-xs mt-3">Config: <code class="text-bone">enableTradeCycling</code>, <code class="text-bone">tradeCycleEmeraldCost</code> (default 6), <code class="text-bone">reputationCycleGain</code> (default +2)</p>
             </article>
 
@@ -182,6 +182,7 @@
             <article id="info-panel" class="bg-card border border-elevated rounded-lg p-5 md:col-span-2">
               <h3 class="text-lg font-semibold text-emerald mb-2">Villager Info Panel</h3>
               <p class="text-sm text-ash leading-relaxed mb-2">A side panel in the merchant screen showing the villager's name, profession and level with XP progress bar, your reputation standing with them, total trades completed, workstation status (bound/unbound and type), and the profession-locked indicator.</p>
+              <p class="text-sm text-ash leading-relaxed mb-2"><strong class="text-bone">Small-screen fallback:</strong> when the window is too narrow to fit the side panel next to the trade GUI, a small <code class="text-bone">i</code> icon appears beside the villager title. Click it to open the same info as a centered overlay; press <code class="text-bone">Esc</code> or the <code class="text-bone">x</code> in the corner to close.</p>
               <p class="text-smoke text-xs mt-3">Client config: <code class="text-bone">enableInfoPanel</code></p>
             </article>
 

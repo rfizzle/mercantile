@@ -8,7 +8,9 @@
         "AbstractContainerScreenRemovedMixin",
         "ClientLevelVillagerSoundMixin",
         "EntityIsCurrentlyGlowingMixin",
-        "MerchantScreenMixin"
+        "MerchantScreenAccessor",
+        "MerchantScreenMixin",
+        "TradeOfferButtonMixin"
     ],
     "injectors": {
         "defaultRequire": 1
