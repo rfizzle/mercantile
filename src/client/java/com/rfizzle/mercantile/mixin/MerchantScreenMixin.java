@@ -232,18 +232,22 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         guiGraphics.drawString(this.font, title, titleX, y, INFO_PANEL_TEXT_COLOR, false);
         y += this.font.lineHeight + 4;
 
-        // Profession + level.
+        // Profession on its own line; level on a second dim line. Split avoids
+        // overflow of the 98px content area on long localized names.
         String profession = info.profession();
-        Component professionLine;
         if (profession == null || profession.isEmpty() || "none".equals(profession)) {
-            professionLine = Component.translatable("gui.mercantile.info.unemployed");
+            guiGraphics.drawString(this.font,
+                    Component.translatable("gui.mercantile.info.unemployed"),
+                    contentX, y, INFO_PANEL_TEXT_COLOR, false);
+            y += this.font.lineHeight + 4;
         } else {
             Component professionName = Component.translatable("entity.minecraft.villager." + profession);
             Component levelName = Component.translatable("merchant.level." + info.level());
-            professionLine = Component.empty().append(professionName).append(" — ").append(levelName);
+            guiGraphics.drawString(this.font, professionName, contentX, y, INFO_PANEL_TEXT_COLOR, false);
+            y += this.font.lineHeight + 4;
+            guiGraphics.drawString(this.font, levelName, contentX, y, INFO_PANEL_DIM_COLOR, false);
+            y += this.font.lineHeight + 4;
         }
-        guiGraphics.drawString(this.font, professionLine, contentX, y, INFO_PANEL_TEXT_COLOR, false);
-        y += this.font.lineHeight + 4;
 
         // XP bar (or "Master" at level 5).
         if (info.level() >= 5) {

@@ -37,7 +37,9 @@ public final class ReputationHudOverlay {
     private static final String TRIBULATION_MOD_ID = "tribulation";
 
     // Render-thread only — HudRenderCallback fires on the render thread.
-    private static long lastScanTick = Long.MIN_VALUE;
+    // Initialized to -SCAN_INTERVAL_TICKS so the first frame (now >= 0) triggers a scan;
+    // using Long.MIN_VALUE would overflow (now - Long.MIN_VALUE) and the HUD would never render.
+    private static long lastScanTick = -SCAN_INTERVAL_TICKS;
     private static boolean nearbyCached = false;
 
     private ReputationHudOverlay() {
@@ -83,7 +85,7 @@ public final class ReputationHudOverlay {
 
     private static boolean villagerNearby(ClientLevel level, LocalPlayer player) {
         long now = level.getGameTime();
-        if (now - lastScanTick >= SCAN_INTERVAL_TICKS || now < lastScanTick) {
+        if (shouldRescan(now, lastScanTick)) {
             nearbyCached = !level.getEntitiesOfClass(
                     Villager.class,
                     player.getBoundingBox().inflate(PROXIMITY_RADIUS),
@@ -91,6 +93,10 @@ public final class ReputationHudOverlay {
             lastScanTick = now;
         }
         return nearbyCached;
+    }
+
+    static boolean shouldRescan(long now, long lastScanTick) {
+        return now - lastScanTick >= SCAN_INTERVAL_TICKS || now < lastScanTick;
     }
 
     private static void drawBox(GuiGraphics g, int x, int y, int w, int h) {

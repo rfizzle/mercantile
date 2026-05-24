@@ -205,6 +205,9 @@
             <li>Phantom client-side follow particles cleared by routing UUID-based stop through <code class="text-bone">ENTITY_UNLOAD</code> on the live <code class="text-bone">Villager</code> instance (S-032).</li>
             <li>Network payload size guards added to <code class="text-bone">ConfigSyncS2CPayload</code>, <code class="text-bone">VillageBoundsS2CPayload</code>, and <code class="text-bone">WorkstationMapS2CPayload</code>; per-player cooldowns on C2S request packets (S-029).</li>
             <li>Build cleanup: deduplicated <code class="text-bone">loom {}</code> blocks, added timeout to <code class="text-bone">runGitDescribe.proc.waitFor()</code> (S-035).</li>
+            <li>Reputation HUD overlay now actually renders near villagers — initial scan-tick value overflowed and suppressed every frame's proximity scan (S-046).</li>
+            <li>EMI villager-trade category now shows its translated name instead of the raw <code class="text-bone">emi.category.mercantile.villager_trades</code> key (S-046).</li>
+            <li>Merchant info panel splits profession and level onto separate lines so long localized names no longer overflow the 98px content area (S-046).</li>
           </ul>
         </article>
 
