@@ -178,6 +178,12 @@
     "tooltip.mercantile.pylon.sentries": "Active Sentries: %s / %s",
     "tooltip.mercantile.pylon.empty": "Out of fuel",
 
+    "tooltip.mercantile.sentry_golem.label": "Sentry Golem",
+    "tooltip.mercantile.sentry_golem.pylon": "Pylon: [%s, %s, %s]",
+    "tooltip.mercantile.sentry_golem.pylon_missing": "Pylon: missing",
+    "tooltip.mercantile.sentry_golem.despawn": "Despawn in: %ss",
+    "tooltip.mercantile.sentry_golem.no_drops": "No Drops",
+
     "tooltip.mercantile.breeding.willing": "Willing to breed",
     "tooltip.mercantile.breeding.not_willing": "Not willing",
     "tooltip.mercantile.breeding.cooldown": "Can breed in: %s",

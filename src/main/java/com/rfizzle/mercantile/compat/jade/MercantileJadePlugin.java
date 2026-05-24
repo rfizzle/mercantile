@@ -2,6 +2,7 @@ package com.rfizzle.mercantile.compat.jade;
 
 import com.rfizzle.mercantile.block.SentryPylonBlock;
 import com.rfizzle.mercantile.block.SentryPylonBlockEntity;
+import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.npc.Villager;
 import snownee.jade.api.IWailaClientRegistration;
 import snownee.jade.api.IWailaCommonRegistration;
@@ -17,6 +18,7 @@ public class MercantileJadePlugin implements IWailaPlugin {
         registration.registerEntityDataProvider(StateIndicatorDataProvider.INSTANCE, Villager.class);
         registration.registerEntityDataProvider(BreedingDataProvider.INSTANCE, Villager.class);
         registration.registerBlockDataProvider(SentryPylonDataProvider.INSTANCE, SentryPylonBlockEntity.class);
+        registration.registerEntityDataProvider(SentryGolemDataProvider.INSTANCE, IronGolem.class);
     }
 
     @Override
@@ -25,5 +27,6 @@ public class MercantileJadePlugin implements IWailaPlugin {
         registration.registerEntityComponent(StateIndicatorComponentProvider.INSTANCE, Villager.class);
         registration.registerEntityComponent(BreedingComponentProvider.INSTANCE, Villager.class);
         registration.registerBlockComponent(SentryPylonComponentProvider.INSTANCE, SentryPylonBlock.class);
+        registration.registerEntityComponent(SentryGolemComponentProvider.INSTANCE, IronGolem.class);
     }
 }

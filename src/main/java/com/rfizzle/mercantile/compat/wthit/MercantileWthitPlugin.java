@@ -5,6 +5,7 @@ import com.rfizzle.mercantile.block.SentryPylonBlockEntity;
 import mcp.mobius.waila.api.IRegistrar;
 import mcp.mobius.waila.api.IWailaPlugin;
 import mcp.mobius.waila.api.TooltipPosition;
+import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.npc.Villager;
 
 public class MercantileWthitPlugin implements IWailaPlugin {
@@ -22,5 +23,8 @@ public class MercantileWthitPlugin implements IWailaPlugin {
 
         registrar.addComponent(SentryPylonWthitProvider.INSTANCE, TooltipPosition.BODY, SentryPylonBlock.class);
         registrar.addBlockData(SentryPylonWthitDataProvider.INSTANCE, SentryPylonBlockEntity.class);
+
+        registrar.addComponent(SentryGolemWthitProvider.INSTANCE, TooltipPosition.BODY, IronGolem.class);
+        registrar.addEntityData(SentryGolemWthitDataProvider.INSTANCE, IronGolem.class);
     }
 }
