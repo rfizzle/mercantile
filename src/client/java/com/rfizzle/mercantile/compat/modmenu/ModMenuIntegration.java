@@ -164,6 +164,11 @@ public class ModMenuIntegration implements ModMenuApi {
                     .setTooltip(Component.translatable("mercantile.config.enablePathfindingWater.tooltip"))
                     .setSaveConsumer(v -> config.enablePathfindingWater = v)
                     .build());
+            pathfinding.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableDoubleDoorSync"), config.enableDoubleDoorSync)
+                    .setDefaultValue(defaults.enableDoubleDoorSync)
+                    .setTooltip(Component.translatable("mercantile.config.enableDoubleDoorSync.tooltip"))
+                    .setSaveConsumer(v -> config.enableDoubleDoorSync = v)
+                    .build());
 
             // --- Trading ---
             ConfigCategory trading = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.trading"));

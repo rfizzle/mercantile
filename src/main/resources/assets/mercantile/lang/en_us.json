@@ -76,6 +76,8 @@
     "mercantile.config.enablePathfindingLadders.tooltip": "Villagers can climb ladders when pathfinding",
     "mercantile.config.enablePathfindingWater": "Water Avoidance",
     "mercantile.config.enablePathfindingWater.tooltip": "Villagers path around water instead of walking into it",
+    "mercantile.config.enableDoubleDoorSync": "Double Door Sync",
+    "mercantile.config.enableDoubleDoorSync.tooltip": "Open/close both halves of double doors and double fence gates together when a player interacts with either half",
 
     "mercantile.config.enableBulkTrading": "Enable Bulk Trading",
     "mercantile.config.enableBulkTrading.tooltip": "Shift-click to execute a trade multiple times",

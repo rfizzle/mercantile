@@ -39,6 +39,7 @@ class MercantileConfigTest {
         assertTrue(config.enablePathfindingStairs);
         assertTrue(config.enablePathfindingLadders);
         assertTrue(config.enablePathfindingWater);
+        assertTrue(config.enableDoubleDoorSync);
         assertTrue(config.enableBulkTrading);
         assertTrue(config.enableProfessionLock);
         assertTrue(config.enableHealing);

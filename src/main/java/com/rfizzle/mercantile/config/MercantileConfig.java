@@ -51,6 +51,7 @@ public class MercantileConfig {
     public boolean enablePathfindingStairs = true;
     public boolean enablePathfindingLadders = true;
     public boolean enablePathfindingWater = true;
+    public boolean enableDoubleDoorSync = true;
 
     // Bulk Trading
     public boolean enableBulkTrading = true;

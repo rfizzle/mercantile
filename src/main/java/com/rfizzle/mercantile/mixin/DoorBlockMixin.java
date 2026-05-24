@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -27,9 +28,16 @@ public abstract class DoorBlockMixin {
     @Inject(method = "setOpen", at = @At("TAIL"))
     private void mercantile$handleDoubleDoor(@Nullable Entity entity, Level level, BlockState state,
                                              BlockPos pos, boolean open, CallbackInfo ci) {
-        if (!(entity instanceof Villager)) return;
-        if (!MercantileConfig.get().enablePathfindingFixes) return;
-        if (!MercantileConfig.get().enablePathfindingDoors) return;
+        MercantileConfig config = MercantileConfig.get();
+        if (entity instanceof Villager) {
+            if (!config.enablePathfindingFixes) return;
+            if (!config.enablePathfindingDoors) return;
+        } else if (entity instanceof Player player) {
+            if (player.isSpectator()) return;
+            if (!config.enableDoubleDoorSync) return;
+        } else {
+            return;
+        }
 
         if (state.getValue(DoorBlock.HALF) == DoubleBlockHalf.UPPER) return;
 
@@ -43,7 +51,8 @@ public abstract class DoorBlockMixin {
         BlockPos partnerPos = pos.relative(partnerDir);
         BlockState partnerState = level.getBlockState(partnerPos);
 
-        if (partnerState.getBlock() instanceof DoorBlock partnerDoor
+        if (partnerState.is(state.getBlock())
+                && partnerState.getBlock() instanceof DoorBlock partnerDoor
                 && partnerState.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER
                 && partnerState.getValue(DoorBlock.FACING) == facing
                 && partnerState.getValue(DoorBlock.HINGE) != hinge
