@@ -3,6 +3,7 @@ package com.rfizzle.mercantile.network;
 import com.rfizzle.mercantile.Mercantile;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.follow.FollowManager;
+import com.rfizzle.mercantile.reputation.ReputationManager;
 import com.rfizzle.mercantile.trade.TradeCycleManager;
 import com.rfizzle.mercantile.visualization.VillageBoundsService;
 import com.rfizzle.mercantile.visualization.WorkstationMapService;
@@ -38,6 +39,7 @@ public class MercantileNetworking {
     public static void init() {
         registerPayloadTypes();
         registerServerHandlers();
+        registerJoinSync();
         registerDisconnectCleanup();
     }
 
@@ -82,6 +84,22 @@ public class MercantileNetworking {
             ServerPlayer player = context.player();
             player.server.execute(() -> handleRequestVillageBounds(player));
         });
+    }
+
+    private static void registerJoinSync() {
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> sendJoinSync(handler.getPlayer()));
+    }
+
+    // Public so gametests can drive the same emission without the real
+    // ServerPlayConnectionEvents.JOIN event firing on mock players, and so future
+    // admin commands could resync a specific player without restarting their session.
+    public static void sendJoinSync(ServerPlayer player) {
+        if (player.connection == null) return;
+        // Send config first — the client uses config gates when interpreting subsequent
+        // payloads (e.g. enableReputationHud), so landing config before rep avoids a
+        // one-frame mismatch on the HUD at login.
+        ServerPlayNetworking.send(player, new ConfigSyncS2CPayload(MercantileConfig.get().toJson()));
+        ReputationManager.syncToClient(player);
     }
 
     private static void registerDisconnectCleanup() {
