@@ -210,6 +210,7 @@
             <li>Merchant info panel splits profession and level onto separate lines so long localized names no longer overflow the 98px content area (S-046).</li>
             <li>Reputation and config now sync to the client on player join, so the HUD and config-gated client features no longer show stale state at login (S-047).</li>
             <li>Jade plugin is now discovered at load time — all Jade tooltips (villager breeding, state indicators, sentry pylon fuel) were silently broken because the <code class="text-bone">jade</code> entrypoint was missing from <code class="text-bone">fabric.mod.json</code> (S-048).</li>
+            <li>Trade-screen info overlay (the centered panel that opens via the <code class="text-bone">[i]</code> icon when the window is too narrow for the inline side panel) no longer lets merchant-screen icons, slots, and the XP bar ghost through the panel surface — the overlay panel background is now fully opaque and the surrounding dim is deeper, so text rows read cleanly instead of overlapping background art (S-053, B-099).</li>
           </ul>
 
           <h3 class="text-base font-semibold text-emerald mb-2 mt-6 uppercase tracking-wider">Added</h3>
@@ -227,6 +228,7 @@
             <li>Price-breakdown tooltip (demand transparency) no longer overlaps the trade-cycling button tooltip or the info panel — hit-testing now sits on the trade-offer button itself instead of approximating slot bounds (S-049).</li>
             <li>Jade/WTHIT villager tooltip slimmed down: breeding state is now a single color-coded line (Ready / Hungry / Needs bed / Cooldown / Growing) with a <code class="text-bone">Food: have/needed</code> progress line only when hungry. Removed the redundant <em>Hungry</em> state icon (the breeding line already covers it) and the <em>Profession: Locked/Unlocked</em> line (lock state lives in the in-game trade screen) (S-051, B-095).</li>
             <li>EMI/REI/JEI trade-index rows redesigned to a clean three-row layout: icon strip with uniform 20px slot pitch on row 1, trade level on row 2, and a <code class="text-bone">Requires &lt;tier&gt;</code> line on row 3 for reputation-locked trades. Removed the stacked "Sold by" / "Workstation" / tier-badge labels below the strip (the same context is in the slot hover tooltips). The profession head item now shows the profession name on hover instead of vanilla's "'s head" fallback (S-051, B-096).</li>
+            <li>Reputation HUD chip near villagers downscaled to sit more naturally next to vanilla HUD chrome — icon shrinks from 16px to 12px and inner padding tightens, producing a box ~16px tall instead of ~20px. Text remains at vanilla 9px height (S-053, B-100).</li>
           </ul>
         </article>
 

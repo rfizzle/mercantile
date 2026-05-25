@@ -54,6 +54,8 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     @Unique
     private static final int INFO_PANEL_BG_COLOR = 0xC0101010;
     @Unique
+    private static final int OVERLAY_PANEL_BG_COLOR = 0xFF101010;
+    @Unique
     private static final int INFO_PANEL_BORDER_COLOR = 0xFF555555;
     @Unique
     private static final int INFO_PANEL_TEXT_COLOR = 0xFFFFFFFF;
@@ -71,7 +73,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     @Unique
     private static final int OVERLAY_PAD = 8;
     @Unique
-    private static final int OVERLAY_DIM_COLOR = 0x80000000;
+    private static final int OVERLAY_DIM_COLOR = 0xE0000000;
     @Unique
     private static final int CLOSE_BUTTON_SIZE = 11;
     @Unique
@@ -301,7 +303,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
 
         int panelX = mercantile$panelX();
         int panelY = this.topPos;
-        mercantile$drawPanelFrame(guiGraphics, panelX, panelY, INFO_PANEL_WIDTH, INFO_PANEL_HEIGHT);
+        mercantile$drawPanelFrame(guiGraphics, panelX, panelY, INFO_PANEL_WIDTH, INFO_PANEL_HEIGHT, INFO_PANEL_BG_COLOR);
         mercantile$drawInfoPanelContents(guiGraphics, config, info, panelX, panelY, INFO_PANEL_WIDTH);
     }
 
@@ -323,7 +325,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
 
         int ox = mercantile$overlayX();
         int oy = mercantile$overlayY();
-        mercantile$drawPanelFrame(guiGraphics, ox, oy, OVERLAY_WIDTH, OVERLAY_HEIGHT);
+        mercantile$drawPanelFrame(guiGraphics, ox, oy, OVERLAY_WIDTH, OVERLAY_HEIGHT, OVERLAY_PANEL_BG_COLOR);
         mercantile$drawInfoPanelContents(guiGraphics, config, info, ox, oy, OVERLAY_WIDTH);
 
         // Re-render the cycle button on top of the dim — vanilla widget pass drew it
@@ -363,8 +365,8 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     }
 
     @Unique
-    private void mercantile$drawPanelFrame(GuiGraphics g, int x, int y, int w, int h) {
-        g.fill(x, y, x + w, y + h, INFO_PANEL_BG_COLOR);
+    private void mercantile$drawPanelFrame(GuiGraphics g, int x, int y, int w, int h, int bgColor) {
+        g.fill(x, y, x + w, y + h, bgColor);
         g.fill(x, y, x + w, y + 1, INFO_PANEL_BORDER_COLOR);
         g.fill(x, y + h - 1, x + w, y + h, INFO_PANEL_BORDER_COLOR);
         g.fill(x, y, x + 1, y + h, INFO_PANEL_BORDER_COLOR);

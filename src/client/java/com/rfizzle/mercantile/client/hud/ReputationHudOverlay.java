@@ -24,10 +24,10 @@ public final class ReputationHudOverlay {
 
     private static final int BASE_X = 2;
     private static final int BASE_Y = 2;
-    private static final int BOX_PAD_X = 4;
+    private static final int BOX_PAD_X = 3;
     private static final int BOX_PAD_Y = 2;
-    private static final int ICON_SIZE = 16;
-    private static final int ICON_TEXT_GAP = 4;
+    private static final int ICON_SIZE = 12;
+    private static final int ICON_TEXT_GAP = 2;
     private static final int TEXT_HEIGHT = 9;
     private static final int BG_COLOR = 0x99000000;
     private static final int TEXT_COLOR = 0xFFFFFFFF;

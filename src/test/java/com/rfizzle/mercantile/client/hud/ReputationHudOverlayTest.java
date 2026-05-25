@@ -12,10 +12,10 @@ class ReputationHudOverlayTest {
 
     @Test
     void boxWidthForIncludesPaddingIconGapAndText() {
-        // 4 (left pad) + 16 (icon) + 4 (gap) + textWidth + 4 (right pad)
-        assertEquals(28 + 42, ReputationHudOverlay.boxWidthFor(42));
-        assertEquals(28, ReputationHudOverlay.boxWidthFor(0));
-        assertEquals(28 + 100, ReputationHudOverlay.boxWidthFor(100));
+        // 3 (left pad) + 12 (icon) + 2 (gap) + textWidth + 3 (right pad)
+        assertEquals(20 + 42, ReputationHudOverlay.boxWidthFor(42));
+        assertEquals(20, ReputationHudOverlay.boxWidthFor(0));
+        assertEquals(20 + 100, ReputationHudOverlay.boxWidthFor(100));
     }
 
     @Test
