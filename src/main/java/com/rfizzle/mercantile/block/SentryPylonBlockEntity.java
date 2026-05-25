@@ -4,6 +4,7 @@ import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.particle.MercantileParticles;
 import com.rfizzle.mercantile.registry.MercantileRegistry;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.nbt.CompoundTag;
@@ -13,14 +14,19 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -31,13 +37,19 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public class SentryPylonBlockEntity extends BlockEntity {
+public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContainer {
     private static final Vector3f RED = new Vector3f(1.0f, 0.0f, 0.0f);
     private static final int OUT_OF_FUEL_ALERT_COOLDOWN_TICKS = 40;
     private static final int SCAN_INTERVAL_TICKS = 40;
     private static final int IDLE_HOSTILE_CHECK_INTERVAL_TICKS = 10;
 
+    private static final int[] ALL_SLOTS = {0};
+    private static final int[] NO_SLOTS = new int[0];
+    private static final int SLOT = 0;
+
     private int fuel = 0;
+    private ItemStack virtualSlot = ItemStack.EMPTY;
+    private boolean syncingSlot = false;
     private int outOfFuelCooldown = 0;
     private int scanCooldown = SCAN_INTERVAL_TICKS;
     private int idleTicks = 0;
@@ -62,7 +74,17 @@ public class SentryPylonBlockEntity extends BlockEntity {
             return;
         }
         fuel = clamped;
-        setChanged();
+        if (clamped == 0) {
+            virtualSlot = ItemStack.EMPTY;
+        } else if (!virtualSlot.isEmpty()) {
+            virtualSlot.setCount(clamped);
+        }
+        syncingSlot = true;
+        try {
+            setChanged();
+        } finally {
+            syncingSlot = false;
+        }
         if (level != null) {
             level.updateNeighbourForOutputSignal(worldPosition, getBlockState().getBlock());
         }
@@ -282,6 +304,115 @@ public class SentryPylonBlockEntity extends BlockEntity {
         if (current.getValue(SentryPylonBlock.STATE) != desired) {
             level.setBlock(worldPosition, current.setValue(SentryPylonBlock.STATE, desired),
                     Block.UPDATE_CLIENTS);
+        }
+    }
+
+    // --- WorldlyContainer ---
+
+    @Override
+    public int[] getSlotsForFace(Direction side) {
+        return MercantileConfig.get().enableSentryPylon ? ALL_SLOTS : NO_SLOTS;
+    }
+
+    @Override
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction direction) {
+        return canPlaceItem(slot, stack);
+    }
+
+    @Override
+    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction direction) {
+        return false;
+    }
+
+    // --- Container ---
+
+    @Override
+    public int getContainerSize() {
+        return 1;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return fuel <= 0;
+    }
+
+    @Override
+    public ItemStack getItem(int slot) {
+        if (slot != SLOT) return ItemStack.EMPTY;
+        if (fuel <= 0) {
+            virtualSlot = ItemStack.EMPTY;
+        } else if (virtualSlot.isEmpty() || virtualSlot.getCount() != fuel) {
+            virtualSlot = new ItemStack(Items.IRON_BLOCK, fuel);
+        }
+        return virtualSlot;
+    }
+
+    @Override
+    public ItemStack removeItem(int slot, int amount) {
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public ItemStack removeItemNoUpdate(int slot) {
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public void setItem(int slot, ItemStack stack) {
+        if (!MercantileConfig.get().enableSentryPylon) return;
+        if (slot != SLOT) return;
+        if (stack.isEmpty()) {
+            setFuel(0);
+            return;
+        }
+        if (!stack.is(Items.IRON_BLOCK)) return;
+        setFuel(stack.getCount());
+    }
+
+    @Override
+    public int getMaxStackSize() {
+        return getMaxFuel();
+    }
+
+    @Override
+    public boolean stillValid(Player player) {
+        return true;
+    }
+
+    @Override
+    public void clearContent() {
+        setFuel(0);
+    }
+
+    @Override
+    public boolean canPlaceItem(int slot, ItemStack stack) {
+        MercantileConfig cfg = MercantileConfig.get();
+        if (!cfg.enableSentryPylon) return false;
+        return slot == SLOT && stack.is(Items.IRON_BLOCK) && fuel < cfg.pylonMaxFuel;
+    }
+
+    @Override
+    public void setChanged() {
+        super.setChanged();
+        if (!syncingSlot && !virtualSlot.isEmpty() && virtualSlot.is(Items.IRON_BLOCK)
+                && MercantileConfig.get().enableSentryPylon) {
+            int slotCount = virtualSlot.getCount();
+            if (slotCount != fuel) {
+                syncingSlot = true;
+                try {
+                    int clamped = Mth.clamp(slotCount, 0, getMaxFuel());
+                    virtualSlot.setCount(clamped);
+                    if (clamped != fuel) {
+                        fuel = clamped;
+                        updateVisualState();
+                        if (level != null) {
+                            level.updateNeighbourForOutputSignal(worldPosition, getBlockState().getBlock());
+                        }
+                    }
+                } finally {
+                    syncingSlot = false;
+                }
+            }
         }
     }
 

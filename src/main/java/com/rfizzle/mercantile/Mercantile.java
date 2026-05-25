@@ -26,6 +26,7 @@ public class Mercantile implements ModInitializer {
     public void onInitialize() {
         MercantileConfig.get();
         MercantileRegistry.register();
+        MercantileRegistry.registerApiLookups();
         MercantileAttachments.init();
         ReputationManager.init();
         ExclusiveTradesManager.init();

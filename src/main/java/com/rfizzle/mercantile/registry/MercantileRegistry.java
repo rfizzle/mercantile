@@ -3,7 +3,10 @@ package com.rfizzle.mercantile.registry;
 import com.rfizzle.mercantile.Mercantile;
 import com.rfizzle.mercantile.block.SentryPylonBlock;
 import com.rfizzle.mercantile.block.SentryPylonBlockEntity;
+import com.rfizzle.mercantile.config.MercantileConfig;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -67,6 +70,14 @@ public final class MercantileRegistry {
                                                                                       BlockEntityType<T> type) {
         Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Mercantile.id(name), type);
         return type;
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    public static void registerApiLookups() {
+        ItemStorage.SIDED.registerForBlockEntity((be, side) -> {
+            if (!MercantileConfig.get().enableSentryPylon) return null;
+            return InventoryStorage.of(be, side);
+        }, SENTRY_PYLON_BE);
     }
 
     private static void registerCreativeTab() {
