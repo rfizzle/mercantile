@@ -32,12 +32,18 @@ class VillagerHeadTexturesTest {
 
     @Test
     void eachVanillaProfessionHasUniqueTexture() {
+        // nitwit intentionally reuses the none (unemployed) skin — vanilla nitwit has no head overlay.
         java.util.Set<String> seen = new java.util.HashSet<>();
         for (String profession : VANILLA_PROFESSIONS) {
+            if (profession.equals("nitwit")) continue;
             ResourceLocation id = ResourceLocation.withDefaultNamespace(profession);
             String texture = VillagerHeadTextures.getTextureValue(id);
             assertTrue(seen.add(texture), "Duplicate texture for " + profession);
         }
+        // Codify the deliberate reuse so it isn't "fixed" accidentally.
+        String nitwit = VillagerHeadTextures.getTextureValue(ResourceLocation.withDefaultNamespace("nitwit"));
+        String none = VillagerHeadTextures.getTextureValue(ResourceLocation.withDefaultNamespace("none"));
+        assertEquals(none, nitwit, "nitwit should share the none skin (no head overlay in vanilla)");
     }
 
     @Test
