@@ -1,7 +1,6 @@
 package com.rfizzle.mercantile.client;
 
 import com.rfizzle.mercantile.client.hud.ReputationHudOverlay;
-import com.rfizzle.mercantile.client.inventory.StackRefillHandler;
 import com.rfizzle.mercantile.client.network.ClientMercantileData;
 import com.rfizzle.mercantile.client.network.ClientNetworkHandler;
 import com.rfizzle.mercantile.client.particle.CycleGlintParticle;
@@ -47,6 +46,5 @@ public class MercantileClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(WorkstationLinkRenderer::tick);
         ClientTickEvents.END_CLIENT_TICK.register(BellRadiusRenderer::tick);
         ClientTickEvents.END_CLIENT_TICK.register(VillageBoundsRenderer::tick);
-        ClientTickEvents.END_CLIENT_TICK.register(StackRefillHandler::tick);
     }
 }

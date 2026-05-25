@@ -164,11 +164,6 @@ public class ModMenuIntegration implements ModMenuApi {
                     .setTooltip(Component.translatable("mercantile.config.enablePathfindingWater.tooltip"))
                     .setSaveConsumer(v -> config.enablePathfindingWater = v)
                     .build());
-            pathfinding.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableDoubleDoorSync"), config.enableDoubleDoorSync)
-                    .setDefaultValue(defaults.enableDoubleDoorSync)
-                    .setTooltip(Component.translatable("mercantile.config.enableDoubleDoorSync.tooltip"))
-                    .setSaveConsumer(v -> config.enableDoubleDoorSync = v)
-                    .build());
 
             // --- Trading ---
             ConfigCategory trading = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.trading"));
@@ -244,14 +239,6 @@ public class ModMenuIntegration implements ModMenuApi {
                     .setMin(5)
                     .setTooltip(Component.translatable("mercantile.config.sentryDespawnSeconds.tooltip"))
                     .setSaveConsumer(v -> config.sentryDespawnSeconds = v)
-                    .build());
-
-            // --- Quality of Life ---
-            ConfigCategory qol = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.qol"));
-            qol.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableStackRefill"), config.enableStackRefill)
-                    .setDefaultValue(defaults.enableStackRefill)
-                    .setTooltip(Component.translatable("mercantile.config.enableStackRefill.tooltip"))
-                    .setSaveConsumer(v -> config.enableStackRefill = v)
                     .build());
 
             // --- Client ---

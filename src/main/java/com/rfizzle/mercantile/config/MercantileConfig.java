@@ -51,7 +51,6 @@ public class MercantileConfig {
     public boolean enablePathfindingStairs = true;
     public boolean enablePathfindingLadders = true;
     public boolean enablePathfindingWater = true;
-    public boolean enableDoubleDoorSync = true;
 
     // Bulk Trading
     public boolean enableBulkTrading = true;
@@ -66,9 +65,6 @@ public class MercantileConfig {
     // Trade GUI
     public boolean enableRestockIndicator = true;
     public boolean enableDemandTransparency = true;
-
-    // Hotbar Stack Refill
-    public boolean enableStackRefill = true;
 
     // Breeding Tooltip (Jade/WTHIT)
     public boolean enableBreedingTooltip = true;

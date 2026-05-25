@@ -212,7 +212,6 @@
             <li>Jade plugin is now discovered at load time — all Jade tooltips (villager breeding, state indicators, sentry pylon fuel) were silently broken because the <code class="text-bone">jade</code> entrypoint was missing from <code class="text-bone">fabric.mod.json</code> (S-048).</li>
             <li>Trade-screen info overlay (the centered panel that opens via the <code class="text-bone">[i]</code> icon when the window is too narrow for the inline side panel) no longer lets merchant-screen icons, slots, and the XP bar ghost through the panel surface — the overlay panel background is now fully opaque and the surrounding dim is deeper, so text rows read cleanly instead of overlapping background art (S-053, B-099).</li>
             <li>Nitwit profession head no longer ships a watermarked third-party user skin — the trade index now renders the nitwit entry with a clean villager face (reused from the unemployed skin, since vanilla nitwits have no head overlay) (S-054, B-097).</li>
-            <li>Double-door sync now covers the two pair configurations that were silently dropped: two normal doors placed beside each other with mirrored hinges, and two fence gates stacked vertically (same facing, Y±1). Previously only horizontally adjacent fence gates synced (S-055, B-101).</li>
             <li>Trade screen lock badge and <strong class="text-bone">Re-roll Trades</strong> button now refresh live on trade completion — previously the open merchant screen kept showing the unlocked badge and an active re-roll button after the first purchase that flipped the villager to locked, only updating on close→reopen or level-up (S-056, B-102).</li>
           </ul>
 
@@ -221,9 +220,13 @@
             <li>Jade/WTHIT tooltip for sentry golems showing parent pylon coordinates, despawn countdown, and a "No Drops" indicator (S-048).</li>
             <li>Small-screen fallback for the villager info panel: when the window is too narrow to fit the side panel, an <code class="text-bone">i</code> icon appears in the merchant screen header and opens the info as a centered overlay (Esc or <code class="text-bone">x</code> to close) (S-049).</li>
             <li>EMI/REI/JEI trade-index entries now show the workstation block that unlocks the profession as a catalyst slot, and each workstation (lectern, composter, smoker, …) is registered as a recipe catalyst so players can click it to list every trade for that profession (S-043).</li>
-            <li>Double doors and double fence gates now open and close together when a player interacts with either half — no more half-stuck entrances. Toggleable via <code class="text-bone">enableDoubleDoorSync</code> (S-044).</li>
-            <li>Hotbar stack refill: when the main hand or offhand stack runs out, the slot auto-refills from a matching stack in your main inventory within a tick. Damageable items match by type so enchanted spares count. Skipped in creative and on manual slot switches. Toggleable via <code class="text-bone">enableStackRefill</code> (S-045).</li>
             <li>Sentry Pylon now accepts hopper and modded-pipe input on every face. Hoppers feed iron blocks in one at a time up to the fuel cap, reject non-iron items so mixed inventories don't deadlock, and cannot extract (fuel is consumed, not stored as items). Modded item pipes (Pipez, etc.) work via the Fabric Transfer API. Input pathway is gated on <code class="text-bone">enableSentryPylon</code> (S-057).</li>
+          </ul>
+
+          <h3 class="text-base font-semibold text-emerald mb-2 mt-6 uppercase tracking-wider">Removed</h3>
+          <ul class="list-disc list-inside text-sm text-ash leading-relaxed space-y-1 ml-2">
+            <li>Double-door / fence-gate sync removed — the feature was out of scope for the villager/trade overhaul and overlaps with dedicated QoL mods. The <code class="text-bone">enableDoubleDoorSync</code> config key no longer exists (S-058).</li>
+            <li>Hotbar / offhand stack refill removed — out of scope for the villager/trade overhaul; overlaps with dedicated QoL mods players already install. The <code class="text-bone">enableStackRefill</code> config key no longer exists (S-058).</li>
           </ul>
 
           <h3 class="text-base font-semibold text-emerald mb-2 mt-6 uppercase tracking-wider">Changed</h3>

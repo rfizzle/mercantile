@@ -154,7 +154,6 @@
                 <tr class="border-t border-elevated/40"><td class="px-3 py-2 text-bone whitespace-nowrap"><code>enablePathfindingStairs</code></td><td class="px-3 py-2">boolean</td><td class="px-3 py-2">true</td><td class="px-3 py-2">—</td><td class="px-3 py-2">Multi-step staircase + slab transitions.</td></tr>
                 <tr class="border-t border-elevated/40"><td class="px-3 py-2 text-bone whitespace-nowrap"><code>enablePathfindingLadders</code></td><td class="px-3 py-2">boolean</td><td class="px-3 py-2">true</td><td class="px-3 py-2">—</td><td class="px-3 py-2">Allow villagers to climb ladders.</td></tr>
                 <tr class="border-t border-elevated/40"><td class="px-3 py-2 text-bone whitespace-nowrap"><code>enablePathfindingWater</code></td><td class="px-3 py-2">boolean</td><td class="px-3 py-2">true</td><td class="px-3 py-2">—</td><td class="px-3 py-2">Penalize water paths so villagers prefer dry routes.</td></tr>
-                <tr class="border-t border-elevated/40"><td class="px-3 py-2 text-bone whitespace-nowrap"><code>enableDoubleDoorSync</code></td><td class="px-3 py-2">boolean</td><td class="px-3 py-2">true</td><td class="px-3 py-2">—</td><td class="px-3 py-2">Open/close both halves of a double door (and double fence gates) when a player interacts with either half.</td></tr>
 
                 <tr class="bg-elevated/40"><td colspan="5" class="px-3 py-2 text-emerald text-xs uppercase tracking-wider">Bulk Trading</td></tr>
                 <tr class="border-t border-elevated/40"><td class="px-3 py-2 text-bone whitespace-nowrap"><code>enableBulkTrading</code></td><td class="px-3 py-2">boolean</td><td class="px-3 py-2">true</td><td class="px-3 py-2">—</td><td class="px-3 py-2">Shift-click trade output to repeat the trade up to 64 times.</td></tr>
@@ -169,9 +168,6 @@
                 <tr class="bg-elevated/40"><td colspan="5" class="px-3 py-2 text-emerald text-xs uppercase tracking-wider">Trade GUI</td></tr>
                 <tr class="border-t border-elevated/40"><td class="px-3 py-2 text-bone whitespace-nowrap"><code>enableRestockIndicator</code></td><td class="px-3 py-2">boolean</td><td class="px-3 py-2">true</td><td class="px-3 py-2">—</td><td class="px-3 py-2">Show restock timer + counter in the merchant screen.</td></tr>
                 <tr class="border-t border-elevated/40"><td class="px-3 py-2 text-bone whitespace-nowrap"><code>enableDemandTransparency</code></td><td class="px-3 py-2">boolean</td><td class="px-3 py-2">true</td><td class="px-3 py-2">—</td><td class="px-3 py-2">Show hoverable price breakdown tooltip.</td></tr>
-
-                <tr class="bg-elevated/40"><td colspan="5" class="px-3 py-2 text-emerald text-xs uppercase tracking-wider">Quality of Life</td></tr>
-                <tr class="border-t border-elevated/40"><td class="px-3 py-2 text-bone whitespace-nowrap"><code>enableStackRefill</code></td><td class="px-3 py-2">boolean</td><td class="px-3 py-2">true</td><td class="px-3 py-2">—</td><td class="px-3 py-2">Auto-refill an empty hotbar (or offhand) slot from the main inventory when a stack runs out.</td></tr>
 
                 <tr class="bg-elevated/40"><td colspan="5" class="px-3 py-2 text-emerald text-xs uppercase tracking-wider">Breeding Tooltip</td></tr>
                 <tr class="border-t border-elevated/40"><td class="px-3 py-2 text-bone whitespace-nowrap"><code>enableBreedingTooltip</code></td><td class="px-3 py-2">boolean</td><td class="px-3 py-2">true</td><td class="px-3 py-2">—</td><td class="px-3 py-2">Send breeding data to Jade/WTHIT tooltips.</td></tr>
@@ -231,10 +227,14 @@
   "tradeCycleEmeraldCost": 6,
   "enableReputation": true,
   "reputationTradeGain": 1,
-  "reputationCureGain": 15,
-  "reputationAttackLoss": 10,
-  "reputationKillLoss": 25,
-  "reputationCycleGain": 2,
+  "reputationCureGain": 5,
+  "reputationAttackLoss": 15,
+  "reputationKillLoss": 40,
+  "reputationCycleGain": 1,
+  "reputationDailyCap": 5,
+  "reputationTradesPerGain": 5,
+  "reputationDailyMaxTradeRep": 2,
+  "reputationDailyMaxCycleRep": 1,
   "enableFollowMode": true,
   "maxFollowingVillagers": 3,
   "enablePathfindingFixes": true,
@@ -242,14 +242,12 @@
   "enablePathfindingStairs": true,
   "enablePathfindingLadders": true,
   "enablePathfindingWater": true,
-  "enableDoubleDoorSync": true,
   "enableBulkTrading": true,
   "enableProfessionLock": true,
   "enableHealing": true,
   "healingMultiplier": 2.0,
   "enableRestockIndicator": true,
   "enableDemandTransparency": true,
-  "enableStackRefill": true,
   "enableBreedingTooltip": true,
   "enableStateIndicators": true,
   "enableSentryPylon": true,

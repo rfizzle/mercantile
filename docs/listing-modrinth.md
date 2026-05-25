@@ -135,8 +135,6 @@ level; a redstone signal disables the pylon entirely.
 - **Pathfinding fixes** — villagers properly traverse fence gates and double
   doors, multi-step staircases, ladders, and route around water instead of
   drowning. Each fix is independently toggleable.
-- **Double door sync** — open one half of a double door (or double fence
-  gate) and the other half swings with it. Same for closing.
 - **Healing enhancement** — splash and lingering potions of healing and
   regeneration are 2× more effective on villagers (configurable).
 - **Profession lock** — once you've made any trade with a villager, their

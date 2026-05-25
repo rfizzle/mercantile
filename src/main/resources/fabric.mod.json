@@ -24,7 +24,6 @@
             "com.rfizzle.mercantile.gametest.ProfessionLockGameTest",
             "com.rfizzle.mercantile.gametest.VillagerHealingGameTest",
             "com.rfizzle.mercantile.gametest.PathfindingGameTest",
-            "com.rfizzle.mercantile.gametest.DoubleDoorSyncGameTest",
             "com.rfizzle.mercantile.gametest.VillagerPickupGameTest",
             "com.rfizzle.mercantile.gametest.ReputationGameTest",
             "com.rfizzle.mercantile.gametest.ReputationHudSyncGameTest",

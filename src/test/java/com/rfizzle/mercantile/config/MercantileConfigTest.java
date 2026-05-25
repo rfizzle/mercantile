@@ -39,14 +39,12 @@ class MercantileConfigTest {
         assertTrue(config.enablePathfindingStairs);
         assertTrue(config.enablePathfindingLadders);
         assertTrue(config.enablePathfindingWater);
-        assertTrue(config.enableDoubleDoorSync);
         assertTrue(config.enableBulkTrading);
         assertTrue(config.enableProfessionLock);
         assertTrue(config.enableHealing);
         assertEquals(2.0f, config.healingMultiplier);
         assertTrue(config.enableRestockIndicator);
         assertTrue(config.enableDemandTransparency);
-        assertTrue(config.enableStackRefill);
         assertTrue(config.enableSentryPylon);
         assertEquals(32, config.pylonDetectionRadius);
         assertEquals(8, config.pylonMaxFuel);
