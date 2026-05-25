@@ -4,6 +4,7 @@ import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
 import com.rfizzle.mercantile.network.DemandPriceS2CPayload;
+import com.rfizzle.mercantile.network.VillagerInfoPanelSync;
 import com.rfizzle.mercantile.reputation.ReputationManager;
 import com.rfizzle.mercantile.trade.BulkTradeContext;
 import com.rfizzle.mercantile.trade.OfferIdentityHash;
@@ -51,6 +52,11 @@ public abstract class AbstractVillagerTradeMixin {
                 && tradingPlayer.connection != null) {
             ServerPlayNetworking.send(tradingPlayer, new DemandPriceS2CPayload(
                     villager.getId(), PriceBreakdownBuilder.buildFor(villager, tradingPlayer)));
+        }
+
+        if (!BulkTradeContext.isActive()
+                && villager.getTradingPlayer() instanceof ServerPlayer tradingPlayer) {
+            VillagerInfoPanelSync.sendTo(tradingPlayer, villager);
         }
     }
 }

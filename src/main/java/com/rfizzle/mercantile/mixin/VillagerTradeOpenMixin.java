@@ -1,19 +1,17 @@
 package com.rfizzle.mercantile.mixin;
 
 import com.rfizzle.mercantile.config.MercantileConfig;
-import com.rfizzle.mercantile.reputation.ReputationTier;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
 import com.rfizzle.mercantile.network.DemandPriceS2CPayload;
 import com.rfizzle.mercantile.network.RestockTimerS2CPayload;
-import com.rfizzle.mercantile.network.VillagerInfoPanelS2CPayload;
+import com.rfizzle.mercantile.network.VillagerInfoPanelSync;
 import com.rfizzle.mercantile.reputation.ExclusiveTradesManager;
 import com.rfizzle.mercantile.reputation.ReputationManager;
 import com.rfizzle.mercantile.trade.PriceBreakdownBuilder;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -85,32 +83,8 @@ public abstract class VillagerTradeOpenMixin {
 
     @Inject(method = "startTrading", at = @At("TAIL"))
     private void mercantile$sendInfoOnTradeOpen(Player player, CallbackInfo ci) {
-        if (!MercantileConfig.get().enableInfoPanel) return;
         if (!(player instanceof ServerPlayer serverPlayer)) return;
-        if (serverPlayer.connection == null) return;
-
-        Villager self = (Villager) (Object) this;
-        net.minecraft.world.entity.npc.VillagerData vd = self.getVillagerData();
-        var villagerData = self.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
-
-        var professionKey = BuiltInRegistries.VILLAGER_PROFESSION.getKey(vd.getProfession());
-        String profession = professionKey == null ? "none" : professionKey.getPath();
-        int level = vd.getLevel();
-        int xp = self.getVillagerXp();
-        int xpToNextLevel = net.minecraft.world.entity.npc.VillagerData.getMaxXpPerLevel(level);
-
-        PlayerData playerData = serverPlayer.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
-        int reputation = playerData.getScore();
-        String reputationTier = ReputationTier.fromScore(reputation).translationKey();
-
-        int totalTrades = playerData.getTradesWithVillager(self.getUUID());
-        boolean hasWorkstation = self.getBrain()
-                .getMemory(MemoryModuleType.JOB_SITE).isPresent();
-
-        ServerPlayNetworking.send(serverPlayer, new VillagerInfoPanelS2CPayload(
-                self.getId(), profession, level, xp, xpToNextLevel,
-                reputation, reputationTier, totalTrades, hasWorkstation,
-                villagerData.isProfessionLocked()));
+        VillagerInfoPanelSync.sendTo(serverPlayer, (Villager) (Object) this);
     }
 
     @Inject(method = "startTrading", at = @At("TAIL"))
