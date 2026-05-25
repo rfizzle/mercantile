@@ -27,7 +27,6 @@ public final class StateIndicatorData {
     public static final String STATE_PANICKING = "panicking";
     public static final String STATE_NEEDS_BED = "needs_bed";
     public static final String STATE_NEEDS_WORKSTATION = "needs_workstation";
-    public static final String STATE_WANTS_BREED = "wants_to_breed";
 
     private static final Map<String, Block> PROFESSION_WORKSTATIONS = Map.ofEntries(
             Map.entry("armorer", Blocks.BLAST_FURNACE),
@@ -79,14 +78,6 @@ public final class StateIndicatorData {
                 ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(workstation.asItem());
                 tag.putString(KEY_WORKSTATION_ITEM, itemId.toString());
             }
-        }
-
-        int foodPoints = BreedingTooltipData.computeFoodPoints(villager);
-        int cooldown = Math.max(0, villager.getAge());
-        boolean hasBed = villager.getBrain().hasMemoryValue(MemoryModuleType.HOME);
-        boolean willing = cooldown == 0 && hasBed && foodPoints >= BreedingTooltipData.WILLING_FOOD_THRESHOLD;
-        if (willing) {
-            states.add(STATE_WANTS_BREED);
         }
 
         ListTag list = new ListTag();

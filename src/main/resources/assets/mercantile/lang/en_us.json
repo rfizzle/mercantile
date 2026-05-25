@@ -203,7 +203,6 @@
 
     "tooltip.mercantile.state.needs_bed": "Needs a bed",
     "tooltip.mercantile.state.needs_workstation": "Needs a workstation",
-    "tooltip.mercantile.state.wants_to_breed": "Wants to breed",
     "tooltip.mercantile.state.panicking": "Panicking",
     "tooltip.mercantile.state.trading": "Trading with %s",
 

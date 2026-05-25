@@ -2,14 +2,11 @@ package com.rfizzle.mercantile.gametest;
 
 import com.rfizzle.mercantile.compat.StateIndicatorData;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.GlobalPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -18,8 +15,6 @@ import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 
 import java.util.HashSet;
@@ -57,31 +52,6 @@ public class StateIndicatorGameTest implements FabricGameTest {
                 "farmer without job site should need workstation");
         helper.assertValueEqual(tag.getString(StateIndicatorData.KEY_WORKSTATION_ITEM),
                 "minecraft:composter", "farmer workstation is composter");
-        helper.succeed();
-    }
-
-    @GameTest(template = EMPTY_STRUCTURE)
-    public void villagerWithBedAndFoodAndJobWantsToBreed(GameTestHelper helper) {
-        ServerLevel level = helper.getLevel();
-        BlockPos bedAbs = helper.absolutePos(new BlockPos(1, 1, 1));
-        BlockPos jobAbs = helper.absolutePos(new BlockPos(2, 1, 2));
-        Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
-        villager.setVillagerData(villager.getVillagerData().setProfession(VillagerProfession.FARMER));
-        villager.getBrain().setMemory(MemoryModuleType.HOME, GlobalPos.of(level.dimension(), bedAbs));
-        villager.getBrain().setMemory(MemoryModuleType.JOB_SITE, GlobalPos.of(level.dimension(), jobAbs));
-        villager.getInventory().addItem(new ItemStack(Items.BREAD, 4));
-        villager.setAge(0);
-
-        CompoundTag tag = new CompoundTag();
-        StateIndicatorData.write(tag, villager);
-
-        Set<String> states = readStates(tag);
-        helper.assertTrue(states.contains(StateIndicatorData.STATE_WANTS_BREED),
-                "should want to breed");
-        helper.assertFalse(states.contains(StateIndicatorData.STATE_NEEDS_BED),
-                "has bed");
-        helper.assertFalse(states.contains(StateIndicatorData.STATE_NEEDS_WORKSTATION),
-                "has workstation");
         helper.succeed();
     }
 
