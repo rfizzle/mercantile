@@ -180,7 +180,7 @@ bundled** — install whichever you already use.
 - [Mod Menu](https://modrinth.com/mod/modmenu) — config screen entry
 - [Cloth Config](https://modrinth.com/mod/cloth-config) — settings GUI
 - [Jade](https://modrinth.com/mod/jade) / [WTHIT](https://modrinth.com/mod/wthit)
-  — villager tooltip overlays (breeding state, food counts, profession lock,
+  — villager tooltip overlays (breeding state, contextual indicators,
   pylon fuel)
 - [EMI](https://modrinth.com/mod/emi) / [REI](https://modrinth.com/mod/rei) /
   [JEI](https://www.curseforge.com/minecraft/mc-mods/jei) — recipe viewer

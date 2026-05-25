@@ -27,7 +27,6 @@ public final class StateIndicatorData {
     public static final String STATE_PANICKING = "panicking";
     public static final String STATE_NEEDS_BED = "needs_bed";
     public static final String STATE_NEEDS_WORKSTATION = "needs_workstation";
-    public static final String STATE_HUNGRY = "hungry";
     public static final String STATE_WANTS_BREED = "wants_to_breed";
 
     private static final Map<String, Block> PROFESSION_WORKSTATIONS = Map.ofEntries(
@@ -83,10 +82,6 @@ public final class StateIndicatorData {
         }
 
         int foodPoints = BreedingTooltipData.computeFoodPoints(villager);
-        if (foodPoints < BreedingTooltipData.WILLING_FOOD_THRESHOLD) {
-            states.add(STATE_HUNGRY);
-        }
-
         int cooldown = Math.max(0, villager.getAge());
         boolean hasBed = villager.getBrain().hasMemoryValue(MemoryModuleType.HOME);
         boolean willing = cooldown == 0 && hasBed && foodPoints >= BreedingTooltipData.WILLING_FOOD_THRESHOLD;

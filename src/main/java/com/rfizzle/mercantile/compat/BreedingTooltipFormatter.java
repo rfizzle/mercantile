@@ -3,8 +3,7 @@ package com.rfizzle.mercantile.compat;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
+import net.minecraft.network.chat.MutableComponent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,48 +18,44 @@ public final class BreedingTooltipFormatter {
 
         if (data.getBoolean(BreedingTooltipData.KEY_IS_BABY)) {
             int babyAge = data.getInt(BreedingTooltipData.KEY_BABY_AGE);
-            lines.add(Component.translatable(
-                    "tooltip.mercantile.breeding.baby_growup",
-                    formatTicks(babyAge)).withStyle(ChatFormatting.AQUA));
+            lines.add(breedingLine(
+                    Component.translatable("tooltip.mercantile.breeding.state.growing", formatTicks(babyAge))
+                            .withStyle(ChatFormatting.AQUA)));
             return lines;
         }
 
-        boolean willing = data.getBoolean(BreedingTooltipData.KEY_WILLING);
         int cooldown = data.getInt(BreedingTooltipData.KEY_COOLDOWN);
-
-        if (willing) {
-            lines.add(Component.translatable("tooltip.mercantile.breeding.willing")
-                    .withStyle(ChatFormatting.GREEN));
-        } else {
-            lines.add(Component.translatable("tooltip.mercantile.breeding.not_willing")
-                    .withStyle(ChatFormatting.GRAY));
-            String reason = data.getString(BreedingTooltipData.KEY_NOT_WILLING_REASON);
-            if (!reason.isEmpty()) {
-                lines.add(Component.translatable("tooltip.mercantile.breeding.reason." + reason)
-                        .withStyle(ChatFormatting.RED));
-            }
-        }
+        boolean hasBed = data.getBoolean(BreedingTooltipData.KEY_HAS_BED);
+        int foodPoints = data.getInt(BreedingTooltipData.KEY_FOOD_POINTS);
+        int threshold = BreedingTooltipData.WILLING_FOOD_THRESHOLD;
 
         if (cooldown > 0) {
-            lines.add(Component.translatable(
-                    "tooltip.mercantile.breeding.cooldown",
-                    formatTicks(cooldown)).withStyle(ChatFormatting.YELLOW));
+            lines.add(breedingLine(
+                    Component.translatable("tooltip.mercantile.breeding.state.cooldown", formatTicks(cooldown))
+                            .withStyle(ChatFormatting.YELLOW)));
+            return lines;
         }
 
-        CompoundTag counts = data.getCompound(BreedingTooltipData.KEY_FOOD_COUNTS);
-        lines.add(Component.translatable("tooltip.mercantile.breeding.food_header"));
-        if (counts.isEmpty()) {
-            lines.add(Component.translatable("tooltip.mercantile.breeding.food_none")
-                    .withStyle(ChatFormatting.GRAY));
-        } else {
-            for (String key : counts.getAllKeys()) {
-                int count = counts.getInt(key);
-                Component itemName = itemDisplayName(key);
-                lines.add(Component.translatable(
-                        "tooltip.mercantile.breeding.food_line", count, itemName));
-            }
+        if (!hasBed) {
+            lines.add(breedingLine(
+                    Component.translatable("tooltip.mercantile.breeding.state.needs_bed")
+                            .withStyle(ChatFormatting.RED)));
+            return lines;
         }
 
+        if (foodPoints < threshold) {
+            lines.add(breedingLine(
+                    Component.translatable("tooltip.mercantile.breeding.state.hungry")
+                            .withStyle(ChatFormatting.RED)));
+            ChatFormatting foodColor = foodPoints == 0 ? ChatFormatting.RED : ChatFormatting.YELLOW;
+            lines.add(Component.translatable("tooltip.mercantile.breeding.food_progress", foodPoints, threshold)
+                    .withStyle(foodColor));
+            return lines;
+        }
+
+        lines.add(breedingLine(
+                Component.translatable("tooltip.mercantile.breeding.state.ready")
+                        .withStyle(ChatFormatting.GREEN)));
         return lines;
     }
 
@@ -71,10 +66,8 @@ public final class BreedingTooltipFormatter {
         return String.format("%d:%02d", minutes, seconds);
     }
 
-    private static Component itemDisplayName(String id) {
-        ResourceLocation rl = ResourceLocation.tryParse(id);
-        if (rl == null) return Component.literal(id);
-        Item item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(rl);
-        return Component.translatable(item.getDescriptionId());
+    private static MutableComponent breedingLine(Component stateComponent) {
+        return Component.translatable("tooltip.mercantile.breeding.label", stateComponent)
+                .withStyle(ChatFormatting.GRAY);
     }
 }

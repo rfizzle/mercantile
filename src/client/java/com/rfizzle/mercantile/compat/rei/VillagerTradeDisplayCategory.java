@@ -48,10 +48,10 @@ public class VillagerTradeDisplayCategory implements DisplayCategory<VillagerTra
         Component levelLabel = entry.level() > 0
                 ? TradeIndexLabels.levelLabel(entry.level())
                 : TradeIndexLabels.tierLabel(entry.minScore().orElse(0));
-        Component badge = TradeIndexLabels.sourceBadge(entry.source(), entry.minScore());
 
-        int startOffset = hasWorkstation ? 70 : 60;
-        Point start = new Point(bounds.getCenterX() - startOffset, bounds.getCenterY() - 18);
+        int startOffset = hasWorkstation ? 69 : 59;
+        int stripY = bounds.y + 4;
+        Point start = new Point(bounds.getCenterX() - startOffset, stripY);
         List<Widget> widgets = new ArrayList<>();
         widgets.add(Widgets.createRecipeBase(bounds));
 
@@ -64,7 +64,7 @@ public class VillagerTradeDisplayCategory implements DisplayCategory<VillagerTra
                         .disableBackground()
                         .notInteractable(),
                 professionLabel));
-        x += 22;
+        x += 20;
 
         if (hasWorkstation) {
             widgets.add(Widgets.withTooltip(
@@ -96,25 +96,13 @@ public class VillagerTradeDisplayCategory implements DisplayCategory<VillagerTra
         widgets.add(Widgets.createSlot(new Point(x, y))
                 .entries(display.getOutputEntries().get(0))
                 .markOutput());
-        x += 22;
 
-        widgets.add(Widgets.createLabel(new Point(x, y + 5), levelLabel).leftAligned());
+        widgets.add(Widgets.createLabel(new Point(start.x, y + 22), levelLabel).leftAligned());
 
-        Component header = Component.translatable(
-                "mercantile.trade_index.tooltip.sold_by", professionLabel);
-        widgets.add(Widgets.createLabel(
-                new Point(bounds.getCenterX(), bounds.getMaxY() - 12), header).centered());
-
-        if (!badge.getString().isEmpty()) {
-            widgets.add(Widgets.createLabel(
-                    new Point(bounds.getCenterX(), bounds.getMaxY() - 22), badge).centered());
-        }
-
-        if (hasWorkstation) {
-            Component workstationLine = Component.translatable(
-                    "mercantile.trade_index.tooltip.workstation", workstation.getHoverName());
-            widgets.add(Widgets.createLabel(
-                    new Point(bounds.getCenterX(), bounds.getMaxY() - 32), workstationLine).centered());
+        if (entry.minScore().isPresent()) {
+            Component repLabel = Component.translatable("mercantile.trade_index.requires_reputation",
+                    TradeIndexLabels.tierLabel(entry.minScore().getAsInt()));
+            widgets.add(Widgets.createLabel(new Point(start.x, y + 33), repLabel).leftAligned());
         }
 
         return widgets;

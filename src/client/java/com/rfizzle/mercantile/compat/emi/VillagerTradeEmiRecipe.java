@@ -20,7 +20,7 @@ import java.util.List;
 public class VillagerTradeEmiRecipe implements EmiRecipe {
 
     private static final int WIDTH = 158;
-    private static final int HEIGHT = 30;
+    private static final int HEIGHT = 50;
 
     private final TradeIndexEntry entry;
     private final ResourceLocation id;
@@ -77,16 +77,6 @@ public class VillagerTradeEmiRecipe implements EmiRecipe {
                 ? TradeIndexLabels.levelLabel(entry.level())
                 : TradeIndexLabels.tierLabel(entry.minScore().orElse(0));
 
-        List<Component> tooltipLines = new ArrayList<>();
-        tooltipLines.add(Component.translatable("mercantile.trade_index.tooltip.sold_by", professionLabel));
-        if (entry.level() > 0) {
-            tooltipLines.add(Component.translatable("mercantile.trade_index.tooltip.level", levelLabel));
-        }
-        Component badge = TradeIndexLabels.sourceBadge(entry.source(), entry.minScore());
-        if (badge != Component.empty() && !badge.getString().isEmpty()) {
-            tooltipLines.add(badge);
-        }
-
         int y = 6;
         int x = 0;
 
@@ -102,29 +92,31 @@ public class VillagerTradeEmiRecipe implements EmiRecipe {
                     .drawBack(false)
                     .catalyst(true)
                     .appendTooltip(workstation.getHoverName());
-            tooltipLines.add(Component.translatable("mercantile.trade_index.tooltip.workstation",
-                    workstation.getHoverName()));
             x += 20;
         }
 
         widgets.addSlot(inputs.get(0), x, y);
-        x += 18;
+        x += 20;
 
         if (inputs.size() > 1) {
             widgets.addText(Component.literal("+"), x + 2, y + 5, 0xFFFFFF, true);
             x += 8;
             widgets.addSlot(inputs.get(1), x, y);
-            x += 18;
+            x += 20;
         }
 
         widgets.addFillingArrow(x, y + 1, 1000);
         x += 24;
 
         widgets.addSlot(outputs.get(0), x, y).recipeContext(this);
-        x += 22;
 
-        widgets.addText(levelLabel.copy().getVisualOrderText(), x, y + 5, 0xFFFFFF, true);
-        widgets.addTooltipText(tooltipLines, 0, 0, WIDTH, HEIGHT);
+        widgets.addText(levelLabel.getVisualOrderText(), 0, y + 22, 0x404040, false);
+
+        if (entry.minScore().isPresent()) {
+            Component repLabel = Component.translatable("mercantile.trade_index.requires_reputation",
+                    TradeIndexLabels.tierLabel(entry.minScore().getAsInt()));
+            widgets.addText(repLabel.getVisualOrderText(), 0, y + 33, 0x404040, false);
+        }
     }
 
     private static String signature(TradeIndexEntry e, int suffix) {

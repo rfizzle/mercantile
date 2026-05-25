@@ -225,6 +225,8 @@
           <ul class="list-disc list-inside text-sm text-ash leading-relaxed space-y-1 ml-2">
             <li>Trade-cycling button renamed from "Cycle Trades" to <strong class="text-bone">"Re-roll Trades"</strong> and redrawn as a labeled text button inside the villager info panel — no more separate icon sprite, and the button is hidden entirely when the villager's profession is locked (S-049).</li>
             <li>Price-breakdown tooltip (demand transparency) no longer overlaps the trade-cycling button tooltip or the info panel — hit-testing now sits on the trade-offer button itself instead of approximating slot bounds (S-049).</li>
+            <li>Jade/WTHIT villager tooltip slimmed down: breeding state is now a single color-coded line (Ready / Hungry / Needs bed / Cooldown / Growing) with a <code class="text-bone">Food: have/needed</code> progress line only when hungry. Removed the redundant <em>Hungry</em> state icon (the breeding line already covers it) and the <em>Profession: Locked/Unlocked</em> line (lock state lives in the in-game trade screen) (S-051, B-095).</li>
+            <li>EMI/REI/JEI trade-index rows redesigned to a clean three-row layout: icon strip with uniform 20px slot pitch on row 1, trade level on row 2, and a <code class="text-bone">Requires &lt;tier&gt;</code> line on row 3 for reputation-locked trades. Removed the stacked "Sold by" / "Workstation" / tier-badge labels below the strip (the same context is in the slot hover tooltips). The profession head item now shows the profession name on hover instead of vanilla's "'s head" fallback (S-051, B-096).</li>
           </ul>
         </article>
 

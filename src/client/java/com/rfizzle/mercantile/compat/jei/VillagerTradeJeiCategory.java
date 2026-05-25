@@ -83,11 +83,11 @@ public class VillagerTradeJeiCategory implements IRecipeCategory<TradeIndexEntry
         }
 
         builder.addSlot(RecipeIngredientRole.INPUT, x, y).addItemStack(entry.inputA());
-        x += 18;
+        x += 20;
         if (!entry.inputB().isEmpty()) {
             x += 8;
             builder.addSlot(RecipeIngredientRole.INPUT, x, y).addItemStack(entry.inputB());
-            x += 18;
+            x += 20;
         }
         x += 24;
 
@@ -99,40 +99,26 @@ public class VillagerTradeJeiCategory implements IRecipeCategory<TradeIndexEntry
                      GuiGraphics graphics, double mouseX, double mouseY) {
         Font font = Minecraft.getInstance().font;
 
-        Component professionLabel = TradeIndexLabels.professionLabel(entry.profession());
         Component levelLabel = entry.level() > 0
                 ? TradeIndexLabels.levelLabel(entry.level())
                 : TradeIndexLabels.tierLabel(entry.minScore().orElse(0));
         boolean hasWorkstation = !entry.workstation().isEmpty();
 
-        int textY = HEIGHT - 22;
-        graphics.drawString(font,
-                Component.translatable("mercantile.trade_index.tooltip.sold_by", professionLabel),
-                0, textY, 0x404040, false);
+        graphics.drawString(font, levelLabel, 0, 28, 0x404040, false);
 
-        if (!levelLabel.getString().isEmpty()) {
-            graphics.drawString(font, levelLabel, 0, textY + 10, 0x404040, false);
-        }
-
-        Component badge = TradeIndexLabels.sourceBadge(entry.source(), entry.minScore());
-        if (!badge.getString().isEmpty()) {
-            int badgeWidth = font.width(badge);
-            graphics.drawString(font, badge, WIDTH - badgeWidth, textY + 10, 0xAA0000, false);
-        }
-
-        if (hasWorkstation) {
-            Component workstationLine = Component.translatable(
-                    "mercantile.trade_index.tooltip.workstation", entry.workstation().getHoverName());
-            graphics.drawString(font, workstationLine, 0, textY - 10, 0x404040, false);
+        if (entry.minScore().isPresent()) {
+            Component repLabel = Component.translatable("mercantile.trade_index.requires_reputation",
+                    TradeIndexLabels.tierLabel(entry.minScore().getAsInt()));
+            graphics.drawString(font, repLabel, 0, 39, 0x404040, false);
         }
 
         int slotOffset = hasWorkstation ? 20 : 0;
-        int x = 38 + slotOffset;
+        int x = 40 + slotOffset;
         if (!entry.inputB().isEmpty()) {
             graphics.drawString(font, "+", x, 9, 0xFFFFFF, true);
         }
 
-        int arrowX = x + (entry.inputB().isEmpty() ? 0 : 26);
+        int arrowX = x + (entry.inputB().isEmpty() ? 0 : 28);
         graphics.drawString(font, "→", arrowX, 9, 0xFFFFFF, true);
     }
 }

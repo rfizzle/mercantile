@@ -28,7 +28,7 @@ import java.util.Set;
 public class StateIndicatorGameTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
-    public void unemployedFreshVillagerNeedsBedAndIsHungry(GameTestHelper helper) {
+    public void unemployedFreshVillagerNeedsBed(GameTestHelper helper) {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
         villager.getBrain().eraseMemory(MemoryModuleType.HOME);
         villager.getBrain().eraseMemory(MemoryModuleType.JOB_SITE);
@@ -38,7 +38,6 @@ public class StateIndicatorGameTest implements FabricGameTest {
 
         Set<String> states = readStates(tag);
         helper.assertTrue(states.contains(StateIndicatorData.STATE_NEEDS_BED), "needs_bed present");
-        helper.assertTrue(states.contains(StateIndicatorData.STATE_HUNGRY), "hungry present");
         helper.assertFalse(states.contains(StateIndicatorData.STATE_NEEDS_WORKSTATION),
                 "unemployed should not need workstation");
         helper.succeed();
@@ -83,8 +82,6 @@ public class StateIndicatorGameTest implements FabricGameTest {
                 "has bed");
         helper.assertFalse(states.contains(StateIndicatorData.STATE_NEEDS_WORKSTATION),
                 "has workstation");
-        helper.assertFalse(states.contains(StateIndicatorData.STATE_HUNGRY),
-                "has food");
         helper.succeed();
     }
 
@@ -137,14 +134,13 @@ public class StateIndicatorGameTest implements FabricGameTest {
         StateIndicatorData.write(tag, villager);
 
         ListTag list = tag.getList(StateIndicatorData.KEY_STATES, Tag.TAG_STRING);
-        helper.assertTrue(list.size() >= 4, "expected at least 4 states, got " + list.size());
+        helper.assertTrue(list.size() >= 3, "expected at least 3 states, got " + list.size());
 
         Set<String> states = readStates(tag);
         helper.assertTrue(states.contains(StateIndicatorData.STATE_TRADING), "trading present");
         helper.assertTrue(states.contains(StateIndicatorData.STATE_NEEDS_BED), "needs_bed present");
         helper.assertTrue(states.contains(StateIndicatorData.STATE_NEEDS_WORKSTATION),
                 "needs_workstation present");
-        helper.assertTrue(states.contains(StateIndicatorData.STATE_HUNGRY), "hungry present");
 
         helper.assertValueEqual(list.getString(0), StateIndicatorData.STATE_TRADING,
                 "trading is first by priority");

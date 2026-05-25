@@ -14,7 +14,6 @@ public class MercantileJadePlugin implements IWailaPlugin {
 
     @Override
     public void register(IWailaCommonRegistration registration) {
-        registration.registerEntityDataProvider(VillagerLockDataProvider.INSTANCE, Villager.class);
         registration.registerEntityDataProvider(StateIndicatorDataProvider.INSTANCE, Villager.class);
         registration.registerEntityDataProvider(BreedingDataProvider.INSTANCE, Villager.class);
         registration.registerBlockDataProvider(SentryPylonDataProvider.INSTANCE, SentryPylonBlockEntity.class);
@@ -23,7 +22,6 @@ public class MercantileJadePlugin implements IWailaPlugin {
 
     @Override
     public void registerClient(IWailaClientRegistration registration) {
-        registration.registerEntityComponent(VillagerLockComponentProvider.INSTANCE, Villager.class);
         registration.registerEntityComponent(StateIndicatorComponentProvider.INSTANCE, Villager.class);
         registration.registerEntityComponent(BreedingComponentProvider.INSTANCE, Villager.class);
         registration.registerBlockComponent(SentryPylonComponentProvider.INSTANCE, SentryPylonBlock.class);

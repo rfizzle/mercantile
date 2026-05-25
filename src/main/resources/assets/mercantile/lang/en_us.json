@@ -190,29 +190,25 @@
     "tooltip.mercantile.sentry_golem.despawn": "Despawn in: %ss",
     "tooltip.mercantile.sentry_golem.no_drops": "No Drops",
 
-    "tooltip.mercantile.breeding.willing": "Willing to breed",
-    "tooltip.mercantile.breeding.not_willing": "Not willing",
-    "tooltip.mercantile.breeding.cooldown": "Can breed in: %s",
-    "tooltip.mercantile.breeding.baby_growup": "Grows up in: %s",
-    "tooltip.mercantile.breeding.reason.on_cooldown": "On cooldown",
-    "tooltip.mercantile.breeding.reason.no_bed": "Needs a bed",
-    "tooltip.mercantile.breeding.reason.not_enough_food": "Needs more food",
-    "tooltip.mercantile.breeding.food_header": "Food:",
-    "tooltip.mercantile.breeding.food_line": "  %1$s × %2$s",
-    "tooltip.mercantile.breeding.food_none": "  none",
+    "tooltip.mercantile.breeding.label": "Breeding: %s",
+    "tooltip.mercantile.breeding.state.ready": "Ready",
+    "tooltip.mercantile.breeding.state.hungry": "Hungry",
+    "tooltip.mercantile.breeding.state.needs_bed": "Needs bed",
+    "tooltip.mercantile.breeding.state.cooldown": "Cooldown %s",
+    "tooltip.mercantile.breeding.state.growing": "Growing %s",
+    "tooltip.mercantile.breeding.food_progress": "Food: %s/%s",
 
     "mercantile.config.enableBreedingTooltip": "Enable Breeding Tooltip",
     "mercantile.config.enableBreedingTooltip.tooltip": "Show villager breeding status, cooldown, food, and baby age in Jade/WTHIT tooltips",
 
     "tooltip.mercantile.state.needs_bed": "Needs a bed",
     "tooltip.mercantile.state.needs_workstation": "Needs a workstation",
-    "tooltip.mercantile.state.hungry": "Hungry",
     "tooltip.mercantile.state.wants_to_breed": "Wants to breed",
     "tooltip.mercantile.state.panicking": "Panicking",
     "tooltip.mercantile.state.trading": "Trading with %s",
 
     "mercantile.config.enableStateIndicators": "Enable State Indicators",
-    "mercantile.config.enableStateIndicators.tooltip": "Show villager state icons (needs bed/workstation, hungry, breeding, panicking, trading) in Jade/WTHIT tooltips",
+    "mercantile.config.enableStateIndicators.tooltip": "Show villager state icons (needs bed/workstation, breeding, panicking, trading) in Jade/WTHIT tooltips",
 
     "category.mercantile.villager_trades": "Villager Trades",
     "emi.category.mercantile.villager_trades": "Villager Trades",
@@ -223,7 +219,5 @@
     "mercantile.trade_index.level.5": "Master",
     "mercantile.trade_index.exclusive": "Mercantile",
     "mercantile.trade_index.exclusive_tooltip": "Requires %s reputation or higher",
-    "mercantile.trade_index.tooltip.sold_by": "Sold by %s",
-    "mercantile.trade_index.tooltip.level": "Level: %s",
-    "mercantile.trade_index.tooltip.workstation": "Workstation: %s"
+    "mercantile.trade_index.requires_reputation": "Requires %s"
 }

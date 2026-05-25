@@ -58,10 +58,6 @@ public final class StateIndicatorFormatter {
                         Component.translatable("tooltip.mercantile.state.needs_workstation")
                                 .withStyle(ChatFormatting.YELLOW));
             }
-            case StateIndicatorData.STATE_HUNGRY -> new IndicatorLine(
-                    new ItemStack(Items.BREAD),
-                    Component.translatable("tooltip.mercantile.state.hungry")
-                            .withStyle(ChatFormatting.YELLOW));
             case StateIndicatorData.STATE_WANTS_BREED -> new IndicatorLine(
                     new ItemStack(Items.POPPY),
                     Component.translatable("tooltip.mercantile.state.wants_to_breed")
