@@ -25,7 +25,6 @@ public final class StateIndicatorData {
 
     public static final String STATE_TRADING = "trading";
     public static final String STATE_PANICKING = "panicking";
-    public static final String STATE_NEEDS_BED = "needs_bed";
     public static final String STATE_NEEDS_WORKSTATION = "needs_workstation";
 
     private static final Map<String, Block> PROFESSION_WORKSTATIONS = Map.ofEntries(
@@ -64,10 +63,6 @@ public final class StateIndicatorData {
 
         if (isPanicking(villager)) {
             states.add(STATE_PANICKING);
-        }
-
-        if (!villager.getBrain().hasMemoryValue(MemoryModuleType.HOME)) {
-            states.add(STATE_NEEDS_BED);
         }
 
         VillagerProfession profession = villager.getVillagerData().getProfession();

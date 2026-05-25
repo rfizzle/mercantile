@@ -191,7 +191,6 @@
     "mercantile.config.enableBreedingTooltip": "Enable Breeding Tooltip",
     "mercantile.config.enableBreedingTooltip.tooltip": "Show villager breeding status, cooldown, food, and baby age in Jade/WTHIT tooltips",
 
-    "tooltip.mercantile.state.needs_bed": "Needs a bed",
     "tooltip.mercantile.state.needs_workstation": "Needs a workstation",
     "tooltip.mercantile.state.panicking": "Panicking",
     "tooltip.mercantile.state.trading": "Trading with %s",

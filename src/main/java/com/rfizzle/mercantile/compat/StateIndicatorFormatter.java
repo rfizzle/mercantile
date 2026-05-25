@@ -48,10 +48,6 @@ public final class StateIndicatorFormatter {
                     new ItemStack(Items.BELL),
                     Component.translatable("tooltip.mercantile.state.panicking")
                             .withStyle(ChatFormatting.RED));
-            case StateIndicatorData.STATE_NEEDS_BED -> new IndicatorLine(
-                    new ItemStack(Items.RED_BED),
-                    Component.translatable("tooltip.mercantile.state.needs_bed")
-                            .withStyle(ChatFormatting.YELLOW));
             case StateIndicatorData.STATE_NEEDS_WORKSTATION -> {
                 ItemStack icon = workstationIcon(data);
                 yield new IndicatorLine(icon,

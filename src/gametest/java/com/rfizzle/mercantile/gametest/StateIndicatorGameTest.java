@@ -23,7 +23,7 @@ import java.util.Set;
 public class StateIndicatorGameTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
-    public void unemployedFreshVillagerNeedsBed(GameTestHelper helper) {
+    public void unemployedFreshVillagerHasNoBedState(GameTestHelper helper) {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
         villager.getBrain().eraseMemory(MemoryModuleType.HOME);
         villager.getBrain().eraseMemory(MemoryModuleType.JOB_SITE);
@@ -32,7 +32,7 @@ public class StateIndicatorGameTest implements FabricGameTest {
         StateIndicatorData.write(tag, villager);
 
         Set<String> states = readStates(tag);
-        helper.assertTrue(states.contains(StateIndicatorData.STATE_NEEDS_BED), "needs_bed present");
+        helper.assertFalse(states.contains("needs_bed"), "needs_bed state must not appear");
         helper.assertFalse(states.contains(StateIndicatorData.STATE_NEEDS_WORKSTATION),
                 "unemployed should not need workstation");
         helper.succeed();
@@ -94,7 +94,6 @@ public class StateIndicatorGameTest implements FabricGameTest {
     public void multipleStatesPresentSimultaneously(GameTestHelper helper) {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
         villager.setVillagerData(villager.getVillagerData().setProfession(VillagerProfession.FARMER));
-        villager.getBrain().eraseMemory(MemoryModuleType.HOME);
         villager.getBrain().eraseMemory(MemoryModuleType.JOB_SITE);
 
         ServerPlayer player = helper.makeMockServerPlayerInLevel();
@@ -104,11 +103,10 @@ public class StateIndicatorGameTest implements FabricGameTest {
         StateIndicatorData.write(tag, villager);
 
         ListTag list = tag.getList(StateIndicatorData.KEY_STATES, Tag.TAG_STRING);
-        helper.assertTrue(list.size() >= 3, "expected at least 3 states, got " + list.size());
+        helper.assertTrue(list.size() >= 2, "expected at least 2 states, got " + list.size());
 
         Set<String> states = readStates(tag);
         helper.assertTrue(states.contains(StateIndicatorData.STATE_TRADING), "trading present");
-        helper.assertTrue(states.contains(StateIndicatorData.STATE_NEEDS_BED), "needs_bed present");
         helper.assertTrue(states.contains(StateIndicatorData.STATE_NEEDS_WORKSTATION),
                 "needs_workstation present");
 
