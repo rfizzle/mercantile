@@ -5,7 +5,6 @@ import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.follow.FollowManager;
 import com.rfizzle.mercantile.reputation.ReputationManager;
 import com.rfizzle.mercantile.trade.TradeCycleManager;
-import com.rfizzle.mercantile.visualization.VillageBoundsService;
 import com.rfizzle.mercantile.visualization.WorkstationMapService;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -29,7 +28,6 @@ public class MercantileNetworking {
     // expensive POI queries or trade-pool regeneration.
     private static final Map<UUID, Long> LAST_CYCLE_TRADES_MS = new ConcurrentHashMap<>();
     private static final Map<UUID, Long> LAST_WORKSTATION_MAP_MS = new ConcurrentHashMap<>();
-    private static final Map<UUID, Long> LAST_VILLAGE_BOUNDS_MS = new ConcurrentHashMap<>();
     private static final Map<UUID, Long> LAST_FOLLOW_TOGGLE_MS = new ConcurrentHashMap<>();
 
     private static final long CYCLE_TRADES_COOLDOWN_MS = 500;
@@ -47,7 +45,6 @@ public class MercantileNetworking {
         PayloadTypeRegistry.playC2S().register(CycleTradesC2SPayload.TYPE, CycleTradesC2SPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(FollowVillagerC2SPayload.TYPE, FollowVillagerC2SPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(RequestWorkstationMapC2SPayload.TYPE, RequestWorkstationMapC2SPayload.CODEC);
-        PayloadTypeRegistry.playC2S().register(RequestVillageBoundsC2SPayload.TYPE, RequestVillageBoundsC2SPayload.CODEC);
 
         PayloadTypeRegistry.playS2C().register(SyncReputationS2CPayload.TYPE, SyncReputationS2CPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(FollowStateS2CPayload.TYPE, FollowStateS2CPayload.CODEC);
@@ -56,7 +53,6 @@ public class MercantileNetworking {
         PayloadTypeRegistry.playS2C().register(VillagerInfoPanelS2CPayload.TYPE, VillagerInfoPanelS2CPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(WorkstationMapS2CPayload.TYPE, WorkstationMapS2CPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(BellRingS2CPayload.TYPE, BellRingS2CPayload.CODEC);
-        PayloadTypeRegistry.playS2C().register(VillageBoundsS2CPayload.TYPE, VillageBoundsS2CPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(ConfigSyncS2CPayload.TYPE, ConfigSyncS2CPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(PylonStateS2CPayload.TYPE, PylonStateS2CPayload.CODEC);
     }
@@ -78,11 +74,6 @@ public class MercantileNetworking {
             ServerPlayer player = context.player();
             if (!checkCooldown(LAST_WORKSTATION_MAP_MS, player.getUUID(), REQUEST_QUERY_COOLDOWN_MS)) return;
             player.server.execute(() -> handleRequestWorkstationMap(player));
-        });
-
-        ServerPlayNetworking.registerGlobalReceiver(RequestVillageBoundsC2SPayload.TYPE, (payload, context) -> {
-            ServerPlayer player = context.player();
-            player.server.execute(() -> handleRequestVillageBounds(player));
         });
     }
 
@@ -107,7 +98,6 @@ public class MercantileNetworking {
             UUID id = handler.getPlayer().getUUID();
             LAST_CYCLE_TRADES_MS.remove(id);
             LAST_WORKSTATION_MAP_MS.remove(id);
-            LAST_VILLAGE_BOUNDS_MS.remove(id);
             LAST_FOLLOW_TOGGLE_MS.remove(id);
         });
     }
@@ -168,18 +158,6 @@ public class MercantileNetworking {
         if (player.connection == null) return;
         ServerLevel level = player.serverLevel();
         WorkstationMapS2CPayload payload = WorkstationMapService.build(level, player.blockPosition());
-        ServerPlayNetworking.send(player, payload);
-    }
-
-    // Public so /mercantile village shares the same per-player cooldown as the C2S path —
-    // otherwise a macro'd command can outrun the rate limit that exists precisely because the
-    // POI query is expensive.
-    public static void handleRequestVillageBounds(ServerPlayer player) {
-        if (!MercantileConfig.get().enableVillageBoundaryVis) return;
-        if (player.connection == null) return;
-        if (!checkCooldown(LAST_VILLAGE_BOUNDS_MS, player.getUUID(), REQUEST_QUERY_COOLDOWN_MS)) return;
-        ServerLevel level = player.serverLevel();
-        VillageBoundsS2CPayload payload = VillageBoundsService.build(level, player.blockPosition());
         ServerPlayNetworking.send(player, payload);
     }
 

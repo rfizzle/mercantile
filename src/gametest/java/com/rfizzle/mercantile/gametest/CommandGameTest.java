@@ -4,9 +4,7 @@ import com.mojang.authlib.GameProfile;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
-import com.rfizzle.mercantile.network.VillageBoundsS2CPayload;
 import com.rfizzle.mercantile.reputation.ReputationTier;
-import io.netty.channel.embedded.EmbeddedChannel;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
@@ -29,7 +27,6 @@ public class CommandGameTest implements FabricGameTest {
         var mercantile = dispatcher.getRoot().getChild("mercantile");
         helper.assertTrue(mercantile != null, "/mercantile not registered");
         helper.assertTrue(mercantile.getChild("reputation") != null, "reputation subcommand missing");
-        helper.assertTrue(mercantile.getChild("village") != null, "village subcommand missing");
         helper.assertTrue(mercantile.getChild("reload") != null, "reload subcommand missing");
         helper.succeed();
     }
@@ -44,8 +41,6 @@ public class CommandGameTest implements FabricGameTest {
 
         helper.assertTrue(mercantile.getChild("reputation").canUse(nonOp),
                 "/mercantile reputation should be public");
-        helper.assertTrue(mercantile.getChild("village").canUse(nonOp),
-                "/mercantile village should be public");
 
         helper.assertFalse(mercantile.getChild("reload").canUse(nonOp),
                 "reload should deny non-ops");
@@ -139,63 +134,6 @@ public class CommandGameTest implements FabricGameTest {
         data.setScore(50);
         data.addScore(10);
         helper.assertTrue(data.getScore() == 60, "should not clamp when in range");
-
-        player.discard();
-        helper.succeed();
-    }
-
-    @GameTest(template = EMPTY_STRUCTURE)
-    public void showVillageSendsPayload(GameTestHelper helper) {
-        var server = helper.getLevel().getServer();
-        var dispatcher = server.getCommands().getDispatcher();
-        var player = helper.makeMockServerPlayerInLevel();
-
-        EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
-        channel.outboundMessages().clear();
-
-        boolean saved = MercantileConfig.get().enableVillageBoundaryVis;
-        try {
-            MercantileConfig.get().enableVillageBoundaryVis = true;
-            int result;
-            try {
-                result = dispatcher.execute("mercantile village", player.createCommandSourceStack());
-            } catch (com.mojang.brigadier.exceptions.CommandSyntaxException e) {
-                helper.fail("/mercantile village failed to parse: " + e.getMessage());
-                return;
-            }
-            helper.assertTrue(result == 1, "/mercantile village should return 1 (success); got " + result);
-
-            int packetCount = GametestNetUtil.countPayloads(channel, VillageBoundsS2CPayload.class);
-            helper.assertTrue(packetCount == 1,
-                    "Exactly one VillageBoundsS2CPayload should be queued; saw " + packetCount);
-        } finally {
-            MercantileConfig.get().enableVillageBoundaryVis = saved;
-        }
-
-        player.discard();
-        helper.succeed();
-    }
-
-    @GameTest(template = EMPTY_STRUCTURE)
-    public void showVillageReturnsZeroWhenConfigDisabled(GameTestHelper helper) {
-        var server = helper.getLevel().getServer();
-        var dispatcher = server.getCommands().getDispatcher();
-        var player = helper.makeMockServerPlayerInLevel();
-
-        boolean saved = MercantileConfig.get().enableVillageBoundaryVis;
-        try {
-            MercantileConfig.get().enableVillageBoundaryVis = false;
-            int result;
-            try {
-                result = dispatcher.execute("mercantile village", player.createCommandSourceStack());
-            } catch (com.mojang.brigadier.exceptions.CommandSyntaxException e) {
-                helper.fail("/mercantile village failed to parse: " + e.getMessage());
-                return;
-            }
-            helper.assertTrue(result == 0, "/mercantile village should return 0 when disabled; got " + result);
-        } finally {
-            MercantileConfig.get().enableVillageBoundaryVis = saved;
-        }
 
         player.discard();
         helper.succeed();

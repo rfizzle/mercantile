@@ -50,11 +50,6 @@ replacing workstations.*
 *The Sentry Pylon — an iron-fueled defense block that summons temporary iron
 golems when hostiles approach.*
 
-![Village boundary visualization](https://mercantile.rfizzle.com/screenshots/village-boundary.png)
-
-*Hold a bell to see the village center, boundary, and every claimed bed,
-workstation, and bell as colored particles.*
-
 ## Features
 
 ### Villager Pickup
@@ -154,9 +149,6 @@ level; a redstone signal disables the pylon entirely.
 - **Bell radius** — hold a bell to see its 48-block gathering area as a
   particle circle on the ground. Ring a placed bell to highlight every
   villager in range.
-- **Village boundary** — hold a bell or run `/mercantile village` to see the
-  village center, its bounding box, and every claimed POI color-coded by
-  type (blue = bed, yellow = workstation, green = bell).
 
 ### Trade Index (EMI / REI / JEI)
 

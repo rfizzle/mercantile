@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Commands — Mercantile | Villager Overhaul for Minecraft</title>
-  <meta name="description" content="The /mercantile command tree: reputation queries and management, village boundary toggle, and config reload.">
+  <meta name="description" content="The /mercantile command tree: reputation queries and management, and config reload.">
 
   <!-- Canonical -->
   <link rel="canonical" href="https://mercantile.rfizzle.com/commands.html">
@@ -17,7 +17,7 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Mercantile">
   <meta property="og:title" content="Commands — Mercantile">
-  <meta property="og:description" content="The /mercantile command tree: reputation queries and management, village boundary toggle, and config reload.">
+  <meta property="og:description" content="The /mercantile command tree: reputation queries and management, and config reload.">
   <meta property="og:url" content="https://mercantile.rfizzle.com/commands.html">
   <meta property="og:image" content="https://mercantile.rfizzle.com/og-image.png">
   <meta property="og:image:width" content="1200">
@@ -27,7 +27,7 @@
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Commands — Mercantile">
-  <meta name="twitter:description" content="The /mercantile command tree: reputation queries and management, village boundary toggle, and config reload.">
+  <meta name="twitter:description" content="The /mercantile command tree: reputation queries and management, and config reload.">
   <meta name="twitter:image" content="https://mercantile.rfizzle.com/og-image.png">
 
   <!-- Icons -->
@@ -128,19 +128,6 @@
             <pre class="bg-ink border border-elevated rounded-md p-3 text-xs md:text-sm text-emerald overflow-x-auto"><code>/mercantile reputation add &lt;player&gt; &lt;value&gt;</code></pre>
             <p class="text-sm text-ash leading-relaxed mt-3">Op-restricted. Adds (or subtracts, with a negative value) to the current score, then clamps to <code class="text-bone">[−100, 200]</code>. The <code class="text-bone">&lt;value&gt;</code> argument is bounded to <code class="text-bone">[−300, 300]</code> — wide enough to traverse the full range in one call, narrow enough to reject parser overflow.</p>
             <p class="text-smoke text-xs mt-2"><strong class="text-bone">Example:</strong> <code>/mercantile reputation add Steve -50</code> → "Added -50 to Steve's reputation: 50 (Trusted)"</p>
-          </article>
-        </section>
-
-        <!-- /mercantile village -->
-        <section class="mb-12">
-          <h2 class="text-xl md:text-2xl font-bold mb-4 heading-gradient">/mercantile village</h2>
-
-          <article class="bg-card border border-elevated rounded-lg p-5">
-            <h3 class="text-base font-semibold text-bone mb-2">Visualize the village boundary</h3>
-            <pre class="bg-ink border border-elevated rounded-md p-3 text-xs md:text-sm text-emerald overflow-x-auto"><code>/mercantile village</code></pre>
-            <p class="text-sm text-ash leading-relaxed mt-3">No permission required. Triggers a one-shot village boundary + POI visualization independent of whether you're holding a bell. Requires the client setting <code class="text-bone">enableVillageBoundaryVis</code>; if it's off, the command fails with an explanatory message.</p>
-            <p class="text-sm text-ash leading-relaxed mt-3">The query is rate-limited per player to prevent spam (shared cooldown with the C2S packet that the held-bell visualization uses). A rate-limited call no-ops on the wire but still reports "shown" to the user.</p>
-            <p class="text-smoke text-xs mt-2"><strong class="text-bone">Example:</strong> <code>/mercantile village</code> → "Village boundary visualization shown."</p>
           </article>
         </section>
 

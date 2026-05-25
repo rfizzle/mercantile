@@ -37,7 +37,6 @@
   "villagerSoundVolume": 1.0,
   "enableWorkstationVis": true,
   "enableBellRadiusVis": true,
-  "enableVillageBoundaryVis": true,
   "enableInfoPanel": true,
   "enableReputationHud": true
 }

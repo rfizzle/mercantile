@@ -84,7 +84,6 @@ public class MercantileConfig {
     public float villagerSoundVolume = 1.0f;
     public boolean enableWorkstationVis = true;
     public boolean enableBellRadiusVis = true;
-    public boolean enableVillageBoundaryVis = true;
     public boolean enableInfoPanel = true;
     public boolean enableReputationHud = true;
 

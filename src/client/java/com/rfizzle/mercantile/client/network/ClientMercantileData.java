@@ -20,7 +20,6 @@ public class ClientMercantileData {
     private static @Nullable VillagerInfoPanelS2CPayload villagerInfo;
 
     private static @Nullable WorkstationMapS2CPayload workstationMap;
-    private static @Nullable VillageBoundsS2CPayload villageBounds;
 
     private static final Map<Integer, Boolean> followStates = new HashMap<>();
     private static final Map<BlockPos, PylonStateS2CPayload> pylonStates = new HashMap<>();
@@ -126,14 +125,6 @@ public class ClientMercantileData {
         workstationMap = payload;
     }
 
-    public static @Nullable VillageBoundsS2CPayload getVillageBounds() {
-        return villageBounds;
-    }
-
-    public static void setVillageBounds(@Nullable VillageBoundsS2CPayload payload) {
-        villageBounds = payload;
-    }
-
     // --- Follow state ---
 
     public static boolean isFollowing(int entityId) {
@@ -177,7 +168,6 @@ public class ClientMercantileData {
         demandPrice = null;
         villagerInfo = null;
         workstationMap = null;
-        villageBounds = null;
         followStates.clear();
         pylonStates.clear();
         serverConfig = null;

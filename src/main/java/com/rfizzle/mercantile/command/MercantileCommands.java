@@ -6,7 +6,6 @@ import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
 import com.rfizzle.mercantile.network.ConfigSyncS2CPayload;
-import com.rfizzle.mercantile.network.MercantileNetworking;
 import com.rfizzle.mercantile.reputation.ReputationManager;
 import com.rfizzle.mercantile.reputation.ReputationTier;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -56,8 +55,6 @@ public final class MercantileCommands {
                                 .requires(src -> src.hasPermission(2))
                                 .executes(ctx -> showPlayerReputation(ctx.getSource(),
                                         EntityArgument.getPlayer(ctx, "player")))))
-                .then(Commands.literal("village")
-                        .executes(ctx -> showVillage(ctx.getSource())))
                 .then(Commands.literal("reload")
                         .requires(src -> src.hasPermission(2))
                         .executes(ctx -> reloadConfig(ctx.getSource()))));
@@ -111,24 +108,6 @@ public final class MercantileCommands {
         source.sendSuccess(() -> Component.translatable("command.mercantile.reputation.add",
                 amount, target.getDisplayName(), newScore, tier), true);
         return newScore;
-    }
-
-    private static int showVillage(CommandSourceStack source) {
-        ServerPlayer player = source.getPlayer();
-        if (player == null) {
-            source.sendFailure(Component.translatable("command.mercantile.village.not_player"));
-            return 0;
-        }
-        if (!MercantileConfig.get().enableVillageBoundaryVis) {
-            source.sendFailure(Component.translatable("command.mercantile.village.disabled"));
-            return 0;
-        }
-        // Shares the per-player cooldown enforced on the C2S packet path. A rate-limited
-        // command call no-ops on the wire side but still reports "shown" to the user; the
-        // toggle window from the most recent successful query is still active client-side.
-        MercantileNetworking.handleRequestVillageBounds(player);
-        source.sendSuccess(() -> Component.translatable("command.mercantile.village.shown"), false);
-        return 1;
     }
 
     private static int reloadConfig(CommandSourceStack source) {

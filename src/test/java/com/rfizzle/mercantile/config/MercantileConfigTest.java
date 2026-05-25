@@ -53,7 +53,6 @@ class MercantileConfigTest {
         assertEquals(1.0f, config.villagerSoundVolume);
         assertTrue(config.enableWorkstationVis);
         assertTrue(config.enableBellRadiusVis);
-        assertTrue(config.enableVillageBoundaryVis);
         assertTrue(config.enableInfoPanel);
         assertTrue(config.enableReputationHud);
     }

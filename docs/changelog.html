@@ -152,7 +152,6 @@
           <ul class="list-disc list-inside text-sm text-ash leading-relaxed space-y-1 ml-2">
             <li>Workstation link visualization while holding a bell, profession-colored particle lines (S-019).</li>
             <li>Bell radius visualization with 48-block gold circle + ring highlight (S-020).</li>
-            <li>Village boundary, centroid, and color-coded POI markers (S-021).</li>
           </ul>
 
           <p class="text-bone text-sm font-semibold mt-4 mb-1">Mod Integrations (E-008)</p>
@@ -203,7 +202,7 @@
             <li>Trade cycling syncs offers after exclusive trade injection so clients see the full updated list immediately (S-031).</li>
             <li>Door-mixin reentrancy guard and pathfinding fence-gate tracking fixed to prevent stack overflow and leaked gate refs (S-030).</li>
             <li>Phantom client-side follow particles cleared by routing UUID-based stop through <code class="text-bone">ENTITY_UNLOAD</code> on the live <code class="text-bone">Villager</code> instance (S-032).</li>
-            <li>Network payload size guards added to <code class="text-bone">ConfigSyncS2CPayload</code>, <code class="text-bone">VillageBoundsS2CPayload</code>, and <code class="text-bone">WorkstationMapS2CPayload</code>; per-player cooldowns on C2S request packets (S-029).</li>
+            <li>Network payload size guards added to <code class="text-bone">ConfigSyncS2CPayload</code> and <code class="text-bone">WorkstationMapS2CPayload</code>; per-player cooldowns on C2S request packets (S-029).</li>
             <li>Build cleanup: deduplicated <code class="text-bone">loom {}</code> blocks, added timeout to <code class="text-bone">runGitDescribe.proc.waitFor()</code> (S-035).</li>
             <li>Reputation HUD overlay now actually renders near villagers — initial scan-tick value overflowed and suppressed every frame's proximity scan (S-046).</li>
             <li>EMI villager-trade category now shows its translated name instead of the raw <code class="text-bone">emi.category.mercantile.villager_trades</code> key (S-046).</li>
@@ -227,6 +226,7 @@
           <ul class="list-disc list-inside text-sm text-ash leading-relaxed space-y-1 ml-2">
             <li>Double-door / fence-gate sync removed — the feature was out of scope for the villager/trade overhaul and overlaps with dedicated QoL mods. The <code class="text-bone">enableDoubleDoorSync</code> config key no longer exists (S-058).</li>
             <li>Hotbar / offhand stack refill removed — out of scope for the villager/trade overhaul; overlaps with dedicated QoL mods players already install. The <code class="text-bone">enableStackRefill</code> config key no longer exists (S-058).</li>
+            <li>Village boundary visualization removed — the debug-overlay centroid column, AABB outline, and POI dust markers were out of scope for the villager/trade overhaul and shipped a buggy sky-spire rendering at the village centroid. The <code class="text-bone">enableVillageBoundaryVis</code> config key and <code class="text-bone">/mercantile village</code> command no longer exist (S-059).</li>
           </ul>
 
           <h3 class="text-base font-semibold text-emerald mb-2 mt-6 uppercase tracking-wider">Changed</h3>

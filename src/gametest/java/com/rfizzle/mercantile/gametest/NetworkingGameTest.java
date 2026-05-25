@@ -12,7 +12,6 @@ import net.minecraft.world.entity.npc.Villager;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 public class NetworkingGameTest implements FabricGameTest {
@@ -34,19 +33,6 @@ public class NetworkingGameTest implements FabricGameTest {
         VillagerInfoPanelS2CPayload decoded = VillagerInfoPanelS2CPayload.CODEC.decode(buf);
         helper.assertTrue(decoded.villagerEntityId() == villager.getId(),
                 "decoded entity ID should match spawned villager");
-
-        buf.clear();
-
-        var boundsPayload = new VillageBoundsS2CPayload(
-                helper.absolutePos(BlockPos.ZERO),
-                helper.absolutePos(new BlockPos(-10, 0, -10)),
-                helper.absolutePos(new BlockPos(10, 10, 10)),
-                List.of(new VillageBoundsS2CPayload.PoiEntry(
-                        helper.absolutePos(BlockPos.ZERO), "bell", Optional.empty())));
-        VillageBoundsS2CPayload.CODEC.encode(buf, boundsPayload);
-        VillageBoundsS2CPayload decodedBounds = VillageBoundsS2CPayload.CODEC.decode(buf);
-        helper.assertTrue(decodedBounds.pois().size() == 1,
-                "decoded bounds should contain one POI");
 
         buf.clear();
 

@@ -259,11 +259,6 @@ public class ModMenuIntegration implements ModMenuApi {
                     .setTooltip(Component.translatable("mercantile.config.enableBellRadiusVis.tooltip"))
                     .setSaveConsumer(v -> config.enableBellRadiusVis = v)
                     .build());
-            client.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableVillageBoundaryVis"), config.enableVillageBoundaryVis)
-                    .setDefaultValue(defaults.enableVillageBoundaryVis)
-                    .setTooltip(Component.translatable("mercantile.config.enableVillageBoundaryVis.tooltip"))
-                    .setSaveConsumer(v -> config.enableVillageBoundaryVis = v)
-                    .build());
             client.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableInfoPanel"), config.enableInfoPanel)
                     .setDefaultValue(defaults.enableInfoPanel)
                     .setTooltip(Component.translatable("mercantile.config.enableInfoPanel.tooltip"))

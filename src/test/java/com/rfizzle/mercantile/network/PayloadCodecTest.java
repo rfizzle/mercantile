@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -49,12 +48,6 @@ class PayloadCodecTest {
     void requestWorkstationMapC2SEmpty() {
         var original = new RequestWorkstationMapC2SPayload();
         assertEquals(original, roundTrip(RequestWorkstationMapC2SPayload.CODEC, original));
-    }
-
-    @Test
-    void requestVillageBoundsC2SEmpty() {
-        var original = new RequestVillageBoundsC2SPayload();
-        assertEquals(original, roundTrip(RequestVillageBoundsC2SPayload.CODEC, original));
     }
 
     // --- S2C payloads ---
@@ -203,50 +196,6 @@ class PayloadCodecTest {
     }
 
     @Test
-    void villageBoundsS2CMixedPois() {
-        var pois = List.of(
-                new VillageBoundsS2CPayload.PoiEntry(
-                        new BlockPos(10, 64, 10), "workstation",
-                        Optional.of(new BlockPos(12, 64, 10))),
-                new VillageBoundsS2CPayload.PoiEntry(
-                        new BlockPos(20, 64, 20), "bed",
-                        Optional.empty()),
-                new VillageBoundsS2CPayload.PoiEntry(
-                        new BlockPos(15, 64, 15), "bell",
-                        Optional.of(new BlockPos(14, 64, 15)))
-        );
-        var original = new VillageBoundsS2CPayload(
-                new BlockPos(15, 64, 15),
-                new BlockPos(0, 54, 0),
-                new BlockPos(30, 74, 30),
-                pois);
-        assertEquals(original, roundTrip(VillageBoundsS2CPayload.CODEC, original));
-    }
-
-    @Test
-    void villageBoundsS2CAllUnclaimed() {
-        var pois = List.of(
-                new VillageBoundsS2CPayload.PoiEntry(
-                        new BlockPos(0, 64, 0), "bed", Optional.empty()),
-                new VillageBoundsS2CPayload.PoiEntry(
-                        new BlockPos(5, 64, 5), "workstation", Optional.empty())
-        );
-        var original = new VillageBoundsS2CPayload(
-                new BlockPos(2, 64, 2),
-                new BlockPos(-10, 54, -10),
-                new BlockPos(15, 74, 15),
-                pois);
-        assertEquals(original, roundTrip(VillageBoundsS2CPayload.CODEC, original));
-    }
-
-    @Test
-    void villageBoundsS2CEmptyPois() {
-        var original = new VillageBoundsS2CPayload(
-                BlockPos.ZERO, BlockPos.ZERO, BlockPos.ZERO, List.of());
-        assertEquals(original, roundTrip(VillageBoundsS2CPayload.CODEC, original));
-    }
-
-    @Test
     void configSyncS2C() {
         var original = new ConfigSyncS2CPayload(
                 "{\"enableTradeCycling\":true,\"tradeCycleEmeraldCost\":6}");
@@ -283,37 +232,6 @@ class PayloadCodecTest {
         var payload = new ConfigSyncS2CPayload(oversized);
         FriendlyByteBuf buf = buf();
         assertThrows(EncoderException.class, () -> ConfigSyncS2CPayload.CODEC.encode(buf, payload));
-    }
-
-    @Test
-    void villageBoundsS2CRejectsTooManyPois() {
-        List<VillageBoundsS2CPayload.PoiEntry> pois = new java.util.ArrayList<>(VillageBoundsS2CPayload.MAX_POIS + 1);
-        for (int i = 0; i < VillageBoundsS2CPayload.MAX_POIS + 1; i++) {
-            pois.add(new VillageBoundsS2CPayload.PoiEntry(new BlockPos(i, 64, i), "bed", Optional.empty()));
-        }
-        var payload = new VillageBoundsS2CPayload(BlockPos.ZERO, BlockPos.ZERO, BlockPos.ZERO, pois);
-        FriendlyByteBuf buf = buf();
-        assertThrows(EncoderException.class, () -> VillageBoundsS2CPayload.CODEC.encode(buf, payload));
-    }
-
-    @Test
-    void villageBoundsS2CRejectsOversizedPoiType() {
-        String hugeType = "x".repeat(VillageBoundsS2CPayload.MAX_POI_TYPE_LEN + 1);
-        var pois = List.of(new VillageBoundsS2CPayload.PoiEntry(
-                new BlockPos(0, 64, 0), hugeType, Optional.empty()));
-        var payload = new VillageBoundsS2CPayload(BlockPos.ZERO, BlockPos.ZERO, BlockPos.ZERO, pois);
-        FriendlyByteBuf buf = buf();
-        assertThrows(EncoderException.class, () -> VillageBoundsS2CPayload.CODEC.encode(buf, payload));
-    }
-
-    @Test
-    void villageBoundsS2CDecodeRejectsBogusSize() {
-        FriendlyByteBuf buf = buf();
-        buf.writeBlockPos(BlockPos.ZERO);
-        buf.writeBlockPos(BlockPos.ZERO);
-        buf.writeBlockPos(BlockPos.ZERO);
-        buf.writeVarInt(Integer.MAX_VALUE);
-        assertThrows(DecoderException.class, () -> VillageBoundsS2CPayload.CODEC.decode(buf));
     }
 
     @Test
@@ -378,7 +296,6 @@ class PayloadCodecTest {
         assertEquals(CycleTradesC2SPayload.TYPE, new CycleTradesC2SPayload(0).type());
         assertEquals(FollowVillagerC2SPayload.TYPE, new FollowVillagerC2SPayload(0).type());
         assertEquals(RequestWorkstationMapC2SPayload.TYPE, new RequestWorkstationMapC2SPayload().type());
-        assertEquals(RequestVillageBoundsC2SPayload.TYPE, new RequestVillageBoundsC2SPayload().type());
         assertEquals(SyncReputationS2CPayload.TYPE, new SyncReputationS2CPayload(0, "", 0, 0).type());
         assertEquals(FollowStateS2CPayload.TYPE, new FollowStateS2CPayload(0, false).type());
         assertEquals(RestockTimerS2CPayload.TYPE, new RestockTimerS2CPayload(0, 0, 0, false).type());
@@ -386,8 +303,6 @@ class PayloadCodecTest {
         assertEquals(VillagerInfoPanelS2CPayload.TYPE,
                 new VillagerInfoPanelS2CPayload(0, "", 0, 0, 0, 0, "", 0, false, false).type());
         assertEquals(WorkstationMapS2CPayload.TYPE, new WorkstationMapS2CPayload(Map.of(), List.of(), List.of()).type());
-        assertEquals(VillageBoundsS2CPayload.TYPE,
-                new VillageBoundsS2CPayload(BlockPos.ZERO, BlockPos.ZERO, BlockPos.ZERO, List.of()).type());
         assertEquals(ConfigSyncS2CPayload.TYPE, new ConfigSyncS2CPayload("").type());
         assertEquals(PylonStateS2CPayload.TYPE,
                 new PylonStateS2CPayload(BlockPos.ZERO, 0, 0, false, false).type());

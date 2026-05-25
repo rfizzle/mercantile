@@ -2,7 +2,6 @@ package com.rfizzle.mercantile.client.network;
 
 import com.rfizzle.mercantile.client.visualization.BellGlowTracker;
 import com.rfizzle.mercantile.client.visualization.BellRadiusRenderer;
-import com.rfizzle.mercantile.client.visualization.VillageBoundsRenderer;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.network.*;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -40,13 +39,6 @@ public class ClientNetworkHandler {
         ClientPlayNetworking.registerGlobalReceiver(WorkstationMapS2CPayload.TYPE, (payload, context) -> {
             context.client().execute(() ->
                     ClientMercantileData.setWorkstationMap(payload));
-        });
-
-        ClientPlayNetworking.registerGlobalReceiver(VillageBoundsS2CPayload.TYPE, (payload, context) -> {
-            context.client().execute(() -> {
-                ClientMercantileData.setVillageBounds(payload);
-                VillageBoundsRenderer.notePacketArrived();
-            });
         });
 
         ClientPlayNetworking.registerGlobalReceiver(ConfigSyncS2CPayload.TYPE, (payload, context) -> {
