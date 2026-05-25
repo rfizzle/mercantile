@@ -8,6 +8,7 @@
         "AreaEffectCloudAccessor",
         "AreaEffectCloudMixin",
         "BellBlockMixin",
+        "DoorBlockAccessor",
         "DoorBlockMixin",
         "FenceGateBlockAccessor",
         "FenceGateBlockMixin",

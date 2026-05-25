@@ -53,6 +53,15 @@ public class DoubleDoorSyncGameTest implements FabricGameTest {
         helper.setBlock(RIGHT, gate);
     }
 
+    private static void placeVerticalFenceGatePair(GameTestHelper helper, boolean open) {
+        BlockState gate = Blocks.OAK_FENCE_GATE.defaultBlockState()
+                .setValue(FenceGateBlock.FACING, Direction.NORTH)
+                .setValue(FenceGateBlock.OPEN, open)
+                .setValue(FenceGateBlock.POWERED, false);
+        helper.setBlock(LEFT, gate);
+        helper.setBlock(LEFT_UPPER, gate);
+    }
+
     private static BlockHitResult hitAt(GameTestHelper helper, BlockPos relative) {
         BlockPos abs = helper.absolutePos(relative);
         return new BlockHitResult(Vec3.atCenterOf(abs), Direction.UP, abs, false);
@@ -276,5 +285,77 @@ public class DoubleDoorSyncGameTest implements FabricGameTest {
         } finally {
             MercantileConfig.get().enableDoubleDoorSync = saved;
         }
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void playerUseOnDoorSyncsAdjacentDoor(GameTestHelper helper) {
+        buildFloor(helper);
+        placeDoorPair(helper, false);
+
+        ServerPlayer player = spawnPlayerAt(helper, LEFT);
+        BlockState state = helper.getBlockState(LEFT);
+        state.useWithoutItem(helper.getLevel(), player, hitAt(helper, LEFT));
+
+        helper.assertBlockProperty(LEFT, DoorBlock.OPEN, true);
+        helper.assertBlockProperty(LEFT_UPPER, DoorBlock.OPEN, true);
+        helper.assertBlockProperty(RIGHT, DoorBlock.OPEN, true);
+        helper.assertBlockProperty(RIGHT_UPPER, DoorBlock.OPEN, true);
+
+        player.discard();
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void playerUseOnDoorClosesAdjacentDoor(GameTestHelper helper) {
+        buildFloor(helper);
+        placeDoorPair(helper, true);
+
+        ServerPlayer player = spawnPlayerAt(helper, LEFT);
+        BlockState state = helper.getBlockState(LEFT);
+        state.useWithoutItem(helper.getLevel(), player, hitAt(helper, LEFT));
+
+        helper.assertBlockProperty(LEFT, DoorBlock.OPEN, false);
+        helper.assertBlockProperty(LEFT_UPPER, DoorBlock.OPEN, false);
+        helper.assertBlockProperty(RIGHT, DoorBlock.OPEN, false);
+        helper.assertBlockProperty(RIGHT_UPPER, DoorBlock.OPEN, false);
+
+        player.discard();
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void verticalFenceGatePairOpensTogether(GameTestHelper helper) {
+        buildFloor(helper);
+        placeVerticalFenceGatePair(helper, false);
+
+        ServerPlayer player = spawnPlayerAt(helper, LEFT);
+        // Face north so vanilla doesn't flip LEFT's FACING in useWithoutItem.
+        player.setYRot(180f);
+        BlockState state = helper.getBlockState(LEFT);
+        state.useWithoutItem(helper.getLevel(), player, hitAt(helper, LEFT));
+
+        helper.assertBlockProperty(LEFT, FenceGateBlock.OPEN, true);
+        helper.assertBlockProperty(LEFT_UPPER, FenceGateBlock.OPEN, true);
+
+        player.discard();
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void verticalFenceGatePairClosesTogether(GameTestHelper helper) {
+        buildFloor(helper);
+        placeVerticalFenceGatePair(helper, true);
+
+        ServerPlayer player = spawnPlayerAt(helper, LEFT_UPPER);
+        // Face north so vanilla doesn't flip LEFT_UPPER's FACING in useWithoutItem.
+        player.setYRot(180f);
+        BlockState state = helper.getBlockState(LEFT_UPPER);
+        state.useWithoutItem(helper.getLevel(), player, hitAt(helper, LEFT_UPPER));
+
+        helper.assertBlockProperty(LEFT, FenceGateBlock.OPEN, false);
+        helper.assertBlockProperty(LEFT_UPPER, FenceGateBlock.OPEN, false);
+
+        player.discard();
+        helper.succeed();
     }
 }

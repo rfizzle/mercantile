@@ -33,12 +33,14 @@ public abstract class FenceGateBlockMixin {
         boolean open = updatedState.getValue(FenceGateBlock.OPEN);
         Direction facing = updatedState.getValue(FenceGateBlock.FACING);
 
-        Direction[] partnerDirs = { facing.getClockWise(), facing.getCounterClockWise() };
+        Direction[] partnerDirs = { facing.getClockWise(), facing.getCounterClockWise(), Direction.UP, Direction.DOWN };
         for (Direction partnerDir : partnerDirs) {
             BlockPos partnerPos = pos.relative(partnerDir);
             BlockState partnerState = level.getBlockState(partnerPos);
 
             if (!partnerState.is(updatedState.getBlock())) continue;
+            // Use axis comparison rather than exact direction: vanilla may flip the clicked gate's
+            // FACING (NORTH→SOUTH) based on approach direction, so NORTH and SOUTH must still match.
             if (partnerState.getValue(FenceGateBlock.FACING).getAxis() != facing.getAxis()) continue;
             if (partnerState.getValue(FenceGateBlock.POWERED)) continue;
             if (partnerState.getValue(FenceGateBlock.OPEN) == open) continue;

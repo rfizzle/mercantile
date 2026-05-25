@@ -212,6 +212,7 @@
             <li>Jade plugin is now discovered at load time — all Jade tooltips (villager breeding, state indicators, sentry pylon fuel) were silently broken because the <code class="text-bone">jade</code> entrypoint was missing from <code class="text-bone">fabric.mod.json</code> (S-048).</li>
             <li>Trade-screen info overlay (the centered panel that opens via the <code class="text-bone">[i]</code> icon when the window is too narrow for the inline side panel) no longer lets merchant-screen icons, slots, and the XP bar ghost through the panel surface — the overlay panel background is now fully opaque and the surrounding dim is deeper, so text rows read cleanly instead of overlapping background art (S-053, B-099).</li>
             <li>Nitwit profession head no longer ships a watermarked third-party user skin — the trade index now renders the nitwit entry with a clean villager face (reused from the unemployed skin, since vanilla nitwits have no head overlay) (S-054, B-097).</li>
+            <li>Double-door sync now covers the two pair configurations that were silently dropped: two normal doors placed beside each other with mirrored hinges, and two fence gates stacked vertically (same facing, Y±1). Previously only horizontally adjacent fence gates synced (S-055, B-101).</li>
           </ul>
 
           <h3 class="text-base font-semibold text-emerald mb-2 mt-6 uppercase tracking-wider">Added</h3>
