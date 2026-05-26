@@ -8,8 +8,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -17,7 +19,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.PlayerHeadItem;
@@ -56,13 +58,16 @@ public final class VillagerPlacementHandler {
             BlockPos targetPos = hit.getBlockPos().relative(hit.getDirection());
             Vec3 spawnVec = Vec3.atBottomCenterOf(targetPos);
 
-            Villager villager;
+            Mob entity;
             try {
-                villager = EntityType.VILLAGER.create(level);
-                if (villager == null) throw new IllegalStateException("Failed to create villager entity");
-                villager.load(nbt);
+                EntityType<?> chosenType = resolveEntityType(nbt);
+                entity = (Mob) chosenType.create(level);
+                if (entity == null) throw new IllegalStateException("Failed to create entity");
+                entity.load(nbt);
             } catch (Exception e) {
-                Mercantile.LOGGER.warn("Failed to deserialize villager from pickup item; keeping item", e);
+                String storedId = nbt.contains("id") ? nbt.getString("id") : "<missing>";
+                Mercantile.LOGGER.warn("Failed to deserialize entity from pickup item (id={}); keeping item",
+                        storedId, e);
                 ((ServerPlayer) player).displayClientMessage(
                         Component.translatable("mercantile.placement.malformed_nbt")
                                 .withStyle(ChatFormatting.RED),
@@ -74,15 +79,15 @@ public final class VillagerPlacementHandler {
             double dz = player.getZ() - spawnVec.z;
             float yaw = (float) (Mth.atan2(dz, dx) * (180.0 / Math.PI)) - 90.0f;
 
-            villager.moveTo(spawnVec.x, spawnVec.y, spawnVec.z, yaw, 0);
-            villager.setYHeadRot(yaw);
-            villager.setYBodyRot(yaw);
-            villager.setDeltaMovement(Vec3.ZERO);
-            villager.fallDistance = 0;
+            entity.moveTo(spawnVec.x, spawnVec.y, spawnVec.z, yaw, 0);
+            entity.setYHeadRot(yaw);
+            entity.setYBodyRot(yaw);
+            entity.setDeltaMovement(Vec3.ZERO);
+            entity.fallDistance = 0;
 
             stack.shrink(1);
 
-            if (!serverLevel.addFreshEntity(villager)) {
+            if (!serverLevel.addFreshEntity(entity)) {
                 stack.grow(1);
                 return InteractionResult.FAIL;
             }
@@ -100,5 +105,16 @@ public final class VillagerPlacementHandler {
 
             return InteractionResult.SUCCESS;
         });
+    }
+
+    private static EntityType<?> resolveEntityType(CompoundTag nbt) {
+        if (!nbt.contains("id")) return EntityType.VILLAGER;
+        ResourceLocation id = ResourceLocation.tryParse(nbt.getString("id"));
+        if (id == null) return EntityType.VILLAGER;
+        EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.getOptional(id).orElse(null);
+        if (type == EntityType.VILLAGER || type == EntityType.WANDERING_TRADER) {
+            return type;
+        }
+        return EntityType.VILLAGER;
     }
 }
