@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.mixin;
 
+import com.rfizzle.mercantile.Mercantile;
 import com.rfizzle.mercantile.client.network.ClientMercantileData;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.network.CycleTradesC2SPayload;
@@ -35,6 +36,10 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     @Unique
     private static final ResourceLocation UNLOCKED_SPRITE =
             ResourceLocation.withDefaultNamespace("widget/unlocked_button");
+    @Unique
+    private static final ResourceLocation INFO_BUTTON_SPRITE = Mercantile.id("info_button");
+    @Unique
+    private static final ResourceLocation CLOSE_BUTTON_SPRITE = Mercantile.id("close_button");
     @Unique
     private static final int ICON_SIZE = 11;
     @Unique
@@ -80,8 +85,6 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     private static final int INFO_ICON_SIZE = 11;
     @Unique
     private static final int INFO_ICON_BG_COLOR = 0xC0303030;
-    @Unique
-    private static final int INFO_ICON_HOVER_BG_COLOR = 0xC0606060;
     @Unique
     private static final int INFO_ICON_BORDER_COLOR = 0xFF888888;
     @Unique
@@ -208,10 +211,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         }
 
         if (mercantile$infoIconVisible()) {
-            int ix = mercantile$infoIconX();
-            boolean hovered = mouseX >= ix && mouseX < ix + INFO_ICON_SIZE
-                    && mouseY >= LOCK_ICON_Y && mouseY < LOCK_ICON_Y + INFO_ICON_SIZE;
-            mercantile$drawInfoIcon(guiGraphics, ix, LOCK_ICON_Y, hovered);
+            mercantile$drawInfoIcon(guiGraphics, mercantile$infoIconX(), LOCK_ICON_Y);
         }
     }
 
@@ -320,6 +320,11 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
             return;
         }
 
+        // Push above vanilla's Z=100 slot-item pass so inventory/hotbar icons don't
+        // bleed through the opaque panel. Stays below Z=400 so tooltips still win.
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(0.0f, 0.0f, 300.0f);
+
         // Dim the trade screen.
         guiGraphics.fill(0, 0, this.width, this.height, OVERLAY_DIM_COLOR);
 
@@ -344,24 +349,14 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         guiGraphics.fill(cx, cy + CLOSE_BUTTON_SIZE - 1, cx + CLOSE_BUTTON_SIZE, cy + CLOSE_BUTTON_SIZE, INFO_ICON_BORDER_COLOR);
         guiGraphics.fill(cx, cy, cx + 1, cy + CLOSE_BUTTON_SIZE, INFO_ICON_BORDER_COLOR);
         guiGraphics.fill(cx + CLOSE_BUTTON_SIZE - 1, cy, cx + CLOSE_BUTTON_SIZE, cy + CLOSE_BUTTON_SIZE, INFO_ICON_BORDER_COLOR);
-        int charW = this.font.width("x");
-        int charX = cx + (CLOSE_BUTTON_SIZE - charW) / 2;
-        int charY = cy + (CLOSE_BUTTON_SIZE - this.font.lineHeight) / 2 + 1;
-        guiGraphics.drawString(this.font, "x", charX, charY, 0xFFFFFFFF, false);
+        guiGraphics.blitSprite(CLOSE_BUTTON_SPRITE, cx, cy, CLOSE_BUTTON_SIZE, CLOSE_BUTTON_SIZE);
+
+        guiGraphics.pose().popPose();
     }
 
     @Unique
-    private void mercantile$drawInfoIcon(GuiGraphics g, int x, int y, boolean hovered) {
-        int bg = hovered ? INFO_ICON_HOVER_BG_COLOR : INFO_ICON_BG_COLOR;
-        g.fill(x, y, x + INFO_ICON_SIZE, y + INFO_ICON_SIZE, bg);
-        g.fill(x, y, x + INFO_ICON_SIZE, y + 1, INFO_ICON_BORDER_COLOR);
-        g.fill(x, y + INFO_ICON_SIZE - 1, x + INFO_ICON_SIZE, y + INFO_ICON_SIZE, INFO_ICON_BORDER_COLOR);
-        g.fill(x, y, x + 1, y + INFO_ICON_SIZE, INFO_ICON_BORDER_COLOR);
-        g.fill(x + INFO_ICON_SIZE - 1, y, x + INFO_ICON_SIZE, y + INFO_ICON_SIZE, INFO_ICON_BORDER_COLOR);
-        int charW = this.font.width("i");
-        int charX = x + (INFO_ICON_SIZE - charW) / 2;
-        int charY = y + (INFO_ICON_SIZE - this.font.lineHeight) / 2 + 1;
-        g.drawString(this.font, "i", charX, charY, 0xFFFFFFFF, false);
+    private void mercantile$drawInfoIcon(GuiGraphics g, int x, int y) {
+        g.blitSprite(INFO_BUTTON_SPRITE, x, y, INFO_ICON_SIZE, INFO_ICON_SIZE);
     }
 
     @Unique

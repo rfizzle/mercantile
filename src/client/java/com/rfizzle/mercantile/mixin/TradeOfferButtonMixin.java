@@ -73,8 +73,14 @@ public abstract class TradeOfferButtonMixin {
         }
 
         List<Component> merged = new ArrayList<>(Screen.getTooltipFromItem(mc, stack));
-        merged.add(Component.empty());
+        Component modidLine = null;
+        if (merged.size() >= 2 && merged.getLast().getStyle().isItalic()) {
+            modidLine = merged.removeLast();
+        }
         merged.addAll(mercantile$buildBreakdownLines(components.get(offerIndex)));
+        if (modidLine != null) {
+            merged.add(modidLine);
+        }
         g.renderTooltip(font, merged, stack.getTooltipImage(), mx, my);
     }
 

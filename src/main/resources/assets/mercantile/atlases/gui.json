@@ -1,0 +1,6 @@
+{
+  "sources": [
+    { "type": "minecraft:single", "resource": "mercantile:info_button" },
+    { "type": "minecraft:single", "resource": "mercantile:close_button" }
+  ]
+}
