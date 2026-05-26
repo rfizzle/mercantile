@@ -35,18 +35,27 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      - name: Run unit tests
-        run: ./gradlew test --no-daemon --stacktrace
+      - name: Run unit tests with coverage
+        run: ./gradlew test jacocoTestReport --no-daemon --stacktrace
 
-      - name: Publish unit test results
+      - name: Upload coverage to Codecov
         if: always()
-        uses: EnricoMi/publish-unit-test-result-action@v2
+        uses: codecov/codecov-action@v4
         with:
-          files: build/test-results/test/**/*.xml
-          check_name: Unit Test Results
-          comment_mode: off
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: build/reports/jacoco/test/jacocoTestReport.xml
+          flags: unit
+          fail_ci_if_error: false
 
-      - name: Upload unit test report
+      - name: Upload unit test results to Codecov
+        if: always()
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: build/test-results/test/**/*.xml
+          flags: unit
+
+      - name: Upload unit test report (fallback)
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -76,15 +85,15 @@ jobs:
       - name: Run gametests
         run: ./gradlew runGametest --no-daemon --stacktrace
 
-      - name: Publish gametest results
+      - name: Upload gametest results to Codecov
         if: always()
-        uses: EnricoMi/publish-unit-test-result-action@v2
+        uses: codecov/test-results-action@v1
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: build/junit-gametest.xml
-          check_name: Gametest Results
-          comment_mode: off
+          flags: gametest
 
-      - name: Upload gametest report
+      - name: Upload gametest report (fallback)
         if: always()
         uses: actions/upload-artifact@v4
         with:
