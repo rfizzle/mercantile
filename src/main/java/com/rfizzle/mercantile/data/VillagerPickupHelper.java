@@ -9,6 +9,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.entity.npc.WanderingTrader;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
@@ -42,6 +43,22 @@ public class VillagerPickupHelper {
         item.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
         item.set(DataComponents.CUSTOM_NAME, buildDisplayName(villager, professionId));
         item.set(DataComponents.LORE, buildLore(villager));
+
+        return item;
+    }
+
+    public static ItemStack createHeadItem(WanderingTrader trader) {
+        CompoundTag nbt = new CompoundTag();
+        trader.saveWithoutId(nbt);
+        nbt.remove("UUID");
+        nbt.putString("id", BuiltInRegistries.ENTITY_TYPE.getKey(trader.getType()).toString());
+        nbt.putInt("MercantileDataVersion", CURRENT_DATA_VERSION);
+
+        ItemStack item = new ItemStack(Items.PLAYER_HEAD);
+        item.set(DataComponents.PROFILE, VillagerHeadTextures.getProfile(VillagerHeadTextures.WANDERING_TRADER));
+        item.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
+        item.set(DataComponents.CUSTOM_NAME, buildTraderDisplayName(trader));
+        item.set(DataComponents.LORE, buildTraderLore(trader));
 
         return item;
     }
@@ -83,31 +100,58 @@ public class VillagerPickupHelper {
                     .withStyle(style -> style.withColor(ChatFormatting.GRAY).withItalic(false)));
         }
 
-        MerchantOffers offers = villager.getOffers();
-        if (!offers.isEmpty()) {
-            lines.add(Component.empty());
-            lines.add(line("mercantile.pickup.lore.trades", ChatFormatting.GRAY));
-
-            MercantileVillagerData data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
-            data.migrateLockedTrades(offers);
-            Set<String> lockedTrades = data.getLockedTrades();
-            int lockedCount = 0;
-
-            for (MerchantOffer offer : offers) {
-                boolean locked = lockedTrades.contains(OfferIdentityHash.compute(offer));
-                if (locked) lockedCount++;
-                lines.add(formatTradeLine(offer, locked));
-            }
-
-            if (lockedCount > 0) {
-                int unlocked = offers.size() - lockedCount;
-                lines.add(Component.translatable("mercantile.pickup.lore.trade_count",
-                                unlocked, offers.size())
-                        .withStyle(style -> style.withColor(ChatFormatting.DARK_GRAY).withItalic(false)));
-            }
-        }
+        MercantileVillagerData data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
+        data.migrateLockedTrades(villager.getOffers());
+        appendTradesSection(lines, villager.getOffers(), data.getLockedTrades());
 
         return new ItemLore(lines, lines);
+    }
+
+    private static Component buildTraderDisplayName(WanderingTrader trader) {
+        Component label = Component.translatable("mercantile.pickup.wandering_trader");
+        MutableComponent name = trader.hasCustomName()
+                ? Component.translatable("mercantile.pickup.named_trader",
+                        trader.getCustomName(), label)
+                : label.copy();
+        return name.withStyle(style -> style.withColor(ChatFormatting.YELLOW).withItalic(false));
+    }
+
+    private static ItemLore buildTraderLore(WanderingTrader trader) {
+        List<Component> lines = new ArrayList<>();
+
+        lines.add(line("mercantile.pickup.lore.instruction", ChatFormatting.DARK_GRAY));
+
+        int despawnTicks = trader.getDespawnDelay();
+        if (despawnTicks > 0) {
+            lines.add(Component.translatable("mercantile.pickup.lore.despawn_remaining",
+                            despawnTicks / 20)
+                    .withStyle(style -> style.withColor(ChatFormatting.GRAY).withItalic(false)));
+        }
+
+        appendTradesSection(lines, trader.getOffers(), Set.of());
+
+        return new ItemLore(lines, lines);
+    }
+
+    private static void appendTradesSection(List<Component> lines, MerchantOffers offers, Set<String> lockedHashes) {
+        if (offers.isEmpty()) return;
+
+        lines.add(Component.empty());
+        lines.add(line("mercantile.pickup.lore.trades", ChatFormatting.GRAY));
+
+        int lockedCount = 0;
+        for (MerchantOffer offer : offers) {
+            boolean locked = lockedHashes.contains(OfferIdentityHash.compute(offer));
+            if (locked) lockedCount++;
+            lines.add(formatTradeLine(offer, locked));
+        }
+
+        if (lockedCount > 0) {
+            int unlocked = offers.size() - lockedCount;
+            lines.add(Component.translatable("mercantile.pickup.lore.trade_count",
+                            unlocked, offers.size())
+                    .withStyle(style -> style.withColor(ChatFormatting.DARK_GRAY).withItalic(false)));
+        }
     }
 
     private static Component formatTradeLine(MerchantOffer offer, boolean locked) {

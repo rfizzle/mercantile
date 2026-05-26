@@ -107,29 +107,6 @@ public class VillagerPickupGameTest implements FabricGameTest {
     }
 
     @GameTest(template = EMPTY_STRUCTURE)
-    public void wanderingTraderNotPickable(GameTestHelper helper) {
-        var trader = helper.spawn(EntityType.WANDERING_TRADER, 0, 1, 0);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
-        player.getAbilities().instabuild = false;
-        player.experienceLevel = 10;
-        player.setShiftKeyDown(true);
-        player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
-        player.moveTo(trader.position().add(1, 0, 0));
-
-        trader.interact(player, InteractionHand.MAIN_HAND);
-
-        helper.assertFalse(trader.isRemoved(),
-                "Wandering trader should not be removed");
-        helper.assertFalse(player.getMainHandItem().is(Items.PLAYER_HEAD),
-                "Player should not receive a head item");
-        helper.assertTrue(player.experienceLevel == 10,
-                "XP should not be deducted");
-
-        player.discard();
-        helper.succeed();
-    }
-
-    @GameTest(template = EMPTY_STRUCTURE)
     public void malformedNbtKeepsItem(GameTestHelper helper) {
         CompoundTag badNbt = new CompoundTag();
         badNbt.putInt("MercantileDataVersion", 1);

@@ -23,6 +23,7 @@ public class VillagerHeadTextures {
 
     public static final ResourceLocation FALLBACK_ID = ResourceLocation.withDefaultNamespace("none");
     public static final ResourceLocation BABY = Mercantile.id("baby");
+    public static final ResourceLocation WANDERING_TRADER = ResourceLocation.withDefaultNamespace("wandering_trader");
 
     static {
         registerVanilla("armorer", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjUyMmRiOTJmMTg4ZWJjNzcxM2NmMzViNGNiYWVkMWNmZTI2NDJhNTk4NmMzYmRlOTkzZjVjZmIzNzI3NjY0YyJ9fX0=");
@@ -41,6 +42,7 @@ public class VillagerHeadTextures {
         registerVanilla("nitwit", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODIyZDhlNzUxYzhmMmZkNGM4OTQyYzQ0YmRiMmY1Y2E0ZDhhZThlNTc1ZWQzZWIzNGMxOGE4NmU5M2IifX19");
         registerVanilla("none", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODIyZDhlNzUxYzhmMmZkNGM4OTQyYzQ0YmRiMmY1Y2E0ZDhhZThlNTc1ZWQzZWIzNGMxOGE4NmU5M2IifX19");
         TEXTURES.put(BABY, "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2UwY2Y0MDc3ZjMzZmI0MDU3MjA0YzQyOTc1YzhjMTg4MzBjMDc1ZGM3OWMwYjJkM2M4MDgyY2UzY2RjNjgxZiJ9fX0=");
+        TEXTURES.put(WANDERING_TRADER, "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGEwZjE1MTljNTk3ZTI4OWQ0ZjJiZjVjZTk2NDNiODFkNzE4NWM2YTUzOTJhNzdiOWFiODE3YTEzMmYzZGRiYyJ9fX0=");
     }
 
     private static void registerVanilla(String profession, String base64Value) {

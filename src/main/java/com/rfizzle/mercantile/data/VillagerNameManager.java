@@ -17,7 +17,9 @@ import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc.WanderingTrader;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.phys.AABB;
@@ -140,36 +142,48 @@ public class VillagerNameManager {
         );
 
         ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> {
-            if (!(entity instanceof Villager villager)) return;
             if (!MercantileConfig.get().enableNames) return;
-            assignName(villager, world);
+            if (entity instanceof Villager villager) {
+                assignName(villager, world);
+            } else if (entity instanceof WanderingTrader trader) {
+                assignTraderName(trader, world);
+            }
         });
     }
 
     private static void assignName(Villager villager, ServerLevel world) {
-        MercantileVillagerData data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
+        assignNameInternal(villager, world, gatherNearbyNames(villager, world));
+    }
+
+    private static void assignTraderName(WanderingTrader trader, ServerLevel world) {
+        // Wandering traders roam — nearby-name dedup is wasted work and irrelevant
+        // since trader names are ephemeral until pickup.
+        assignNameInternal(trader, world, Set.of());
+    }
+
+    private static void assignNameInternal(LivingEntity entity, ServerLevel world, Set<String> taken) {
+        MercantileVillagerData data = entity.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
 
         if (data.isNameAssigned()) {
-            if (villager.hasCustomName()) {
-                villager.setCustomNameVisible(true);
+            if (entity.hasCustomName()) {
+                entity.setCustomNameVisible(true);
             }
             return;
         }
 
         data.setNameAssigned(true);
-        villager.setAttached(MercantileAttachments.VILLAGER_DATA, data);
+        entity.setAttached(MercantileAttachments.VILLAGER_DATA, data);
 
-        if (villager.hasCustomName()) {
+        if (entity.hasCustomName()) {
             return;
         }
 
-        Holder<Biome> biomeHolder = world.getBiome(villager.blockPosition());
+        Holder<Biome> biomeHolder = world.getBiome(entity.blockPosition());
         Optional<ResourceKey<Biome>> biomeKey = biomeHolder.unwrapKey();
-        Set<String> taken = gatherNearbyNames(villager, world);
-        String name = getRandomNameAvoiding(biomeKey.orElse(null), villager.getRandom(), taken);
+        String name = getRandomNameAvoiding(biomeKey.orElse(null), entity.getRandom(), taken);
 
-        villager.setCustomName(Component.literal(name));
-        villager.setCustomNameVisible(true);
+        entity.setCustomName(Component.literal(name));
+        entity.setCustomNameVisible(true);
     }
 
     private static Set<String> gatherNearbyNames(Villager villager, ServerLevel world) {

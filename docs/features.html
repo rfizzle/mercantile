@@ -106,14 +106,15 @@
             <article id="villager-pickup" class="bg-card border border-elevated rounded-lg p-5">
               <h3 class="text-lg font-semibold text-emerald mb-2">Villager Pickup</h3>
               <p class="text-sm text-ash leading-relaxed mb-2">Sneak-right-click an adult or baby villager with an empty main hand to pick them up as a profession-styled player head item. Full NBT — profession, level, XP, trades, gossip, name, inventory — is preserved.</p>
-              <p class="text-sm text-ash leading-relaxed mb-2">Right-click the head item on a block to place the villager back, facing toward you. Wandering traders are excluded. Blocked during raids, while another player is trading the villager, or while it is following someone.</p>
+              <p class="text-sm text-ash leading-relaxed mb-2">Wandering traders work the same way — sneak-right-click to capture, with the despawn countdown frozen while held and resumed on placement. Each leashed trader llama drops its lead and stays put rather than chasing the captured trader.</p>
+              <p class="text-sm text-ash leading-relaxed mb-2">Right-click the head item on a block to place the villager or trader back, facing toward you. Villager pickup is blocked during raids, while another player is trading with them, or while they are following someone. Trader pickup is blocked only while another player is trading with them.</p>
               <p class="text-smoke text-xs mt-3">Config: <code class="text-bone">enableVillagerPickup</code>, <code class="text-bone">pickupXpCost</code> (default 5 XP)</p>
             </article>
 
             <article id="villager-names" class="bg-card border border-elevated rounded-lg p-5">
               <h3 class="text-lg font-semibold text-emerald mb-2">Villager Names</h3>
-              <p class="text-sm text-ash leading-relaxed mb-2">Every villager is auto-named on spawn from a biome-themed pool: English in Plains/Forest, Arabic in Desert, Nordic in Taiga, Mesoamerican in Jungle, African in Savanna, Old English in Swamp, Western in Badlands.</p>
-              <p class="text-sm text-ash leading-relaxed mb-2">Names always render above the villager. Player-applied nametags override the generated name. Names survive pickup, world reloads, and dimension changes. Datapacks can override or extend pools via <code class="text-bone text-xs">data/mercantile/villager_names/&lt;category&gt;.json</code>.</p>
+              <p class="text-sm text-ash leading-relaxed mb-2">Every villager and wandering trader is auto-named on spawn from a biome-themed pool: English in Plains/Forest, Arabic in Desert, Nordic in Taiga, Mesoamerican in Jungle, African in Savanna, Old English in Swamp, Western in Badlands.</p>
+              <p class="text-sm text-ash leading-relaxed mb-2">Names always render above the villager or trader. Player-applied nametags override the generated name. Names survive pickup, world reloads, and dimension changes. Datapacks can override or extend pools via <code class="text-bone text-xs">data/mercantile/villager_names/&lt;category&gt;.json</code>.</p>
               <p class="text-smoke text-xs mt-3">Config: <code class="text-bone">enableNames</code></p>
             </article>
 
