@@ -23,7 +23,7 @@ logs/
 # Dev
 .plan
 spec/
-.claude
+.claude/settings.local.json
 
 # OS junk
 .DS_Store
