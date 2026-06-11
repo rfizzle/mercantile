@@ -1,7 +1,8 @@
 # Mercantile — Villager & Trade Overhaul
 
-![Mercantile logo](https://mercantile.rfizzle.com/logo.png)
-<!-- TODO: confirm hosted logo URL renders on CurseForge before publishing -->
+**_Every villager remembers._**
+
+![Mercantile logo](https://raw.githubusercontent.com/rfizzle/mercantile/master/art/logo.png)
 
 [![Minecraft 1.21.1](https://img.shields.io/badge/Minecraft-1.21.1-62B47A?logo=minecraft&logoColor=white)](https://www.minecraft.net/)
 [![Fabric](https://img.shields.io/badge/Mod_Loader-Fabric-DBB69B)](https://fabricmc.net/)

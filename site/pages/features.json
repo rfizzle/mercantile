@@ -1,0 +1,295 @@
+{
+  "nav": "Features",
+  "metaTitle": "Features — Mercantile | Villager Overhaul for Minecraft",
+  "metaDescription": "Every player-visible feature in Mercantile: villager pickup, names, follow mode, trade cycling, reputation, sentry pylon, and more.",
+  "ogTitle": "Features — Mercantile",
+  "ogDescription": "Every player-visible feature in Mercantile: villager pickup, names, follow mode, trade cycling, reputation, sentry pylon, and more.",
+  "title": "Features",
+  "lede": "A detailed look at everything Mercantile changes about villagers, trading, and village defense. Every feature is individually toggleable via <a href='/config.html' class='text-accent hover:text-accent2 underline'>config</a>.",
+  "width": "6xl",
+  "scale": "lg",
+  "sections": [
+    {
+      "id": "villagers",
+      "title": "Villagers",
+      "blocks": [
+        {
+          "type": "cards",
+          "mdColumns": 2,
+          "items": [
+            {
+              "id": "villager-pickup",
+              "title": "Villager Pickup",
+              "html": [
+                "Sneak-right-click an adult or baby villager with an empty main hand to pick them up as a profession-styled player head item. Full NBT — profession, level, XP, trades, gossip, name, inventory — is preserved.",
+                "Wandering traders work the same way — sneak-right-click to capture, with the despawn countdown frozen while held and resumed on placement. Each leashed trader llama drops its lead and stays put rather than chasing the captured trader.",
+                "Right-click the head item on a block to place the villager or trader back, facing toward you. Villager pickup is blocked during raids, while another player is trading with them, or while they are following someone. Trader pickup is blocked only while another player is trading with them."
+              ],
+              "note": "Config: <code class='text-bone'>enableVillagerPickup</code>, <code class='text-bone'>pickupXpCost</code> (default 5 XP)"
+            },
+            {
+              "id": "villager-names",
+              "title": "Villager Names",
+              "html": [
+                "Every villager and wandering trader is auto-named on spawn from a biome-themed pool: English in Plains/Forest, Arabic in Desert, Nordic in Taiga, Mesoamerican in Jungle, African in Savanna, Old English in Swamp, Western in Badlands.",
+                "Names always render above the villager or trader. Player-applied nametags override the generated name. Names survive pickup, world reloads, and dimension changes. Datapacks can override or extend pools via <code class='text-bone text-xs'>data/mercantile/villager_names/&lt;category&gt;.json</code>."
+              ],
+              "note": "Config: <code class='text-bone'>enableNames</code>"
+            },
+            {
+              "id": "follow-mode",
+              "title": "Follow Mode",
+              "html": [
+                "Sneak-right-click a villager while holding an emerald to make them follow you. They pathfind toward the player at ~6 blocks distance, ignore schedule goals (workstation, bed, wandering), and refuse mob-to-mob collision pushes.",
+                "Cyan particles trail at their feet while following. They auto-release if you move more than 32 blocks away. A villager already following one player cannot be recruited by another. Not persisted — cleared on logout, unload, or restart."
+              ],
+              "note": "Config: <code class='text-bone'>enableFollowMode</code>, <code class='text-bone'>maxFollowingVillagers</code> (default 3)"
+            },
+            {
+              "id": "healing",
+              "title": "Boosted Healing",
+              "html": [
+                "Splash and lingering potions of healing restore double the normal HP when they hit a villager. Splash and lingering regeneration potions apply double the normal duration. Tipped arrows are unaffected.",
+                "Tune the multiplier (1.0×–10.0×) to make raid recovery easier or stricter."
+              ],
+              "note": "Config: <code class='text-bone'>enableHealing</code>, <code class='text-bone'>healingMultiplier</code> (default 2.0)"
+            },
+            {
+              "id": "profession-lock",
+              "title": "Profession Lock",
+              "html": [
+                "After any completed trade, a villager's profession becomes permanently locked. Their trade offers survive even if the workstation is broken, moved, or destroyed. They will still claim a same-type workstation if one is available nearby.",
+                "A lock icon appears in the trade GUI header. Jade/WTHIT tooltips show \"Profession: Locked\" vs \"Profession: Unlocked\"."
+              ],
+              "note": "Config: <code class='text-bone'>enableProfessionLock</code>"
+            },
+            {
+              "id": "pathfinding",
+              "title": "Smarter Pathfinding",
+              "html": [
+                "Villagers properly open fence gates and double doors, navigate multi-step staircases and slab transitions, climb ladders when the path calls for it, and prefer dry routes over water.",
+                "Each fix is independently toggleable."
+              ],
+              "note": "Config: <code class='text-bone'>enablePathfindingFixes</code>, <code class='text-bone'>enablePathfindingDoors</code>, <code class='text-bone'>enablePathfindingStairs</code>, <code class='text-bone'>enablePathfindingLadders</code>, <code class='text-bone'>enablePathfindingWater</code>"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "trading",
+      "title": "Trading",
+      "blocks": [
+        {
+          "type": "cards",
+          "mdColumns": 2,
+          "items": [
+            {
+              "id": "trade-cycling",
+              "title": "Trade Cycling",
+              "html": [
+                "Pay 6 emeralds (configurable) to re-roll a villager's unlocked trades from the profession pool — no more breaking and replacing workstations. Trades become locked once purchased; locked trades are preserved across cycles.",
+                "The <strong class='text-bone'>\"Re-roll Trades\"</strong> button sits in the villager info panel. It's grayed out when all trades are locked or you have no emeralds, and hidden entirely when the villager's profession is locked (so a locked villager reads as fully frozen). Cycling also grants a small reputation gain."
+              ],
+              "note": "Config: <code class='text-bone'>enableTradeCycling</code>, <code class='text-bone'>tradeCycleEmeraldCost</code> (default 6), <code class='text-bone'>reputationCycleGain</code> (default +1)"
+            },
+            {
+              "id": "bulk-trading",
+              "title": "Bulk Trading",
+              "html": [
+                "Shift-click a trade output slot to repeat the trade automatically. Stops when input runs out, the trade goes out of stock, the inventory fills up, or 64 trades are executed.",
+                "Price stays locked for the duration of a single bulk operation — no mid-loop repricing. Demand counters update correctly for all completed trades."
+              ],
+              "note": "Config: <code class='text-bone'>enableBulkTrading</code>"
+            },
+            {
+              "id": "restock-indicator",
+              "title": "Restock Indicator",
+              "html": [
+                "The trade GUI shows estimated time until the next restock in <code class='text-bone'>~M:SS</code> format, plus a counter for restocks remaining today. Shows \"Fully stocked\" when all trades are at max, or \"No workstation\" in red when the villager is unbound."
+              ],
+              "note": "Config: <code class='text-bone'>enableRestockIndicator</code>"
+            },
+            {
+              "id": "demand-transparency",
+              "title": "Demand Transparency",
+              "html": [
+                "Hover over a trade price to see a breakdown: base price, demand adjustment, reputation modifier, gossip modifier, final price. Discounts appear in green, markups in red."
+              ],
+              "note": "Config: <code class='text-bone'>enableDemandTransparency</code>"
+            }
+          ]
+        },
+        {
+          "type": "cards",
+          "mdColumns": 1,
+          "items": [
+            {
+              "id": "info-panel",
+              "title": "Villager Info Panel",
+              "html": [
+                "A side panel in the merchant screen showing the villager's name, profession and level with XP progress bar, your reputation standing with them, total trades completed, workstation status (bound/unbound and type), and the profession-locked indicator.",
+                "<strong class='text-bone'>Small-screen fallback:</strong> when the window is too narrow to fit the side panel next to the trade GUI, a small <code class='text-bone'>i</code> icon appears beside the villager title. Click it to open the same info as a centered overlay; press <code class='text-bone'>Esc</code> or the <code class='text-bone'>x</code> in the corner to close."
+              ],
+              "note": "Client config: <code class='text-bone'>enableInfoPanel</code>"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "reputation",
+      "title": "Reputation",
+      "blocks": [
+        {
+          "type": "sub",
+          "id": "reputation-system",
+          "title": "Five-Tier Reputation",
+          "intro": "A persistent per-player score from −100 to +200 that survives death and travels with you across the world. Score changes are configurable.",
+          "blocks": [
+            {
+              "type": "table",
+              "headers": ["Tier", "Range", "Effect"],
+              "rows": [
+                ["Reviled", "−100 to −50", "Trade refusal, angry particles, head shake"],
+                ["Distrusted", "−49 to −1", "10–25% markup"],
+                ["Neutral", "0", "No effect"],
+                ["Liked", "1 to 49", "5% discount"],
+                ["Trusted", "50 to 99", "10% discount + profession-exclusive trades"],
+                ["Honored", "100 to 200", "15% discount + all exclusive trades"]
+              ],
+              "note": "Config: <code class='text-bone'>enableReputation</code>"
+            }
+          ]
+        },
+        {
+          "type": "cards",
+          "mdColumns": 2,
+          "items": [
+            {
+              "id": "reputation-events",
+              "title": "Score Events",
+              "html": [],
+              "bullets": [
+                "Trade: <span class='text-bone'>+1</span> per 5 trades",
+                "Cure zombie villager: <span class='text-bone'>+5</span> (one-time per UUID)",
+                "Attack a villager: <span class='text-bone'>−15</span>",
+                "Kill a villager: <span class='text-bone'>−40</span>",
+                "Trade cycling: <span class='text-bone'>+2</span>",
+                "Proximity: <span class='text-bone'>+1 per 10 min</span> (capped at +1/day)"
+              ],
+              "note": "Config: <code class='text-bone'>reputationTradeGain</code>, <code class='text-bone'>reputationCureGain</code>, <code class='text-bone'>reputationAttackLoss</code>, <code class='text-bone'>reputationKillLoss</code>, <code class='text-bone'>reputationCycleGain</code>"
+            },
+            {
+              "id": "reputation-hud",
+              "title": "Reputation HUD",
+              "html": [
+                "A compact indicator in the top-left HUD strip shows your current tier when a villager is nearby (default 32-block radius). Auto-stacks with other rfizzle suite mods at priority 2.",
+                "Hidden during F1, open screens, and death. Uses a balance-scale icon plus the tier name in vanilla font."
+              ],
+              "note": "Client config: <code class='text-bone'>enableReputationHud</code>"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sentry-pylon",
+      "title": "Sentry Pylon",
+      "blocks": [
+        {
+          "type": "cards",
+          "mdColumns": 1,
+          "items": [
+            {
+              "title": "Iron-Fueled Defense Block",
+              "html": [
+                "A placeable block that detects hostile mobs within a 32-block radius (configurable) and spawns temporary iron golems to defend your village. Right-click with iron blocks to fuel — up to 8 stored. Each golem costs 1 iron block to summon. Maximum 3 active sentries per pylon.",
+                "Sentry golems have vanilla combat AI, leash to the pylon, drop nothing on death, and don't count toward the mob cap. They despawn 30 seconds after no hostiles are detected, with a visible crack-and-fade effect.",
+                "Three blockstate variants — idle, active, empty — each with distinct particles. Redstone disables the pylon; comparator output is proportional to fuel level (0–15). Crafted from carved pumpkin, iron blocks, bell, and stone bricks.",
+                "<strong class='text-bone'>Hopper &amp; pipe fueling:</strong> hoppers attached to any face (top, sides, bottom) feed iron blocks into the pylon one at a time, up to the fuel cap. Non-iron items are rejected, so hoppers cycling mixed inventories don't deadlock, and overflow is left in the hopper rather than destroyed. Hoppers cannot extract — fuel only flows in. Modded item pipes (Pipez, etc.) work via the Fabric Transfer API (<code class='text-bone'>ItemStorage.SIDED</code>). Disabled when <code class='text-bone'>enableSentryPylon</code> is off."
+              ],
+              "note": "Config: <code class='text-bone'>enableSentryPylon</code>, <code class='text-bone'>pylonDetectionRadius</code> (4–128), <code class='text-bone'>pylonMaxFuel</code>, <code class='text-bone'>pylonMaxGolems</code>, <code class='text-bone'>sentryDespawnSeconds</code> (min 5)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "visualizations",
+      "title": "Visualizations",
+      "blocks": [
+        {
+          "type": "cards",
+          "mdColumns": 2,
+          "items": [
+            {
+              "id": "workstation-vis",
+              "title": "Workstation Links",
+              "html": [
+                "While holding a bell: profession-colored dust-particle lines connect each villager to their claimed workstation within 64 blocks. Unemployed villagers get a pulsing angry-villager particle. Unclaimed workstations get a yellow particle orbit."
+              ],
+              "note": "Client config: <code class='text-bone'>enableWorkstationVis</code>"
+            },
+            {
+              "id": "bell-radius-vis",
+              "title": "Bell Radius",
+              "html": [
+                "While holding a bell: a gold particle circle on the ground at the 48-block gathering radius, centered on the player. Ringing a bell briefly highlights every villager inside the radius with a vanilla glow effect."
+              ],
+              "note": "Client config: <code class='text-bone'>enableBellRadiusVis</code>"
+            },
+            {
+              "id": "jade-wthit",
+              "title": "Jade / WTHIT Tooltips",
+              "html": [
+                "Look at a villager with Jade or WTHIT installed to see a single color-coded breeding line — Ready, Hungry (with food progress), Needs bed, Cooldown, or Growing — plus contextual state icons: \"Needs workstation\", \"Panicking\", \"Trading with &lt;player&gt;\". Sentry golems show their parent pylon coordinates, despawn countdown, and a \"No Drops\" indicator. Both plugins work simultaneously without conflict."
+              ],
+              "note": "Config: <code class='text-bone'>enableBreedingTooltip</code>, <code class='text-bone'>enableStateIndicators</code>"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "compat",
+      "title": "Compat &amp; Integration",
+      "blocks": [
+        {
+          "type": "cards",
+          "mdColumns": 2,
+          "items": [
+            {
+              "title": "Mod Menu + Cloth Config",
+              "html": [
+                "An in-game settings GUI accessible from Mod Menu's mod list. Categorized sections for Server and Client config with sliders, toggles, and input validation that mirrors the server-side <code class='text-bone'>clamp()</code> bounds."
+              ],
+              "note": "Optional dependencies: Mod Menu, Cloth Config API"
+            },
+            {
+              "title": "Jade / WTHIT",
+              "html": [
+                "Both tooltip mods supported simultaneously with no conflict. Mercantile registers its own provider classes that read brain memories server-side and sync data to the tooltip plugin."
+              ],
+              "note": "Either, both, or neither — Mercantile loads cleanly without them."
+            },
+            {
+              "title": "EMI / REI / JEI",
+              "html": [
+                "A unified, searchable trade index across all professions and levels with profession-head icons. Filter by profession, level, or reputation requirement. Each entry also shows the workstation block that unlocks the profession — click a workstation (lectern, composter, smoker, …) in your recipe viewer to list every trade for that profession. Exclusive trades show tier badges. Bidirectional item lookup — \"Villager sells this\" and \"Villager buys this\"."
+              ],
+              "note": "Optional — install any one of the three recipe viewers."
+            },
+            {
+              "title": "Sound Volume Slider",
+              "html": [
+                "A client-side volume slider (0%–100%) controls all villager sounds independently: ambient, hurt, death, trade, yes, and no. Set to 0% for full silence without affecting any other audio category."
+              ],
+              "note": "Client config: <code class='text-bone'>villagerSoundVolume</code> (default 1.0)"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
