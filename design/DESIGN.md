@@ -26,9 +26,10 @@ this line to replace the older feature-description copy ("Turn villagers from
 disposable trade machines into…"). It states the reputation thesis in three
 words and deliberately echoes Prosperity's "Every chest, yours to discover."
 
-> **Adoption status:** README, site `<title>`, and store listings still carry
-> the descriptive copy ("Villager Overhaul for Minecraft" / feature-summary
-> sentences). Rolling the tagline through those surfaces is pending.
+> **Adoption status:** Adopted 2026-06-12. The README masthead, the site hero
+> lede, and both store listings lead with the tagline; descriptive copy
+> ("villager and trade overhaul…") remains as the supporting line and in SEO
+> metadata, per the VISION §2 pattern.
 
 ### Logo Description
 
@@ -262,9 +263,8 @@ Recorded so they read as *undecided*, not as omissions:
    medallion + market stall, or regenerate toward the suite's dark-stone
    frame (VISION's bell-over-emeralds proposal)? The current art predates
    nothing — it shipped — so this is a deliberate keep-or-conform call.
-4. **Tagline rollout.** "Every villager remembers." is the brand line per
-   `VISION.md`; README, site metadata, and listings still carry descriptive
-   copy.
+4. ~~**Tagline rollout.**~~ Resolved 2026-06-12 — "Every villager remembers."
+   adopted across README, site hero, and listings (see §1 Tagline).
 
 ---
 

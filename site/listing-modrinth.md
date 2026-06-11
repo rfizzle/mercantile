@@ -1,5 +1,7 @@
 # Mercantile — Villager & Trade Overhaul
 
+**_Every villager remembers._**
+
 **Also on [CurseForge](https://www.curseforge.com/minecraft/mc-mods/mercantile).**
 Visit the [website](https://mercantile.rfizzle.com) for the full feature
 list, config reference, and command guide.
