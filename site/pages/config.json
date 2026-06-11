@@ -13,11 +13,24 @@
       "title": "File Location &amp; Reload",
       "plainTitle": true,
       "blocks": [
-        { "type": "code", "label": "The config file is generated on first launch at:", "code": ".minecraft/config/mercantile.json", "bottomGap": true },
-        { "type": "code", "label": "Server operators can apply changes without a restart with:", "code": "/mercantile reload", "bottomGap": true },
-        { "type": "prose", "html": [
-          "Missing keys are filled with defaults and saved. Unknown keys are ignored. All numeric values are clamped on load — out-of-range hand edits are silently corrected."
-        ] }
+        {
+          "type": "code",
+          "label": "The config file is generated on first launch at:",
+          "code": ".minecraft/config/mercantile.json",
+          "bottomGap": true
+        },
+        {
+          "type": "code",
+          "label": "Server operators can apply changes without a restart with:",
+          "code": "/mercantile reload",
+          "bottomGap": true
+        },
+        {
+          "type": "prose",
+          "html": [
+            "Missing keys are filled with defaults and saved. Unknown keys are ignored. All numeric values are clamped on load — out-of-range hand edits are silently corrected."
+          ]
+        }
       ]
     },
     {
@@ -32,10 +45,28 @@
           "blocks": [
             {
               "type": "table",
-              "headers": ["Key", "Type", "Default", "Range", "Description"],
+              "headers": [
+                "Key",
+                "Type",
+                "Default",
+                "Range",
+                "Description"
+              ],
               "rows": [
-                ["<code class='text-bone whitespace-nowrap'>enableVillagerPickup</code>", "boolean", "true", "—", "Master toggle for villager pickup feature."],
-                ["<code class='text-bone whitespace-nowrap'>pickupXpCost</code>", "int", "5", "0+", "XP levels deducted per pickup (creative waived)."]
+                [
+                  "<code class='text-bone whitespace-nowrap'>enableVillagerPickup</code>",
+                  "boolean",
+                  "true",
+                  "—",
+                  "Master toggle for villager pickup feature."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>pickupXpCost</code>",
+                  "int",
+                  "5",
+                  "0+",
+                  "XP levels deducted per pickup (creative waived)."
+                ]
               ]
             }
           ]
@@ -47,9 +78,21 @@
           "blocks": [
             {
               "type": "table",
-              "headers": ["Key", "Type", "Default", "Range", "Description"],
+              "headers": [
+                "Key",
+                "Type",
+                "Default",
+                "Range",
+                "Description"
+              ],
               "rows": [
-                ["<code class='text-bone whitespace-nowrap'>enableNames</code>", "boolean", "true", "—", "Auto-assign biome-themed names on villager spawn."]
+                [
+                  "<code class='text-bone whitespace-nowrap'>enableNames</code>",
+                  "boolean",
+                  "true",
+                  "—",
+                  "Auto-assign biome-themed names on villager spawn."
+                ]
               ]
             }
           ]
@@ -61,10 +104,28 @@
           "blocks": [
             {
               "type": "table",
-              "headers": ["Key", "Type", "Default", "Range", "Description"],
+              "headers": [
+                "Key",
+                "Type",
+                "Default",
+                "Range",
+                "Description"
+              ],
               "rows": [
-                ["<code class='text-bone whitespace-nowrap'>enableTradeCycling</code>", "boolean", "true", "—", "Show the \"Re-roll Trades\" button in the merchant GUI."],
-                ["<code class='text-bone whitespace-nowrap'>tradeCycleEmeraldCost</code>", "int", "6", "0+", "Emeralds consumed per cycle (creative waived)."]
+                [
+                  "<code class='text-bone whitespace-nowrap'>enableTradeCycling</code>",
+                  "boolean",
+                  "true",
+                  "—",
+                  "Show the \"Re-roll Trades\" button in the merchant GUI."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>tradeCycleEmeraldCost</code>",
+                  "int",
+                  "6",
+                  "0+",
+                  "Emeralds consumed per cycle (creative waived)."
+                ]
               ]
             }
           ]
@@ -76,14 +137,84 @@
           "blocks": [
             {
               "type": "table",
-              "headers": ["Key", "Type", "Default", "Range", "Description"],
+              "headers": [
+                "Key",
+                "Type",
+                "Default",
+                "Range",
+                "Description"
+              ],
               "rows": [
-                ["<code class='text-bone whitespace-nowrap'>enableReputation</code>", "boolean", "true", "—", "Master toggle for the reputation system (score, tiers, exclusive trades)."],
-                ["<code class='text-bone whitespace-nowrap'>reputationTradeGain</code>", "int", "1", "0+", "Score gained per completed trade."],
-                ["<code class='text-bone whitespace-nowrap'>reputationCureGain</code>", "int", "15", "0+", "Score gained per cured zombie villager (one-time per UUID)."],
-                ["<code class='text-bone whitespace-nowrap'>reputationAttackLoss</code>", "int", "10", "0+", "Score lost per villager attack (absolute value)."],
-                ["<code class='text-bone whitespace-nowrap'>reputationKillLoss</code>", "int", "25", "0+", "Score lost per villager kill (absolute value)."],
-                ["<code class='text-bone whitespace-nowrap'>reputationCycleGain</code>", "int", "2", "0+", "Score gained per trade cycle."]
+                [
+                  "<code class='text-bone whitespace-nowrap'>enableReputation</code>",
+                  "boolean",
+                  "true",
+                  "—",
+                  "Master toggle for the reputation system (score, tiers, exclusive trades)."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>reputationTradeGain</code>",
+                  "int",
+                  "1",
+                  "0+",
+                  "Score gained per trade-gain pulse (every <code class='text-bone'>reputationTradesPerGain</code>-th completed trade)."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>reputationCureGain</code>",
+                  "int",
+                  "5",
+                  "0+",
+                  "Score gained per cured zombie villager (one-time per UUID)."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>reputationAttackLoss</code>",
+                  "int",
+                  "15",
+                  "0+",
+                  "Score lost per villager attack (absolute value)."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>reputationKillLoss</code>",
+                  "int",
+                  "40",
+                  "0+",
+                  "Score lost per villager kill (absolute value)."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>reputationCycleGain</code>",
+                  "int",
+                  "1",
+                  "0+",
+                  "Score gained per trade cycle."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>reputationDailyCap</code>",
+                  "int",
+                  "5",
+                  "1–50",
+                  "Maximum total reputation earnable per in-game day from trades and cycles combined. Daily counters reset at day rollover."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>reputationTradesPerGain</code>",
+                  "int",
+                  "5",
+                  "1–20",
+                  "Completed trades required to trigger one trade-gain pulse."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>reputationDailyMaxTradeRep</code>",
+                  "int",
+                  "2",
+                  "1–10",
+                  "Daily cap on reputation earned from trading."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>reputationDailyMaxCycleRep</code>",
+                  "int",
+                  "1",
+                  "1–10",
+                  "Daily cap on reputation earned from trade cycling."
+                ]
               ]
             }
           ]
@@ -95,10 +226,28 @@
           "blocks": [
             {
               "type": "table",
-              "headers": ["Key", "Type", "Default", "Range", "Description"],
+              "headers": [
+                "Key",
+                "Type",
+                "Default",
+                "Range",
+                "Description"
+              ],
               "rows": [
-                ["<code class='text-bone whitespace-nowrap'>enableFollowMode</code>", "boolean", "true", "—", "Sneak-right-click + emerald to recruit a villager to follow."],
-                ["<code class='text-bone whitespace-nowrap'>maxFollowingVillagers</code>", "int", "3", "1+", "Maximum villagers one player may have following at once."]
+                [
+                  "<code class='text-bone whitespace-nowrap'>enableFollowMode</code>",
+                  "boolean",
+                  "true",
+                  "—",
+                  "Sneak-right-click + emerald to recruit a villager to follow."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>maxFollowingVillagers</code>",
+                  "int",
+                  "3",
+                  "1+",
+                  "Maximum villagers one player may have following at once."
+                ]
               ]
             }
           ]
@@ -110,13 +259,49 @@
           "blocks": [
             {
               "type": "table",
-              "headers": ["Key", "Type", "Default", "Range", "Description"],
+              "headers": [
+                "Key",
+                "Type",
+                "Default",
+                "Range",
+                "Description"
+              ],
               "rows": [
-                ["<code class='text-bone whitespace-nowrap'>enablePathfindingFixes</code>", "boolean", "true", "—", "Master toggle for all pathfinding improvements."],
-                ["<code class='text-bone whitespace-nowrap'>enablePathfindingDoors</code>", "boolean", "true", "—", "Fence gate + double door navigation."],
-                ["<code class='text-bone whitespace-nowrap'>enablePathfindingStairs</code>", "boolean", "true", "—", "Multi-step staircase + slab transitions."],
-                ["<code class='text-bone whitespace-nowrap'>enablePathfindingLadders</code>", "boolean", "true", "—", "Allow villagers to climb ladders."],
-                ["<code class='text-bone whitespace-nowrap'>enablePathfindingWater</code>", "boolean", "true", "—", "Penalize water paths so villagers prefer dry routes."]
+                [
+                  "<code class='text-bone whitespace-nowrap'>enablePathfindingFixes</code>",
+                  "boolean",
+                  "true",
+                  "—",
+                  "Master toggle for all pathfinding improvements."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>enablePathfindingDoors</code>",
+                  "boolean",
+                  "true",
+                  "—",
+                  "Fence gate + double door navigation."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>enablePathfindingStairs</code>",
+                  "boolean",
+                  "true",
+                  "—",
+                  "Multi-step staircase + slab transitions."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>enablePathfindingLadders</code>",
+                  "boolean",
+                  "true",
+                  "—",
+                  "Allow villagers to climb ladders."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>enablePathfindingWater</code>",
+                  "boolean",
+                  "true",
+                  "—",
+                  "Penalize water paths so villagers prefer dry routes."
+                ]
               ]
             }
           ]
@@ -128,9 +313,21 @@
           "blocks": [
             {
               "type": "table",
-              "headers": ["Key", "Type", "Default", "Range", "Description"],
+              "headers": [
+                "Key",
+                "Type",
+                "Default",
+                "Range",
+                "Description"
+              ],
               "rows": [
-                ["<code class='text-bone whitespace-nowrap'>enableBulkTrading</code>", "boolean", "true", "—", "Shift-click trade output to repeat the trade up to 64 times."]
+                [
+                  "<code class='text-bone whitespace-nowrap'>enableBulkTrading</code>",
+                  "boolean",
+                  "true",
+                  "—",
+                  "Shift-click trade output to repeat the trade up to 64 times."
+                ]
               ]
             }
           ]
@@ -142,9 +339,21 @@
           "blocks": [
             {
               "type": "table",
-              "headers": ["Key", "Type", "Default", "Range", "Description"],
+              "headers": [
+                "Key",
+                "Type",
+                "Default",
+                "Range",
+                "Description"
+              ],
               "rows": [
-                ["<code class='text-bone whitespace-nowrap'>enableProfessionLock</code>", "boolean", "true", "—", "Permanently lock profession after any completed trade."]
+                [
+                  "<code class='text-bone whitespace-nowrap'>enableProfessionLock</code>",
+                  "boolean",
+                  "true",
+                  "—",
+                  "Permanently lock profession after any completed trade."
+                ]
               ]
             }
           ]
@@ -156,10 +365,28 @@
           "blocks": [
             {
               "type": "table",
-              "headers": ["Key", "Type", "Default", "Range", "Description"],
+              "headers": [
+                "Key",
+                "Type",
+                "Default",
+                "Range",
+                "Description"
+              ],
               "rows": [
-                ["<code class='text-bone whitespace-nowrap'>enableHealing</code>", "boolean", "true", "—", "Multiply splash/lingering heal + regen effects on villagers."],
-                ["<code class='text-bone whitespace-nowrap'>healingMultiplier</code>", "float", "2.0", "1.0 – 10.0", "Multiplier applied to heal amount and regen duration."]
+                [
+                  "<code class='text-bone whitespace-nowrap'>enableHealing</code>",
+                  "boolean",
+                  "true",
+                  "—",
+                  "Multiply splash/lingering heal + regen effects on villagers."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>healingMultiplier</code>",
+                  "float",
+                  "2.0",
+                  "1.0 – 10.0",
+                  "Multiplier applied to heal amount and regen duration."
+                ]
               ]
             }
           ]
@@ -171,10 +398,28 @@
           "blocks": [
             {
               "type": "table",
-              "headers": ["Key", "Type", "Default", "Range", "Description"],
+              "headers": [
+                "Key",
+                "Type",
+                "Default",
+                "Range",
+                "Description"
+              ],
               "rows": [
-                ["<code class='text-bone whitespace-nowrap'>enableRestockIndicator</code>", "boolean", "true", "—", "Show restock timer + counter in the merchant screen."],
-                ["<code class='text-bone whitespace-nowrap'>enableDemandTransparency</code>", "boolean", "true", "—", "Show hoverable price breakdown tooltip."]
+                [
+                  "<code class='text-bone whitespace-nowrap'>enableRestockIndicator</code>",
+                  "boolean",
+                  "true",
+                  "—",
+                  "Show restock timer + counter in the merchant screen."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>enableDemandTransparency</code>",
+                  "boolean",
+                  "true",
+                  "—",
+                  "Show hoverable price breakdown tooltip."
+                ]
               ]
             }
           ]
@@ -186,9 +431,21 @@
           "blocks": [
             {
               "type": "table",
-              "headers": ["Key", "Type", "Default", "Range", "Description"],
+              "headers": [
+                "Key",
+                "Type",
+                "Default",
+                "Range",
+                "Description"
+              ],
               "rows": [
-                ["<code class='text-bone whitespace-nowrap'>enableBreedingTooltip</code>", "boolean", "true", "—", "Send breeding data to Jade/WTHIT tooltips."]
+                [
+                  "<code class='text-bone whitespace-nowrap'>enableBreedingTooltip</code>",
+                  "boolean",
+                  "true",
+                  "—",
+                  "Send breeding data to Jade/WTHIT tooltips."
+                ]
               ]
             }
           ]
@@ -200,9 +457,21 @@
           "blocks": [
             {
               "type": "table",
-              "headers": ["Key", "Type", "Default", "Range", "Description"],
+              "headers": [
+                "Key",
+                "Type",
+                "Default",
+                "Range",
+                "Description"
+              ],
               "rows": [
-                ["<code class='text-bone whitespace-nowrap'>enableStateIndicators</code>", "boolean", "true", "—", "Send contextual state icons (needs workstation, panicking, trading) to Jade/WTHIT."]
+                [
+                  "<code class='text-bone whitespace-nowrap'>enableStateIndicators</code>",
+                  "boolean",
+                  "true",
+                  "—",
+                  "Send contextual state icons (needs workstation, panicking, trading) to Jade/WTHIT."
+                ]
               ]
             }
           ]
@@ -214,13 +483,49 @@
           "blocks": [
             {
               "type": "table",
-              "headers": ["Key", "Type", "Default", "Range", "Description"],
+              "headers": [
+                "Key",
+                "Type",
+                "Default",
+                "Range",
+                "Description"
+              ],
               "rows": [
-                ["<code class='text-bone whitespace-nowrap'>enableSentryPylon</code>", "boolean", "true", "—", "Master toggle for the Sentry Pylon block + crafting recipe."],
-                ["<code class='text-bone whitespace-nowrap'>pylonDetectionRadius</code>", "int", "32", "4 – 128", "Blocks within which the pylon detects hostile mobs."],
-                ["<code class='text-bone whitespace-nowrap'>pylonMaxFuel</code>", "int", "8", "1+", "Iron blocks the pylon can store at once."],
-                ["<code class='text-bone whitespace-nowrap'>pylonMaxGolems</code>", "int", "3", "1+", "Maximum active sentry golems per pylon."],
-                ["<code class='text-bone whitespace-nowrap'>sentryDespawnSeconds</code>", "int", "30", "5+", "Seconds without hostiles before a sentry despawns."]
+                [
+                  "<code class='text-bone whitespace-nowrap'>enableSentryPylon</code>",
+                  "boolean",
+                  "true",
+                  "—",
+                  "Master toggle for the Sentry Pylon block + crafting recipe."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>pylonDetectionRadius</code>",
+                  "int",
+                  "32",
+                  "4 – 128",
+                  "Blocks within which the pylon detects hostile mobs."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>pylonMaxFuel</code>",
+                  "int",
+                  "8",
+                  "1+",
+                  "Iron blocks the pylon can store at once."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>pylonMaxGolems</code>",
+                  "int",
+                  "3",
+                  "1+",
+                  "Maximum active sentry golems per pylon."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>sentryDespawnSeconds</code>",
+                  "int",
+                  "30",
+                  "5+",
+                  "Seconds without hostiles before a sentry despawns."
+                ]
               ]
             }
           ]
@@ -234,13 +539,49 @@
       "blocks": [
         {
           "type": "table",
-          "headers": ["Key", "Type", "Default", "Range", "Description"],
+          "headers": [
+            "Key",
+            "Type",
+            "Default",
+            "Range",
+            "Description"
+          ],
           "rows": [
-            ["<code class='text-bone whitespace-nowrap'>villagerSoundVolume</code>", "float", "1.0", "0.0 – 1.0", "Volume for all villager sound events (0.0 = mute, 1.0 = vanilla)."],
-            ["<code class='text-bone whitespace-nowrap'>enableWorkstationVis</code>", "boolean", "true", "—", "Render workstation-link particles while holding a bell."],
-            ["<code class='text-bone whitespace-nowrap'>enableBellRadiusVis</code>", "boolean", "true", "—", "Render the 48-block bell radius circle while holding a bell."],
-            ["<code class='text-bone whitespace-nowrap'>enableInfoPanel</code>", "boolean", "true", "—", "Show the villager info side panel in the merchant screen."],
-            ["<code class='text-bone whitespace-nowrap'>enableReputationHud</code>", "boolean", "true", "—", "Show the top-left reputation tier indicator near villagers."]
+            [
+              "<code class='text-bone whitespace-nowrap'>villagerSoundVolume</code>",
+              "float",
+              "1.0",
+              "0.0 – 1.0",
+              "Volume for all villager sound events (0.0 = mute, 1.0 = vanilla)."
+            ],
+            [
+              "<code class='text-bone whitespace-nowrap'>enableWorkstationVis</code>",
+              "boolean",
+              "true",
+              "—",
+              "Render workstation-link particles while holding a bell."
+            ],
+            [
+              "<code class='text-bone whitespace-nowrap'>enableBellRadiusVis</code>",
+              "boolean",
+              "true",
+              "—",
+              "Render the 48-block bell radius circle while holding a bell."
+            ],
+            [
+              "<code class='text-bone whitespace-nowrap'>enableInfoPanel</code>",
+              "boolean",
+              "true",
+              "—",
+              "Show the villager info side panel in the merchant screen."
+            ],
+            [
+              "<code class='text-bone whitespace-nowrap'>enableReputationHud</code>",
+              "boolean",
+              "true",
+              "—",
+              "Show the top-left reputation tier indicator near villagers."
+            ]
           ]
         }
       ]

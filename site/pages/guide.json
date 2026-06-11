@@ -93,10 +93,12 @@
               "type": "list",
               "spacing": 1,
               "items": [
-                "Complete a trade: <strong class='text-bone'>+1</strong>",
-                "Cure a zombie villager: <strong class='text-bone'>+15</strong> (one-time per villager UUID)",
-                "Cycle a villager's trades: <strong class='text-bone'>+2</strong>",
+                "Complete trades: <strong class='text-bone'>+1</strong> per 5 trades",
+                "Cure a zombie villager: <strong class='text-bone'>+5</strong> (one-time per villager UUID)",
+                "Cycle a villager's trades: <strong class='text-bone'>+1</strong>",
                 "Stand near a villager for 10 minutes: <strong class='text-bone'>+1</strong> (capped at +1/day total)"
+              ,
+                "Earnings from trades and cycles are capped at <strong class='text-bone'>5 reputation per in-game day</strong> by default (<a href='/config.html#config-reputation' class='text-emerald hover:underline'>configurable</a>)."
               ]
             }
           ]
@@ -109,8 +111,8 @@
               "type": "list",
               "spacing": 1,
               "items": [
-                "Attack a villager: <strong class='text-bone'>−10</strong>",
-                "Kill a villager: <strong class='text-bone'>−25</strong>"
+                "Attack a villager: <strong class='text-bone'>−15</strong>",
+                "Kill a villager: <strong class='text-bone'>−40</strong>"
               ]
             }
           ]
@@ -148,7 +150,7 @@
         },
         { "type": "prose", "html": [
           "<strong class='text-bone'>Locked trades are preserved.</strong> A trade becomes locked once you've purchased it at least once. Lock state is tracked by a stable hash of the trade's input/output items, so the same trade keeps the same lock across cycles. The button disables when every trade is locked.",
-          "Cycling also grants <strong class='text-bone'>+2 reputation</strong> per cycle, so chasing trades helps your standing too. <a href='/features.html#trade-cycling' class='text-accent hover:text-accent2 underline'>Read more →</a>"
+          "Cycling also grants <strong class='text-bone'>+1 reputation</strong> per cycle, so chasing trades helps your standing too. <a href='/features.html#trade-cycling' class='text-accent hover:text-accent2 underline'>Read more →</a>"
         ] }
       ]
     },
