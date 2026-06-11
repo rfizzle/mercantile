@@ -91,7 +91,7 @@
                 "Pay 6 emeralds (configurable) to re-roll a villager's unlocked trades from the profession pool — no more breaking and replacing workstations. Trades become locked once purchased; locked trades are preserved across cycles.",
                 "The <strong class='text-bone'>\"Re-roll Trades\"</strong> button sits in the villager info panel. It's grayed out when all trades are locked or you have no emeralds, and hidden entirely when the villager's profession is locked (so a locked villager reads as fully frozen). Cycling also grants a small reputation gain."
               ],
-              "note": "Config: <code class='text-bone'>enableTradeCycling</code>, <code class='text-bone'>tradeCycleEmeraldCost</code> (default 6), <code class='text-bone'>reputationCycleGain</code> (default +2)"
+              "note": "Config: <code class='text-bone'>enableTradeCycling</code>, <code class='text-bone'>tradeCycleEmeraldCost</code> (default 6), <code class='text-bone'>reputationCycleGain</code> (default +1)"
             },
             {
               "id": "bulk-trading",
@@ -171,10 +171,10 @@
               "title": "Score Events",
               "html": [],
               "bullets": [
-                "Trade: <span class='text-bone'>+1</span>",
-                "Cure zombie villager: <span class='text-bone'>+15</span> (one-time per UUID)",
-                "Attack a villager: <span class='text-bone'>−10</span>",
-                "Kill a villager: <span class='text-bone'>−25</span>",
+                "Trade: <span class='text-bone'>+1</span> per 5 trades",
+                "Cure zombie villager: <span class='text-bone'>+5</span> (one-time per UUID)",
+                "Attack a villager: <span class='text-bone'>−15</span>",
+                "Kill a villager: <span class='text-bone'>−40</span>",
                 "Trade cycling: <span class='text-bone'>+2</span>",
                 "Proximity: <span class='text-bone'>+1 per 10 min</span> (capped at +1/day)"
               ],
