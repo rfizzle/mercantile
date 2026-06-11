@@ -8,7 +8,7 @@ point at the same content so each agent finds what it expects to read.
 
 Mercantile is a Minecraft 1.21.1 Fabric mod — a villager and trade overhaul.
 Java 21, Fabric Loader 0.16.10, Loom 1.9. The full feature spec lives in
-[`SPEC.md`](SPEC.md). Work is tracked in GitHub Issues — see the
+[`design/SPEC.md`](design/SPEC.md). Work is tracked in GitHub Issues — see the
 [Development lifecycle](#development-lifecycle) section below.
 
 ## Build commands
@@ -85,12 +85,12 @@ Compat classes live under `com.rfizzle.mercantile.compat.<modid>`.
 
 | Path | Purpose |
 |---|---|
-| `SPEC.md` | Full feature spec for the mod. |
+| `design/SPEC.md` | Full feature spec for the mod. |
+| `design/DESIGN.md` | Brand, palette, asset specs — the pre-implementation "why & what". |
+| `site/` | Structured website content (source for [mercantile.rfizzle.com](https://mercantile.rfizzle.com)), rendered by the shared Concord template. |
 | GitHub Issues | Active work — feature requests, bugs, in-flight specs. |
 | `.ai/skills/` | Domain skills — read these before working in their subject area. |
-| `.ai/prompts/` | Reusable prompts loaded by CI workflows. |
-| `.ai/review-criteria.yml` | Categories scored by `claude-code-review.yml`. |
-| `.github/workflows/` | CI workflows (build, test, Codecov, Claude review, spec-writer). |
+| `.github/workflows/` | Thin trigger stubs — workflow logic, default CI prompts, and [review criteria](https://github.com/rfizzle/concord/blob/master/.ai/review-criteria.yml) live in [rfizzle/concord](https://github.com/rfizzle/concord). |
 
 ## Working with domain skills
 
@@ -115,14 +115,16 @@ relevant `SKILL.md` directly before working in its subject area.
 2. **Triage** — human discussion in the issue.
 3. **`needs-spec` label** added → `.github/workflows/claude-spec.yml` fires,
    Claude posts a structured implementation spec as an issue comment
-   (prompt: `.ai/prompts/spec-writer.md`).
+   (prompt: concord's default `spec-writer.md`, unless a repo-local
+   `.ai/prompts/spec-writer.md` override exists).
 4. **Human review** — spec edited or approved.
 5. **`jules` label** added (remove `needs-spec`) → Jules picks up the issue
    and opens a draft PR.
 6. **PR opened** → `claude-code-review.yml` posts a structured ✓/⚠/✗ review
-   (categories from `.ai/review-criteria.yml`). `test.yml` runs unit tests +
-   gametests, uploads coverage + results to Codecov. `ci.yml` runs the full
-   build.
+   (categories from concord's default `review-criteria.yml`, unless a
+   repo-local `.ai/review-criteria.yml` override exists). `ci.yml` runs the
+   full build, unit tests + gametests, and uploads coverage + results to
+   Codecov.
 7. **Human review + merge.**
 
 `@claude <message>` in any issue or PR comment also invokes Claude for ad-hoc

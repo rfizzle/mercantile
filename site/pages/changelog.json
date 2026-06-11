@@ -1,0 +1,175 @@
+{
+  "nav": "Changelog",
+  "metaTitle": "Changelog — Mercantile | Villager Overhaul for Minecraft",
+  "metaDescription": "Version history for Mercantile in the Keep a Changelog format: every added, changed, fixed, and removed entry across releases.",
+  "ogTitle": "Changelog — Mercantile",
+  "ogDescription": "Version history for Mercantile in the Keep a Changelog format.",
+  "title": "Changelog",
+  "lede": "Version history for Mercantile, in the <a href='https://keepachangelog.com/en/1.1.0/' rel='noopener noreferrer' target='_blank' class='text-accent hover:text-accent2 underline'>Keep a Changelog</a> format. Mercantile follows <a href='https://semver.org/' rel='noopener noreferrer' target='_blank' class='text-accent hover:text-accent2 underline'>semantic versioning</a>. For binaries, see <a href='https://github.com/rfizzle/mercantile/releases' rel='noopener noreferrer' target='_blank' class='text-accent hover:text-accent2 underline'>GitHub Releases</a>.",
+  "width": "4xl",
+  "sections": [
+    {
+      "id": "0-1-0",
+      "title": "[Unreleased] / [0.1.0] — Initial Release",
+      "intro": "First public version. Full feature set across villager overhaul, trade GUI, reputation, and village defense.",
+      "blocks": [
+        {
+          "type": "sub",
+          "title": "<span class='text-accent uppercase tracking-wider'>Added</span>",
+          "blocks": [
+            { "type": "prose", "html": ["<strong class='text-bone'>Infrastructure (E-001)</strong>"] },
+            { "type": "list", "spacing": 1, "items": [
+              "Config system with JSON persistence, hot reload, Cloth Config + Mod Menu integration (S-001).",
+              "Fabric attachment types for per-player and per-entity persistent data (S-002).",
+              "Custom packet payloads with <code class='text-bone'>StreamCodec</code>s for all client-server traffic (S-003).",
+              "<code class='text-bone'>/mercantile</code> command tree: reputation get/set/add, village, reload (S-004).",
+              "Profession-to-head-texture registry with Base64 skin values for all 16 vanilla professions (S-005)."
+            ] },
+            { "type": "prose", "html": ["<strong class='text-bone'>Core Standalone Features (E-002)</strong>"] },
+            { "type": "list", "spacing": 1, "items": [
+              "Biome-themed villager names with datapack-overridable pools (S-006).",
+              "Profession lock on first completed trade with lock icon in trade GUI (S-007).",
+              "Splash/lingering healing + regen multiplier for villagers (S-008).",
+              "Client-side villager sound volume slider (S-009).",
+              "Pathfinding fixes: doors, stairs, ladders, water avoidance (S-010)."
+            ] },
+            { "type": "prose", "html": ["<strong class='text-bone'>Trade GUI (E-003)</strong>"] },
+            { "type": "list", "spacing": 1, "items": [
+              "Bulk trading via shift-click on trade output, up to 64 iterations (S-011).",
+              "Restock timer + counter in merchant screen (S-012).",
+              "Demand pricing transparency with color-coded breakdown tooltip (S-013).",
+              "Villager info side panel with profession, level, reputation, trade count (S-014)."
+            ] },
+            { "type": "prose", "html": ["<strong class='text-bone'>Villager Pickup (E-004)</strong>"] },
+            { "type": "list", "spacing": 1, "items": [
+              "Villager pickup with full NBT preservation, profession-styled head item, XP cost, raid/trade/follow denials (S-015)."
+            ] },
+            { "type": "prose", "html": ["<strong class='text-bone'>Trade Cycling &amp; Reputation (E-005)</strong>"] },
+            { "type": "list", "spacing": 1, "items": [
+              "Trade cycling with emerald cost, lock tracking, and per-profession lock preservation (S-016).",
+              "Five-tier reputation system with persistent score, gossip integration, exclusive trades via datapack (S-017)."
+            ] },
+            { "type": "prose", "html": ["<strong class='text-bone'>Villager AI (E-006)</strong>"] },
+            { "type": "list", "spacing": 1, "items": [
+              "Follow mode: sneak-right-click with emerald, max 3 villagers per player, auto-release at distance (S-018)."
+            ] },
+            { "type": "prose", "html": ["<strong class='text-bone'>Visualization (E-007)</strong>"] },
+            { "type": "list", "spacing": 1, "items": [
+              "Workstation link visualization while holding a bell, profession-colored particle lines (S-019).",
+              "Bell radius visualization with 48-block gold circle + ring highlight (S-020)."
+            ] },
+            { "type": "prose", "html": ["<strong class='text-bone'>Mod Integrations (E-008)</strong>"] },
+            { "type": "list", "spacing": 1, "items": [
+              "Jade/WTHIT breeding information tooltips with cooldown, food inventory, baby growth (S-022).",
+              "Jade/WTHIT contextual state indicators (needs bed, hungry, panicking, trading-with) (S-023).",
+              "EMI/REI/JEI unified trade index with profession filters and tier badges for exclusive trades (S-024)."
+            ] },
+            { "type": "prose", "html": ["<strong class='text-bone'>Sentry Pylon (E-009)</strong>"] },
+            { "type": "list", "spacing": 1, "items": [
+              "Sentry Pylon block with iron-block fuel, hostile detection, temporary golem spawning, redstone disable, comparator output, Jade/WTHIT fuel tooltip (S-025)."
+            ] },
+            { "type": "prose", "html": ["<strong class='text-bone'>HUD &amp; Client Polish (E-011)</strong>"] },
+            { "type": "list", "spacing": 1, "items": [
+              "Reputation HUD overlay near villagers, auto-stacks with rfizzle suite mods (S-036)."
+            ] },
+            { "type": "prose", "html": ["<strong class='text-bone'>Website &amp; Distribution (E-012)</strong>"] },
+            { "type": "list", "spacing": 1, "items": [
+              "Public website at <a href='https://mercantile.rfizzle.com' class='text-accent hover:text-accent2 underline'>mercantile.rfizzle.com</a> with feature documentation, config reference, command reference, and getting-started guide (S-037).",
+              "Modrinth and CurseForge project listings with screenshots and feature documentation (S-038)."
+            ] },
+            { "type": "prose", "html": ["<strong class='text-bone'>CI/CD &amp; Automation (E-013)</strong>"] },
+            { "type": "list", "spacing": 1, "items": [
+              "GitHub Actions pipelines for build, test, release, GitHub Pages deployment, and Claude integrations (S-039)."
+            ] }
+          ]
+        },
+        {
+          "type": "sub",
+          "title": "<span class='text-accent uppercase tracking-wider'>Changed</span>",
+          "blocks": [
+            { "type": "list", "spacing": 1, "items": [
+              "Consolidated tier boundaries into a single <code class='text-bone'>ReputationTier</code> enum used by commands, exclusive trades, and price modifiers (S-027).",
+              "Tier names made translatable via <code class='text-bone'>command.mercantile.tier.*</code> language keys.",
+              "Migrated all static mutable state to thread-safe alternatives (<code class='text-bone'>ConcurrentHashMap</code>, <code class='text-bone'>volatile</code>, <code class='text-bone'>ThreadLocal</code>) for integrated client safety (S-026).",
+              "Standardized offer identity hashing across pickup and trade cycling via shared <code class='text-bone'>OfferIdentityHash</code> utility.",
+              "Renamed internal <code class='text-bone'>VillagerData</code> to <code class='text-bone'>MercantileVillagerData</code> to avoid collision with <code class='text-bone'>net.minecraft.world.entity.npc.VillagerData</code> (S-028)."
+            ] }
+          ]
+        },
+        {
+          "type": "sub",
+          "title": "<span class='text-accent uppercase tracking-wider'>Fixed</span>",
+          "blocks": [
+            { "type": "list", "spacing": 1, "items": [
+              "Atomic config writes via tmp-file + <code class='text-bone'>Files.move</code> with <code class='text-bone'>ATOMIC_MOVE</code> to prevent corruption mid-write (S-028).",
+              "Expanded numeric <code class='text-bone'>clamp()</code> coverage to every field, matching Cloth Config screen bounds (S-028).",
+              "Reputation price modifier now sets absolute value on <code class='text-bone'>specialPriceDiff</code> instead of compounding on each trade screen open (S-027).",
+              "Kill-event reputation penalty corrected from accidental −35 to spec'd −25 by guarding the AFTER_DAMAGE handler against already-dead entities (S-027).",
+              "Entity-duplication and emerald-loss windows in pickup and follow flows closed by reordering irreversible actions last (S-032).",
+              "Bulk trading <code class='text-bone'>refillSlot</code> refills to <code class='text-bone'>cost.count()</code>, not <code class='text-bone'>maxStackSize</code> (S-031).",
+              "Trade cycling syncs offers after exclusive trade injection so clients see the full updated list immediately (S-031).",
+              "Door-mixin reentrancy guard and pathfinding fence-gate tracking fixed to prevent stack overflow and leaked gate refs (S-030).",
+              "Phantom client-side follow particles cleared by routing UUID-based stop through <code class='text-bone'>ENTITY_UNLOAD</code> on the live <code class='text-bone'>Villager</code> instance (S-032).",
+              "Network payload size guards added to <code class='text-bone'>ConfigSyncS2CPayload</code> and <code class='text-bone'>WorkstationMapS2CPayload</code>; per-player cooldowns on C2S request packets (S-029).",
+              "Build cleanup: deduplicated <code class='text-bone'>loom {}</code> blocks, added timeout to <code class='text-bone'>runGitDescribe.proc.waitFor()</code> (S-035).",
+              "Reputation HUD overlay now actually renders near villagers — initial scan-tick value overflowed and suppressed every frame's proximity scan (S-046).",
+              "EMI villager-trade category now shows its translated name instead of the raw <code class='text-bone'>emi.category.mercantile.villager_trades</code> key (S-046).",
+              "Merchant info panel splits profession and level onto separate lines so long localized names no longer overflow the 98px content area (S-046).",
+              "Reputation and config now sync to the client on player join, so the HUD and config-gated client features no longer show stale state at login (S-047).",
+              "Jade plugin is now discovered at load time — all Jade tooltips (villager breeding, state indicators, sentry pylon fuel) were silently broken because the <code class='text-bone'>jade</code> entrypoint was missing from <code class='text-bone'>fabric.mod.json</code> (S-048).",
+              "Trade-screen info overlay (the centered panel that opens via the <code class='text-bone'>[i]</code> icon when the window is too narrow for the inline side panel) no longer lets merchant-screen icons, slots, and the XP bar ghost through the panel surface — the overlay panel background is now fully opaque and the surrounding dim is deeper, so text rows read cleanly instead of overlapping background art (S-053, B-099).",
+              "Nitwit profession head no longer ships a watermarked third-party user skin — the trade index now renders the nitwit entry with a clean villager face (reused from the unemployed skin, since vanilla nitwits have no head overlay) (S-054, B-097).",
+              "Trade screen lock badge and <strong class='text-bone'>Re-roll Trades</strong> button now refresh live on trade completion — previously the open merchant screen kept showing the unlocked badge and an active re-roll button after the first purchase that flipped the villager to locked, only updating on close→reopen or level-up (S-056, B-102).",
+              "Bedless villager tooltip no longer shows two lines for the same condition — the redundant yellow <em>Needs a bed</em> state-indicator icon was removed; the breeding tooltip's red <em>Breeding: Needs bed</em> line now stands alone. The state-indicator stream's remaining icons are <em>Trading</em>, <em>Panicking</em>, and <em>Needs workstation</em> (S-060, B-103).",
+              "Trade-screen info-panel overlay (the centered modal opened by the <code class='text-bone'>[i]</code> button on narrow windows) no longer has inventory and hotbar item icons rendering on top of it — the panel, dim layer, <strong class='text-bone'>Re-roll Trades</strong> button, and close <code class='text-bone'>x</code> now sit above slot items, while button tooltips still appear on top of the overlay (S-064, B-106).",
+              "Trade-screen <code class='text-bone'>[i]</code> info button and overlay close <code class='text-bone'>[x]</code> button now use dedicated sprites with the glyphs pre-baked, so the icons are visually centered in their boxes instead of sitting one pixel off (S-064, B-104).",
+              "Trade tooltip mod-id line (added by Mod Menu's mod-id-tooltip feature) now sits at the bottom of the tooltip — below <em>Final:</em> — instead of between the item name and the price breakdown. The extra blank row above <em>Base:</em> was removed so the tooltip layout matches every other vanilla tooltip (S-064, B-105)."
+            ] }
+          ]
+        },
+        {
+          "type": "sub",
+          "title": "<span class='text-accent uppercase tracking-wider'>Added</span>",
+          "blocks": [
+            { "type": "list", "spacing": 1, "items": [
+              "Jade/WTHIT tooltip for sentry golems showing parent pylon coordinates, despawn countdown, and a \"No Drops\" indicator (S-048).",
+              "Small-screen fallback for the villager info panel: when the window is too narrow to fit the side panel, an <code class='text-bone'>i</code> icon appears in the merchant screen header and opens the info as a centered overlay (Esc or <code class='text-bone'>x</code> to close) (S-049).",
+              "EMI/REI/JEI trade-index entries now show the workstation block that unlocks the profession as a catalyst slot, and each workstation (lectern, composter, smoker, …) is registered as a recipe catalyst so players can click it to list every trade for that profession (S-043).",
+              "Sentry Pylon now accepts hopper and modded-pipe input on every face. Hoppers feed iron blocks in one at a time up to the fuel cap, reject non-iron items so mixed inventories don't deadlock, and cannot extract (fuel is consumed, not stored as items). Modded item pipes (Pipez, etc.) work via the Fabric Transfer API. Input pathway is gated on <code class='text-bone'>enableSentryPylon</code> (S-057).",
+              "Wandering traders can now be picked up like villagers — same sneak-right-click + empty-hand interaction, same <code class='text-bone'>pickupXpCost</code>, gated by the same <code class='text-bone'>enableVillagerPickup</code> config. The despawn timer is frozen while the trader is held as an item and resumes on placement, so players can park traders in known spots without losing them. Each leashed trader llama drops its lead and stops pathing toward the captured trader; llamas are not bundled onto the held item. Traders get biome-themed names on first encounter that persist across pickup/place cycles (S-062)."
+            ] }
+          ]
+        },
+        {
+          "type": "sub",
+          "title": "<span class='text-accent uppercase tracking-wider'>Removed</span>",
+          "blocks": [
+            { "type": "list", "spacing": 1, "items": [
+              "Double-door / fence-gate sync removed — the feature was out of scope for the villager/trade overhaul and overlaps with dedicated QoL mods. The <code class='text-bone'>enableDoubleDoorSync</code> config key no longer exists (S-058).",
+              "Hotbar / offhand stack refill removed — out of scope for the villager/trade overhaul; overlaps with dedicated QoL mods players already install. The <code class='text-bone'>enableStackRefill</code> config key no longer exists (S-058).",
+              "Village boundary visualization removed — the debug-overlay centroid column, AABB outline, and POI dust markers were out of scope for the villager/trade overhaul and shipped a buggy sky-spire rendering at the village centroid. The <code class='text-bone'>enableVillageBoundaryVis</code> config key and <code class='text-bone'>/mercantile village</code> command no longer exist (S-059)."
+            ] }
+          ]
+        },
+        {
+          "type": "sub",
+          "title": "<span class='text-accent uppercase tracking-wider'>Changed</span>",
+          "blocks": [
+            { "type": "list", "spacing": 1, "items": [
+              "Trade-cycling button renamed from \"Cycle Trades\" to <strong class='text-bone'>\"Re-roll Trades\"</strong> and redrawn as a labeled text button inside the villager info panel — no more separate icon sprite, and the button is hidden entirely when the villager's profession is locked (S-049).",
+              "Price-breakdown tooltip (demand transparency) no longer overlaps the trade-cycling button tooltip or the info panel — hit-testing now sits on the trade-offer button itself instead of approximating slot bounds (S-049).",
+              "Jade/WTHIT villager tooltip slimmed down: breeding state is now a single color-coded line (Ready / Hungry / Needs bed / Cooldown / Growing) with a <code class='text-bone'>Food: have/needed</code> progress line only when hungry. Removed the redundant <em>Hungry</em> state icon (the breeding line already covers it) and the <em>Profession: Locked/Unlocked</em> line (lock state lives in the in-game trade screen) (S-051, B-095).",
+              "EMI/REI/JEI trade-index rows redesigned to a clean three-row layout: icon strip with uniform 20px slot pitch on row 1, trade level on row 2, and a <code class='text-bone'>Requires &lt;tier&gt;</code> line on row 3 for reputation-locked trades. Removed the stacked \"Sold by\" / \"Workstation\" / tier-badge labels below the strip (the same context is in the slot hover tooltips). The profession head item now shows the profession name on hover instead of vanilla's \"'s head\" fallback (S-051, B-096).",
+              "Reputation HUD chip near villagers downscaled to sit more naturally next to vanilla HUD chrome — icon shrinks from 16px to 12px and inner padding tightens, producing a box ~16px tall instead of ~20px. Text remains at vanilla 9px height (S-053, B-100)."
+            ] }
+          ]
+        },
+        {
+          "type": "note",
+          "center": true,
+          "html": "Sprint-level breakdowns are tracked in <code class='text-bone'>.plan/DONE.md</code>. Story IDs (S-XXX, B-XXX) cross-reference <code class='text-bone'>.plan/BACKLOG.md</code>."
+        }
+      ]
+    }
+  ]
+}
