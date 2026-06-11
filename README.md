@@ -2,6 +2,8 @@
   <img src="art/logo.png" alt="Mercantile logo" width="600">
 </p>
 
+<p align="center"><strong>Every villager remembers.</strong></p>
+
 <p align="center">
   <a href="https://www.minecraft.net/"><img alt="Minecraft 1.21.1" src="https://img.shields.io/badge/Minecraft-1.21.1-62B47A?logo=minecraft&logoColor=white"></a>
   <a href="https://fabricmc.net/"><img alt="Fabric" src="https://img.shields.io/badge/Mod_Loader-Fabric-DBB69B"></a>

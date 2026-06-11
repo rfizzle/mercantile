@@ -1,5 +1,7 @@
 # Mercantile — Villager & Trade Overhaul
 
+**_Every villager remembers._**
+
 ![Mercantile logo](https://raw.githubusercontent.com/rfizzle/mercantile/master/art/logo.png)
 
 [![Minecraft 1.21.1](https://img.shields.io/badge/Minecraft-1.21.1-62B47A?logo=minecraft&logoColor=white)](https://www.minecraft.net/)

@@ -6,8 +6,8 @@
   "ogTitle": "Mercantile — Villager Overhaul for Minecraft",
   "ogDescription": "Mercantile is a Minecraft 1.21.1 Fabric mod that overhauls villagers and trading: pickup, names, reputation, trade cycling, and the Sentry Pylon defense block.",
   "hero": {
-    "lede": "A villager and trade overhaul for Minecraft 1.21.1 (Fabric).",
-    "sub": "Pickup, names, reputation, trade cycling, sentry pylons, and more.",
+    "lede": "Every villager remembers.",
+    "sub": "A villager and trade overhaul for Minecraft 1.21.1 (Fabric) — pickup, names, reputation, trade cycling, sentry pylons, and more.",
     "buttons": [
       {
         "label": "Download on Modrinth",
