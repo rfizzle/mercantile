@@ -1,0 +1,170 @@
+{
+  "nav": "Guide",
+  "metaTitle": "Getting Started — Mercantile | Villager Overhaul for Minecraft",
+  "metaDescription": "A linear walkthrough — install Mercantile, pick up your first villager, learn how reputation works, and refresh trades with cycling.",
+  "ogTitle": "Getting Started — Mercantile",
+  "ogDescription": "Install Mercantile, pick up your first villager, learn reputation, and cycle trades.",
+  "title": "Getting Started",
+  "lede": "A linear walkthrough — install Mercantile, pick up your first villager, learn how reputation works, and refresh trades with cycling.",
+  "width": "4xl",
+  "scale": "lg",
+  "sections": [
+    {
+      "id": "installation",
+      "title": "1. Installation",
+      "titleGap": "4",
+      "blocks": [
+        { "type": "prose", "html": ["Mercantile is a Fabric mod for Minecraft 1.21.1. Like every Fabric mod, you'll need:"] },
+        {
+          "type": "list",
+          "ordered": true,
+          "spacing": 3,
+          "items": [
+            "Install <strong class='text-bone'>Fabric Loader 0.16+</strong> via the official Fabric installer.",
+            "Download <strong class='text-bone'>Fabric API</strong> from <a href='https://modrinth.com/mod/fabric-api' rel='noopener noreferrer' target='_blank' class='text-accent hover:text-accent2 underline'>Modrinth</a> and drop it into your <code class='text-bone'>mods/</code> folder.",
+            "Download Mercantile from <a href='https://modrinth.com/mod/mercantile' rel='noopener noreferrer' target='_blank' class='text-accent hover:text-accent2 underline'>Modrinth</a> or <a href='https://www.curseforge.com/minecraft/mc-mods/mercantile' rel='noopener noreferrer' target='_blank' class='text-accent hover:text-accent2 underline'>CurseForge</a> and drop the jar into <code class='text-bone'>mods/</code>.",
+            "Launch Minecraft once. The first run generates <code class='text-bone'>.minecraft/config/mercantile.json</code> with default values."
+          ]
+        },
+        { "type": "prose", "html": ["For an in-game settings GUI (recommended), also install:"] },
+        {
+          "type": "list",
+          "spacing": 1,
+          "items": [
+            "<strong class='text-bone'>Mod Menu</strong> — adds an entry point on the mods list.",
+            "<strong class='text-bone'>Cloth Config API</strong> — provides the settings UI builder."
+          ]
+        },
+        { "type": "prose", "html": ["All other integrations (Jade, WTHIT, EMI, REI, JEI) are optional. Mercantile loads cleanly without any of them. See the <a href='/config.html' class='text-accent hover:text-accent2 underline'>full config reference</a> for every available setting."] }
+      ]
+    },
+    {
+      "id": "first-pickup",
+      "title": "2. Your First Villager Pickup",
+      "titleGap": "4",
+      "blocks": [
+        { "type": "prose", "html": ["Mercantile turns villagers into portable items, preserving everything about them — profession, trades, gossip, name, even their inventory. Try it:"] },
+        {
+          "type": "list",
+          "ordered": true,
+          "spacing": 3,
+          "items": [
+            "Find an adult villager (any profession, or unemployed) or a wandering trader.",
+            "Make sure you have <strong class='text-bone'>5 XP levels</strong> available (creative mode waives the cost). The cost is configurable via <code class='text-bone'>pickupXpCost</code>.",
+            "Empty your main hand, then <kbd class='px-1.5 py-0.5 bg-elevated border border-elevated rounded text-xs text-bone'>Sneak</kbd> + <kbd class='px-1.5 py-0.5 bg-elevated border border-elevated rounded text-xs text-bone'>Right-Click</kbd> the villager.",
+            "A green particle burst and sweep sound confirm the pickup. The villager vanishes; a profession-styled player head appears in your hand.",
+            "The head item's tooltip shows the villager's profession, level, and trades. Each trade includes lock indicators and a strikethrough for out-of-stock entries.",
+            "To place the villager again, <kbd class='px-1.5 py-0.5 bg-elevated border border-elevated rounded text-xs text-bone'>Right-Click</kbd> the head item on a block. The villager respawns facing you with all original data intact."
+          ]
+        },
+        { "type": "prose", "html": ["Pickup is blocked during raids, while another player is trading with the villager, and while the villager is following someone. Wandering traders use the same flow — their despawn countdown is frozen while held and resumes on placement, and any leashed trader llamas drop their lead and stay put. <a href='/features.html#villager-pickup' class='text-accent hover:text-accent2 underline'>Read more →</a>"] }
+      ]
+    },
+    {
+      "id": "reputation",
+      "title": "3. Understanding Reputation",
+      "titleGap": "4",
+      "blocks": [
+        { "type": "prose", "html": ["Mercantile tracks a persistent <strong class='text-bone'>global reputation score</strong> per player, from −100 to +200. The score affects pricing across every villager in the world and survives death."] },
+        {
+          "type": "sub",
+          "title": "The five tiers",
+          "blocks": [
+            {
+              "type": "table",
+              "bottomGap": true,
+              "headers": ["Tier", "Range", "Effect"],
+              "rows": [
+                ["Reviled", "−100 to −50", "Trade refusal, angry particles, head shake"],
+                ["Distrusted", "−49 to −1", "10–25% markup"],
+                ["Neutral", "0", "No effect"],
+                ["Liked", "1 to 49", "5% discount"],
+                ["Trusted", "50 to 99", "10% discount + profession-exclusive trades"],
+                ["Honored", "100 to 200", "15% discount + all exclusive trades"]
+              ]
+            }
+          ]
+        },
+        {
+          "type": "sub",
+          "title": "Ways to gain reputation",
+          "blocks": [
+            {
+              "type": "list",
+              "spacing": 1,
+              "items": [
+                "Complete a trade: <strong class='text-bone'>+1</strong>",
+                "Cure a zombie villager: <strong class='text-bone'>+15</strong> (one-time per villager UUID)",
+                "Cycle a villager's trades: <strong class='text-bone'>+2</strong>",
+                "Stand near a villager for 10 minutes: <strong class='text-bone'>+1</strong> (capped at +1/day total)"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "sub",
+          "title": "Ways to lose reputation",
+          "blocks": [
+            {
+              "type": "list",
+              "spacing": 1,
+              "items": [
+                "Attack a villager: <strong class='text-bone'>−10</strong>",
+                "Kill a villager: <strong class='text-bone'>−25</strong>"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "sub",
+          "title": "Knowing where you stand",
+          "blocks": [
+            { "type": "prose", "html": [
+              "A compact <strong class='text-bone'>HUD overlay</strong> appears in the top-left corner when a villager is within 32 blocks, showing your current tier. The icon is the Mercantile balance scale; the text is your tier name."
+            ] },
+            { "type": "code", "label": "For a precise score, run:", "tone": "accent2", "code": "/mercantile reputation", "bottomGap": true },
+            { "type": "prose", "html": ["See the <a href='/commands.html' class='text-accent hover:text-accent2 underline'>commands reference</a> for op-restricted set/add variants, and <a href='/features.html#reputation' class='text-accent hover:text-accent2 underline'>features → Reputation</a> for the full details."] }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "trade-cycling",
+      "title": "4. Trade Cycling Basics",
+      "titleGap": "4",
+      "blocks": [
+        { "type": "prose", "html": ["Tired of breaking and replacing workstations to chase a Mending book? Cycle the villager's trades for <strong class='text-bone'>6 emeralds</strong> (configurable) instead."] },
+        {
+          "type": "list",
+          "ordered": true,
+          "spacing": 3,
+          "items": [
+            "Find any villager with at least one profession (Librarian for enchant books, Cleric for glowstone, etc.).",
+            "Right-click to open the trade GUI. Look for the <strong class='text-bone'>\"Re-roll Trades\"</strong> button in the villager info panel.",
+            "Make sure you have at least <code class='text-bone'>tradeCycleEmeraldCost</code> emeralds in your inventory or offhand.",
+            "Click the button. Six emeralds are consumed (the cost is waived in creative). All unlocked trades are re-rolled from the profession's trade pool.",
+            "You'll see a gold-diamond particle flash and hear a villager \"yes\" sound on success."
+          ]
+        },
+        { "type": "prose", "html": [
+          "<strong class='text-bone'>Locked trades are preserved.</strong> A trade becomes locked once you've purchased it at least once. Lock state is tracked by a stable hash of the trade's input/output items, so the same trade keeps the same lock across cycles. The button disables when every trade is locked.",
+          "Cycling also grants <strong class='text-bone'>+2 reputation</strong> per cycle, so chasing trades helps your standing too. <a href='/features.html#trade-cycling' class='text-accent hover:text-accent2 underline'>Read more →</a>"
+        ] }
+      ]
+    },
+    {
+      "blocks": [
+        {
+          "type": "panel",
+          "title": "Where to go next",
+          "items": [
+            "<a href='/features.html' class='text-accent hover:text-accent2 underline'>Features</a> — full breakdown of every Mercantile feature.",
+            "<a href='/config.html' class='text-accent hover:text-accent2 underline'>Config</a> — tune every value, disable features you don't want.",
+            "<a href='/commands.html' class='text-accent hover:text-accent2 underline'>Commands</a> — server-side commands for ops.",
+            "<a href='/faq.html' class='text-accent hover:text-accent2 underline'>FAQ</a> — performance, compat, and common questions."
+          ]
+        }
+      ]
+    }
+  ]
+}

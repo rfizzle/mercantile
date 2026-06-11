@@ -1,0 +1,28 @@
+{
+  "id": "mercantile",
+  "name": "Mercantile",
+  "domain": "mercantile.rfizzle.com",
+  "url": "https://mercantile.rfizzle.com",
+  "description": "A villager and trade overhaul for Minecraft 1.21.1 (Fabric).",
+  "metaKeywords": "Minecraft, Fabric mod, villager mod, trade overhaul, villager pickup, trade cycling, reputation, sentry pylon, 1.21.1",
+  "github": "https://github.com/rfizzle/mercantile",
+  "defaultBranch": "master",
+  "copyright": "© 2026 rfizzle. Mercantile is not affiliated with Mojang Studios or Microsoft.",
+  "footerMeta": "Minecraft 1.21.1 · Fabric",
+  "ogImage": "og-image.png",
+  "nav": [
+    "index",
+    "features",
+    "config",
+    "commands",
+    "guide",
+    "faq",
+    "changelog"
+  ],
+  "theme": {
+    "accent": "#50C878",
+    "accent2": "#00C853",
+    "accent2Bright": "#6DDB94",
+    "glowRgb": "80, 200, 120"
+  }
+}

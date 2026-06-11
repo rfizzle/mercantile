@@ -1,0 +1,124 @@
+{
+  "type": "home",
+  "nav": "Home",
+  "metaTitle": "Mercantile — Villager Overhaul for Minecraft",
+  "metaDescription": "Mercantile is a Minecraft 1.21.1 Fabric mod that overhauls villagers and trading: pickup, names, reputation, trade cycling, and the Sentry Pylon defense block.",
+  "ogTitle": "Mercantile — Villager Overhaul for Minecraft",
+  "ogDescription": "Mercantile is a Minecraft 1.21.1 Fabric mod that overhauls villagers and trading: pickup, names, reputation, trade cycling, and the Sentry Pylon defense block.",
+  "hero": {
+    "lede": "A villager and trade overhaul for Minecraft 1.21.1 (Fabric).",
+    "sub": "Pickup, names, reputation, trade cycling, sentry pylons, and more.",
+    "buttons": [
+      {
+        "label": "Download on Modrinth",
+        "href": "https://modrinth.com/mod/mercantile",
+        "primary": true,
+        "external": true
+      },
+      {
+        "label": "CurseForge",
+        "href": "https://www.curseforge.com/minecraft/mc-mods/mercantile",
+        "external": true
+      },
+      {
+        "label": "GitHub",
+        "href": "https://github.com/rfizzle/mercantile",
+        "external": true
+      }
+    ]
+  },
+  "sections": [
+    {
+      "title": "Features",
+      "band": true,
+      "lede": "A glimpse of what Mercantile changes. <a href='/features.html' class='text-accent hover:text-accent2 underline'>Full list →</a>",
+      "blocks": [
+        {
+          "type": "cards",
+          "mdColumns": 2,
+          "lgColumns": 3,
+          "hoverAccent": true,
+          "items": [
+            {
+              "title": "Villager Pickup",
+              "html": [
+                "Sneak-right-click a villager to pick it up. Full NBT — profession, trades, gossip — is preserved."
+              ]
+            },
+            {
+              "title": "Villager Names",
+              "html": [
+                "Biome-themed names are auto-assigned on spawn and always visible above the villager."
+              ]
+            },
+            {
+              "title": "Trade Cycling",
+              "html": [
+                "Refresh a villager's trade pool using emeralds and emerald blocks instead of breaking their workstation."
+              ]
+            },
+            {
+              "title": "Reputation",
+              "html": [
+                "A five-tier global standing with persistent gossip that travels with villagers across the world."
+              ]
+            },
+            {
+              "title": "Sentry Pylon",
+              "html": [
+                "An iron-fueled defense block that spawns temporary iron golems to guard your village."
+              ]
+            },
+            {
+              "title": "…and many more.",
+              "titleTone": "bone",
+              "html": [
+                "<a href='/features.html' class='text-accent hover:text-accent2 font-semibold'>See all features →</a>"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Get Mercantile",
+      "lede": "Requires Fabric Loader 0.16+ and Fabric API on Minecraft 1.21.1.",
+      "blocks": [
+        {
+          "type": "cards",
+          "mdColumns": 3,
+          "hoverAccent": true,
+          "items": [
+            {
+              "title": "Modrinth",
+              "titleTone": "bone",
+              "badge": "Recommended",
+              "html": [
+                "Primary distribution. Auto-update support in most launchers.",
+                "<a href='https://modrinth.com/mod/mercantile' rel='noopener noreferrer' target='_blank' class='text-accent hover:text-accent2'>modrinth.com/mod/mercantile →</a>"
+              ]
+            },
+            {
+              "title": "CurseForge",
+              "titleTone": "bone",
+              "badge": "Alternative",
+              "html": [
+                "For users on the CurseForge launcher or modpack distributions.",
+                "<a href='https://www.curseforge.com/minecraft/mc-mods/mercantile' rel='noopener noreferrer' target='_blank' class='text-accent hover:text-accent2'>curseforge.com →</a>"
+              ]
+            },
+            {
+              "title": "GitHub",
+              "titleTone": "bone",
+              "badge": "Source",
+              "html": [
+                "Source code, issue tracker, and release downloads.",
+                "<a href='https://github.com/rfizzle/mercantile' rel='noopener noreferrer' target='_blank' class='text-accent hover:text-accent2'>github.com/rfizzle/mercantile →</a>"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
