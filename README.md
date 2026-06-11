@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="logo.png" alt="Mercantile logo" width="600">
+  <img src="art/logo.png" alt="Mercantile logo" width="600">
 </p>
 
 <p align="center">
