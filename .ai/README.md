@@ -5,19 +5,17 @@ Single, vendor-neutral home for everything AI agents (Claude Code, Jules, future
 | Path | What lives there |
 |---|---|
 | `skills/` | Domain skills (`mc-*/SKILL.md`). Claude Code auto-loads via `.claude/skills` symlink; Jules reads them when `AGENTS.md` points to them. |
-| `prompts/spec-writer.md` | Prompt for the `needs-spec` label workflow — produces an implementation spec as an issue comment. |
-| `prompts/code-reviewer.md` | Prompt for `claude-code-review.yml` — produces the structured `✓/⚠/✗` review table. |
-| `review-criteria.yml` | Repo-tailored categories the reviewer scores. Edit this to change review behavior without touching workflow YAML. |
 
-## How to change the review
+The CI prompts (`code-reviewer.md`, `spec-writer.md`) and the review criteria
+(`review-criteria.yml`) are **not** kept here — the generic suite defaults in
+[rfizzle/concord](https://github.com/rfizzle/concord) `.ai/` are used.
+Domain-specific review emphasis lives in `AGENTS.md`, which the workflows
+always inject into the prompt.
 
-1. Edit `review-criteria.yml` (add/remove categories, tweak descriptions).
-2. Re-run the review (push a commit, or use the workflow's re-run button).
-3. The prompt is generic; the criteria file drives the categories.
-
-## How to change the spec format
-
-Edit `prompts/spec-writer.md`. The workflow loads it at runtime — no YAML changes needed.
+Resolution order in the reusable workflows: explicit `prompt-file` /
+`criteria-file` workflow input → repo-local `.ai/` file (whole-file override)
+→ concord default. To specialize a prompt or the scored categories for this
+repo, copy the concord default into `.ai/` and edit it.
 
 ## Adding a new skill
 

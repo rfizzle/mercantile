@@ -8,6 +8,7 @@ classes/
 run/
 mods/
 logs/
+config/
 
 # IDE
 .idea/
@@ -20,11 +21,19 @@ logs/
 .project
 *.launch
 
-# Dev
-.plan
-spec/
+# generated website (built by concord template)
+_site/
+
+# local AI / planning state
 .claude/settings.local.json
+.claude/projects/
+.claude/scheduled_tasks.lock
+.plan/
 
 # OS junk
 .DS_Store
 Thumbs.db
+
+# stray runtime artifacts
+replay_pid*.log
+hs_err_pid*.log

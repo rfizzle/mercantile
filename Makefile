@@ -1,7 +1,7 @@
 GRADLE := ./gradlew
 BASE_VERSION := $(shell awk -F= '/^mod_version/ {gsub(/ /,"",$$2); print $$2}' gradle.properties)
 
-.PHONY: help build clean test jar run-client run-server gen-sources refresh-deps version release
+.PHONY: help build clean test jar run-client run-server gen-sources refresh-deps version release site site-serve
 
 help:
 	@echo "Targets:"
@@ -15,6 +15,8 @@ help:
 	@echo "  clean        Remove build outputs"
 	@echo "  version      Print the base and git-derived computed version"
 	@echo "  release      Cut a release (usage: make release BUMP=patch|minor|major [NO_PUSH=1])"
+	@echo "  site         Build the website from site/ with the shared concord template"
+	@echo "  site-serve   Build and serve the website locally with live reload"
 
 build:
 	$(GRADLE) build
@@ -47,3 +49,9 @@ version:
 release:
 	@test -n "$(BUMP)" || (echo "Usage: make release BUMP=patch|minor|major [NO_PUSH=1]" && exit 1)
 	@scripts/release.sh $(BUMP) $(if $(NO_PUSH),--no-push,)
+
+site:
+	SITE_DIR=$(PWD)/site npx -y @11ty/eleventy@3.0.0 --config=../concord/template/eleventy.config.cjs --input=../concord/template/src --output=_site
+
+site-serve:
+	SITE_DIR=$(PWD)/site npx -y @11ty/eleventy@3.0.0 --config=../concord/template/eleventy.config.cjs --input=../concord/template/src --output=_site --serve
