@@ -1,45 +1,49 @@
 package com.rfizzle.mercantile.client.hud;
 
 import com.rfizzle.mercantile.Mercantile;
+import com.rfizzle.mercantile.api.ReputationTier;
 import com.rfizzle.mercantile.client.network.ClientMercantileData;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 
+/**
+ * Slot-2 HUD badge in the shared Concord layout: an icon-only element
+ * matching Tribulation's slot-1 badge — a 16×16 glyph over a 2px progress
+ * bar, state conveyed by color rather than text. The glyph is the vanilla
+ * emerald item (asset philosophy: vanilla-first, no custom textures); the
+ * bar is tinted by reputation tier and fills with progress toward the next
+ * tier.
+ */
 public final class ReputationHudOverlay {
 
-    private static final ResourceLocation ICON = Mercantile.id("icon.png");
+    private static final ItemStack GLYPH = new ItemStack(Items.EMERALD);
 
     private static final int PROXIMITY_RADIUS = 32;
     private static final int SCAN_INTERVAL_TICKS = 20;
 
-    private static final int BOX_PAD_X = 3;
-    private static final int BOX_PAD_Y = 2;
-    private static final int ICON_SIZE = 12;
-    private static final int ICON_TEXT_GAP = 2;
-    private static final int TEXT_HEIGHT = 9;
-    private static final int BG_COLOR = 0x99000000;
-    private static final int TEXT_COLOR = 0xFFFFFFFF;
+    private static final int ICON_SIZE = 16;
+    private static final int BAR_HEIGHT = 2;
+    private static final int BAR_GAP = 1;
+    private static final int BAR_BG_COLOR = 0xC0202020;
 
     /**
      * This element's height contribution for sibling HUD coordination
      * (HUD-STANDARD §3/§6): the standard 20px slot element plus the 2px
-     * stacking gap. The box currently renders 16px tall (12px glyph + 2px
-     * padding); the slot still reserves the standard 22px so siblings don't
-     * shift when the visual is brought up to the 20px spec.
+     * stacking gap. The badge renders 19px tall (16px glyph + 1px gap +
+     * 2px bar) and rounds into the 20px box exactly as Tribulation's does.
      */
     private static final int HUD_HEIGHT_CONTRIBUTION = 22;
 
@@ -60,23 +64,29 @@ public final class ReputationHudOverlay {
         Minecraft mc = Minecraft.getInstance();
         if (!shouldRender(mc)) return;
 
-        Font font = mc.font;
-        Component label = buildLabel();
-        int textWidth = font.width(label);
+        int score = ClientMercantileData.getReputationScore();
+        ReputationTier tier = ReputationTier.fromScore(score);
+        int color = tierColor(tier);
+        float fraction = progressFraction(score, tier);
 
         MercantileConfig config = MercantileConfig.get();
         MercantileConfig.Anchor anchor = config.hudAnchor != null ? config.hudAnchor : MercantileConfig.Anchor.TOP_LEFT;
-        int boxW = boxWidthFor(textWidth);
-        int boxH = BOX_PAD_Y + ICON_SIZE + BOX_PAD_Y;
+        int badgeH = ICON_SIZE + BAR_GAP + BAR_HEIGHT;
         int stackOffset = stackOffsetFor(anchor, TribulationOffset.current());
-        int x = computeOriginX(anchor, graphics.guiWidth(), config.hudOffsetX, boxW);
-        int y = computeOriginY(anchor, graphics.guiHeight(), config.hudOffsetY, boxH, stackOffset);
+        int x = computeOriginX(anchor, graphics.guiWidth(), config.hudOffsetX, ICON_SIZE);
+        int y = computeOriginY(anchor, graphics.guiHeight(), config.hudOffsetY, badgeH, stackOffset);
 
-        drawBox(graphics, x, y, boxW, boxH);
-        graphics.blit(ICON, x + BOX_PAD_X, y + BOX_PAD_Y, 0, 0, ICON_SIZE, ICON_SIZE, ICON_SIZE, ICON_SIZE);
-        int textX = x + BOX_PAD_X + ICON_SIZE + ICON_TEXT_GAP;
-        int textY = y + BOX_PAD_Y + (ICON_SIZE - TEXT_HEIGHT) / 2;
-        graphics.drawString(font, label, textX, textY, TEXT_COLOR, true);
+        // The emerald is an item render, not a tintable grayscale sprite, so
+        // tier state lives in the bar color. When the pixel-art 16×16 glyph
+        // master lands (deferred asset), it can be tinted like Tribulation's.
+        graphics.renderItem(GLYPH, x, y);
+
+        int barY = y + ICON_SIZE + BAR_GAP;
+        graphics.fill(x, barY, x + ICON_SIZE, barY + BAR_HEIGHT, BAR_BG_COLOR);
+        int filledW = Math.round(ICON_SIZE * fraction);
+        if (filledW > 0) {
+            graphics.fill(x, barY, x + filledW, barY + BAR_HEIGHT, color);
+        }
     }
 
     private static boolean shouldRender(Minecraft mc) {
@@ -112,18 +122,40 @@ public final class ReputationHudOverlay {
         return now - lastScanTick >= SCAN_INTERVAL_TICKS || now < lastScanTick;
     }
 
-    private static void drawBox(GuiGraphics g, int x, int y, int w, int h) {
-        // Two overlapping rects produce a 1px corner inset — cheap rounded look without sprites.
-        g.fill(x + 1, y, x + w - 1, y + h, BG_COLOR);
-        g.fill(x, y + 1, x + w, y + h - 1, BG_COLOR);
+    /**
+     * Bar tint per tier. Positive tiers ramp through the mod's emerald
+     * accents; NEUTRAL is white and the negative tiers use the shared
+     * orange/red state ramp (HUD-STANDARD §3 — state tinting is the
+     * element's only decoration).
+     */
+    static int tierColor(ReputationTier tier) {
+        return switch (tier) {
+            case HONORED -> 0xFF6DDB94;    // Emerald Bright (accent 2)
+            case TRUSTED -> 0xFF50C878;    // Emerald (accent 1)
+            case LIKED -> 0xFFA9D9B5;      // pale emerald
+            case NEUTRAL -> 0xFFFFFFFF;    // white
+            case DISTRUSTED -> 0xFFFF8C00; // orange (shared state ramp)
+            case REVILED -> 0xFFFF4040;    // red (shared state ramp)
+        };
     }
 
-    static int boxWidthFor(int textWidth) {
-        return BOX_PAD_X + ICON_SIZE + ICON_TEXT_GAP + textWidth + BOX_PAD_X;
+    /**
+     * Fraction of the way from this tier's floor to the next tier's floor;
+     * 1.0 at the top tier. Tiers are declared in descending minScore order,
+     * so the next tier up is the previous enum constant.
+     */
+    static float progressFraction(int score, ReputationTier tier) {
+        ReputationTier next = nextTierAbove(tier);
+        if (next == null) return 1.0f;
+        int span = next.minScore() - tier.minScore();
+        if (span <= 0) return 1.0f;
+        float fraction = (score - tier.minScore()) / (float) span;
+        return Math.max(0.0f, Math.min(1.0f, fraction));
     }
 
-    static Component buildLabel() {
-        return Component.translatable(ClientMercantileData.getReputationTier());
+    static ReputationTier nextTierAbove(ReputationTier tier) {
+        int idx = tier.ordinal();
+        return idx == 0 ? null : ReputationTier.values()[idx - 1];
     }
 
     /**
@@ -222,14 +254,14 @@ public final class ReputationHudOverlay {
     }
 
     /**
-     * Origin = top-left corner of the box. Offsets are measured inward from
+     * Origin = top-left corner of the badge. Offsets are measured inward from
      * the anchored edges, so the element keeps its distance from its corner
-     * regardless of screen size or label width (HUD-STANDARD §4).
+     * regardless of screen size (HUD-STANDARD §4).
      */
-    static int computeOriginX(MercantileConfig.Anchor anchor, int screenW, int offsetX, int boxW) {
+    static int computeOriginX(MercantileConfig.Anchor anchor, int screenW, int offsetX, int badgeW) {
         return switch (anchor) {
             case TOP_LEFT, BOTTOM_LEFT -> offsetX;
-            case TOP_RIGHT, BOTTOM_RIGHT -> screenW - offsetX - boxW;
+            case TOP_RIGHT, BOTTOM_RIGHT -> screenW - offsetX - badgeW;
         };
     }
 
@@ -237,10 +269,10 @@ public final class ReputationHudOverlay {
      * The stacking offset shifts inward from the anchored vertical edge: down
      * from a top anchor, up from a bottom anchor.
      */
-    static int computeOriginY(MercantileConfig.Anchor anchor, int screenH, int offsetY, int boxH, int stackOffset) {
+    static int computeOriginY(MercantileConfig.Anchor anchor, int screenH, int offsetY, int badgeH, int stackOffset) {
         return switch (anchor) {
             case TOP_LEFT, TOP_RIGHT -> offsetY + stackOffset;
-            case BOTTOM_LEFT, BOTTOM_RIGHT -> screenH - offsetY - boxH - stackOffset;
+            case BOTTOM_LEFT, BOTTOM_RIGHT -> screenH - offsetY - badgeH - stackOffset;
         };
     }
 }

@@ -1,10 +1,12 @@
 package com.rfizzle.mercantile.client.hud;
 
+import com.rfizzle.mercantile.api.ReputationTier;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ReputationHudOverlayTest {
@@ -12,19 +14,44 @@ class ReputationHudOverlayTest {
     private static final int SCAN_INTERVAL_TICKS = 20;
 
     @Test
-    void boxWidthForIncludesPaddingIconGapAndText() {
-        // 3 (left pad) + 12 (icon) + 2 (gap) + textWidth + 3 (right pad)
-        assertEquals(20 + 42, ReputationHudOverlay.boxWidthFor(42));
-        assertEquals(20, ReputationHudOverlay.boxWidthFor(0));
-        assertEquals(20 + 100, ReputationHudOverlay.boxWidthFor(100));
+    void nextTierAboveWalksUpTheLadderAndStopsAtHonored() {
+        assertEquals(ReputationTier.DISTRUSTED, ReputationHudOverlay.nextTierAbove(ReputationTier.REVILED));
+        assertEquals(ReputationTier.NEUTRAL, ReputationHudOverlay.nextTierAbove(ReputationTier.DISTRUSTED));
+        assertEquals(ReputationTier.LIKED, ReputationHudOverlay.nextTierAbove(ReputationTier.NEUTRAL));
+        assertEquals(ReputationTier.TRUSTED, ReputationHudOverlay.nextTierAbove(ReputationTier.LIKED));
+        assertEquals(ReputationTier.HONORED, ReputationHudOverlay.nextTierAbove(ReputationTier.TRUSTED));
+        assertNull(ReputationHudOverlay.nextTierAbove(ReputationTier.HONORED));
     }
 
     @Test
-    void boxWidthForGrowsMonotonicallyWithText() {
-        int shorter = ReputationHudOverlay.boxWidthFor(20);
-        int longer = ReputationHudOverlay.boxWidthFor(60);
-        assertTrue(longer > shorter, "longer label must produce a wider box");
-        assertEquals(40, longer - shorter, "width difference must equal textWidth difference");
+    void progressFractionIsZeroAtTierFloorAndApproachesOneBelowCeiling() {
+        // NEUTRAL spans 0..74; LIKED starts at 75.
+        assertEquals(0.0f, ReputationHudOverlay.progressFraction(0, ReputationTier.NEUTRAL));
+        assertEquals(0.5f, ReputationHudOverlay.progressFraction(37, ReputationTier.NEUTRAL), 0.01f);
+        assertTrue(ReputationHudOverlay.progressFraction(74, ReputationTier.NEUTRAL) < 1.0f);
+    }
+
+    @Test
+    void progressFractionIsFullAtTopTier() {
+        assertEquals(1.0f, ReputationHudOverlay.progressFraction(1000, ReputationTier.HONORED));
+        assertEquals(1.0f, ReputationHudOverlay.progressFraction(1500, ReputationTier.HONORED));
+    }
+
+    @Test
+    void progressFractionIsClampedAgainstMismatchedScores() {
+        // Defensive: a score outside the tier's range must not under/overflow the bar.
+        assertEquals(0.0f, ReputationHudOverlay.progressFraction(-500, ReputationTier.NEUTRAL));
+        assertEquals(1.0f, ReputationHudOverlay.progressFraction(5000, ReputationTier.NEUTRAL));
+    }
+
+    @Test
+    void tierColorIsDistinctPerTier() {
+        // The bar tint is the badge's only state signal — every tier must read differently.
+        long distinct = java.util.Arrays.stream(ReputationTier.values())
+                .mapToInt(ReputationHudOverlay::tierColor)
+                .distinct()
+                .count();
+        assertEquals(ReputationTier.values().length, distinct);
     }
 
     @Test
