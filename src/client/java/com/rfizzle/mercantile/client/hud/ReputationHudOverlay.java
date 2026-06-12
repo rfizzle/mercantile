@@ -75,8 +75,11 @@ public final class ReputationHudOverlay {
         LocalPlayer player = mc.player;
         ClientLevel level = mc.level;
         if (player == null || level == null) return false;
+        // The four HUD-STANDARD §5 visibility rules: F1, open screen,
+        // spectator mode, death screen.
         if (mc.options.hideGui) return false;
         if (mc.screen != null) return false;
+        if (player.isSpectator()) return false;
         if (player.isDeadOrDying()) return false;
         if (!MercantileConfig.get().enableReputationHud) return false;
         MercantileConfig synced = ClientMercantileData.getServerConfig();
