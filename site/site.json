@@ -3,7 +3,7 @@
   "name": "Mercantile",
   "domain": "mercantile.rfizzle.com",
   "url": "https://mercantile.rfizzle.com",
-  "description": "A villager and trade overhaul for Minecraft 1.21.1 (Fabric).",
+  "description": "Every villager remembers. A villager and trade overhaul for Minecraft 1.21.1 (Fabric).",
   "metaKeywords": "Minecraft, Fabric mod, villager mod, trade overhaul, villager pickup, trade cycling, reputation, sentry pylon, 1.21.1",
   "github": "https://github.com/rfizzle/mercantile",
   "defaultBranch": "master",
