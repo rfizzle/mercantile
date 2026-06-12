@@ -247,10 +247,11 @@ optional. Required deps: Fabric API only.
 > unrelated mod on both stores (discovered 2026-06-12), so the suite slug
 > convention is `<mod>-<domain>-overhaul` (`VISION.md` §4) —
 > `mercantile-villager-overhaul` once registered. Meridian and Tribulation
-> are already live on CurseForge under this pattern; Modrinth submissions are
-> pending review. README/site link only to GitHub Releases until this mod's
-> listings are publicly live, then the store links, download badges, and
-> listing cross-links come back under the final slugs.
+> are already live on CurseForge under this pattern; the Modrinth submission
+> is in review as project `Bnp3Drhe` (IDs for all three: `VISION.md` §4).
+> README/site link only to GitHub Releases until this mod's listings are
+> publicly live, then the store links, download badges, and listing
+> cross-links come back under the final slugs/IDs.
 
 README badges: MC 1.21.1 · Fabric · MIT · release · CI (store download badges
 return when the listings are publicly live).
