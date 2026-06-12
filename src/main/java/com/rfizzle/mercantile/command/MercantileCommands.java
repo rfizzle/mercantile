@@ -2,12 +2,12 @@ package com.rfizzle.mercantile.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.rfizzle.mercantile.api.ReputationTier;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
 import com.rfizzle.mercantile.network.ConfigSyncS2CPayload;
 import com.rfizzle.mercantile.reputation.ReputationManager;
-import com.rfizzle.mercantile.api.ReputationTier;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.commands.CommandSourceStack;
@@ -92,18 +92,19 @@ public final class MercantileCommands {
     }
 
     private static int setReputation(CommandSourceStack source, ServerPlayer target, int value) {
-        PlayerData data = target.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
-        data.setScore(value);
-        Component tier = ReputationTier.fromScore(value).displayName();
+        // Routed through ReputationManager so the change fires
+        // ReputationChangedCallback and syncs the target's HUD.
+        int newScore = ReputationManager.setScore(target, value);
+        Component tier = ReputationTier.fromScore(newScore).displayName();
         source.sendSuccess(() -> Component.translatable("command.mercantile.reputation.set",
-                target.getDisplayName(), value, tier), true);
-        return value;
+                target.getDisplayName(), newScore, tier), true);
+        return newScore;
     }
 
     private static int addReputation(CommandSourceStack source, ServerPlayer target, int amount) {
-        PlayerData data = target.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
-        data.addScore(amount);
-        int newScore = data.getScore();
+        // Routed through ReputationManager so the change fires
+        // ReputationChangedCallback and syncs the target's HUD.
+        int newScore = ReputationManager.addScore(target, amount);
         Component tier = ReputationTier.fromScore(newScore).displayName();
         source.sendSuccess(() -> Component.translatable("command.mercantile.reputation.add",
                 amount, target.getDisplayName(), newScore, tier), true);

@@ -1,5 +1,7 @@
 package com.rfizzle.mercantile.reputation;
 
+import com.rfizzle.mercantile.Mercantile;
+import com.rfizzle.mercantile.api.ReputationChangedCallback;
 import com.rfizzle.mercantile.api.ReputationTier;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
@@ -92,8 +94,61 @@ public final class ReputationManager {
         if (!MercantileConfig.get().enableReputation) return;
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         migrateIfNeeded(data);
-        data.addScore(amount);
+        changeScore(player, data, data.getScore() + amount);
         syncToClient(player, data);
+    }
+
+    /**
+     * Admin path ({@code /mercantile reputation set}): sets an absolute score,
+     * bypassing the {@code enableReputation} gate. Migrates first so a later
+     * lazy migration cannot 10x an admin-set value, fires the change event,
+     * and syncs the HUD.
+     *
+     * @return the applied (clamped) score
+     */
+    public static int setScore(ServerPlayer player, int value) {
+        PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
+        migrateIfNeeded(data);
+        changeScore(player, data, value);
+        syncToClient(player, data);
+        return data.getScore();
+    }
+
+    /**
+     * Admin path ({@code /mercantile reputation add}): adds a delta, bypassing
+     * the {@code enableReputation} gate. See {@link #setScore}.
+     *
+     * @return the applied (clamped) score
+     */
+    public static int addScore(ServerPlayer player, int amount) {
+        PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
+        migrateIfNeeded(data);
+        changeScore(player, data, data.getScore() + amount);
+        syncToClient(player, data);
+        return data.getScore();
+    }
+
+    /**
+     * The single choke point through which every reputation score change
+     * flows (trade/cycle/cure/proximity gains, attack/kill losses, bulk
+     * trades, admin commands). Applies the clamped score and fires
+     * {@link ReputationChangedCallback} when the score actually changed.
+     * The one-shot legacy migration in {@link #migrateIfNeeded} intentionally
+     * does not flow through here — it is a save-format rescale, not a
+     * gameplay change.
+     */
+    private static void changeScore(ServerPlayer player, PlayerData data, int newScore) {
+        int oldScore = data.getScore();
+        data.setScore(newScore);
+        int applied = data.getScore();
+        if (applied == oldScore) return;
+        try {
+            ReputationChangedCallback.EVENT.invoker().onReputationChanged(player, oldScore, applied);
+        } catch (Exception e) {
+            // Error isolation per Concord API-STANDARD §3: a misbehaving
+            // listener must never corrupt the reputation flow.
+            Mercantile.LOGGER.warn("ReputationChangedCallback listener threw", e);
+        }
     }
 
     public enum CapDecision {
@@ -160,7 +215,7 @@ public final class ReputationManager {
         CapDecision decision = evaluateTradeGain(data, config, currentDay);
         switch (decision) {
             case AWARDED -> {
-                data.addScore(config.reputationTradeGain);
+                changeScore(player, data, data.getScore() + config.reputationTradeGain);
                 syncToClient(player, data);
             }
             case SUBCAP_HIT, TOTAL_CAP_HIT -> sendDailyCapMessage(player, data);
@@ -177,7 +232,7 @@ public final class ReputationManager {
         CapDecision decision = evaluateCycleGain(data, config, currentDay);
         switch (decision) {
             case AWARDED -> {
-                data.addScore(config.reputationCycleGain);
+                changeScore(player, data, data.getScore() + config.reputationCycleGain);
                 syncToClient(player, data);
             }
             case SUBCAP_HIT, TOTAL_CAP_HIT -> sendDailyCapMessage(player, data);
@@ -196,7 +251,7 @@ public final class ReputationManager {
         migrateIfNeeded(data);
         long currentDay = player.serverLevel().getGameTime() / 24_000L;
         rolloverIfNewDay(data, currentDay);
-        data.addScore(config.reputationCureGain);
+        changeScore(player, data, data.getScore() + config.reputationCureGain);
         syncToClient(player, data);
     }
 
@@ -258,7 +313,7 @@ public final class ReputationManager {
 
         data.setProximityTicks(0);
         data.setLastProximityDay(currentDay);
-        data.addScore(1);
+        changeScore(player, data, data.getScore() + 1);
         syncToClient(player, data);
     }
 }

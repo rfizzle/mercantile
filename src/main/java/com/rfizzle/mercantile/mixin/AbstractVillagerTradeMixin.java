@@ -1,5 +1,7 @@
 package com.rfizzle.mercantile.mixin;
 
+import com.rfizzle.mercantile.Mercantile;
+import com.rfizzle.mercantile.api.TradeExecutedCallback;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
@@ -24,6 +26,23 @@ public abstract class AbstractVillagerTradeMixin {
 
     @Inject(method = "notifyTrade", at = @At("TAIL"))
     private void mercantile$onTrade(MerchantOffer offer, CallbackInfo ci) {
+        AbstractVillager self = (AbstractVillager) (Object) this;
+
+        // TradeExecutedCallback (api): fires for villagers AND wandering
+        // traders — both complete trades through notifyTrade. Server-side
+        // only: the client menu trades against ClientSideMerchant, never an
+        // AbstractVillager, but guard anyway for safety.
+        if (!self.level().isClientSide()
+                && self.getTradingPlayer() instanceof ServerPlayer tradingServerPlayer) {
+            try {
+                TradeExecutedCallback.EVENT.invoker().onTradeExecuted(tradingServerPlayer, self, offer);
+            } catch (Exception e) {
+                // Error isolation per Concord API-STANDARD §3: a misbehaving
+                // listener must never corrupt the trade.
+                Mercantile.LOGGER.warn("TradeExecutedCallback listener threw", e);
+            }
+        }
+
         if (!((Object) this instanceof Villager villager)) return;
 
         MercantileConfig config = MercantileConfig.get();
