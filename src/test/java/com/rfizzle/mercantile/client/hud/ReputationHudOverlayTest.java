@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.client.hud;
 
+import com.rfizzle.mercantile.config.MercantileConfig;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,17 +28,41 @@ class ReputationHudOverlayTest {
     }
 
     @Test
-    void yOffsetForWithoutTribulationUsesBaseY() {
-        assertEquals(2, ReputationHudOverlay.yOffsetFor(false));
+    void stackOffsetWithoutTribulationIsZero() {
+        assertEquals(0, ReputationHudOverlay.stackOffsetFor(MercantileConfig.Anchor.TOP_LEFT, false));
     }
 
     @Test
-    void yOffsetForWithTribulationReservesSpaceAbove() {
-        int withTrib = ReputationHudOverlay.yOffsetFor(true);
-        int withoutTrib = ReputationHudOverlay.yOffsetFor(false);
-        assertTrue(withTrib > withoutTrib, "Tribulation must push our HUD down");
-        // base 2 + reserved 22
-        assertEquals(24, withTrib);
+    void stackOffsetWithTribulationReservesSlotOneAtTopLeft() {
+        int withTrib = ReputationHudOverlay.stackOffsetFor(MercantileConfig.Anchor.TOP_LEFT, true);
+        assertTrue(withTrib > 0, "Tribulation must push our HUD down at the shared default anchor");
+        assertEquals(22, withTrib);
+    }
+
+    @Test
+    void stackOffsetOnlyAppliesAtTopLeftAnchor() {
+        // Tribulation's slot-1 element canonically sits top-left; other anchors don't stack against it.
+        assertEquals(0, ReputationHudOverlay.stackOffsetFor(MercantileConfig.Anchor.TOP_RIGHT, true));
+        assertEquals(0, ReputationHudOverlay.stackOffsetFor(MercantileConfig.Anchor.BOTTOM_LEFT, true));
+        assertEquals(0, ReputationHudOverlay.stackOffsetFor(MercantileConfig.Anchor.BOTTOM_RIGHT, true));
+    }
+
+    @Test
+    void computeOriginXAnchorsLeftAndRightEdges() {
+        // screen 400 wide, offset 4, box 50 wide
+        assertEquals(4, ReputationHudOverlay.computeOriginX(MercantileConfig.Anchor.TOP_LEFT, 400, 4, 50));
+        assertEquals(4, ReputationHudOverlay.computeOriginX(MercantileConfig.Anchor.BOTTOM_LEFT, 400, 4, 50));
+        assertEquals(400 - 4 - 50, ReputationHudOverlay.computeOriginX(MercantileConfig.Anchor.TOP_RIGHT, 400, 4, 50));
+        assertEquals(400 - 4 - 50, ReputationHudOverlay.computeOriginX(MercantileConfig.Anchor.BOTTOM_RIGHT, 400, 4, 50));
+    }
+
+    @Test
+    void computeOriginYAnchorsTopAndBottomEdgesAndStacksInward() {
+        // screen 300 tall, offset 4, box 16 tall, stack 22
+        assertEquals(4 + 22, ReputationHudOverlay.computeOriginY(MercantileConfig.Anchor.TOP_LEFT, 300, 4, 16, 22));
+        assertEquals(4 + 22, ReputationHudOverlay.computeOriginY(MercantileConfig.Anchor.TOP_RIGHT, 300, 4, 16, 22));
+        assertEquals(300 - 4 - 16 - 22, ReputationHudOverlay.computeOriginY(MercantileConfig.Anchor.BOTTOM_LEFT, 300, 4, 16, 22));
+        assertEquals(300 - 4 - 16, ReputationHudOverlay.computeOriginY(MercantileConfig.Anchor.BOTTOM_RIGHT, 300, 4, 16, 0));
     }
 
     @Test

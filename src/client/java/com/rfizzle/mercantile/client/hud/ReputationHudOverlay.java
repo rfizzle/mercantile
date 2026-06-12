@@ -22,8 +22,6 @@ public final class ReputationHudOverlay {
     private static final int PROXIMITY_RADIUS = 32;
     private static final int SCAN_INTERVAL_TICKS = 20;
 
-    private static final int BASE_X = 2;
-    private static final int BASE_Y = 2;
     private static final int BOX_PAD_X = 3;
     private static final int BOX_PAD_Y = 2;
     private static final int ICON_SIZE = 12;
@@ -57,10 +55,13 @@ public final class ReputationHudOverlay {
         Component label = buildLabel();
         int textWidth = font.width(label);
 
+        MercantileConfig config = MercantileConfig.get();
+        MercantileConfig.Anchor anchor = config.hudAnchor != null ? config.hudAnchor : MercantileConfig.Anchor.TOP_LEFT;
         int boxW = boxWidthFor(textWidth);
         int boxH = BOX_PAD_Y + ICON_SIZE + BOX_PAD_Y;
-        int x = BASE_X;
-        int y = yOffsetFor(FabricLoader.getInstance().isModLoaded(TRIBULATION_MOD_ID));
+        int stackOffset = stackOffsetFor(anchor, FabricLoader.getInstance().isModLoaded(TRIBULATION_MOD_ID));
+        int x = computeOriginX(anchor, graphics.guiWidth(), config.hudOffsetX, boxW);
+        int y = computeOriginY(anchor, graphics.guiHeight(), config.hudOffsetY, boxH, stackOffset);
 
         drawBox(graphics, x, y, boxW, boxH);
         graphics.blit(ICON, x + BOX_PAD_X, y + BOX_PAD_Y, 0, 0, ICON_SIZE, ICON_SIZE, ICON_SIZE, ICON_SIZE);
@@ -113,9 +114,41 @@ public final class ReputationHudOverlay {
         return Component.translatable(ClientMercantileData.getReputationTier());
     }
 
-    static int yOffsetFor(boolean tribulationLoaded) {
+    /**
+     * Sibling stacking offset per HUD-STANDARD §4: stacking applies within an
+     * anchor. Tribulation owns slot 1; its anchor is not queryable through the
+     * coordination accessors (only visibility/height are), so the reservation
+     * applies at our default TOP_LEFT anchor — the slot registry's canonical
+     * position. A user who moves our element to another corner opts out of
+     * stacking against the default-placed sibling.
+     */
+    static int stackOffsetFor(MercantileConfig.Anchor anchor, boolean tribulationLoaded) {
+        if (anchor != MercantileConfig.Anchor.TOP_LEFT) return 0;
         // We can't introspect Tribulation's runtime HUD toggle without a shared interop API;
         // reservation is binary on isModLoaded for now.
-        return tribulationLoaded ? BASE_Y + TRIBULATION_RESERVED_HEIGHT : BASE_Y;
+        return tribulationLoaded ? TRIBULATION_RESERVED_HEIGHT : 0;
+    }
+
+    /**
+     * Origin = top-left corner of the box. Offsets are measured inward from
+     * the anchored edges, so the element keeps its distance from its corner
+     * regardless of screen size or label width (HUD-STANDARD §4).
+     */
+    static int computeOriginX(MercantileConfig.Anchor anchor, int screenW, int offsetX, int boxW) {
+        return switch (anchor) {
+            case TOP_LEFT, BOTTOM_LEFT -> offsetX;
+            case TOP_RIGHT, BOTTOM_RIGHT -> screenW - offsetX - boxW;
+        };
+    }
+
+    /**
+     * The stacking offset shifts inward from the anchored vertical edge: down
+     * from a top anchor, up from a bottom anchor.
+     */
+    static int computeOriginY(MercantileConfig.Anchor anchor, int screenH, int offsetY, int boxH, int stackOffset) {
+        return switch (anchor) {
+            case TOP_LEFT, TOP_RIGHT -> offsetY + stackOffset;
+            case BOTTOM_LEFT, BOTTOM_RIGHT -> screenH - offsetY - boxH - stackOffset;
+        };
     }
 }
