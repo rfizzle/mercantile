@@ -7,7 +7,7 @@ import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
 import com.rfizzle.mercantile.network.ConfigSyncS2CPayload;
 import com.rfizzle.mercantile.reputation.ReputationManager;
-import com.rfizzle.mercantile.reputation.ReputationTier;
+import com.rfizzle.mercantile.api.ReputationTier;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.commands.CommandSourceStack;

@@ -5,7 +5,7 @@ import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
 import com.rfizzle.mercantile.network.SyncReputationS2CPayload;
 import com.rfizzle.mercantile.reputation.ReputationManager;
-import com.rfizzle.mercantile.reputation.ReputationTier;
+import com.rfizzle.mercantile.api.ReputationTier;
 import io.netty.channel.embedded.EmbeddedChannel;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.gametest.framework.GameTest;

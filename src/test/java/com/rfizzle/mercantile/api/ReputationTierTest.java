@@ -1,6 +1,7 @@
-package com.rfizzle.mercantile.reputation;
+package com.rfizzle.mercantile.api;
 
 import com.rfizzle.mercantile.data.PlayerData;
+import com.rfizzle.mercantile.reputation.ReputationManager;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;

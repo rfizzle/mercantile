@@ -4,7 +4,7 @@ import com.mojang.authlib.GameProfile;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
-import com.rfizzle.mercantile.reputation.ReputationTier;
+import com.rfizzle.mercantile.api.ReputationTier;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;

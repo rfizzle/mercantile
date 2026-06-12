@@ -1,10 +1,22 @@
-package com.rfizzle.mercantile.reputation;
+package com.rfizzle.mercantile.api;
 
 import com.rfizzle.mercantile.Mercantile;
 import net.minecraft.network.chat.Component;
 
 import java.util.Locale;
 
+/**
+ * The six reputation standings a player can hold with the villager economy,
+ * ordered from best to worst. A player's tier is derived from their scalar
+ * reputation score via {@link #fromScore(int)}; the score itself is available
+ * through {@link MercantileAPI#getReputation}.
+ *
+ * <p>Part of Mercantile's stable API surface (Concord API Standard v1):
+ * existing constants, their relative ordering, and the public methods on this
+ * enum are stable across minor and patch releases. Exact score thresholds are
+ * gameplay tuning and may shift in minor releases — compare tiers, don't
+ * hardcode scores.
+ */
 public enum ReputationTier {
     // Declared in descending minScore order so fromScore() can walk values() once.
     // minScore = lowest score in the tier's range (range extends up to the next tier's minScore - 1).

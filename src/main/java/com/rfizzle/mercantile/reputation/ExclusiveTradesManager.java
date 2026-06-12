@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.rfizzle.mercantile.Mercantile;
+import com.rfizzle.mercantile.api.ReputationTier;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.trade.OfferIdentityHash;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
