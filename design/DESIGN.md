@@ -236,16 +236,24 @@ document never restates it.
 
 ## 8. Distribution Listings
 
-Store copy lives in-repo: `docs/listing-modrinth.md` and
-`docs/listing-curseforge.md` (moving to `site/listing-*.md` with the layout
-migration — Mercantile originated this pattern, `REPO-LAYOUT.md` §1). Format
-follows the suite listing standard (`VISION.md` §4): 128×128 icon, full logo +
-screenshots in the gallery, tagline → feature bullets with real numbers →
-"Enhanced by" section naming siblings as strictly optional. Required deps:
-Fabric API only.
+Store copy lives in-repo at `site/listing-modrinth.md` and
+`site/listing-curseforge.md` (Mercantile originated this pattern,
+`REPO-LAYOUT.md` §1). Format follows the suite listing standard (`VISION.md`
+§4): 128×128 icon, full logo + screenshots in the gallery, tagline → feature
+bullets with real numbers → "Enhanced by" section naming siblings as strictly
+optional. Required deps: Fabric API only.
 
-README badges: MC 1.21.1 · Fabric · MIT · release · CI · Modrinth/CurseForge
-downloads (already in place).
+> **Not publicly listed yet.** The bare `mercantile` slug is taken by an
+> unrelated mod on both stores (discovered 2026-06-12), so the suite slug
+> convention is `<mod>-<domain>-overhaul` (`VISION.md` §4) —
+> `mercantile-villager-overhaul` once registered. Meridian and Tribulation
+> are already live on CurseForge under this pattern; Modrinth submissions are
+> pending review. README/site link only to GitHub Releases until this mod's
+> listings are publicly live, then the store links, download badges, and
+> listing cross-links come back under the final slugs.
+
+README badges: MC 1.21.1 · Fabric · MIT · release · CI (store download badges
+return when the listings are publicly live).
 
 ---
 
@@ -259,10 +267,10 @@ Recorded so they read as *undecided*, not as omissions:
 2. **HUD glyph motif.** Bell vs. emerald — both sanctioned by
    `HUD-STANDARD.md` §2 and `VISION.md` §3.2. Blocks the `hud-icon-16.png`
    master.
-3. **Logo vs. stone-frame formula.** Keep the current green-brick circular
-   medallion + market stall, or regenerate toward the suite's dark-stone
-   frame (VISION's bell-over-emeralds proposal)? The current art predates
-   nothing — it shipped — so this is a deliberate keep-or-conform call.
+3. ~~**Logo vs. stone-frame formula.**~~ Resolved 2026-06-12 — the shipped
+   market-stall medallion is ratified as-is in `VISION.md` §3.2; the
+   bell-over-emeralds arch proposal is retired. The stone-frame formula
+   remains the spec for *new* logos.
 4. ~~**Tagline rollout.**~~ Resolved 2026-06-12 — "Every villager remembers."
    adopted across README, site hero, and listings (see §1 Tagline).
 

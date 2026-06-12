@@ -10,15 +10,14 @@
     "sub": "A villager and trade overhaul for Minecraft 1.21.1 (Fabric) — pickup, names, reputation, trade cycling, sentry pylons, and more.",
     "buttons": [
       {
-        "label": "Download on Modrinth",
-        "href": "https://modrinth.com/mod/mercantile",
+        "label": "Download Latest Release",
+        "href": "https://github.com/rfizzle/mercantile/releases",
         "primary": true,
         "external": true
       },
       {
-        "label": "CurseForge",
-        "href": "https://www.curseforge.com/minecraft/mc-mods/mercantile",
-        "external": true
+        "label": "Getting Started",
+        "href": "/guide.html"
       },
       {
         "label": "GitHub",
@@ -90,21 +89,21 @@
           "hoverAccent": true,
           "items": [
             {
-              "title": "Modrinth",
+              "title": "GitHub Releases",
               "titleTone": "bone",
-              "badge": "Recommended",
+              "badge": "Latest",
               "html": [
-                "Primary distribution. Auto-update support in most launchers.",
-                "<a href='https://modrinth.com/mod/mercantile' rel='noopener noreferrer' target='_blank' class='text-accent hover:text-accent2'>modrinth.com/mod/mercantile →</a>"
+                "Download <code class='text-bone'>mercantile-&lt;version&gt;.jar</code> straight from the releases page.",
+                "<a href='https://github.com/rfizzle/mercantile/releases' rel='noopener noreferrer' target='_blank' class='text-accent hover:text-accent2'>github.com/rfizzle/mercantile/releases →</a>"
               ]
             },
             {
-              "title": "CurseForge",
+              "title": "Getting Started",
               "titleTone": "bone",
-              "badge": "Alternative",
+              "badge": "Guide",
               "html": [
-                "For users on the CurseForge launcher or modpack distributions.",
-                "<a href='https://www.curseforge.com/minecraft/mc-mods/mercantile' rel='noopener noreferrer' target='_blank' class='text-accent hover:text-accent2'>curseforge.com →</a>"
+                "Install walkthrough, your first villager pickup, and how reputation works.",
+                "<a href='/guide.html' class='text-accent hover:text-accent2'>Read the guide →</a>"
               ]
             },
             {

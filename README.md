@@ -10,8 +10,6 @@
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/github/license/rfizzle/mercantile"></a>
   <a href="https://github.com/rfizzle/mercantile/releases"><img alt="Latest release" src="https://img.shields.io/github/v/release/rfizzle/mercantile?include_prereleases"></a>
   <a href="https://github.com/rfizzle/mercantile/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/rfizzle/mercantile/actions/workflows/ci.yml/badge.svg"></a>
-  <a href="https://modrinth.com/mod/mercantile"><img alt="Modrinth downloads" src="https://img.shields.io/modrinth/dt/mercantile?logo=modrinth&label=Modrinth"></a>
-  <a href="https://www.curseforge.com/minecraft/mc-mods/mercantile"><img alt="CurseForge downloads" src="https://img.shields.io/curseforge/dt/mercantile?logo=curseforge&label=CurseForge"></a>
 </p>
 
 A villager and trade overhaul for Minecraft 1.21.1 (Fabric). Mercantile turns
@@ -23,8 +21,8 @@ balance-breaking shortcuts.
 
 ## Download
 
-| [Modrinth](https://modrinth.com/mod/mercantile) | [CurseForge](https://www.curseforge.com/minecraft/mc-mods/mercantile) | [Website](https://mercantile.rfizzle.com) | [Report an issue](https://github.com/rfizzle/mercantile/issues) |
-| --- | --- | --- | --- |
+| [GitHub Releases](https://github.com/rfizzle/mercantile/releases) | [Website](https://mercantile.rfizzle.com) | [Report an issue](https://github.com/rfizzle/mercantile/issues) |
+| --- | --- | --- |
 
 ## Features
 
@@ -58,9 +56,7 @@ the website for every behavior, tuning knob, and edge case.
 2. Drop [Fabric API](https://modrinth.com/mod/fabric-api) into your `mods/`
    folder.
 3. Download `mercantile-<version>.jar` from
-   [Modrinth](https://modrinth.com/mod/mercantile),
-   [CurseForge](https://www.curseforge.com/minecraft/mc-mods/mercantile), or
-   [GitHub Releases](https://github.com/rfizzle/mercantile/releases), and drop
+   [GitHub Releases](https://github.com/rfizzle/mercantile/releases) and drop
    it into `mods/` as well.
 4. (Optional) Install [Mod Menu](https://modrinth.com/mod/modmenu) and
    [Cloth Config](https://modrinth.com/mod/cloth-config) to access the in-game
@@ -86,19 +82,18 @@ bundled):
 ## Links
 
 - Website: <https://mercantile.rfizzle.com>
-- Modrinth: <https://modrinth.com/mod/mercantile>
-- CurseForge: <https://www.curseforge.com/minecraft/mc-mods/mercantile>
+- Releases: <https://github.com/rfizzle/mercantile/releases>
 - Issues: <https://github.com/rfizzle/mercantile/issues>
 - Changelog: <https://mercantile.rfizzle.com/changelog.html>
 
-## Companion mods
+## Part of Concord
 
-Mercantile is part of the rfizzle mod suite. If you like it, you may also
-enjoy:
+Part of [Concord](https://github.com/rfizzle/concord) — a Vanilla+ collection.
+Install any, combine all.
 
-- [Meridian](https://meridian.rfizzle.com)
-- [Tribulation](https://tribulation.rfizzle.com)
-- [Prosperity](https://prosperity.rfizzle.com)
+- [Meridian](https://meridian.rfizzle.com) — Chart your enchantments.
+- [Tribulation](https://tribulation.rfizzle.com) — Survive what comes next.
+- [Prosperity](https://prosperity.rfizzle.com) — Every chest, yours to discover.
 
 ## Building from source
 
@@ -113,5 +108,5 @@ source layout, available Gradle tasks, and conventions.
 
 ## License
 
-Licensed under the [MIT License](LICENSE). © 2025 rfizzle. Mercantile is not
+Licensed under the [MIT License](LICENSE). © 2026 rfizzle. Mercantile is not
 affiliated with Mojang Studios or Microsoft.
