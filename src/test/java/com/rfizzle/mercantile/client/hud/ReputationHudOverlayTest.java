@@ -28,23 +28,23 @@ class ReputationHudOverlayTest {
     }
 
     @Test
-    void stackOffsetWithoutTribulationIsZero() {
-        assertEquals(0, ReputationHudOverlay.stackOffsetFor(MercantileConfig.Anchor.TOP_LEFT, false));
+    void stackOffsetWithoutSiblingIsZero() {
+        assertEquals(0, ReputationHudOverlay.stackOffsetFor(MercantileConfig.Anchor.TOP_LEFT, 0));
     }
 
     @Test
-    void stackOffsetWithTribulationReservesSlotOneAtTopLeft() {
-        int withTrib = ReputationHudOverlay.stackOffsetFor(MercantileConfig.Anchor.TOP_LEFT, true);
-        assertTrue(withTrib > 0, "Tribulation must push our HUD down at the shared default anchor");
+    void stackOffsetPassesSiblingHeightThroughAtTopLeft() {
+        int withTrib = ReputationHudOverlay.stackOffsetFor(MercantileConfig.Anchor.TOP_LEFT, 22);
+        assertTrue(withTrib > 0, "a visible sibling must push our HUD down at the shared default anchor");
         assertEquals(22, withTrib);
     }
 
     @Test
     void stackOffsetOnlyAppliesAtTopLeftAnchor() {
         // Tribulation's slot-1 element canonically sits top-left; other anchors don't stack against it.
-        assertEquals(0, ReputationHudOverlay.stackOffsetFor(MercantileConfig.Anchor.TOP_RIGHT, true));
-        assertEquals(0, ReputationHudOverlay.stackOffsetFor(MercantileConfig.Anchor.BOTTOM_LEFT, true));
-        assertEquals(0, ReputationHudOverlay.stackOffsetFor(MercantileConfig.Anchor.BOTTOM_RIGHT, true));
+        assertEquals(0, ReputationHudOverlay.stackOffsetFor(MercantileConfig.Anchor.TOP_RIGHT, 22));
+        assertEquals(0, ReputationHudOverlay.stackOffsetFor(MercantileConfig.Anchor.BOTTOM_LEFT, 22));
+        assertEquals(0, ReputationHudOverlay.stackOffsetFor(MercantileConfig.Anchor.BOTTOM_RIGHT, 22));
     }
 
     @Test

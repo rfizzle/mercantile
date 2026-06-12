@@ -15,6 +15,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.npc.Villager;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+
 public final class ReputationHudOverlay {
 
     private static final ResourceLocation ICON = Mercantile.id("icon.png");
@@ -30,9 +34,14 @@ public final class ReputationHudOverlay {
     private static final int BG_COLOR = 0x99000000;
     private static final int TEXT_COLOR = 0xFFFFFFFF;
 
-    // Tribulation reserves the same top-left strip when present; bump our HUD down to clear it.
-    private static final int TRIBULATION_RESERVED_HEIGHT = 22;
-    private static final String TRIBULATION_MOD_ID = "tribulation";
+    /**
+     * This element's height contribution for sibling HUD coordination
+     * (HUD-STANDARD §3/§6): the standard 20px slot element plus the 2px
+     * stacking gap. The box currently renders 16px tall (12px glyph + 2px
+     * padding); the slot still reserves the standard 22px so siblings don't
+     * shift when the visual is brought up to the 20px spec.
+     */
+    private static final int HUD_HEIGHT_CONTRIBUTION = 22;
 
     // Render-thread only — HudRenderCallback fires on the render thread.
     // Initialized to -SCAN_INTERVAL_TICKS so the first frame (now >= 0) triggers a scan;
@@ -59,7 +68,7 @@ public final class ReputationHudOverlay {
         MercantileConfig.Anchor anchor = config.hudAnchor != null ? config.hudAnchor : MercantileConfig.Anchor.TOP_LEFT;
         int boxW = boxWidthFor(textWidth);
         int boxH = BOX_PAD_Y + ICON_SIZE + BOX_PAD_Y;
-        int stackOffset = stackOffsetFor(anchor, FabricLoader.getInstance().isModLoaded(TRIBULATION_MOD_ID));
+        int stackOffset = stackOffsetFor(anchor, TribulationOffset.current());
         int x = computeOriginX(anchor, graphics.guiWidth(), config.hudOffsetX, boxW);
         int y = computeOriginY(anchor, graphics.guiHeight(), config.hudOffsetY, boxH, stackOffset);
 
@@ -125,11 +134,91 @@ public final class ReputationHudOverlay {
      * position. A user who moves our element to another corner opts out of
      * stacking against the default-placed sibling.
      */
-    static int stackOffsetFor(MercantileConfig.Anchor anchor, boolean tribulationLoaded) {
-        if (anchor != MercantileConfig.Anchor.TOP_LEFT) return 0;
-        // We can't introspect Tribulation's runtime HUD toggle without a shared interop API;
-        // reservation is binary on isModLoaded for now.
-        return tribulationLoaded ? TRIBULATION_RESERVED_HEIGHT : 0;
+    static int stackOffsetFor(MercantileConfig.Anchor anchor, int siblingHeight) {
+        return anchor == MercantileConfig.Anchor.TOP_LEFT ? siblingHeight : 0;
+    }
+
+    // --- HUD coordination accessors (HUD-STANDARD §6) ---
+    // Reflection targets of MercantileAPI.isHudVisible()/getHudHeight(); keep
+    // names and (static, no-arg) signatures in sync with the api facade.
+
+    /**
+     * Whether the reputation HUD element is currently being drawn — config
+     * enabled, none of the §5 visibility rules hiding it, and a villager in
+     * range. Client render state; call on the client only.
+     */
+    public static boolean isHudVisible() {
+        return shouldRender(Minecraft.getInstance());
+    }
+
+    /**
+     * This element's current height contribution in px (element + gap) for
+     * sibling offset computation; 0 when not visible.
+     */
+    public static int getHudHeight() {
+        return isHudVisible() ? HUD_HEIGHT_CONTRIBUTION : 0;
+    }
+
+    /**
+     * Tribulation's slot-1 height, read through its HUD coordination
+     * accessors per HUD-STANDARD §6 — hardcoded sibling heights go stale the
+     * moment the user disables or moves the sibling's HUD.
+     *
+     * <p>Graceful degradation: {@code TribulationAPI.isHudVisible()} /
+     * {@code getHudHeight()} are being added to Tribulation in a parallel
+     * change and do not exist in its current releases. When the class or
+     * methods are absent (older Tribulation), we fall back to the legacy
+     * fixed 22px reservation so behavior with current releases is unchanged.
+     * When Tribulation is absent entirely the offset is 0.
+     */
+    static final class TribulationOffset {
+        private static final String TRIBULATION_MOD_ID = "tribulation";
+        private static final String TRIBULATION_API_CLASS = "com.rfizzle.tribulation.api.TribulationAPI";
+        /** Pre-accessor behavior: reserve a fixed strip whenever Tribulation is loaded. */
+        private static final int LEGACY_FIXED_OFFSET = 22;
+
+        // Render-thread only, resolved once on first render pass.
+        private static boolean resolveAttempted;
+        private static MethodHandle isHudVisibleHandle;
+        private static MethodHandle getHudHeightHandle;
+
+        private TribulationOffset() {
+        }
+
+        /** Tribulation's current height contribution; queried per render pass (cheap client reads). */
+        static int current() {
+            if (!FabricLoader.getInstance().isModLoaded(TRIBULATION_MOD_ID)) return 0;
+            resolveOnce();
+            if (isHudVisibleHandle == null || getHudHeightHandle == null) {
+                return LEGACY_FIXED_OFFSET;
+            }
+            try {
+                if (!(boolean) isHudVisibleHandle.invokeExact()) return 0;
+                return Math.max(0, (int) getHudHeightHandle.invokeExact());
+            } catch (Throwable t) {
+                // Accessor misbehaving — degrade to the legacy reservation
+                // rather than overlapping slot 1.
+                return LEGACY_FIXED_OFFSET;
+            }
+        }
+
+        private static void resolveOnce() {
+            if (resolveAttempted) return;
+            resolveAttempted = true;
+            try {
+                Class<?> api = Class.forName(TRIBULATION_API_CLASS);
+                MethodHandles.Lookup lookup = MethodHandles.publicLookup();
+                isHudVisibleHandle = lookup.findStatic(api, "isHudVisible", MethodType.methodType(boolean.class));
+                getHudHeightHandle = lookup.findStatic(api, "getHudHeight", MethodType.methodType(int.class));
+            } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException e) {
+                // Older Tribulation without the coordination accessors.
+                isHudVisibleHandle = null;
+                getHudHeightHandle = null;
+                Mercantile.LOGGER.info(
+                        "Tribulation present without HUD accessors; using the legacy fixed {}px HUD offset",
+                        LEGACY_FIXED_OFFSET);
+            }
+        }
     }
 
     /**

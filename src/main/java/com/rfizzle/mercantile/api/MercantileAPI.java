@@ -5,6 +5,8 @@ import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.MercantileVillagerData;
 import com.rfizzle.mercantile.data.PlayerData;
 import com.rfizzle.mercantile.trade.OfferIdentityHash;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.npc.Villager;
@@ -107,5 +109,54 @@ public final class MercantileAPI {
         if (data == null) return false;
         if (data.isTradeLocked(OfferIdentityHash.compute(offer))) return true;
         return !data.isTradesMigrated() && data.isTradeLocked(OfferIdentityHash.computeLegacy(offer));
+    }
+
+    /**
+     * HUD coordination accessor (Concord HUD-STANDARD §6): whether
+     * Mercantile's reputation HUD element is currently being drawn. Safe to
+     * call unconditionally from common code on either side.
+     *
+     * <p>Reflection-backed into the client overlay so this class never
+     * references client-only code. Documented sentinel: {@code false} on a
+     * dedicated server, when the HUD is config-disabled, or when it is
+     * currently hidden (F1, open screen, spectator, death screen, no villager
+     * in range). Rendering coordination only — never use for gameplay logic.
+     *
+     * @return true if the reputation HUD element is currently visible
+     */
+    public static boolean isHudVisible() {
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+            try {
+                Class<?> clazz = Class.forName("com.rfizzle.mercantile.client.hud.ReputationHudOverlay");
+                return (boolean) clazz.getMethod("isHudVisible").invoke(null);
+            } catch (Exception e) {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * HUD coordination accessor (Concord HUD-STANDARD §6): this element's
+     * current height contribution in pixels (element + stacking gap), for
+     * lower-priority HUD slots to offset past. Safe to call unconditionally
+     * from common code on either side.
+     *
+     * <p>Reflection-backed into the client overlay. Documented sentinel:
+     * {@code 0} on a dedicated server or whenever {@link #isHudVisible} is
+     * false; {@code 22} (20px standard element + 2px gap) when visible.
+     *
+     * @return the element's height contribution in px, or 0 if not visible
+     */
+    public static int getHudHeight() {
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+            try {
+                Class<?> clazz = Class.forName("com.rfizzle.mercantile.client.hud.ReputationHudOverlay");
+                return (int) clazz.getMethod("getHudHeight").invoke(null);
+            } catch (Exception e) {
+                return 0;
+            }
+        }
+        return 0;
     }
 }
