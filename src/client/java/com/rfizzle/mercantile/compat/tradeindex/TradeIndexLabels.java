@@ -1,7 +1,7 @@
 package com.rfizzle.mercantile.compat.tradeindex;
 
 import com.rfizzle.mercantile.data.VillagerHeadTextures;
-import com.rfizzle.mercantile.reputation.ReputationTier;
+import com.rfizzle.mercantile.api.ReputationTier;
 import com.rfizzle.mercantile.trade.index.TradeIndexEntry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;

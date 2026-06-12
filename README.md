@@ -86,6 +86,79 @@ bundled):
 - Issues: <https://github.com/rfizzle/mercantile/issues>
 - Changelog: <https://mercantile.rfizzle.com/changelog.html>
 
+## For Mod Developers
+
+Mercantile exposes a stable, read-only API and two server-side events in
+`com.rfizzle.mercantile.api`, following the
+[Concord API Standard](https://github.com/rfizzle/concord/blob/master/API-STANDARD.md).
+Use it as a soft dependency: compile against the mod with `modCompileOnly` and
+guard every call with `FabricLoader.isModLoaded("mercantile")`. Everything
+outside the `api` package is internal and may change in any release.
+
+**The stable surface**
+
+- `MercantileAPI.getReputation(ServerPlayer)` — the player's reputation score
+- `MercantileAPI.getReputationTier(ServerPlayer)` — the derived
+  `ReputationTier` (`HONORED` … `REVILED`)
+- `MercantileAPI.isSentryGolem(Entity)` — whether an entity is a pylon-spawned
+  sentry golem
+- `MercantileAPI.isProfessionLocked(Villager)` — whether a villager's
+  profession is locked (first trade locks it)
+- `MercantileAPI.isTradeLocked(Villager, MerchantOffer)` — whether a specific
+  offer is locked (locked offers survive trade cycling)
+- `ReputationChangedCallback` — fired server-side whenever a player's score
+  changes (trades, cycling, cures, proximity, attacks, commands)
+- `TradeExecutedCallback` — fired server-side when a player completes a trade
+  with a villager or wandering trader
+
+### Gradle Setup
+
+```gradle
+dependencies {
+    modCompileOnly "maven.modrinth:mercantile:<version>"
+}
+```
+
+### Usage Examples
+
+**Reading Reputation:**
+
+```java
+if (FabricLoader.getInstance().isModLoaded("mercantile")) {
+    int score = com.rfizzle.mercantile.api.MercantileAPI.getReputation(serverPlayer);
+    var tier = com.rfizzle.mercantile.api.MercantileAPI.getReputationTier(serverPlayer);
+}
+```
+
+**Listening for Reputation Changes:**
+
+```java
+if (FabricLoader.getInstance().isModLoaded("mercantile")) {
+    com.rfizzle.mercantile.api.ReputationChangedCallback.EVENT.register((player, oldScore, newScore) -> {
+        // react to the standing change
+    });
+}
+```
+
+**Listening for Completed Trades:**
+
+```java
+if (FabricLoader.getInstance().isModLoaded("mercantile")) {
+    com.rfizzle.mercantile.api.TradeExecutedCallback.EVENT.register((player, villager, offer) -> {
+        // villager is a Villager or WanderingTrader; fires once per executed trade
+    });
+}
+```
+
+**Checking Villager / Golem State:**
+
+```java
+if (FabricLoader.getInstance().isModLoaded("mercantile")) {
+    boolean sentry = com.rfizzle.mercantile.api.MercantileAPI.isSentryGolem(entity);
+    boolean locked = com.rfizzle.mercantile.api.MercantileAPI.isProfessionLocked(villager);
+}
+```
+
 ## Part of Concord
 
 Part of [Concord](https://github.com/rfizzle/concord) — a Vanilla+ collection.

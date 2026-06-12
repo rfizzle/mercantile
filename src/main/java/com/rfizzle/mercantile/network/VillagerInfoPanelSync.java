@@ -3,7 +3,7 @@ package com.rfizzle.mercantile.network;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
-import com.rfizzle.mercantile.reputation.ReputationTier;
+import com.rfizzle.mercantile.api.ReputationTier;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
