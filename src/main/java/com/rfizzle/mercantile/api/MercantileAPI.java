@@ -12,6 +12,10 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.item.trading.MerchantOffer;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+
 /**
  * Public, read-only API for Mercantile (Concord API Standard v1).
  *
@@ -111,6 +115,25 @@ public final class MercantileAPI {
         return !data.isTradesMigrated() && data.isTradeLocked(OfferIdentityHash.computeLegacy(offer));
     }
 
+    // Render-thread only — resolved once on the first ENV=CLIENT call.
+    private static boolean hudHandlesResolved;
+    private static MethodHandle isHudVisibleHandle;
+    private static MethodHandle getHudHeightHandle;
+
+    private static void resolveHudHandles() {
+        if (hudHandlesResolved) return;
+        hudHandlesResolved = true;
+        try {
+            Class<?> overlay = Class.forName("com.rfizzle.mercantile.client.hud.ReputationHudOverlay");
+            MethodHandles.Lookup lookup = MethodHandles.publicLookup();
+            isHudVisibleHandle = lookup.findStatic(overlay, "isHudVisible", MethodType.methodType(boolean.class));
+            getHudHeightHandle = lookup.findStatic(overlay, "getHudHeight", MethodType.methodType(int.class));
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException e) {
+            isHudVisibleHandle = null;
+            getHudHeightHandle = null;
+        }
+    }
+
     /**
      * HUD coordination accessor (Concord HUD-STANDARD §6): whether
      * Mercantile's reputation HUD element is currently being drawn. Safe to
@@ -126,10 +149,11 @@ public final class MercantileAPI {
      */
     public static boolean isHudVisible() {
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+            resolveHudHandles();
+            if (isHudVisibleHandle == null) return false;
             try {
-                Class<?> clazz = Class.forName("com.rfizzle.mercantile.client.hud.ReputationHudOverlay");
-                return (boolean) clazz.getMethod("isHudVisible").invoke(null);
-            } catch (Exception e) {
+                return (boolean) isHudVisibleHandle.invokeExact();
+            } catch (Throwable t) {
                 return false;
             }
         }
@@ -150,10 +174,11 @@ public final class MercantileAPI {
      */
     public static int getHudHeight() {
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+            resolveHudHandles();
+            if (getHudHeightHandle == null) return 0;
             try {
-                Class<?> clazz = Class.forName("com.rfizzle.mercantile.client.hud.ReputationHudOverlay");
-                return (int) clazz.getMethod("getHudHeight").invoke(null);
-            } catch (Exception e) {
+                return (int) getHudHeightHandle.invokeExact();
+            } catch (Throwable t) {
                 return 0;
             }
         }
