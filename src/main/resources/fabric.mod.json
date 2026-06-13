@@ -18,6 +18,7 @@
         "jade": ["com.rfizzle.mercantile.compat.jade.MercantileJadePlugin"],
         "fabric-gametest": [
             "com.rfizzle.mercantile.gametest.ApiEventsGameTest",
+            "com.rfizzle.mercantile.gametest.HudAccessorsGameTest",
             "com.rfizzle.mercantile.gametest.AttachmentGameTest",
             "com.rfizzle.mercantile.gametest.NetworkingGameTest",
             "com.rfizzle.mercantile.gametest.CommandGameTest",

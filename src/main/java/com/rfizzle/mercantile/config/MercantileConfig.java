@@ -86,6 +86,15 @@ public class MercantileConfig {
     public boolean enableBellRadiusVis = true;
     public boolean enableInfoPanel = true;
     public boolean enableReputationHud = true;
+    // Reputation HUD placement per Concord HUD-STANDARD §4: corner anchor plus
+    // pixel offsets measured inward from the anchored edges.
+    public Anchor hudAnchor = Anchor.TOP_LEFT;
+    public int hudOffsetX = 4;
+    public int hudOffsetY = 4;
+
+    public enum Anchor {
+        TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT
+    }
 
     public void clamp() {
         pickupXpCost = Math.clamp(pickupXpCost, 0, Integer.MAX_VALUE);
@@ -106,6 +115,10 @@ public class MercantileConfig {
         pylonMaxGolems = Math.clamp(pylonMaxGolems, 1, Integer.MAX_VALUE);
         sentryDespawnSeconds = Math.clamp(sentryDespawnSeconds, 5, Integer.MAX_VALUE);
         villagerSoundVolume = Math.clamp(villagerSoundVolume, 0.0f, 1.0f);
+        // Gson leaves enum fields null on unknown/missing values.
+        if (hudAnchor == null) hudAnchor = Anchor.TOP_LEFT;
+        hudOffsetX = Math.clamp(hudOffsetX, 0, 10_000);
+        hudOffsetY = Math.clamp(hudOffsetY, 0, 10_000);
     }
 
     public String toJson() {

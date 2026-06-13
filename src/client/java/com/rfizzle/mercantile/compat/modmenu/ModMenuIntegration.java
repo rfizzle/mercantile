@@ -8,6 +8,8 @@ import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import net.minecraft.network.chat.Component;
 
+import java.util.Locale;
+
 public class ModMenuIntegration implements ModMenuApi {
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
@@ -268,6 +270,26 @@ public class ModMenuIntegration implements ModMenuApi {
                     .setDefaultValue(defaults.enableReputationHud)
                     .setTooltip(Component.translatable("mercantile.config.enableReputationHud.tooltip"))
                     .setSaveConsumer(v -> config.enableReputationHud = v)
+                    .build());
+            client.addEntry(entry.startEnumSelector(Component.translatable("mercantile.config.hudAnchor"),
+                            MercantileConfig.Anchor.class, config.hudAnchor)
+                    .setDefaultValue(defaults.hudAnchor)
+                    .setEnumNameProvider(v -> Component.translatable(
+                            "mercantile.config.hudAnchor." + v.name().toLowerCase(Locale.ROOT)))
+                    .setTooltip(Component.translatable("mercantile.config.hudAnchor.tooltip"))
+                    .setSaveConsumer(v -> config.hudAnchor = v)
+                    .build());
+            client.addEntry(entry.startIntField(Component.translatable("mercantile.config.hudOffsetX"), config.hudOffsetX)
+                    .setDefaultValue(defaults.hudOffsetX)
+                    .setMin(0).setMax(10_000)
+                    .setTooltip(Component.translatable("mercantile.config.hudOffsetX.tooltip"))
+                    .setSaveConsumer(v -> config.hudOffsetX = v)
+                    .build());
+            client.addEntry(entry.startIntField(Component.translatable("mercantile.config.hudOffsetY"), config.hudOffsetY)
+                    .setDefaultValue(defaults.hudOffsetY)
+                    .setMin(0).setMax(10_000)
+                    .setTooltip(Component.translatable("mercantile.config.hudOffsetY.tooltip"))
+                    .setSaveConsumer(v -> config.hudOffsetY = v)
                     .build());
 
             return builder.build();
