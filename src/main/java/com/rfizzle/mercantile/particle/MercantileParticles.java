@@ -18,6 +18,9 @@ public final class MercantileParticles {
     // Colour-carrying type for the workstation link visualization (profession-tinted).
     public static final ParticleType<LinkMoteParticleOptions> LINK_MOTE =
             FabricParticleTypes.complex(LinkMoteParticleOptions.CODEC, LinkMoteParticleOptions.STREAM_CODEC);
+    // Workstation status markers (bell-held overlay): green check / white question mark.
+    public static final SimpleParticleType WORKSTATION_CLAIMED = FabricParticleTypes.simple();
+    public static final SimpleParticleType WORKSTATION_UNCLAIMED = FabricParticleTypes.simple();
 
     public static void init() {
         Registry.register(BuiltInRegistries.PARTICLE_TYPE, Mercantile.id("cycle_glint"), CYCLE_GLINT);
@@ -27,6 +30,8 @@ public final class MercantileParticles {
         Registry.register(BuiltInRegistries.PARTICLE_TYPE, Mercantile.id("pylon_spark"), PYLON_SPARK);
         Registry.register(BuiltInRegistries.PARTICLE_TYPE, Mercantile.id("golem_shard"), GOLEM_SHARD);
         Registry.register(BuiltInRegistries.PARTICLE_TYPE, Mercantile.id("link_mote"), LINK_MOTE);
+        Registry.register(BuiltInRegistries.PARTICLE_TYPE, Mercantile.id("workstation_claimed"), WORKSTATION_CLAIMED);
+        Registry.register(BuiltInRegistries.PARTICLE_TYPE, Mercantile.id("workstation_unclaimed"), WORKSTATION_UNCLAIMED);
     }
 
     private MercantileParticles() {

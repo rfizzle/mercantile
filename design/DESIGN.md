@@ -110,7 +110,7 @@ against it.
 | Apple touch icon | `docs/apple-touch-icon.png` | Final |
 | Favicons | `docs/favicon.ico`, `docs/favicon-32.png` | Final |
 | Sentry pylon block textures | `assets/mercantile/textures/block/` | Final — the only custom block textures |
-| Custom particle textures | `assets/mercantile/textures/particle/` | Final (pickup, trade cycling, follow, pylon, profession-tinted link mote) |
+| Custom particle textures | `assets/mercantile/textures/particle/` | Final (pickup, trade cycling, follow, pylon, profession-tinted link mote, workstation status markers ✓/?) |
 | GUI sprites | `assets/mercantile/textures/gui/sprites/` | Final (info/close buttons, merchant lock/unlock glyphs, reputation HUD emerald gem) |
 | HUD glyph master + sources | `art/hud-icon-16.png`, `art/glyphs/*.glyph` | Final — emerald-gem glyph; sources regenerate via concord's glyph tool |
 
