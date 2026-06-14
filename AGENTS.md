@@ -64,10 +64,17 @@ Fabric APIs must use gametests instead.
   mod ID inlined.
 - **Mappings:** Official Mojang mappings (not Yarn). Use Mojang class/method
   names everywhere (`CompoundTag`, not `NbtCompound`; `Level`, not `World`).
-- **Asset philosophy:** Vanilla-first. All sounds, particles, and icons use
-  existing vanilla assets. Villager pickup items use player heads with
-  pre-existing skin textures (no custom textures). The only custom texture
-  planned is the sentry pylon block model.
+- **Asset philosophy:** Vanilla-first *where a vanilla asset maps cleanly* —
+  all sounds, and any icon whose meaning a vanilla sprite already carries
+  (villager pickup items keep player heads with pre-existing skins; the
+  recipe-viewer profession icons stay vanilla heads). Where the vanilla asset
+  is muddy or generic, ship a **custom pixel-art glyph in the Concord
+  design-system palette** (DESIGN.md §1) rather than settle: the sentry pylon
+  block, the custom GUI buttons, the bespoke particle textures, the merchant
+  lock/unlock glyphs, the reputation HUD emerald gem, the profession-tinted
+  workstation link mote, and the workstation status markers (claimed ✓ /
+  unclaimed ?). Glyph masters live in `art/` (e.g. `art/hud-icon-16.png`) with
+  their editable `.glyph` sources in `art/glyphs/`.
 - **Mixin config:** `mercantile.mixins.json` in `src/main/resources`. Mixin
   package: `com.rfizzle.mercantile.mixin`.
 - **Commits:** [Conventional Commits](https://www.conventionalcommits.org/)

@@ -11,9 +11,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -22,14 +21,14 @@ import java.lang.invoke.MethodType;
 /**
  * Slot-2 HUD badge in the shared Concord layout: an icon-only element
  * matching Tribulation's slot-1 badge — a 16×16 glyph over a 2px progress
- * bar, state conveyed by color rather than text. The glyph is the vanilla
- * emerald item (asset philosophy: vanilla-first, no custom textures); the
- * bar is tinted by reputation tier and fills with progress toward the next
- * tier.
+ * bar, state conveyed by color rather than text. The glyph is Mercantile's
+ * custom 16×16 emerald-gem sprite (master at {@code art/hud-icon-16.png}),
+ * replacing the muddy downscaled vanilla emerald item; the bar is tinted by
+ * reputation tier and fills with progress toward the next tier.
  */
 public final class ReputationHudOverlay {
 
-    private static final ItemStack GLYPH = new ItemStack(Items.EMERALD);
+    private static final ResourceLocation GLYPH = Mercantile.id("reputation_badge");
 
     private static final int PROXIMITY_RADIUS = 32;
     private static final int SCAN_INTERVAL_TICKS = 20;
@@ -76,10 +75,10 @@ public final class ReputationHudOverlay {
         int x = computeOriginX(anchor, graphics.guiWidth(), config.hudOffsetX, ICON_SIZE);
         int y = computeOriginY(anchor, graphics.guiHeight(), config.hudOffsetY, badgeH, stackOffset);
 
-        // The emerald is an item render, not a tintable grayscale sprite, so
-        // tier state lives in the bar color. When the pixel-art 16×16 glyph
-        // master lands (deferred asset), it can be tinted like Tribulation's.
-        graphics.renderItem(GLYPH, x, y);
+        // The gem is a full-color sprite, not a tintable grayscale one, so tier
+        // state lives in the bar color (the emerald reads as Mercantile's
+        // identity at every tier).
+        graphics.blitSprite(GLYPH, x, y, ICON_SIZE, ICON_SIZE);
 
         int barY = y + ICON_SIZE + BAR_GAP;
         graphics.fill(x, barY, x + ICON_SIZE, barY + BAR_HEIGHT, BAR_BG_COLOR);

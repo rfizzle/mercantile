@@ -4,21 +4,25 @@ import com.rfizzle.mercantile.client.network.ClientMercantileData;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.network.RequestWorkstationMapC2SPayload;
 import com.rfizzle.mercantile.network.WorkstationMapS2CPayload;
+import com.rfizzle.mercantile.particle.LinkMoteParticleOptions;
+import com.rfizzle.mercantile.particle.MercantileParticles;
 import com.rfizzle.mercantile.visualization.ProfessionColors;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public final class WorkstationLinkRenderer {
@@ -33,11 +37,18 @@ public final class WorkstationLinkRenderer {
     // 0.0 ≈ 180° cone (everything in front); negative widens further.
     private static final double VIEW_DOT_THRESHOLD = -0.35;
     private static final double UNBOUND_PULSE_PERIOD = 12.0;
-    private static final double ORBIT_PERIOD_TICKS = 40.0;
+    // Status-marker lifetime must match WorkstationMarkerParticle's, so re-emission
+    // lands exactly as the prior icon expires (its bob/pulse is phase-aligned).
+    private static final int MARKER_LIFETIME_TICKS = 30;
+    private static final double MARKER_Y_OFFSET = 1.0; // float height above the workstation block
 
     // Tick-thread only state — ClientTickEvents fires on the render thread.
     private static int ticksSinceRequest = REQUEST_INTERVAL_TICKS;
     private static boolean wasActive = false;
+    // Per-workstation re-emit cooldowns so exactly one status marker is alive per
+    // position (markers live MARKER_LIFETIME_TICKS; re-emitted as they expire).
+    private static final Map<BlockPos, Integer> claimedCooldown = new HashMap<>();
+    private static final Map<BlockPos, Integer> unclaimedCooldown = new HashMap<>();
 
     private WorkstationLinkRenderer() {
     }
@@ -61,6 +72,8 @@ public final class WorkstationLinkRenderer {
             }
             wasActive = false;
             ticksSinceRequest = REQUEST_INTERVAL_TICKS;
+            claimedCooldown.clear();
+            unclaimedCooldown.clear();
             return;
         }
 
@@ -96,7 +109,7 @@ public final class WorkstationLinkRenderer {
         // Index villagers once.
         Map<UUID, Villager> villagerByUuid = indexVillagers(level);
 
-        // Bound links — coloured dust segments.
+        // Bound links — profession-coloured link motes.
         for (Map.Entry<UUID, BlockPos> entry : payload.bound().entrySet()) {
             if (spawned >= MAX_PARTICLES_PER_TICK) return;
             Villager villager = villagerByUuid.get(entry.getKey());
@@ -107,7 +120,7 @@ public final class WorkstationLinkRenderer {
             if (!withinRange(from, eye) && !withinRange(to, eye)) continue;
             if (!inViewCone(from, eye, view) && !inViewCone(to, eye, view)) continue;
             Vector3f color = ProfessionColors.lookup(villager.getVillagerData().getProfession());
-            spawned += spawnDustLine(level, from, to, eye, color);
+            spawned += spawnMoteLine(level, from, to, eye, color);
         }
 
         // Unbound villagers — pulsing angry_villager puff.
@@ -126,27 +139,44 @@ public final class WorkstationLinkRenderer {
             }
         }
 
-        // Unclaimed workstations — yellow orbit.
-        DustParticleOptions orbitDust = new DustParticleOptions(new Vector3f(1.0f, 0.95f, 0.2f), 1.0f);
-        double angle = (gameTime % (long) ORBIT_PERIOD_TICKS) / ORBIT_PERIOD_TICKS * Math.PI * 2.0;
-        for (BlockPos pos : payload.unclaimedWorkstations()) {
-            if (spawned >= MAX_PARTICLES_PER_TICK) return;
-            Vec3 center = Vec3.atCenterOf(pos).add(0.0, 0.7, 0.0);
-            if (!withinRange(center, eye)) continue;
-            if (!inViewCone(center, eye, view)) continue;
-            double radius = 0.6;
-            for (int i = 0; i < 2; i++) {
-                double a = angle + i * Math.PI;
-                double x = center.x + Math.cos(a) * radius;
-                double z = center.z + Math.sin(a) * radius;
-                level.addParticle(orbitDust, x, center.y, z, 0.0, 0.0, 0.0);
-                spawned++;
-                if (spawned >= MAX_PARTICLES_PER_TICK) return;
-            }
-        }
+        // Workstation status markers — a floating green check (claimed) or white
+        // question mark (unclaimed) above each workstation, replacing the old
+        // orbit dust. The claimed set is every workstation a villager is bound to.
+        Set<BlockPos> claimed = new HashSet<>(payload.bound().values());
+        spawned += emitMarkers(level, eye, view, claimed, claimedCooldown,
+                MercantileParticles.WORKSTATION_CLAIMED, spawned);
+        Set<BlockPos> unclaimed = new HashSet<>(payload.unclaimedWorkstations());
+        emitMarkers(level, eye, view, unclaimed, unclaimedCooldown,
+                MercantileParticles.WORKSTATION_UNCLAIMED, spawned);
     }
 
-    private static int spawnDustLine(ClientLevel level, Vec3 from, Vec3 to, Vec3 eye, Vector3f color) {
+    /**
+     * Emit one status-marker particle per workstation in {@code current},
+     * throttled by {@code cooldown} so exactly one icon is alive per position at
+     * a time. Off-screen positions don't burn a marker — they re-check next tick.
+     */
+    private static int emitMarkers(ClientLevel level, Vec3 eye, Vec3 view,
+                                   Set<BlockPos> current, Map<BlockPos, Integer> cooldown,
+                                   SimpleParticleType type, int alreadySpawned) {
+        cooldown.keySet().retainAll(current); // forget workstations that changed state
+        int spawned = 0;
+        for (BlockPos pos : current) {
+            int remaining = cooldown.getOrDefault(pos, 0);
+            if (remaining > 0) {
+                cooldown.put(pos, remaining - 1);
+                continue;
+            }
+            if (alreadySpawned + spawned >= MAX_PARTICLES_PER_TICK) break;
+            Vec3 base = Vec3.atCenterOf(pos).add(0.0, MARKER_Y_OFFSET, 0.0);
+            if (!withinRange(base, eye) || !inViewCone(base, eye, view)) continue;
+            level.addParticle(type, base.x, base.y, base.z, 0.0, 0.0, 0.0);
+            cooldown.put(pos, MARKER_LIFETIME_TICKS);
+            spawned++;
+        }
+        return spawned;
+    }
+
+    private static int spawnMoteLine(ClientLevel level, Vec3 from, Vec3 to, Vec3 eye, Vector3f color) {
         Vec3 delta = to.subtract(from);
         double length = delta.length();
         if (length < 1.0e-3) return 0;
@@ -155,7 +185,7 @@ public final class WorkstationLinkRenderer {
         double camDist = Math.sqrt(mid.distanceToSqr(eye));
         double step = Math.min(MAX_STEP_BLOCKS, BASE_STEP_BLOCKS * (1.0 + camDist / 16.0));
         int count = Math.max(1, (int) Math.floor(length / step));
-        DustParticleOptions opts = new DustParticleOptions(color, 1.0f);
+        LinkMoteParticleOptions opts = new LinkMoteParticleOptions(color);
         Vec3 unit = delta.scale(1.0 / length);
         int spawned = 0;
         for (int i = 1; i <= count; i++) {
@@ -195,5 +225,7 @@ public final class WorkstationLinkRenderer {
     private static void resetState() {
         ticksSinceRequest = REQUEST_INTERVAL_TICKS;
         wasActive = false;
+        claimedCooldown.clear();
+        unclaimedCooldown.clear();
     }
 }

@@ -1,0 +1,23 @@
+# Mercantile — merchant-screen "profession unlocked" glyph (11x11), emerald-styled
+# pair to locked-button. Replaces minecraft:widget/unlocked_button. Shackle swung
+# open: left leg seated, right leg lifted clear of the body (the open cue).
+size: 11
+
+legend:
+  . transparent
+  K ink                          # #0a0a0a outline + keyhole
+  E mercantile.emerald           # #50c878 body
+  e mercantile.emerald-bright    # #6ddb94 sheen
+
+grid:
+  ...KKK.....
+  ..K...K....
+  ..K...K....
+  ..K...K....
+  ..K........
+  ..KKKKKKK..
+  ..KeEEEEK..
+  ..KEEKEEK..
+  ..KEEKEEK..
+  ..KEEEEEK..
+  ..KKKKKKK..

@@ -31,11 +31,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MerchantScreenMixin extends AbstractContainerScreen<MerchantMenu> {
 
     @Unique
-    private static final ResourceLocation LOCKED_SPRITE =
-            ResourceLocation.withDefaultNamespace("widget/locked_button");
+    private static final ResourceLocation LOCKED_SPRITE = Mercantile.id("locked_button");
     @Unique
-    private static final ResourceLocation UNLOCKED_SPRITE =
-            ResourceLocation.withDefaultNamespace("widget/unlocked_button");
+    private static final ResourceLocation UNLOCKED_SPRITE = Mercantile.id("unlocked_button");
     @Unique
     private static final ResourceLocation INFO_BUTTON_SPRITE = Mercantile.id("info_button");
     @Unique

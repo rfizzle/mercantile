@@ -110,14 +110,14 @@ against it.
 | Apple touch icon | `docs/apple-touch-icon.png` | Final |
 | Favicons | `docs/favicon.ico`, `docs/favicon-32.png` | Final |
 | Sentry pylon block textures | `assets/mercantile/textures/block/` | Final — the only custom block textures |
-| Custom particle textures | `assets/mercantile/textures/particle/` | Final (pickup, trade cycling, follow, pylon) |
-| GUI sprites | `assets/mercantile/textures/gui/sprites/` | Final (info/close buttons) |
+| Custom particle textures | `assets/mercantile/textures/particle/` | Final (pickup, trade cycling, follow, pylon, profession-tinted link mote, workstation status markers ✓/?) |
+| GUI sprites | `assets/mercantile/textures/gui/sprites/` | Final (info/close buttons, merchant lock/unlock glyphs, reputation HUD emerald gem) |
+| HUD glyph master + sources | `art/hud-icon-16.png`, `art/glyphs/*.glyph` | Final — emerald-gem glyph; sources regenerate via concord's glyph tool |
 
 ### Needed Assets
 
 | Asset | Generator | Priority | Spec |
 |-------|-----------|----------|------|
-| HUD glyph 16×16 (`art/hud-icon-16.png`) | PixelLab | High | Dedicated 16×16 pixel glyph for HUD slot 2 and Jade/recipe-viewer contexts. Motif **bell or emerald — undecided** (`VISION.md` §3.2; `HUD-STANDARD.md` §2 says "emerald/bell glyph"). The HUD currently downscales the 128×128 mod icon, which muddies at 16px. |
 | Store gallery screenshots | Screenshot | Medium | 1920×1080, 3–5 shots per `VISION.md` §4 listing standard; at least one captioned sibling-integration shot when those land |
 | `art/exploration/` | — | Low | Directory for style explorations and generation prompts, per `REPO-LAYOUT.md` §1 — empty until the logo-formula question (§9) is worked |
 
@@ -125,17 +125,23 @@ against it.
 
 ## 3. Generation Prompts
 
-### PixelLab — HUD Glyph (once the motif is decided)
+### HUD Glyph — shipped (single emerald gem)
+
+The bell-vs-emerald motif question (§9) is **resolved: a single cut emerald
+gem**, the most legible motif at 16px and a direct tie to the reputation =
+emerald economy. Authored as an ASCII glyph spec with concord's glyph tool;
+master at `art/hud-icon-16.png`, source at `art/glyphs/hud-emerald-gem.glyph`.
+To regenerate or revise:
 
 ```
-Theme: Village trade / commerce
-Subject: [village bell on a short crossbeam | single emerald gem] — pending §9 decision
-Style: Minecraft item icon, pixel art
+Subject: single cut emerald gem, one centered motif, no text
 Size: 16x16
-Colors: Emerald (#50C878) primary, Emerald Bright (#6DDB94) highlights,
-        dark outline; must read on a 50–60% black HUD box
-Notes: Single centered motif, no text. Must stay legible next to
-       Tribulation's skull and Prosperity's chest glyphs in the HUD stack.
+Colors: Emerald (#50C878) body, Emerald Bright (#6DDB94) top facet, deeper
+        emerald (#2C8A57) lower-right facet shadow, ink (#0A0A0A) outline,
+        bone (#E8E0D4) glint; must read on a 50–60% black HUD box
+Notes: Stays legible next to Tribulation's skull and Prosperity's chest in
+       the HUD stack. Edit art/glyphs/hud-emerald-gem.glyph, then run
+       `python3 scripts/glyph.py <spec>` in the concord repo.
 ```
 
 Logo regeneration prompts (if §9 resolves toward the stone-frame formula) belong
@@ -183,8 +189,9 @@ screen per the standard's visibility rules.
 2. **No `api` package yet.** The accessors live in `com.rfizzle.mercantile.api`,
    which does not exist; creating it is Mercantile roadmap item 1
    (`VISION.md` §5.3, §6).
-3. **Glyph.** Currently blits the full mod icon scaled to 16×16; needs the
-   dedicated `hud-icon-16.png` (§2).
+3. ~~**Glyph.** Currently blits the full mod icon scaled to 16×16; needs the
+   dedicated `hud-icon-16.png` (§2).~~ **Done** — slot 2 now blits the custom
+   `mercantile:reputation_badge` emerald-gem sprite (master `art/hud-icon-16.png`).
 4. **Anchor config.** Top-left only today; the standard wants a corner anchor
    enum + pixel offsets.
 
@@ -267,9 +274,9 @@ Recorded so they read as *undecided*, not as omissions:
 1. **Tinted surface pair.** Adopt deep emerald-black surfaces
    (suggested `#0a140d` / `#10241a`, `VISION.md` §3.1) or stay on pure
    neutrals? Recommendation in VISION is to adopt; no pair has been chosen.
-2. **HUD glyph motif.** Bell vs. emerald — both sanctioned by
-   `HUD-STANDARD.md` §2 and `VISION.md` §3.2. Blocks the `hud-icon-16.png`
-   master.
+2. ~~**HUD glyph motif.** Bell vs. emerald.~~ Resolved 2026-06-14 — **single
+   emerald gem** chosen (most legible at 16px; ties to reputation = emerald).
+   Shipped as `art/hud-icon-16.png` / `mercantile:reputation_badge` (§2, §3).
 3. ~~**Logo vs. stone-frame formula.**~~ Resolved 2026-06-12 — the shipped
    market-stall medallion is ratified as-is in `VISION.md` §3.2; the
    bell-over-emeralds arch proposal is retired. The stone-frame formula

@@ -1,0 +1,21 @@
+# Mercantile — workstation "link mote" particle (8x8), replacing ParticleTypes.DUST
+# on the bell-held workstation overlay. Pure white with soft alpha falloff so the
+# per-profession color (set via TextureSheetParticle#setColor) multiplies through
+# cleanly — a glowing dot reads better than the square dust pixel.
+size: 8
+
+legend:
+  . transparent
+  s #ffffff55    # faint outer glow
+  w #ffffffbb    # soft mid
+  f #ffffffff    # white core
+
+grid:
+  ........
+  ..swws..
+  .swffws.
+  .wffffw.
+  .wffffw.
+  .swffws.
+  ..swws..
+  ........
