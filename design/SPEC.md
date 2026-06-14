@@ -2,7 +2,7 @@
 
 Minecraft 1.21.1 Fabric mod. Villager and trade overhaul.
 
-**Asset philosophy:** Custom textures for mod-specific visuals; vanilla assets for everything else. All sounds use existing vanilla sound events. Custom particle textures are used for mod-specific effects (pickup, trade cycling, follow mode, sentry pylon) to give each feature a distinct visual identity. Visualization features (workstation links, bell radius, village boundary) use vanilla `dust` particles since they are functional overlays, not themed effects. The sentry pylon has custom block textures (top/side/bottom). Villager pickup items use **player heads** with pre-existing skin textures sourced from minecraft-heads.com and hosted permanently on Mojang's CDN.
+**Asset philosophy:** Custom pixel-art textures for mod-specific visuals (authored through the Concord texture pipeline — `mc-textures` skill, concord `design/DESIGN-SYSTEM.md` §8 — with `.glyph` sources kept beside the masters); vanilla assets where they already map cleanly. All sounds use existing vanilla sound events. Custom particle textures are used for mod-specific effects (pickup, trade cycling, follow mode, sentry pylon) to give each feature a distinct visual identity. Visualization features (workstation links, bell radius, village boundary) use vanilla `dust` particles since they are functional overlays, not themed effects. The sentry pylon has custom block textures (top/side/bottom). Villager pickup items use **player heads** with pre-existing skin textures sourced from minecraft-heads.com and hosted permanently on Mojang's CDN.
 
 ---
 
