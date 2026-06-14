@@ -16,8 +16,8 @@ A villager and trade overhaul for Minecraft 1.21.1 (Fabric). Mercantile turns
 villagers from disposable trade machines into mobile, named, persistent
 characters — with pickup, biome-themed names, a five-tier reputation system,
 emerald-based trade cycling, and an iron-fueled sentry block that defends your
-village. Vanilla-first design: no custom textures beyond the sentry pylon, no
-balance-breaking shortcuts.
+village. Vanilla-coherent design: custom pixel-art textures where they raise the
+bar, vanilla assets where they already map cleanly; no balance-breaking shortcuts.
 
 ## Download
 
