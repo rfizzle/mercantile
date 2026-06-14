@@ -19,6 +19,13 @@ public class LinkMoteParticle extends TextureSheetParticle {
 
     LinkMoteParticle(ClientLevel level, double x, double y, double z, Vector3f color) {
         super(level, x, y, z, 0.0, 0.0, 0.0);
+        // The 7-arg Particle constructor adds a randomized velocity with a +0.1
+        // upward bias, which makes the motes drift up off the villager→workstation
+        // line. The line is meant to be a static dotted connector, so pin every
+        // mote in place — zero velocity, no gravity.
+        this.xd = 0.0;
+        this.yd = 0.0;
+        this.zd = 0.0;
         this.lifetime = 12 + this.random.nextInt(8);
         this.gravity = 0.0f;
         this.hasPhysics = false;
