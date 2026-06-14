@@ -4,6 +4,7 @@ import com.rfizzle.mercantile.client.network.ClientMercantileData;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.network.RequestWorkstationMapC2SPayload;
 import com.rfizzle.mercantile.network.WorkstationMapS2CPayload;
+import com.rfizzle.mercantile.particle.LinkMoteParticleOptions;
 import com.rfizzle.mercantile.visualization.ProfessionColors;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
@@ -96,7 +97,7 @@ public final class WorkstationLinkRenderer {
         // Index villagers once.
         Map<UUID, Villager> villagerByUuid = indexVillagers(level);
 
-        // Bound links — coloured dust segments.
+        // Bound links — profession-coloured link motes.
         for (Map.Entry<UUID, BlockPos> entry : payload.bound().entrySet()) {
             if (spawned >= MAX_PARTICLES_PER_TICK) return;
             Villager villager = villagerByUuid.get(entry.getKey());
@@ -107,7 +108,7 @@ public final class WorkstationLinkRenderer {
             if (!withinRange(from, eye) && !withinRange(to, eye)) continue;
             if (!inViewCone(from, eye, view) && !inViewCone(to, eye, view)) continue;
             Vector3f color = ProfessionColors.lookup(villager.getVillagerData().getProfession());
-            spawned += spawnDustLine(level, from, to, eye, color);
+            spawned += spawnMoteLine(level, from, to, eye, color);
         }
 
         // Unbound villagers — pulsing angry_villager puff.
@@ -146,7 +147,7 @@ public final class WorkstationLinkRenderer {
         }
     }
 
-    private static int spawnDustLine(ClientLevel level, Vec3 from, Vec3 to, Vec3 eye, Vector3f color) {
+    private static int spawnMoteLine(ClientLevel level, Vec3 from, Vec3 to, Vec3 eye, Vector3f color) {
         Vec3 delta = to.subtract(from);
         double length = delta.length();
         if (length < 1.0e-3) return 0;
@@ -155,7 +156,7 @@ public final class WorkstationLinkRenderer {
         double camDist = Math.sqrt(mid.distanceToSqr(eye));
         double step = Math.min(MAX_STEP_BLOCKS, BASE_STEP_BLOCKS * (1.0 + camDist / 16.0));
         int count = Math.max(1, (int) Math.floor(length / step));
-        DustParticleOptions opts = new DustParticleOptions(color, 1.0f);
+        LinkMoteParticleOptions opts = new LinkMoteParticleOptions(color);
         Vec3 unit = delta.scale(1.0 / length);
         int spawned = 0;
         for (int i = 1; i <= count; i++) {

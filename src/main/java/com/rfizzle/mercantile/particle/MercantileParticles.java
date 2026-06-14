@@ -3,6 +3,7 @@ package com.rfizzle.mercantile.particle;
 import com.rfizzle.mercantile.Mercantile;
 import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes;
 import net.minecraft.core.Registry;
+import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
 
@@ -14,6 +15,9 @@ public final class MercantileParticles {
     public static final SimpleParticleType PYLON_MOTE = FabricParticleTypes.simple();
     public static final SimpleParticleType PYLON_SPARK = FabricParticleTypes.simple();
     public static final SimpleParticleType GOLEM_SHARD = FabricParticleTypes.simple();
+    // Colour-carrying type for the workstation link visualization (profession-tinted).
+    public static final ParticleType<LinkMoteParticleOptions> LINK_MOTE =
+            FabricParticleTypes.complex(LinkMoteParticleOptions.CODEC, LinkMoteParticleOptions.STREAM_CODEC);
 
     public static void init() {
         Registry.register(BuiltInRegistries.PARTICLE_TYPE, Mercantile.id("cycle_glint"), CYCLE_GLINT);
@@ -22,6 +26,7 @@ public final class MercantileParticles {
         Registry.register(BuiltInRegistries.PARTICLE_TYPE, Mercantile.id("pylon_mote"), PYLON_MOTE);
         Registry.register(BuiltInRegistries.PARTICLE_TYPE, Mercantile.id("pylon_spark"), PYLON_SPARK);
         Registry.register(BuiltInRegistries.PARTICLE_TYPE, Mercantile.id("golem_shard"), GOLEM_SHARD);
+        Registry.register(BuiltInRegistries.PARTICLE_TYPE, Mercantile.id("link_mote"), LINK_MOTE);
     }
 
     private MercantileParticles() {

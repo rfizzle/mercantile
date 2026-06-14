@@ -1,0 +1,23 @@
+# Mercantile — merchant-screen "profession locked" glyph (11x11), emerald-styled
+# to match the custom info/close buttons. Replaces minecraft:widget/locked_button.
+# Closed shackle seated into the lock body; centered keyhole.
+size: 11
+
+legend:
+  . transparent
+  K ink                          # #0a0a0a outline + keyhole
+  E mercantile.emerald           # #50c878 body
+  e mercantile.emerald-bright    # #6ddb94 sheen
+
+grid:
+  ...........
+  ...KKKKK...
+  ...K...K...
+  ...K...K...
+  ...K...K...
+  ..KKKKKKK..
+  ..KeEEEEK..
+  ..KEEKEEK..
+  ..KEEKEEK..
+  ..KEEEEEK..
+  ..KKKKKKK..
