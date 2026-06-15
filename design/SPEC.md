@@ -2,7 +2,7 @@
 
 Minecraft 1.21.1 Fabric mod. Villager and trade overhaul.
 
-**Asset philosophy:** Custom pixel-art textures for mod-specific visuals (authored through the Concord texture pipeline — `mc-textures` skill, concord `design/DESIGN-SYSTEM.md` §8 — with `.glyph` sources kept beside the masters); vanilla assets where they already map cleanly. All sounds use existing vanilla sound events. Custom particle textures are used for mod-specific effects (pickup, trade cycling, follow mode, sentry pylon) to give each feature a distinct visual identity. Visualization features (workstation links, bell radius, village boundary) use vanilla `dust` particles since they are functional overlays, not themed effects. The sentry pylon has custom block textures (top/side/bottom). Villager pickup items use **player heads** with pre-existing skin textures sourced from minecraft-heads.com and hosted permanently on Mojang's CDN.
+**Asset philosophy:** Custom pixel-art textures for mod-specific visuals (authored through the Concord texture pipeline — `mc-textures` skill, concord `design/DESIGN-SYSTEM.md` §8 — with `.glyph` sources kept beside the masters); vanilla assets where they already map cleanly. All sounds use existing vanilla sound events. Custom particle textures are used for mod-specific effects (pickup, trade cycling, follow mode, sentry pylon) to give each feature a distinct visual identity. Visualization features (workstation links, bell radius) use vanilla `dust` particles since they are functional overlays, not themed effects. The sentry pylon has custom block textures (top/side/bottom). Villager pickup items use **player heads** with pre-existing skin textures sourced from minecraft-heads.com and hosted permanently on Mojang's CDN.
 
 ---
 
@@ -212,14 +212,17 @@ This is distinct from vanilla's per-villager gossip system. Mercantile reputatio
 | Action | Change | Notes |
 |---|---|---|
 | Completing a trade | +1 | Per trade execution (bulk trades count each execution individually) |
-| Curing a zombie villager | +15 | One-time bonus per villager (tracked by villager UUID) |
-| Attacking a villager | -10 | Per hit |
-| Killing a villager | -25 | Stacks with attack penalty from the killing blow |
+| Curing a zombie villager | +5 | One-time bonus per villager (tracked by villager UUID). Bypasses the daily cap |
+| Attacking a villager | -15 | Per hit |
+| Killing a villager | -40 | Stacks with attack penalty from the killing blow |
 | Proximity to villagers | +1 per 10 min | Passive accrual while within 16 blocks of any villager. Tracked via an internal tick counter (12,000 ticks = 10 min). Capped at +1 per in-game day |
-| Successful trade cycling | +2 | Per cycle |
+| Successful trade cycling | +1 | Per cycle |
 | Gifting a profession item | +1 | Toss a profession-appropriate item to a villager. Daily-capped (see Gifting below) |
+| Defending a village from a raid | +10 | Granted to each player vanilla awards Hero of the Village. Bypasses the daily cap (see below) |
 
 All values are configurable via the reputation config subsection.
+
+**Raid-defense rep is an intentional cap bypass.** Like the cure bonus, winning a raid skips the daily total cap and the per-source sub-caps, and does not count toward the day's earned total — defending a village is a rare, heroic act rewarded in full. It is gated behind both `enableReputation` and `enableRaidReputation`, and triggers off vanilla's Hero of the Village award, so any player vanilla credits for the raid is credited here too.
 
 ### Vanilla Gossip Interaction
 Mercantile reputation operates as a **parallel system** alongside vanilla gossip. Both independently contribute to the final trade price:
@@ -247,6 +250,7 @@ Mercantile reputation operates as a **parallel system** alongside vanilla gossip
 - Implementation approach: define a set of **bonus offers** per profession that are injected into the villager's trade list when the interacting player meets the reputation threshold.
 - These bonus trades are defined in data packs (`data/mercantile/exclusive_trades/<profession>.json`) so they are extensible.
 - **Per-profession primarily**, plus a small set of **cross-profession "mercantile" trades** available from any villager at Honored tier. Cross-profession trades are defined in `data/mercantile/exclusive_trades/_mercantile.json`.
+- **Wandering traders** also gain a bonus offer at Trusted tier and above, defined in `data/mercantile/exclusive_trades/wandering_trader.json`. Unlike villagers (which can accumulate several exclusive offers), each wandering trader receives exactly **one** bonus offer: the first time a qualifying player opens it, one offer is chosen from the qualifying pool and persisted to the trader's data, so it stays stable across re-opens even if the player's score later drifts. Gated behind `enableWanderingTraderRep`.
 - Bonus trades are **player-specific** — they appear for the high-rep player but not for others interacting with the same villager. This requires intercepting the trade list sent to the client and injecting/removing offers based on the player's reputation.
 
 **Trade Refusal:**
@@ -257,22 +261,22 @@ Mercantile reputation operates as a **parallel system** alongside vanilla gossip
 
 | Tier | Range | Effect |
 |---|---|---|
-| Reviled | -100 to -50 | Trade refusal, `angry_villager` particles |
-| Distrusted | -49 to -1 | Price markup (+10-25%, scaled linearly within range) |
-| Neutral | 0 | No modifier |
-| Liked | 1 to 49 | Small discount (5%) |
-| Trusted | 50 to 99 | Moderate discount (10%), profession-specific exclusive trades |
-| Honored | 100+ | Best discount (15%), all exclusive trades including cross-profession |
+| Reviled | -200 to -150 | Trade refusal, `angry_villager` particles |
+| Distrusted | -149 to -1 | Price markup (+10-25%, scaled linearly within range) |
+| Neutral | 0 to 74 | No modifier |
+| Liked | 75 to 299 | Small discount (5%) |
+| Trusted | 300 to 999 | Moderate discount (10%), profession-specific exclusive trades |
+| Honored | 1000+ | Best discount (15%), all exclusive trades including cross-profession |
 
 ### Reputation Bounds and Decay
-- **Hard cap:** -100 minimum, +200 maximum. The buffer above the Honored threshold (100) allows continued earning without wasted actions, while the cap prevents runaway values.
+- **Hard cap:** -200 minimum, +1500 maximum. The buffer above the Honored threshold (1000) allows continued earning without wasted actions, while the cap prevents runaway values.
 - **Positive reputation does not decay.** Reputation earned through deliberate action is never lost to absence — decay would punish players for exploring or working on other projects.
 - **Negative reputation recovers.** Scores below 0 climb back toward 0 at `reputationNegativeDecayPerDay` points per in-game day (default 1), evaluated at day rollover. This gives a passive redemption path that complements active gifting; positive scores are never touched.
 - **Player death:** Full reputation is retained. Reputation represents a long-term relationship, not a resource.
 
 ### Exclusive Trades Datapack Schema
 
-Files at `data/mercantile/exclusive_trades/<profession>.json` and `data/mercantile/exclusive_trades/_mercantile.json`:
+Files at `data/mercantile/exclusive_trades/<profession>.json`, `data/mercantile/exclusive_trades/_mercantile.json` (cross-profession), and `data/mercantile/exclusive_trades/wandering_trader.json` (wandering-trader bonus offers) — all share the same schema:
 
 ```json
 {
@@ -299,8 +303,9 @@ Files at `data/mercantile/exclusive_trades/<profession>.json` and `data/mercanti
 ```
 
 - `replace`: If `true`, replaces the built-in exclusive trades for this profession.
-- `min_tier`: Default minimum reputation tier for all trades in this file.
+- `min_tier`: Default minimum reputation tier for all trades in this file (defaults to `trusted`).
 - `min_tier_override`: Per-trade override of the minimum tier.
+- `max_uses` (optional, default 12), `xp_gain` (optional, default 1), and `price_multiplier` (optional, default 0.05) tune each trade's stock, villager XP reward, and demand-based price scaling.
 - Trade format uses 1.21.1's **data component system** for item definitions. The `components` field accepts the same component structure as vanilla `/give` commands and recipe definitions. Items without special components omit the field entirely.
 
 ### Gifting
@@ -352,14 +357,15 @@ Villagers can be commanded to follow a player, replacing the need for minecarts/
 
 ### Interaction
 - **Trigger:** Sneak + right-click a villager while holding an **emerald**.
-- Emerald is the trigger item because bell is already overloaded (workstation visualization, bell radius, village boundary). Emerald is thematic — the player is "paying" for the villager's attention.
-- **Toggle:** Same action again to release the villager from follow mode.
+- Emerald is the trigger item because bell is already overloaded (workstation visualization, bell radius). Emerald is thematic — the player is "paying" for the villager's attention.
+- **Toggle:** Same action again (sneak + right-click with an emerald) to release the villager from follow mode. Only the player the villager is following can release it.
 - Villager follows at a moderate pace, keeping within ~6 blocks of the player.
 
 ### Behavior
 - Following villager pathfinds toward the player using standard mob AI goals (injected at high priority).
 - If the player moves too far (>32 blocks), the villager gives up and stops following (prevents chunk-loading exploits).
 - Following villagers ignore their normal schedule (won't wander to workstations or beds until released).
+- **Return home on release.** When released, a villager that remembers a bed or workstation walks back to it (bed takes priority over workstation) at a steady pace, stopping once it arrives within ~4 blocks, gets stuck, or finishes pathing. A villager with neither memory simply resumes normal behavior in place. Taking damage cancels the return so it can defend itself or flee. Toggled by `enableSendHome` (independent of `enableFollowMode`).
 - **Following villagers are immune to entity collision pushing** (mob-on-mob pushing only — block collision and piston interactions are unaffected). Without this, other entities constantly shove them off their path, making the feature frustrating.
 - Visual indicator: Custom `mercantile:follow_trail` particles emitted periodically at the villager's feet while following (teal/cyan ground glow — distinct from trade cycling's gold flash and pickup's green starburst).
 
@@ -620,36 +626,7 @@ When holding or ringing a bell, show the area of effect.
 
 ---
 
-## 18. Village Boundary Awareness
-
-Visualize the extent of a village's area for planning builds and villager placement.
-
-### Behavior
-- **Trigger:** Holding a bell or using `/mercantile village` command.
-- Renders an outline showing:
-  - The village center (marked with a vertical column of `end_rod` particles — vanilla white rising effect, visible from a distance without custom textures).
-  - The village boundary (edges drawn with `dust` particles in white).
-  - Individual POI locations colored by type using `dust` particles: blue = bed, yellow = workstation, green = bell.
-- POI claim status: occupied POIs show a `dust` particle link line to their villager, unclaimed POIs pulse (particle spawn rate oscillates).
-- **Shows all POI types:** beds, workstations, and bells. Players need full visibility for village planning.
-
-### Boundary Definition
-- **Bounding box** of all related POIs with **10-block padding**. Convex hull is more mathematically precise but harder to render and reason about visually. A padded bounding box is simple, predictable, and fast to compute.
-- Village "center" is the centroid of all POI positions.
-
-### Render Limits
-- Only render within **128 blocks** of the player. POI markers beyond render distance are culled.
-- Lines and markers use LOD — reduce `dust` particle density for links farther from the player.
-- Performance-tested target: smooth rendering with up to 100 POIs in range.
-
-### Implementation Notes
-- Server sends POI data via `VillageBoundsS2C` packet on request.
-- Client renders boundary and POI markers entirely via vanilla `ParticleEngine` (`DustParticleOptions` for colored markers, `ParticleTypes.END_ROD` for center beacon). No custom render layer or textures needed.
-- Complements the workstation link visualization (section 11) — both share the POI query infrastructure.
-
----
-
-## 19. Sentry Pylon
+## 18. Sentry Pylon
 
 A placeable block that passively defends an area by summoning temporary iron golems when hostile mobs are nearby.
 
@@ -720,6 +697,11 @@ Shaped recipe (3x3 crafting grid):
 ### Out-of-Fuel Alert
 - When the pylon detects a hostile but has no fuel: `dust` particles in red pulse from the pylon and a **note block bass drum sound** (`minecraft:block.note_block.basedrum`) plays at low pitch (once per detection cycle, not continuously). Alerts nearby players to refuel.
 
+### Bell Alarm
+- On detecting a hostile, the pylon rings the **nearest village bell** within its detection radius using the standard vanilla bell ring (sound + swing), drawing players to the threat. Located via the village point-of-interest system; if no bell is in range, nothing happens.
+- The alarm fires on threat detection regardless of whether a golem is spawned, and is **rate-limited to once per 10 seconds** (200-tick cooldown, persisted across save/load) so a sustained threat does not ring continuously.
+- Toggled by `enablePylonBellAlarm` (requires the pylon itself to be enabled via `enableSentryPylon`).
+
 ### Redstone Interaction
 - A redstone signal **disables** the pylon (stops scanning and spawning). Allows players to toggle defense on/off.
 - Comparator output reflects fuel level (0–15 signal strength proportional to iron blocks stored).
@@ -734,7 +716,7 @@ Shaped recipe (3x3 crafting grid):
 
 ---
 
-## 20. Commands
+## 19. Commands
 
 ### `/mercantile` Command Tree
 
@@ -746,17 +728,15 @@ All commands use the `mercantile` root. Requires **operator level 2** for admin 
 | `/mercantile reputation <player>` | Op level 2 | Shows another player's reputation |
 | `/mercantile reputation set <player> <value>` | Op level 2 | Sets a player's reputation to an exact value |
 | `/mercantile reputation add <player> <value>` | Op level 2 | Adds (or subtracts, if negative) reputation |
-| `/mercantile village` | Any player | Triggers village boundary visualization (same as holding bell) |
 | `/mercantile reload` | Op level 2 | Reloads config from disk. Localization key: `command.mercantile.reload` |
 
 ### Implementation Notes
 - Register via Fabric's `CommandRegistrationCallback`.
-- `/mercantile village` sends the `VillageBoundsS2C` packet to the executing player with POI data for their current area.
 - `/mercantile reload` re-reads `config/mercantile.json` and pushes updated server config values to all connected clients.
 
 ---
 
-## 21. Multiplayer Edge Cases
+## 20. Multiplayer Edge Cases
 
 Rules for interactions that involve multiple players or shared villager state.
 
@@ -774,12 +754,12 @@ Rules for interactions that involve multiple players or shared villager state.
 ### Reputation (Section 4)
 - Reputation is per-player. Exclusive trades are injected per-player at trade screen open. Two players trading with the same villager see different trade lists if their reputation tiers differ.
 
-### Sentry Pylon (Section 19)
+### Sentry Pylon (Section 18)
 - Pylons are not player-owned. Any player can fuel or break them. Sentry golems defend all players and villagers equally.
 
 ---
 
-## 22. Creative Mode Behavior
+## 21. Creative Mode Behavior
 
 Adjustments when the player is in creative mode, to support testing and building.
 
@@ -794,7 +774,7 @@ Adjustments when the player is in creative mode, to support testing and building
 
 ---
 
-## 23. Trade Index (EMI / REI / JEI Integration)
+## 22. Trade Index (EMI / REI / JEI Integration)
 
 A unified, searchable trade catalog integrated into recipe viewers. Replaces the need for mods like "EMI Trades" with a purpose-built experience that supports search, filtering, and Mercantile-specific data.
 
@@ -861,7 +841,7 @@ A shared `TradeIndexDataSource` class builds the trade list once; each plugin ad
 
 ---
 
-## 24. Third-Party Profession Support
+## 23. Third-Party Profession Support
 
 Mercantile must support modded villager professions (e.g. from Create, Farmer's Delight, or custom datapacks). The `BuiltInRegistries.VILLAGER_PROFESSION` registry is the single source of truth — Mercantile never hardcodes the set of vanilla professions.
 
@@ -894,7 +874,7 @@ Every feature that references professions must work in one of two modes:
 - Mercantile ships built-in exclusive trades only for vanilla professions. Modded professions have no exclusive trades by default — mod authors or pack makers can add them via datapacks.
 - The `_mercantile.json` cross-profession trades apply to all professions, including modded ones.
 
-**Trade Index — EMI/REI/JEI (Section 23):**
+**Trade Index — EMI/REI/JEI (Section 22):**
 - `TradeIndexDataSource` iterates `VillagerTrades.TRADES` at runtime. All registered professions (vanilla and modded) are included automatically.
 - Profession filter tabs are generated dynamically from the registry — no hardcoded list.
 - Profession icons use `VillagerHeadTextures` with the same fallback as pickup (generic head for unknown professions).
@@ -930,13 +910,25 @@ All features are independently toggleable via ModMenu / Cloth Config screen and 
 | `enableTradeCycling` | bool | true | Toggle trade cycling button |
 | `tradeCycleEmeraldCost` | int | 6 | Emeralds per cycle |
 | `enableReputation` | bool | true | Toggle reputation system |
-| `reputationTradeGain` | int | 1 | Rep gained per trade |
-| `reputationCureGain` | int | 15 | Rep gained for curing a zombie villager |
-| `reputationAttackLoss` | int | 10 | Rep lost per villager attack |
-| `reputationKillLoss` | int | 25 | Rep lost for killing a villager |
-| `reputationCycleGain` | int | 2 | Rep gained per trade cycle |
+| `reputationTradeGain` | int | 1 | Rep gained per trade-gain pulse |
+| `reputationCureGain` | int | 5 | Rep gained for curing a zombie villager (bypasses daily cap) |
+| `reputationAttackLoss` | int | 15 | Rep lost per villager attack |
+| `reputationKillLoss` | int | 40 | Rep lost for killing a villager |
+| `reputationCycleGain` | int | 1 | Rep gained per trade cycle |
+| `reputationDailyCap` | int | 5 | Max total rep earnable per in-game day from trades + cycles + gifts (range 1–50) |
+| `reputationTradesPerGain` | int | 5 | Completed trades per trade-gain pulse (range 1–20) |
+| `reputationDailyMaxTradeRep` | int | 2 | Daily sub-cap on trade rep (range 1–10) |
+| `reputationDailyMaxCycleRep` | int | 1 | Daily sub-cap on cycle rep (range 1–10) |
+| `enableRaidReputation` | bool | true | Toggle reputation gain for defending raids |
+| `reputationRaidWinGain` | int | 10 | Rep granted for winning a raid (bypasses daily cap) |
+| `enableWanderingTraderRep` | bool | true | Toggle wandering-trader bonus offer at high reputation |
+| `enableGifting` | bool | true | Toggle accepting profession-matched item gifts for rep |
+| `reputationGiftGain` | int | 1 | Rep gained per accepted gift item |
+| `reputationDailyMaxGiftRep` | int | 2 | Daily sub-cap on gift rep (range 1–10) |
+| `reputationNegativeDecayPerDay` | int | 1 | Points a negative score recovers toward 0 per in-game day (0 disables) |
 | `enableFollowMode` | bool | true | Toggle villager follow mode |
 | `maxFollowingVillagers` | int | 3 | Max villagers following a player |
+| `enableSendHome` | bool | true | Released villagers walk back to bed/workstation |
 | `enablePathfindingFixes` | bool | true | Toggle pathfinding improvements |
 | `enablePathfindingDoors` | bool | true | Door/gate fix |
 | `enablePathfindingStairs` | bool | true | Stair/slab fix |
@@ -944,10 +936,14 @@ All features are independently toggleable via ModMenu / Cloth Config screen and 
 | `enablePathfindingWater` | bool | true | Water avoidance |
 | `enableBulkTrading` | bool | true | Toggle shift-click bulk trades |
 | `enableProfessionLock` | bool | true | Toggle profession lock protection |
-| `healingMultiplier` | float | 2.0 | Potion healing multiplier for villagers |
+| `enableHealing` | bool | true | Toggle boosted potion healing for villagers |
+| `healingMultiplier` | float | 2.0 | Potion healing multiplier for villagers (range 1.0–10.0) |
 | `enableRestockIndicator` | bool | true | Toggle restock timer in trade GUI |
 | `enableDemandTransparency` | bool | true | Toggle price breakdown tooltip |
+| `enableBreedingTooltip` | bool | true | Toggle breeding-status tooltip (Jade/WTHIT) |
+| `enableStateIndicators` | bool | true | Toggle villager state indicators (Jade/WTHIT) |
 | `enableSentryPylon` | bool | true | Toggle sentry pylon block |
+| `enablePylonBellAlarm` | bool | true | Pylon rings the nearest village bell on threat detection |
 | `pylonDetectionRadius` | int | 32 | Sentry pylon hostile scan radius |
 | `pylonMaxFuel` | int | 8 | Max iron blocks a pylon can hold |
 | `pylonMaxGolems` | int | 3 | Max active sentry golems per pylon |
@@ -960,8 +956,11 @@ All features are independently toggleable via ModMenu / Cloth Config screen and 
 | `villagerSoundVolume` | float | 1.0 | Villager sound volume (0.0-1.0) |
 | `enableWorkstationVis` | bool | true | Toggle workstation link particles |
 | `enableBellRadiusVis` | bool | true | Toggle bell radius visualization |
-| `enableVillageBoundaryVis` | bool | true | Toggle village boundary rendering |
 | `enableInfoPanel` | bool | true | Toggle extended info panel in trade GUI |
+| `enableReputationHud` | bool | true | Toggle the reputation tier HUD indicator |
+| `hudAnchor` | enum | TOP_LEFT | HUD corner anchor: TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT |
+| `hudOffsetX` | int | 4 | HUD horizontal inset from the anchored edge (range 0–10000) |
+| `hudOffsetY` | int | 4 | HUD vertical inset from the anchored edge (range 0–10000) |
 
 ---
 
@@ -989,9 +988,9 @@ These are not user-facing features but are required by everything that follows.
 
 1. **Config system** — `MercantileConfig` class with all server + client fields, JSON serialization, Cloth Config screen builder, `ModMenuIntegration` wired up. Every feature reads from this.
 2. **Persistence infrastructure** — Register Fabric `AttachmentType` definitions for all persistent per-player data (reputation, stats) and per-entity data (profession lock flag, trade lock set, name assignment flag). Centralizes all attachment registrations in a single `MercantileAttachments` class. Used by: reputation (section 4), profession lock (section 12), trade cycling locked state (section 3).
-3. **Networking infrastructure** — Packet registration pattern (`FabricPacketHandler` or similar), `CustomPayload` base types. Needed by: trade cycling, restock indicator, demand transparency, workstation vis, village boundary, villager info panel.
-4. **Command registration** — `/mercantile` command tree (section 20). Needed by: reputation management, village boundary trigger, config reload.
-5. **Profession support infrastructure** (section 24) — `VillagerHeadTextures` registry keyed by `ResourceLocation` with Base64 texture values from minecraft-heads.com + fallback head + public `register()` API. Profession display name resolver using translation keys with raw-ID fallback. All downstream features consume these utilities rather than implementing their own profession handling.
+3. **Networking infrastructure** — Packet registration pattern (`FabricPacketHandler` or similar), `CustomPayload` base types. Needed by: trade cycling, restock indicator, demand transparency, workstation vis, villager info panel.
+4. **Command registration** — `/mercantile` command tree (section 19). Needed by: reputation management, config reload.
+5. **Profession support infrastructure** (section 23) — `VillagerHeadTextures` registry keyed by `ResourceLocation` with Base64 texture values from minecraft-heads.com + fallback head + public `register()` API. Profession display name resolver using translation keys with raw-ID fallback. All downstream features consume these utilities rather than implementing their own profession handling.
 
 ### Phase 1: Core Standalone Features
 No cross-feature dependencies. Can be developed in parallel.
@@ -1031,19 +1030,18 @@ Client-side rendering features. All share particle/render infrastructure.
 
 19. **Workstation Link Visualization** (section 11) — Server POI query, `WorkstationMapS2C` packet, particle line rendering.
 20. **Bell Radius Visualization** (section 17) — Client-side circle rendering, glow effect on ring.
-21. **Village Boundary Awareness** (section 18) — Shares POI infra from #19, adds boundary box + POI markers.
 
 ### Phase 7: Mod Integrations
 Optional-dependency features. Can be developed once the underlying data exists from earlier phases.
 
-22. **Breeding Information** (section 7) — Jade/WTHIT plugin, server data provider.
-23. **Villager State Indicators** (section 15) — Extends #22 with additional brain memory reads.
-24. **Trade Index** (section 23) — EMI/REI/JEI plugin. Depends on reputation (phase 4) for exclusive trade display. Shared `TradeIndexDataSource` + three viewer adapters. Profession tabs generated dynamically from registry.
+21. **Breeding Information** (section 7) — Jade/WTHIT plugin, server data provider.
+22. **Villager State Indicators** (section 15) — Extends #21 with additional brain memory reads.
+23. **Trade Index** (section 22) — EMI/REI/JEI plugin. Depends on reputation (phase 4) for exclusive trade display. Shared `TradeIndexDataSource` + three viewer adapters. Profession tabs generated dynamically from registry.
 
 ### Phase 8: Sentry Pylon
 Most complex feature. Custom block, block entity, AI goals, spawning logic, visual states, crafting recipe. Saved for last to benefit from all infrastructure built in prior phases.
 
-25. **Sentry Pylon** (section 19) — Block + block entity, fuel system, hostile detection, golem spawning, sentry AI goals, despawn sequence, redstone interaction, crafting recipe, block model + assets.
+24. **Sentry Pylon** (section 18) — Block + block entity, fuel system, hostile detection, golem spawning, sentry AI goals, despawn sequence, redstone interaction, crafting recipe, block model + assets.
 
 ---
 
@@ -1070,7 +1068,7 @@ All sounds use **vanilla Minecraft sound events** — no custom audio assets. Th
 
 ### Particle Mapping
 
-Mod-specific effects use custom particle textures under `assets/mercantile/textures/particle/`. Visualization overlays (workstation links, bell radius, village boundary) use vanilla particles since they are functional, not themed.
+Mod-specific effects use custom particle textures under `assets/mercantile/textures/particle/`. Visualization overlays (workstation links, bell radius) use vanilla particles since they are functional, not themed.
 
 | Feature | Effect | Particle | Texture |
 |---|---|---|---|
@@ -1084,9 +1082,6 @@ Mod-specific effects use custom particle textures under `assets/mercantile/textu
 | Workstation Links — unclaimed POI | Yellow orbit | `minecraft:dust` (yellow) | Vanilla |
 | Bell Radius — circle | Gold ring on ground | `minecraft:dust` (gold) | Vanilla |
 | Bell Radius — ring highlight | Villager glow | Vanilla entity glow flag | Vanilla (spectral arrow style) |
-| Village Boundary — center beacon | White rising column | `minecraft:end_rod` | Vanilla |
-| Village Boundary — edges | White box outline | `minecraft:dust` (white) | Vanilla |
-| Village Boundary — POI markers | Colored by type | `minecraft:dust` (blue/yellow/green) | Vanilla |
 | Sentry Pylon — idle | Drifting motes | `mercantile:pylon_mote` | `pylon_mote.png` (4x4, light gray, round dot) |
 | Sentry Pylon — active | Jagged energy sparks | `mercantile:pylon_spark` | `pylon_spark.png` (8x8, orange-gold, spiky) |
 | Sentry Pylon — out of fuel | Red pulse | `minecraft:dust` (red) | Vanilla |
@@ -1146,7 +1141,7 @@ Require a running server instance. Located in `src/gametest/`.
 Features that require visual/UI verification and can't be automated:
 
 - Trade GUI mixin rendering (cycle button placement, restock timer, demand tooltip, info panel)
-- Visualization features (workstation links, bell radius, village boundary)
+- Visualization features (workstation links, bell radius)
 - Jade/WTHIT tooltip rendering
 - EMI/REI/JEI trade index UI and search integration
 - Sentry pylon block model and visual states
@@ -1155,12 +1150,12 @@ Features that require visual/UI verification and can't be automated:
 
 ## Rendering Compatibility
 
-Visualization features (sections 11, 17, 18) use client-side world rendering. These must work with common rendering mods.
+Visualization features (sections 11, 17) use client-side world rendering. These must work with common rendering mods.
 
 ### Approach
 - Use **Fabric Rendering API** events (`WorldRenderEvents.AFTER_TRANSLUCENT` or `WorldRenderEvents.LAST`) for all custom world rendering. Do not use raw `RenderSystem` calls or GL state manipulation outside of these events.
 - Particle-based effects (workstation links, bell radius markers, follow mode trail) use vanilla `ParticleEngine` — these are inherently compatible with Sodium/Iris since they go through the standard particle pipeline.
-- Line/shape rendering (bell radius circle, village boundary box) uses `VertexConsumer` on the `LINES` render type via `RenderBufferSource`. Sodium preserves this path.
+- Line/shape rendering (bell radius circle) uses `VertexConsumer` on the `LINES` render type via `RenderBufferSource`. Sodium preserves this path.
 - **Iris shader compatibility:** Custom rendering in `AFTER_TRANSLUCENT` may be affected by shader post-processing. Known limitation — document in mod description that visualization features may render differently with shader packs. No workaround needed for v0.1.
 
 ---
@@ -1168,4 +1163,3 @@ Visualization features (sections 11, 17, 18) use client-side world rendering. Th
 ## Future Considerations (Out of Scope for v0.1)
 - Villager trading post block (centralized trade access)
 - Villager happiness / mood system
-- Wandering trader improvements

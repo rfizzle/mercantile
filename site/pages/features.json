@@ -41,9 +41,10 @@
               "title": "Follow Mode",
               "html": [
                 "Sneak-right-click a villager while holding an emerald to make them follow you. They pathfind toward the player at ~6 blocks distance, ignore schedule goals (workstation, bed, wandering), and refuse mob-to-mob collision pushes.",
-                "Cyan particles trail at their feet while following. They auto-release if you move more than 32 blocks away. A villager already following one player cannot be recruited by another. Not persisted — cleared on logout, unload, or restart."
+                "Cyan particles trail at their feet while following. They auto-release if you move more than 32 blocks away. A villager already following one player cannot be recruited by another. Not persisted — cleared on logout, unload, or restart.",
+                "<strong class='text-bone'>Sent home on release:</strong> sneak-right-click with an emerald again to dismiss, and the villager walks back to its bed (or workstation, if it has no bed) instead of standing where you left it. Taking damage cancels the trip. Toggle with <code class='text-bone'>enableSendHome</code>."
               ],
-              "note": "Config: <code class='text-bone'>enableFollowMode</code>, <code class='text-bone'>maxFollowingVillagers</code> (default 3)"
+              "note": "Config: <code class='text-bone'>enableFollowMode</code>, <code class='text-bone'>maxFollowingVillagers</code> (default 3), <code class='text-bone'>enableSendHome</code>"
             },
             {
               "id": "healing",
@@ -145,18 +146,18 @@
           "type": "sub",
           "id": "reputation-system",
           "title": "Five-Tier Reputation",
-          "intro": "A persistent per-player score from −100 to +200 that survives death and travels with you across the world. Score changes are configurable.",
+          "intro": "A persistent per-player score from −200 to +1500 that survives death and travels with you across the world. Score changes are configurable.",
           "blocks": [
             {
               "type": "table",
               "headers": ["Tier", "Range", "Effect"],
               "rows": [
-                ["Reviled", "−100 to −50", "Trade refusal, angry particles, head shake"],
-                ["Distrusted", "−49 to −1", "10–25% markup"],
-                ["Neutral", "0", "No effect"],
-                ["Liked", "1 to 49", "5% discount"],
-                ["Trusted", "50 to 99", "10% discount + profession-exclusive trades"],
-                ["Honored", "100 to 200", "15% discount + all exclusive trades"]
+                ["Reviled", "−200 to −150", "Trade refusal, angry particles, head shake"],
+                ["Distrusted", "−149 to −1", "10–25% markup"],
+                ["Neutral", "0 to 74", "No effect"],
+                ["Liked", "75 to 299", "5% discount"],
+                ["Trusted", "300 to 999", "10% discount + profession-exclusive trades"],
+                ["Honored", "1000+", "15% discount + all exclusive trades"]
               ],
               "note": "Config: <code class='text-bone'>enableReputation</code>"
             }
@@ -175,11 +176,12 @@
                 "Cure zombie villager: <span class='text-bone'>+5</span> (one-time per UUID)",
                 "Attack a villager: <span class='text-bone'>−15</span>",
                 "Kill a villager: <span class='text-bone'>−40</span>",
-                "Trade cycling: <span class='text-bone'>+2</span>",
+                "Trade cycling: <span class='text-bone'>+1</span>",
                 "Proximity: <span class='text-bone'>+1 per 10 min</span> (capped at +1/day)",
-                "Gift a profession item: <span class='text-bone'>+1</span> (daily-capped)"
+                "Gift a profession item: <span class='text-bone'>+1</span> (daily-capped)",
+                "Defend a village from a raid: <span class='text-bone'>+10</span> (bypasses the daily cap)"
               ],
-              "note": "Config: <code class='text-bone'>reputationTradeGain</code>, <code class='text-bone'>reputationCureGain</code>, <code class='text-bone'>reputationAttackLoss</code>, <code class='text-bone'>reputationKillLoss</code>, <code class='text-bone'>reputationCycleGain</code>, <code class='text-bone'>reputationGiftGain</code>"
+              "note": "Config: <code class='text-bone'>reputationTradeGain</code>, <code class='text-bone'>reputationCureGain</code>, <code class='text-bone'>reputationAttackLoss</code>, <code class='text-bone'>reputationKillLoss</code>, <code class='text-bone'>reputationCycleGain</code>, <code class='text-bone'>reputationGiftGain</code>, <code class='text-bone'>reputationRaidWinGain</code>"
             },
             {
               "id": "reputation-redemption",
@@ -189,6 +191,15 @@
                 "Negative reputation also recovers on its own: scores below 0 drift back toward Neutral by a configurable amount each in-game day. Positive reputation never decays."
               ],
               "note": "Config: <code class='text-bone'>enableGifting</code>, <code class='text-bone'>reputationDailyMaxGiftRep</code>, <code class='text-bone'>reputationNegativeDecayPerDay</code> · Datapack: <code class='text-bone'>data/mercantile/gift_mappings/</code>"
+            },
+            {
+              "id": "reputation-raid-trader",
+              "title": "Raid Defense &amp; Traders",
+              "html": [
+                "Earn back standing the heroic way: any player vanilla awards <strong class='text-bone'>Hero of the Village</strong> for breaking a raid also gains reputation — granted in full, outside the daily cap.",
+                "<strong class='text-bone'>Wandering traders</strong> reward loyalty too. At Trusted tier and above, a wandering trader rolls one exclusive bonus offer (rare blocks and materials); the offer sticks to that trader so it stays put across re-opens."
+              ],
+              "note": "Config: <code class='text-bone'>enableRaidReputation</code>, <code class='text-bone'>enableWanderingTraderRep</code>"
             },
             {
               "id": "reputation-hud",
@@ -217,9 +228,10 @@
                 "A placeable block that detects hostile mobs within a 32-block radius (configurable) and spawns temporary iron golems to defend your village. Right-click with iron blocks to fuel — up to 8 stored. Each golem costs 1 iron block to summon. Maximum 3 active sentries per pylon.",
                 "Sentry golems have vanilla combat AI, leash to the pylon, drop nothing on death, and don't count toward the mob cap. They despawn 30 seconds after no hostiles are detected, with a visible crack-and-fade effect.",
                 "Three blockstate variants — idle, active, empty — each with distinct particles. Redstone disables the pylon; comparator output is proportional to fuel level (0–15). Crafted from carved pumpkin, iron blocks, bell, and stone bricks.",
+                "<strong class='text-bone'>Bell alarm:</strong> on spotting a threat the pylon rings the nearest village bell within its radius — the standard vanilla ring, drawing players to the fight — rate-limited to once every 10 seconds. Toggle with <code class='text-bone'>enablePylonBellAlarm</code>.",
                 "<strong class='text-bone'>Hopper &amp; pipe fueling:</strong> hoppers attached to any face (top, sides, bottom) feed iron blocks into the pylon one at a time, up to the fuel cap. Non-iron items are rejected, so hoppers cycling mixed inventories don't deadlock, and overflow is left in the hopper rather than destroyed. Hoppers cannot extract — fuel only flows in. Modded item pipes (Pipez, etc.) work via the Fabric Transfer API (<code class='text-bone'>ItemStorage.SIDED</code>). Disabled when <code class='text-bone'>enableSentryPylon</code> is off."
               ],
-              "note": "Config: <code class='text-bone'>enableSentryPylon</code>, <code class='text-bone'>pylonDetectionRadius</code> (4–128), <code class='text-bone'>pylonMaxFuel</code>, <code class='text-bone'>pylonMaxGolems</code>, <code class='text-bone'>sentryDespawnSeconds</code> (min 5)"
+              "note": "Config: <code class='text-bone'>enableSentryPylon</code>, <code class='text-bone'>enablePylonBellAlarm</code>, <code class='text-bone'>pylonDetectionRadius</code> (4–128), <code class='text-bone'>pylonMaxFuel</code>, <code class='text-bone'>pylonMaxGolems</code>, <code class='text-bone'>sentryDespawnSeconds</code> (min 5)"
             }
           ]
         }

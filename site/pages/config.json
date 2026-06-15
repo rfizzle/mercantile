@@ -216,6 +216,27 @@
                   "Daily cap on reputation earned from trade cycling."
                 ],
                 [
+                  "<code class='text-bone whitespace-nowrap'>enableRaidReputation</code>",
+                  "boolean",
+                  "true",
+                  "—",
+                  "Grant reputation to players vanilla awards Hero of the Village for defending a raid."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>reputationRaidWinGain</code>",
+                  "int",
+                  "10",
+                  "0+",
+                  "Reputation granted for winning a raid. Bypasses the daily cap, like the cure bonus."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>enableWanderingTraderRep</code>",
+                  "boolean",
+                  "true",
+                  "—",
+                  "Offer a wandering trader a bonus trade at Trusted tier and above (one sticky offer per trader)."
+                ],
+                [
                   "<code class='text-bone whitespace-nowrap'>enableGifting</code>",
                   "boolean",
                   "true",
@@ -275,6 +296,13 @@
                   "3",
                   "1+",
                   "Maximum villagers one player may have following at once."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>enableSendHome</code>",
+                  "boolean",
+                  "true",
+                  "—",
+                  "When released, a villager walks back to its bed (or workstation) instead of stopping in place."
                 ]
               ]
             }
@@ -527,6 +555,13 @@
                   "Master toggle for the Sentry Pylon block + crafting recipe."
                 ],
                 [
+                  "<code class='text-bone whitespace-nowrap'>enablePylonBellAlarm</code>",
+                  "boolean",
+                  "true",
+                  "—",
+                  "On detecting a threat, the pylon rings the nearest village bell within its radius (max once per 10s)."
+                ],
+                [
                   "<code class='text-bone whitespace-nowrap'>pylonDetectionRadius</code>",
                   "int",
                   "32",
@@ -622,7 +657,7 @@
         {
           "type": "code",
           "small": true,
-          "code": "{\n  \"enableVillagerPickup\": true,\n  \"pickupXpCost\": 5,\n  \"enableNames\": true,\n  \"enableTradeCycling\": true,\n  \"tradeCycleEmeraldCost\": 6,\n  \"enableReputation\": true,\n  \"reputationTradeGain\": 1,\n  \"reputationCureGain\": 5,\n  \"reputationAttackLoss\": 15,\n  \"reputationKillLoss\": 40,\n  \"reputationCycleGain\": 1,\n  \"reputationDailyCap\": 5,\n  \"reputationTradesPerGain\": 5,\n  \"reputationDailyMaxTradeRep\": 2,\n  \"reputationDailyMaxCycleRep\": 1,\n  \"enableGifting\": true,\n  \"reputationGiftGain\": 1,\n  \"reputationDailyMaxGiftRep\": 2,\n  \"reputationNegativeDecayPerDay\": 1,\n  \"enableFollowMode\": true,\n  \"maxFollowingVillagers\": 3,\n  \"enablePathfindingFixes\": true,\n  \"enablePathfindingDoors\": true,\n  \"enablePathfindingStairs\": true,\n  \"enablePathfindingLadders\": true,\n  \"enablePathfindingWater\": true,\n  \"enableBulkTrading\": true,\n  \"enableProfessionLock\": true,\n  \"enableHealing\": true,\n  \"healingMultiplier\": 2.0,\n  \"enableRestockIndicator\": true,\n  \"enableDemandTransparency\": true,\n  \"enableBreedingTooltip\": true,\n  \"enableStateIndicators\": true,\n  \"enableSentryPylon\": true,\n  \"pylonDetectionRadius\": 32,\n  \"pylonMaxFuel\": 8,\n  \"pylonMaxGolems\": 3,\n  \"sentryDespawnSeconds\": 30,\n  \"villagerSoundVolume\": 1.0,\n  \"enableWorkstationVis\": true,\n  \"enableBellRadiusVis\": true,\n  \"enableInfoPanel\": true,\n  \"enableReputationHud\": true\n}"
+          "code": "{\n  \"enableVillagerPickup\": true,\n  \"pickupXpCost\": 5,\n  \"enableNames\": true,\n  \"enableTradeCycling\": true,\n  \"tradeCycleEmeraldCost\": 6,\n  \"enableReputation\": true,\n  \"reputationTradeGain\": 1,\n  \"reputationCureGain\": 5,\n  \"reputationAttackLoss\": 15,\n  \"reputationKillLoss\": 40,\n  \"reputationCycleGain\": 1,\n  \"reputationDailyCap\": 5,\n  \"reputationTradesPerGain\": 5,\n  \"reputationDailyMaxTradeRep\": 2,\n  \"reputationDailyMaxCycleRep\": 1,\n  \"enableRaidReputation\": true,\n  \"reputationRaidWinGain\": 10,\n  \"enableWanderingTraderRep\": true,\n  \"enableGifting\": true,\n  \"reputationGiftGain\": 1,\n  \"reputationDailyMaxGiftRep\": 2,\n  \"reputationNegativeDecayPerDay\": 1,\n  \"enableFollowMode\": true,\n  \"maxFollowingVillagers\": 3,\n  \"enableSendHome\": true,\n  \"enablePathfindingFixes\": true,\n  \"enablePathfindingDoors\": true,\n  \"enablePathfindingStairs\": true,\n  \"enablePathfindingLadders\": true,\n  \"enablePathfindingWater\": true,\n  \"enableBulkTrading\": true,\n  \"enableProfessionLock\": true,\n  \"enableHealing\": true,\n  \"healingMultiplier\": 2.0,\n  \"enableRestockIndicator\": true,\n  \"enableDemandTransparency\": true,\n  \"enableBreedingTooltip\": true,\n  \"enableStateIndicators\": true,\n  \"enableSentryPylon\": true,\n  \"enablePylonBellAlarm\": true,\n  \"pylonDetectionRadius\": 32,\n  \"pylonMaxFuel\": 8,\n  \"pylonMaxGolems\": 3,\n  \"sentryDespawnSeconds\": 30,\n  \"villagerSoundVolume\": 1.0,\n  \"enableWorkstationVis\": true,\n  \"enableBellRadiusVis\": true,\n  \"enableInfoPanel\": true,\n  \"enableReputationHud\": true\n}"
         }
       ]
     }
