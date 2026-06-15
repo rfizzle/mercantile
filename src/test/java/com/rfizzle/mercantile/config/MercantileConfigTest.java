@@ -50,6 +50,7 @@ class MercantileConfigTest {
         assertEquals(8, config.pylonMaxFuel);
         assertEquals(3, config.pylonMaxGolems);
         assertEquals(30, config.sentryDespawnSeconds);
+        assertTrue(config.enablePylonBellAlarm);
         assertEquals(1.0f, config.villagerSoundVolume);
         assertTrue(config.enableWorkstationVis);
         assertTrue(config.enableBellRadiusVis);

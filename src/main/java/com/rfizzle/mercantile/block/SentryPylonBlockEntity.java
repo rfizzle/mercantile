@@ -298,7 +298,6 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
                     if (state.getBlock() instanceof BellBlock bellBlock) {
                         BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(bellPos), Direction.UP, bellPos, false);
                         bellBlock.onHit(server, state, hit, null, false);
-                        BellRingBroadcaster.broadcast(server, bellPos);
                         bellCooldown = BELL_RING_COOLDOWN_TICKS;
                         setChanged();
                     }
