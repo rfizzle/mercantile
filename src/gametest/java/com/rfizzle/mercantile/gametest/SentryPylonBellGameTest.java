@@ -86,6 +86,7 @@ public class SentryPylonBellGameTest implements FabricGameTest {
         MercantileConfig.get().enablePylonBellAlarm = false;
 
         helper.spawn(EntityType.ZOMBIE, 3, 2, 1);
+        pylon.setScanCooldownForTesting(0);
 
         helper.runAfterDelay(5, () -> {
             try {
