@@ -90,11 +90,14 @@ running parallel to vanilla gossip.
 | Trusted | 50 to 99 | Moderate discount (10%), profession-exclusive trades |
 | Honored | 100+ | Best discount (15%), all exclusive trades |
 
-Reputation goes up for trading, curing zombie villagers, cycling trades, and
-spending time near villagers; it goes down for hitting and killing them.
-Exclusive trades — both per-profession and cross-profession — appear in your
-trade list when you hit the right tier. Other players trading with the same
-villager see their own list at their own tier.
+Reputation goes up for trading, curing zombie villagers, cycling trades,
+spending time near villagers, and gifting profession-appropriate items; it
+goes down for hitting and killing them. Fallen out of favor? Negative
+reputation slowly recovers toward neutral on its own, and gifting villagers
+speeds the climb — even a Reviled player has a clear path back. Exclusive
+trades — both per-profession and cross-profession — appear in your trade list
+when you hit the right tier. Other players trading with the same villager see
+their own list at their own tier.
 
 ### Trade Cycling
 

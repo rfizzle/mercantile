@@ -44,6 +44,12 @@ public class MercantileConfig {
     public boolean enableRaidReputation = true;
     public int reputationRaidWinGain = 10;
 
+    // Gifting
+    public boolean enableGifting = true;
+    public int reputationGiftGain = 1;
+    public int reputationDailyMaxGiftRep = 2;
+    public int reputationNegativeDecayPerDay = 1;
+
     // Follow Mode
     public boolean enableFollowMode = true;
     public int maxFollowingVillagers = 3;
@@ -114,6 +120,9 @@ public class MercantileConfig {
         reputationTradesPerGain = Math.clamp(reputationTradesPerGain, 1, 20);
         reputationDailyMaxTradeRep = Math.clamp(reputationDailyMaxTradeRep, 1, 10);
         reputationDailyMaxCycleRep = Math.clamp(reputationDailyMaxCycleRep, 1, 10);
+        reputationGiftGain = Math.clamp(reputationGiftGain, 0, Integer.MAX_VALUE);
+        reputationDailyMaxGiftRep = Math.clamp(reputationDailyMaxGiftRep, 1, 10);
+        reputationNegativeDecayPerDay = Math.clamp(reputationNegativeDecayPerDay, 0, Integer.MAX_VALUE);
         maxFollowingVillagers = Math.clamp(maxFollowingVillagers, 1, Integer.MAX_VALUE);
         healingMultiplier = Math.clamp(healingMultiplier, 1.0f, 10.0f);
         pylonDetectionRadius = Math.clamp(pylonDetectionRadius, 4, 128);
