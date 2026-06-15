@@ -38,6 +38,10 @@ public class MercantileVillagerData {
         this(false, Set.of(), false, false, null);
     }
 
+    public MercantileVillagerData(boolean professionLocked, Set<String> lockedTrades, boolean nameAssigned, boolean tradesMigrated) {
+        this(professionLocked, lockedTrades, nameAssigned, tradesMigrated, null);
+    }
+
     public MercantileVillagerData(boolean professionLocked, Set<String> lockedTrades, boolean nameAssigned, boolean tradesMigrated, CompoundTag wanderingTraderOfferTag) {
         this.professionLocked = professionLocked;
         this.lockedTrades = new HashSet<>(lockedTrades);
