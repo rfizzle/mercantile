@@ -31,6 +31,7 @@ public class MercantileConfig {
 
     // Reputation
     public boolean enableReputation = true;
+    public boolean enableWanderingTraderRep = true;
     public int reputationTradeGain = 1;
     public int reputationCureGain = 5;
     public int reputationAttackLoss = 15;
@@ -40,6 +41,8 @@ public class MercantileConfig {
     public int reputationTradesPerGain = 5;
     public int reputationDailyMaxTradeRep = 2;
     public int reputationDailyMaxCycleRep = 1;
+    public boolean enableRaidReputation = true;
+    public int reputationRaidWinGain = 10;
     public boolean enableGifting = true;
     public int reputationGiftGain = 1;
     public int reputationDailyMaxGiftRep = 2;

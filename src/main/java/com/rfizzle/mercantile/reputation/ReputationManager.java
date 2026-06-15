@@ -300,6 +300,20 @@ public final class ReputationManager {
         }
     }
 
+    // Raid win rep is an intentional bypass similar to cure rep: it skips both the daily total
+    // cap and the per-source sub-caps, and does NOT contribute to dailyReputationEarned.
+    // Defending a village is a rare, heroic act that is rewarded in full.
+    public static void gainRaidWinRep(ServerPlayer player) {
+        MercantileConfig config = MercantileConfig.get();
+        if (!config.enableReputation || !config.enableRaidReputation) return;
+        PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
+        migrateIfNeeded(data);
+        long currentDay = player.serverLevel().getGameTime() / 24_000L;
+        rolloverIfNewDay(player, data, currentDay);
+        changeScore(player, data, data.getScore() + config.reputationRaidWinGain);
+        syncToClient(player, data);
+    }
+
     // Cure rep is an intentional bypass: it skips both the daily total cap and the per-source
     // sub-caps, and does NOT contribute to dailyReputationEarned (so the HUD's "earned/cap"
     // readout will not reflect cure gains). Curing a zombie villager is a rare, high-effort

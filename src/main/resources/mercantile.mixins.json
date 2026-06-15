@@ -15,6 +15,7 @@
         "MerchantMenuMixin",
         "MerchantOfferDemandAccessor",
         "MobEffectInstanceAccessor",
+        "RaidMixin",
         "SentryGolemDropsMixin",
         "ThrownPotionSplashMixin",
         "VillagerAccessor",
@@ -30,6 +31,7 @@
         "VillagerRestockAccessor",
         "VillagerTradeOpenMixin",
         "WanderingTraderPickupMixin",
+        "WanderingTraderTradeOpenMixin",
         "ZombieVillagerCureMixin",
         "WalkNodeEvaluatorMixin"
     ],
