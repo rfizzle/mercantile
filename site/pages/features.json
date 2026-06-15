@@ -176,7 +176,7 @@
                 "Cure zombie villager: <span class='text-bone'>+5</span> (one-time per UUID)",
                 "Attack a villager: <span class='text-bone'>−15</span>",
                 "Kill a villager: <span class='text-bone'>−40</span>",
-                "Trade cycling: <span class='text-bone'>+2</span>",
+                "Trade cycling: <span class='text-bone'>+1</span>",
                 "Proximity: <span class='text-bone'>+1 per 10 min</span> (capped at +1/day)",
                 "Gift a profession item: <span class='text-bone'>+1</span> (daily-capped)",
                 "Defend a village from a raid: <span class='text-bone'>+10</span> (bypasses the daily cap)"

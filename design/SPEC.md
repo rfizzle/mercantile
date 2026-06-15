@@ -212,11 +212,11 @@ This is distinct from vanilla's per-villager gossip system. Mercantile reputatio
 | Action | Change | Notes |
 |---|---|---|
 | Completing a trade | +1 | Per trade execution (bulk trades count each execution individually) |
-| Curing a zombie villager | +15 | One-time bonus per villager (tracked by villager UUID) |
-| Attacking a villager | -10 | Per hit |
-| Killing a villager | -25 | Stacks with attack penalty from the killing blow |
+| Curing a zombie villager | +5 | One-time bonus per villager (tracked by villager UUID). Bypasses the daily cap |
+| Attacking a villager | -15 | Per hit |
+| Killing a villager | -40 | Stacks with attack penalty from the killing blow |
 | Proximity to villagers | +1 per 10 min | Passive accrual while within 16 blocks of any villager. Tracked via an internal tick counter (12,000 ticks = 10 min). Capped at +1 per in-game day |
-| Successful trade cycling | +2 | Per cycle |
+| Successful trade cycling | +1 | Per cycle |
 | Gifting a profession item | +1 | Toss a profession-appropriate item to a villager. Daily-capped (see Gifting below) |
 | Defending a village from a raid | +10 | Granted to each player vanilla awards Hero of the Village. Bypasses the daily cap (see below) |
 
