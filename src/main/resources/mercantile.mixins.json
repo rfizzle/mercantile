@@ -27,6 +27,7 @@
         "VillagerRestockAccessor",
         "VillagerTradeOpenMixin",
         "WanderingTraderPickupMixin",
+        "WanderingTraderTradeOpenMixin",
         "ZombieVillagerCureMixin",
         "WalkNodeEvaluatorMixin"
     ],

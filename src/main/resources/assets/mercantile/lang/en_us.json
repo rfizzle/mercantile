@@ -39,6 +39,8 @@
 
     "mercantile.config.enableReputation": "Enable Reputation",
     "mercantile.config.enableReputation.tooltip": "Enable the global reputation system",
+    "mercantile.config.enableWanderingTraderRep": "Enable Trader Reputation",
+    "mercantile.config.enableWanderingTraderRep.tooltip": "Allow wandering traders to offer rare bonus trades at high reputation",
     "mercantile.config.reputationTradeGain": "Trade Rep Gain",
     "mercantile.config.reputationTradeGain.tooltip": "Reputation gained per N completed trades (N controlled by Trades Per Gain)",
     "mercantile.config.reputationCureGain": "Cure Rep Gain",

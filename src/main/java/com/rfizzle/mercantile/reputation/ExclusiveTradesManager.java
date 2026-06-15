@@ -15,12 +15,17 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc.WanderingTrader;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
+import com.rfizzle.mercantile.data.MercantileAttachments;
+import com.rfizzle.mercantile.data.MercantileVillagerData;
+import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.VisibleForTesting;
 
 import java.io.BufferedReader;
@@ -37,7 +42,7 @@ public final class ExclusiveTradesManager {
     private static volatile Map<String, List<ExclusiveTrade>> PROFESSION_TRADES = Map.of();
     private static volatile List<ExclusiveTrade> CROSS_PROFESSION_TRADES = List.of();
 
-    private static final Map<Villager, List<MerchantOffer>> INJECTED_OFFERS =
+    private static final Map<AbstractVillager, List<MerchantOffer>> INJECTED_OFFERS =
             Collections.synchronizedMap(new WeakHashMap<>());
 
     private ExclusiveTradesManager() {
@@ -59,11 +64,11 @@ public final class ExclusiveTradesManager {
         );
     }
 
-    public static void stripInjectedOffers(Villager villager) {
-        List<MerchantOffer> previouslyInjected = INJECTED_OFFERS.remove(villager);
+    public static void stripInjectedOffers(AbstractVillager merchant) {
+        List<MerchantOffer> previouslyInjected = INJECTED_OFFERS.remove(merchant);
         if (previouslyInjected == null || previouslyInjected.isEmpty()) return;
 
-        var offers = villager.getOffers();
+        var offers = merchant.getOffers();
         for (MerchantOffer injected : previouslyInjected) {
             offers.remove(injected);
         }
@@ -99,6 +104,43 @@ public final class ExclusiveTradesManager {
 
         villager.getOffers().addAll(toInject);
         INJECTED_OFFERS.put(villager, toInject);
+    }
+
+    public static void injectWanderingTraderOffer(WanderingTrader trader, int playerScore) {
+        MercantileConfig config = MercantileConfig.get();
+        if (!config.enableReputation || !config.enableWanderingTraderRep) return;
+
+        // Requirement: at least TRUSTED (300)
+        if (playerScore < ReputationTier.TRUSTED.minScore()) return;
+
+        List<ExclusiveTrade> pool = PROFESSION_TRADES.get("wandering_trader");
+        if (pool == null || pool.isEmpty()) return;
+
+        MercantileVillagerData data = trader.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
+        CompoundTag storedOfferTag = data.getWanderingTraderOfferTag();
+        MerchantOffer offer = null;
+
+        if (storedOfferTag != null) {
+            offer = MerchantOffer.CODEC.parse(trader.level().registryAccess().createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE), storedOfferTag)
+                    .resultOrPartial(Mercantile.LOGGER::error).orElse(null);
+        }
+
+        if (offer == null) {
+            List<ExclusiveTrade> qualifying = pool.stream()
+                    .filter(t -> playerScore >= t.minScore())
+                    .toList();
+            if (qualifying.isEmpty()) return;
+
+            ExclusiveTrade selected = qualifying.get(trader.getRandom().nextInt(qualifying.size()));
+            offer = selected.createOffer();
+            data.setWanderingTraderOfferTag((CompoundTag) MerchantOffer.CODEC.encodeStart(trader.level().registryAccess().createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE), offer)
+                    .resultOrPartial(Mercantile.LOGGER::error).orElse(null));
+        }
+
+        if (offer != null) {
+            trader.getOffers().add(offer);
+            INJECTED_OFFERS.put(trader, List.of(offer));
+        }
     }
 
     /**

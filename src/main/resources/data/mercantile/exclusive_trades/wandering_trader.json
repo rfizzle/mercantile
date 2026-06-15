@@ -1,0 +1,46 @@
+{
+  "replace": false,
+  "min_tier": "trusted",
+  "trades": [
+    {
+      "input_1": { "item": "minecraft:emerald", "count": 10 },
+      "output": { "item": "minecraft:brain_coral_block", "count": 1 },
+      "max_uses": 8
+    },
+    {
+      "input_1": { "item": "minecraft:emerald", "count": 10 },
+      "output": { "item": "minecraft:bubble_coral_block", "count": 1 },
+      "max_uses": 8
+    },
+    {
+      "input_1": { "item": "minecraft:emerald", "count": 10 },
+      "output": { "item": "minecraft:fire_coral_block", "count": 1 },
+      "max_uses": 8
+    },
+    {
+      "input_1": { "item": "minecraft:emerald", "count": 10 },
+      "output": { "item": "minecraft:horn_coral_block", "count": 1 },
+      "max_uses": 8
+    },
+    {
+      "input_1": { "item": "minecraft:emerald", "count": 10 },
+      "output": { "item": "minecraft:tube_coral_block", "count": 1 },
+      "max_uses": 8
+    },
+    {
+      "input_1": { "item": "minecraft:emerald", "count": 12 },
+      "output": { "item": "minecraft:podzol", "count": 16 },
+      "max_uses": 6
+    },
+    {
+      "input_1": { "item": "minecraft:emerald", "count": 12 },
+      "output": { "item": "minecraft:mycelium", "count": 16 },
+      "max_uses": 6
+    },
+    {
+      "input_1": { "item": "minecraft:emerald", "count": 8 },
+      "output": { "item": "minecraft:nautilus_shell", "count": 1 },
+      "max_uses": 5
+    }
+  ]
+}

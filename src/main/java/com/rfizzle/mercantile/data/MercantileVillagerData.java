@@ -3,6 +3,7 @@ package com.rfizzle.mercantile.data;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.rfizzle.mercantile.trade.OfferIdentityHash;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.trading.MerchantOffer;
 
 import java.util.*;
@@ -20,24 +21,33 @@ public class MercantileVillagerData {
                     Codec.BOOL.optionalFieldOf("nameAssigned", false)
                             .forGetter(MercantileVillagerData::isNameAssigned),
                     Codec.BOOL.optionalFieldOf("tradesMigrated", false)
-                            .forGetter(MercantileVillagerData::isTradesMigrated)
-            ).apply(instance, MercantileVillagerData::new)
+                            .forGetter(MercantileVillagerData::isTradesMigrated),
+                    CompoundTag.CODEC.optionalFieldOf("wanderingTraderOfferTag")
+                            .forGetter(data -> Optional.ofNullable(data.wanderingTraderOfferTag))
+            ).apply(instance, (professionLocked, lockedTrades, nameAssigned, tradesMigrated, wanderingTraderOfferTag) ->
+                    new MercantileVillagerData(professionLocked, lockedTrades, nameAssigned, tradesMigrated, wanderingTraderOfferTag.orElse(null)))
     );
 
     private boolean professionLocked;
     private final Set<String> lockedTrades;
     private boolean nameAssigned;
     private boolean tradesMigrated;
+    private CompoundTag wanderingTraderOfferTag;
 
     public MercantileVillagerData() {
-        this(false, Set.of(), false, false);
+        this(false, Set.of(), false, false, null);
     }
 
     public MercantileVillagerData(boolean professionLocked, Set<String> lockedTrades, boolean nameAssigned, boolean tradesMigrated) {
+        this(professionLocked, lockedTrades, nameAssigned, tradesMigrated, null);
+    }
+
+    public MercantileVillagerData(boolean professionLocked, Set<String> lockedTrades, boolean nameAssigned, boolean tradesMigrated, CompoundTag wanderingTraderOfferTag) {
         this.professionLocked = professionLocked;
         this.lockedTrades = new HashSet<>(lockedTrades);
         this.nameAssigned = nameAssigned;
         this.tradesMigrated = tradesMigrated;
+        this.wanderingTraderOfferTag = wanderingTraderOfferTag;
     }
 
     public boolean isProfessionLocked() {
@@ -103,5 +113,13 @@ public class MercantileVillagerData {
 
     public void setNameAssigned(boolean assigned) {
         this.nameAssigned = assigned;
+    }
+
+    public CompoundTag getWanderingTraderOfferTag() {
+        return wanderingTraderOfferTag;
+    }
+
+    public void setWanderingTraderOfferTag(CompoundTag tag) {
+        this.wanderingTraderOfferTag = tag;
     }
 }
