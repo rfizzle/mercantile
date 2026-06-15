@@ -43,6 +43,8 @@ public class MercantileConfig {
     public int reputationDailyMaxCycleRep = 1;
     public boolean enableRaidReputation = true;
     public int reputationRaidWinGain = 10;
+
+    // Gifting
     public boolean enableGifting = true;
     public int reputationGiftGain = 1;
     public int reputationDailyMaxGiftRep = 2;
