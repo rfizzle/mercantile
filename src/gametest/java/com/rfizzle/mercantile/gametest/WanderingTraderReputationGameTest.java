@@ -110,7 +110,11 @@ public class WanderingTraderReputationGameTest implements FabricGameTest {
         BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(target), Direction.UP, target, false);
         player.gameMode.useItemOn(player, helper.getLevel(), headItem, InteractionHand.MAIN_HAND, hit);
 
-        WanderingTrader placed = helper.getLevel().getEntitiesOfClass(WanderingTrader.class, new net.minecraft.world.phys.AABB(target.above()).inflate(2.0)).get(0);
+        List<WanderingTrader> found = helper.getLevel().getEntitiesOfClass(WanderingTrader.class, new net.minecraft.world.phys.AABB(target.above()).inflate(2.0));
+        if (found.isEmpty()) {
+            helper.fail("No WanderingTrader found after re-placement");
+        }
+        WanderingTrader placed = found.get(0);
 
         // Check offer on placed trader
         placed.interact(player, InteractionHand.MAIN_HAND);
