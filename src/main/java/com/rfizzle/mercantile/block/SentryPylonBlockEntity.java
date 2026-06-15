@@ -1,7 +1,6 @@
 package com.rfizzle.mercantile.block;
 
 import com.rfizzle.mercantile.config.MercantileConfig;
-import com.rfizzle.mercantile.network.BellRingBroadcaster;
 import com.rfizzle.mercantile.particle.MercantileParticles;
 import com.rfizzle.mercantile.registry.MercantileRegistry;
 import net.minecraft.core.BlockPos;

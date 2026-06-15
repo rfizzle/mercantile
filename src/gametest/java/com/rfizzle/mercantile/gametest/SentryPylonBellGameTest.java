@@ -42,28 +42,26 @@ public class SentryPylonBellGameTest implements FabricGameTest {
         EmbeddedChannel channel = extractEmbeddedChannel(helper, player);
         channel.outboundMessages().clear();
 
-        boolean savedVis = MercantileConfig.get().enableBellRadiusVis;
-        boolean savedAlarm = MercantileConfig.get().enablePylonBellAlarm;
-        try {
+        // Spawn a threat nearby to trigger scan and activation
+        helper.spawn(EntityType.ZOMBIE, 3, 2, 1);
+        pylon.setScanCooldownForTesting(0);
+
+        helper.runAfterDelay(5, () -> {
+            boolean savedVis = MercantileConfig.get().enableBellRadiusVis;
+            boolean savedAlarm = MercantileConfig.get().enablePylonBellAlarm;
             MercantileConfig.get().enableBellRadiusVis = true;
             MercantileConfig.get().enablePylonBellAlarm = true;
-
-            // Spawn a threat nearby to trigger scan and activation
-            helper.spawn(EntityType.ZOMBIE, 3, 2, 1);
-            pylon.setScanCooldownForTesting(0);
-            pylon.setScanCooldownForTesting(0);
-
-            helper.runAfterDelay(5, () -> {
+            try {
                 pylon.tickServerCommon();
                 BellRingS2CPayload payload = findBellRingPayload(channel);
                 helper.assertTrue(payload != null, "Expected a BellRingS2CPayload when pylon activates near a bell");
                 helper.assertTrue(payload.bellPos().equals(bellAbs), "Payload bellPos should match the bell's position");
                 helper.succeed();
-            });
-        } finally {
-            MercantileConfig.get().enableBellRadiusVis = savedVis;
-            MercantileConfig.get().enablePylonBellAlarm = savedAlarm;
-        }
+            } finally {
+                MercantileConfig.get().enableBellRadiusVis = savedVis;
+                MercantileConfig.get().enablePylonBellAlarm = savedAlarm;
+            }
+        });
     }
 
     @GameTest(template = EMPTY_STRUCTURE)
