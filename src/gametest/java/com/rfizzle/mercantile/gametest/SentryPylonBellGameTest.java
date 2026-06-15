@@ -44,7 +44,6 @@ public class SentryPylonBellGameTest implements FabricGameTest {
 
         // Spawn a threat nearby to trigger scan and activation
         helper.spawn(EntityType.ZOMBIE, 3, 2, 1);
-        pylon.setScanCooldownForTesting(0);
 
         helper.runAfterDelay(5, () -> {
             boolean savedVis = MercantileConfig.get().enableBellRadiusVis;
@@ -52,6 +51,7 @@ public class SentryPylonBellGameTest implements FabricGameTest {
             MercantileConfig.get().enableBellRadiusVis = true;
             MercantileConfig.get().enablePylonBellAlarm = true;
             try {
+                pylon.setScanCooldownForTesting(0);
                 pylon.tickServerCommon();
                 BellRingS2CPayload payload = findBellRingPayload(channel);
                 helper.assertTrue(payload != null, "Expected a BellRingS2CPayload when pylon activates near a bell");
@@ -81,12 +81,12 @@ public class SentryPylonBellGameTest implements FabricGameTest {
         channel.outboundMessages().clear();
 
         helper.spawn(EntityType.ZOMBIE, 3, 2, 1);
-        pylon.setScanCooldownForTesting(0);
 
         helper.runAfterDelay(5, () -> {
             boolean savedAlarm = MercantileConfig.get().enablePylonBellAlarm;
             MercantileConfig.get().enablePylonBellAlarm = false;
             try {
+                pylon.setScanCooldownForTesting(0);
                 pylon.tickServerCommon();
                 BellRingS2CPayload payload = findBellRingPayload(channel);
                 helper.assertTrue(payload == null, "Bell should NOT ring when enablePylonBellAlarm is false");
