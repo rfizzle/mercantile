@@ -41,6 +41,8 @@ public class MercantileConfig {
     public int reputationTradesPerGain = 5;
     public int reputationDailyMaxTradeRep = 2;
     public int reputationDailyMaxCycleRep = 1;
+    public boolean enableRaidReputation = true;
+    public int reputationRaidWinGain = 10;
 
     // Follow Mode
     public boolean enableFollowMode = true;
@@ -105,6 +107,7 @@ public class MercantileConfig {
         reputationAttackLoss = Math.clamp(reputationAttackLoss, 0, Integer.MAX_VALUE);
         reputationKillLoss = Math.clamp(reputationKillLoss, 0, Integer.MAX_VALUE);
         reputationCycleGain = Math.clamp(reputationCycleGain, 0, Integer.MAX_VALUE);
+        reputationRaidWinGain = Math.clamp(reputationRaidWinGain, 0, Integer.MAX_VALUE);
         reputationDailyCap = Math.clamp(reputationDailyCap, 1, 50);
         reputationTradesPerGain = Math.clamp(reputationTradesPerGain, 1, 20);
         reputationDailyMaxTradeRep = Math.clamp(reputationDailyMaxTradeRep, 1, 10);

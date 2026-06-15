@@ -255,6 +255,20 @@ public final class ReputationManager {
         syncToClient(player, data);
     }
 
+    // Raid win rep is an intentional bypass similar to cure rep: it skips both the daily total
+    // cap and the per-source sub-caps, and does NOT contribute to dailyReputationEarned.
+    // Defending a village is a rare, heroic act that is rewarded in full.
+    public static void gainRaidWinRep(ServerPlayer player) {
+        MercantileConfig config = MercantileConfig.get();
+        if (!config.enableReputation || !config.enableRaidReputation) return;
+        PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
+        migrateIfNeeded(data);
+        long currentDay = player.serverLevel().getGameTime() / 24_000L;
+        rolloverIfNewDay(data, currentDay);
+        changeScore(player, data, data.getScore() + config.reputationRaidWinGain);
+        syncToClient(player, data);
+    }
+
     private static void sendDailyCapMessage(ServerPlayer player, PlayerData data) {
         if (player.connection == null) return;
         // Dedup: with reputationTradesPerGain=5 and active trading, an undeduped message would
