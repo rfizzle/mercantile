@@ -2,7 +2,7 @@
 
 Minecraft 1.21.1 Fabric mod. Villager and trade overhaul.
 
-**Asset philosophy:** Custom pixel-art textures for mod-specific visuals (authored through the Concord texture pipeline — `mc-textures` skill, concord `design/DESIGN-SYSTEM.md` §8 — with `.glyph` sources kept beside the masters); vanilla assets where they already map cleanly. All sounds use existing vanilla sound events. Custom particle textures are used for mod-specific effects (pickup, trade cycling, follow mode, sentry pylon) to give each feature a distinct visual identity. Visualization features (workstation links, bell radius, village boundary) use vanilla `dust` particles since they are functional overlays, not themed effects. The sentry pylon has custom block textures (top/side/bottom). Villager pickup items use **player heads** with pre-existing skin textures sourced from minecraft-heads.com and hosted permanently on Mojang's CDN.
+**Asset philosophy:** Custom pixel-art textures for mod-specific visuals (authored through the Concord texture pipeline — `mc-textures` skill, concord `design/DESIGN-SYSTEM.md` §8 — with `.glyph` sources kept beside the masters); vanilla assets where they already map cleanly. All sounds use existing vanilla sound events. Custom particle textures are used for mod-specific effects (pickup, trade cycling, follow mode, sentry pylon) to give each feature a distinct visual identity. Visualization features (workstation links, bell radius) use vanilla `dust` particles since they are functional overlays, not themed effects. The sentry pylon has custom block textures (top/side/bottom). Villager pickup items use **player heads** with pre-existing skin textures sourced from minecraft-heads.com and hosted permanently on Mojang's CDN.
 
 ---
 
@@ -357,7 +357,7 @@ Villagers can be commanded to follow a player, replacing the need for minecarts/
 
 ### Interaction
 - **Trigger:** Sneak + right-click a villager while holding an **emerald**.
-- Emerald is the trigger item because bell is already overloaded (workstation visualization, bell radius, village boundary). Emerald is thematic — the player is "paying" for the villager's attention.
+- Emerald is the trigger item because bell is already overloaded (workstation visualization, bell radius). Emerald is thematic — the player is "paying" for the villager's attention.
 - **Toggle:** Same action again (sneak + right-click with an emerald) to release the villager from follow mode. Only the player the villager is following can release it.
 - Villager follows at a moderate pace, keeping within ~6 blocks of the player.
 
@@ -626,36 +626,7 @@ When holding or ringing a bell, show the area of effect.
 
 ---
 
-## 18. Village Boundary Awareness
-
-Visualize the extent of a village's area for planning builds and villager placement.
-
-### Behavior
-- **Trigger:** Holding a bell or using `/mercantile village` command.
-- Renders an outline showing:
-  - The village center (marked with a vertical column of `end_rod` particles — vanilla white rising effect, visible from a distance without custom textures).
-  - The village boundary (edges drawn with `dust` particles in white).
-  - Individual POI locations colored by type using `dust` particles: blue = bed, yellow = workstation, green = bell.
-- POI claim status: occupied POIs show a `dust` particle link line to their villager, unclaimed POIs pulse (particle spawn rate oscillates).
-- **Shows all POI types:** beds, workstations, and bells. Players need full visibility for village planning.
-
-### Boundary Definition
-- **Bounding box** of all related POIs with **10-block padding**. Convex hull is more mathematically precise but harder to render and reason about visually. A padded bounding box is simple, predictable, and fast to compute.
-- Village "center" is the centroid of all POI positions.
-
-### Render Limits
-- Only render within **128 blocks** of the player. POI markers beyond render distance are culled.
-- Lines and markers use LOD — reduce `dust` particle density for links farther from the player.
-- Performance-tested target: smooth rendering with up to 100 POIs in range.
-
-### Implementation Notes
-- Server sends POI data via `VillageBoundsS2C` packet on request.
-- Client renders boundary and POI markers entirely via vanilla `ParticleEngine` (`DustParticleOptions` for colored markers, `ParticleTypes.END_ROD` for center beacon). No custom render layer or textures needed.
-- Complements the workstation link visualization (section 11) — both share the POI query infrastructure.
-
----
-
-## 19. Sentry Pylon
+## 18. Sentry Pylon
 
 A placeable block that passively defends an area by summoning temporary iron golems when hostile mobs are nearby.
 
@@ -745,7 +716,7 @@ Shaped recipe (3x3 crafting grid):
 
 ---
 
-## 20. Commands
+## 19. Commands
 
 ### `/mercantile` Command Tree
 
@@ -757,17 +728,15 @@ All commands use the `mercantile` root. Requires **operator level 2** for admin 
 | `/mercantile reputation <player>` | Op level 2 | Shows another player's reputation |
 | `/mercantile reputation set <player> <value>` | Op level 2 | Sets a player's reputation to an exact value |
 | `/mercantile reputation add <player> <value>` | Op level 2 | Adds (or subtracts, if negative) reputation |
-| `/mercantile village` | Any player | Triggers village boundary visualization (same as holding bell) |
 | `/mercantile reload` | Op level 2 | Reloads config from disk. Localization key: `command.mercantile.reload` |
 
 ### Implementation Notes
 - Register via Fabric's `CommandRegistrationCallback`.
-- `/mercantile village` sends the `VillageBoundsS2C` packet to the executing player with POI data for their current area.
 - `/mercantile reload` re-reads `config/mercantile.json` and pushes updated server config values to all connected clients.
 
 ---
 
-## 21. Multiplayer Edge Cases
+## 20. Multiplayer Edge Cases
 
 Rules for interactions that involve multiple players or shared villager state.
 
@@ -785,12 +754,12 @@ Rules for interactions that involve multiple players or shared villager state.
 ### Reputation (Section 4)
 - Reputation is per-player. Exclusive trades are injected per-player at trade screen open. Two players trading with the same villager see different trade lists if their reputation tiers differ.
 
-### Sentry Pylon (Section 19)
+### Sentry Pylon (Section 18)
 - Pylons are not player-owned. Any player can fuel or break them. Sentry golems defend all players and villagers equally.
 
 ---
 
-## 22. Creative Mode Behavior
+## 21. Creative Mode Behavior
 
 Adjustments when the player is in creative mode, to support testing and building.
 
@@ -805,7 +774,7 @@ Adjustments when the player is in creative mode, to support testing and building
 
 ---
 
-## 23. Trade Index (EMI / REI / JEI Integration)
+## 22. Trade Index (EMI / REI / JEI Integration)
 
 A unified, searchable trade catalog integrated into recipe viewers. Replaces the need for mods like "EMI Trades" with a purpose-built experience that supports search, filtering, and Mercantile-specific data.
 
@@ -872,7 +841,7 @@ A shared `TradeIndexDataSource` class builds the trade list once; each plugin ad
 
 ---
 
-## 24. Third-Party Profession Support
+## 23. Third-Party Profession Support
 
 Mercantile must support modded villager professions (e.g. from Create, Farmer's Delight, or custom datapacks). The `BuiltInRegistries.VILLAGER_PROFESSION` registry is the single source of truth — Mercantile never hardcodes the set of vanilla professions.
 
@@ -905,7 +874,7 @@ Every feature that references professions must work in one of two modes:
 - Mercantile ships built-in exclusive trades only for vanilla professions. Modded professions have no exclusive trades by default — mod authors or pack makers can add them via datapacks.
 - The `_mercantile.json` cross-profession trades apply to all professions, including modded ones.
 
-**Trade Index — EMI/REI/JEI (Section 23):**
+**Trade Index — EMI/REI/JEI (Section 22):**
 - `TradeIndexDataSource` iterates `VillagerTrades.TRADES` at runtime. All registered professions (vanilla and modded) are included automatically.
 - Profession filter tabs are generated dynamically from the registry — no hardcoded list.
 - Profession icons use `VillagerHeadTextures` with the same fallback as pickup (generic head for unknown professions).
@@ -987,7 +956,6 @@ All features are independently toggleable via ModMenu / Cloth Config screen and 
 | `villagerSoundVolume` | float | 1.0 | Villager sound volume (0.0-1.0) |
 | `enableWorkstationVis` | bool | true | Toggle workstation link particles |
 | `enableBellRadiusVis` | bool | true | Toggle bell radius visualization |
-| `enableVillageBoundaryVis` | bool | true | Toggle village boundary rendering |
 | `enableInfoPanel` | bool | true | Toggle extended info panel in trade GUI |
 | `enableReputationHud` | bool | true | Toggle the reputation tier HUD indicator |
 | `hudAnchor` | enum | TOP_LEFT | HUD corner anchor: TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT |
@@ -1020,9 +988,9 @@ These are not user-facing features but are required by everything that follows.
 
 1. **Config system** — `MercantileConfig` class with all server + client fields, JSON serialization, Cloth Config screen builder, `ModMenuIntegration` wired up. Every feature reads from this.
 2. **Persistence infrastructure** — Register Fabric `AttachmentType` definitions for all persistent per-player data (reputation, stats) and per-entity data (profession lock flag, trade lock set, name assignment flag). Centralizes all attachment registrations in a single `MercantileAttachments` class. Used by: reputation (section 4), profession lock (section 12), trade cycling locked state (section 3).
-3. **Networking infrastructure** — Packet registration pattern (`FabricPacketHandler` or similar), `CustomPayload` base types. Needed by: trade cycling, restock indicator, demand transparency, workstation vis, village boundary, villager info panel.
-4. **Command registration** — `/mercantile` command tree (section 20). Needed by: reputation management, village boundary trigger, config reload.
-5. **Profession support infrastructure** (section 24) — `VillagerHeadTextures` registry keyed by `ResourceLocation` with Base64 texture values from minecraft-heads.com + fallback head + public `register()` API. Profession display name resolver using translation keys with raw-ID fallback. All downstream features consume these utilities rather than implementing their own profession handling.
+3. **Networking infrastructure** — Packet registration pattern (`FabricPacketHandler` or similar), `CustomPayload` base types. Needed by: trade cycling, restock indicator, demand transparency, workstation vis, villager info panel.
+4. **Command registration** — `/mercantile` command tree (section 19). Needed by: reputation management, config reload.
+5. **Profession support infrastructure** (section 23) — `VillagerHeadTextures` registry keyed by `ResourceLocation` with Base64 texture values from minecraft-heads.com + fallback head + public `register()` API. Profession display name resolver using translation keys with raw-ID fallback. All downstream features consume these utilities rather than implementing their own profession handling.
 
 ### Phase 1: Core Standalone Features
 No cross-feature dependencies. Can be developed in parallel.
@@ -1062,19 +1030,18 @@ Client-side rendering features. All share particle/render infrastructure.
 
 19. **Workstation Link Visualization** (section 11) — Server POI query, `WorkstationMapS2C` packet, particle line rendering.
 20. **Bell Radius Visualization** (section 17) — Client-side circle rendering, glow effect on ring.
-21. **Village Boundary Awareness** (section 18) — Shares POI infra from #19, adds boundary box + POI markers.
 
 ### Phase 7: Mod Integrations
 Optional-dependency features. Can be developed once the underlying data exists from earlier phases.
 
-22. **Breeding Information** (section 7) — Jade/WTHIT plugin, server data provider.
-23. **Villager State Indicators** (section 15) — Extends #22 with additional brain memory reads.
-24. **Trade Index** (section 23) — EMI/REI/JEI plugin. Depends on reputation (phase 4) for exclusive trade display. Shared `TradeIndexDataSource` + three viewer adapters. Profession tabs generated dynamically from registry.
+21. **Breeding Information** (section 7) — Jade/WTHIT plugin, server data provider.
+22. **Villager State Indicators** (section 15) — Extends #21 with additional brain memory reads.
+23. **Trade Index** (section 22) — EMI/REI/JEI plugin. Depends on reputation (phase 4) for exclusive trade display. Shared `TradeIndexDataSource` + three viewer adapters. Profession tabs generated dynamically from registry.
 
 ### Phase 8: Sentry Pylon
 Most complex feature. Custom block, block entity, AI goals, spawning logic, visual states, crafting recipe. Saved for last to benefit from all infrastructure built in prior phases.
 
-25. **Sentry Pylon** (section 19) — Block + block entity, fuel system, hostile detection, golem spawning, sentry AI goals, despawn sequence, redstone interaction, crafting recipe, block model + assets.
+24. **Sentry Pylon** (section 18) — Block + block entity, fuel system, hostile detection, golem spawning, sentry AI goals, despawn sequence, redstone interaction, crafting recipe, block model + assets.
 
 ---
 
@@ -1101,7 +1068,7 @@ All sounds use **vanilla Minecraft sound events** — no custom audio assets. Th
 
 ### Particle Mapping
 
-Mod-specific effects use custom particle textures under `assets/mercantile/textures/particle/`. Visualization overlays (workstation links, bell radius, village boundary) use vanilla particles since they are functional, not themed.
+Mod-specific effects use custom particle textures under `assets/mercantile/textures/particle/`. Visualization overlays (workstation links, bell radius) use vanilla particles since they are functional, not themed.
 
 | Feature | Effect | Particle | Texture |
 |---|---|---|---|
@@ -1115,9 +1082,6 @@ Mod-specific effects use custom particle textures under `assets/mercantile/textu
 | Workstation Links — unclaimed POI | Yellow orbit | `minecraft:dust` (yellow) | Vanilla |
 | Bell Radius — circle | Gold ring on ground | `minecraft:dust` (gold) | Vanilla |
 | Bell Radius — ring highlight | Villager glow | Vanilla entity glow flag | Vanilla (spectral arrow style) |
-| Village Boundary — center beacon | White rising column | `minecraft:end_rod` | Vanilla |
-| Village Boundary — edges | White box outline | `minecraft:dust` (white) | Vanilla |
-| Village Boundary — POI markers | Colored by type | `minecraft:dust` (blue/yellow/green) | Vanilla |
 | Sentry Pylon — idle | Drifting motes | `mercantile:pylon_mote` | `pylon_mote.png` (4x4, light gray, round dot) |
 | Sentry Pylon — active | Jagged energy sparks | `mercantile:pylon_spark` | `pylon_spark.png` (8x8, orange-gold, spiky) |
 | Sentry Pylon — out of fuel | Red pulse | `minecraft:dust` (red) | Vanilla |
@@ -1177,7 +1141,7 @@ Require a running server instance. Located in `src/gametest/`.
 Features that require visual/UI verification and can't be automated:
 
 - Trade GUI mixin rendering (cycle button placement, restock timer, demand tooltip, info panel)
-- Visualization features (workstation links, bell radius, village boundary)
+- Visualization features (workstation links, bell radius)
 - Jade/WTHIT tooltip rendering
 - EMI/REI/JEI trade index UI and search integration
 - Sentry pylon block model and visual states
@@ -1186,12 +1150,12 @@ Features that require visual/UI verification and can't be automated:
 
 ## Rendering Compatibility
 
-Visualization features (sections 11, 17, 18) use client-side world rendering. These must work with common rendering mods.
+Visualization features (sections 11, 17) use client-side world rendering. These must work with common rendering mods.
 
 ### Approach
 - Use **Fabric Rendering API** events (`WorldRenderEvents.AFTER_TRANSLUCENT` or `WorldRenderEvents.LAST`) for all custom world rendering. Do not use raw `RenderSystem` calls or GL state manipulation outside of these events.
 - Particle-based effects (workstation links, bell radius markers, follow mode trail) use vanilla `ParticleEngine` — these are inherently compatible with Sodium/Iris since they go through the standard particle pipeline.
-- Line/shape rendering (bell radius circle, village boundary box) uses `VertexConsumer` on the `LINES` render type via `RenderBufferSource`. Sodium preserves this path.
+- Line/shape rendering (bell radius circle) uses `VertexConsumer` on the `LINES` render type via `RenderBufferSource`. Sodium preserves this path.
 - **Iris shader compatibility:** Custom rendering in `AFTER_TRANSLUCENT` may be affected by shader post-processing. Known limitation — document in mod description that visualization features may render differently with shader packs. No workaround needed for v0.1.
 
 ---

@@ -208,7 +208,7 @@ authoritative where they differ):
   textures.
 - **Particles:** custom particle *textures* for mod-identity effects (pickup,
   trade cycling, follow mode, sentry pylon); vanilla `dust` for functional
-  overlays (workstation links, bell radius, village boundary), which are
+  overlays (workstation links, bell radius), which are
   readouts, not theming.
 - **Blocks:** the sentry pylon is the only custom block texture in the mod.
 - **Text:** action-bar messages and tooltips are vanilla-toned — short, dry,
