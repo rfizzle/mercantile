@@ -9,8 +9,12 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Comparator;
+import java.util.Optional;
 
 public final class SentryPylonScanner {
     private SentryPylonScanner() {
@@ -91,5 +95,13 @@ public final class SentryPylonScanner {
         BlockPos head = candidate.above();
         BlockState atHead = level.getBlockState(head);
         return atHead.getCollisionShape(level, head).isEmpty();
+    }
+
+    public static Optional<BlockPos> findNearestBell(ServerLevel level, BlockPos center, int radius) {
+        return level.getPoiManager().getInRange(holder ->
+                        holder.value().matchingStates().stream().anyMatch(s -> s.is(Blocks.BELL)),
+                center, radius, net.minecraft.world.entity.ai.village.poi.PoiManager.Occupancy.HAS_SPACE)
+                .min(Comparator.comparingDouble(record -> record.getPos().distSqr(center)))
+                .map(net.minecraft.world.entity.ai.village.poi.PoiRecord::getPos);
     }
 }

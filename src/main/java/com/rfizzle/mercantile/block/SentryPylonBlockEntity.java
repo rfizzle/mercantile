@@ -1,6 +1,7 @@
 package com.rfizzle.mercantile.block;
 
 import com.rfizzle.mercantile.config.MercantileConfig;
+import com.rfizzle.mercantile.network.BellRingBroadcaster;
 import com.rfizzle.mercantile.particle.MercantileParticles;
 import com.rfizzle.mercantile.registry.MercantileRegistry;
 import net.minecraft.core.BlockPos;
@@ -23,9 +24,12 @@ import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -42,6 +46,7 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
     private static final int OUT_OF_FUEL_ALERT_COOLDOWN_TICKS = 40;
     private static final int SCAN_INTERVAL_TICKS = 40;
     private static final int IDLE_HOSTILE_CHECK_INTERVAL_TICKS = 10;
+    private static final int BELL_RING_COOLDOWN_TICKS = 200;
 
     private static final int[] ALL_SLOTS = {0};
     private static final int[] NO_SLOTS = new int[0];
@@ -52,6 +57,7 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
     private boolean syncingSlot = false;
     private int outOfFuelCooldown = 0;
     private int scanCooldown = SCAN_INTERVAL_TICKS;
+    private int bellCooldown = 0;
     private int idleTicks = 0;
     private int idleHostileCheckCooldown = IDLE_HOSTILE_CHECK_INTERVAL_TICKS;
     private final LinkedHashSet<UUID> sentries = new LinkedHashSet<>();
@@ -142,12 +148,19 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
         setChanged();
     }
 
+    public void setScanCooldownForTesting(int value) {
+        this.scanCooldown = value;
+    }
+
     public void tickServerCommon() {
         if (outOfFuelCooldown > 0) {
             outOfFuelCooldown--;
         }
         if (scanCooldown > 0) {
             scanCooldown--;
+        }
+        if (bellCooldown > 0) {
+            bellCooldown--;
         }
         if (scanCooldown == 0) {
             scanCooldown = SCAN_INTERVAL_TICKS;
@@ -237,6 +250,10 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
             return;
         }
 
+        if (MercantileConfig.get().enablePylonBellAlarm && bellCooldown <= 0) {
+            tryRingBell(server);
+        }
+
         if (sentries.size() >= MercantileConfig.get().pylonMaxGolems) {
             return;
         }
@@ -272,6 +289,20 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
         consumeFuel(1);
         setChanged();
         updateVisualState();
+    }
+
+    private void tryRingBell(ServerLevel server) {
+        SentryPylonScanner.findNearestBell(server, worldPosition, MercantileConfig.get().pylonDetectionRadius)
+                .ifPresent(bellPos -> {
+                    BlockState state = server.getBlockState(bellPos);
+                    if (state.getBlock() instanceof BellBlock bellBlock) {
+                        BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(bellPos), Direction.UP, bellPos, false);
+                        bellBlock.onHit(server, state, hit, null, false);
+                        BellRingBroadcaster.broadcast(server, bellPos);
+                        bellCooldown = BELL_RING_COOLDOWN_TICKS;
+                        setChanged();
+                    }
+                });
     }
 
     private void pruneSentries(ServerLevel server) {
@@ -422,6 +453,7 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
         tag.putInt("Fuel", fuel);
         tag.putInt("OutOfFuelCooldown", outOfFuelCooldown);
         tag.putInt("ScanCooldown", scanCooldown);
+        tag.putInt("BellCooldown", bellCooldown);
         tag.putInt("IdleTicks", idleTicks);
         ListTag sentriesTag = new ListTag();
         for (UUID uuid : sentries) {
@@ -437,6 +469,7 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
         fuel = Mth.clamp(tag.getInt("Fuel"), 0, getMaxFuel());
         outOfFuelCooldown = Mth.clamp(tag.getInt("OutOfFuelCooldown"), 0, OUT_OF_FUEL_ALERT_COOLDOWN_TICKS);
         scanCooldown = Mth.clamp(tag.getInt("ScanCooldown"), 0, SCAN_INTERVAL_TICKS);
+        bellCooldown = tag.contains("BellCooldown") ? tag.getInt("BellCooldown") : 0;
         int despawnThreshold = MercantileConfig.get().sentryDespawnSeconds * 20;
         idleTicks = Mth.clamp(tag.getInt("IdleTicks"), 0, despawnThreshold);
         idleHostileCheckCooldown = IDLE_HOSTILE_CHECK_INTERVAL_TICKS;
