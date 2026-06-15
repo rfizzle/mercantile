@@ -941,14 +941,22 @@ All features are independently toggleable via ModMenu / Cloth Config screen and 
 | `enableTradeCycling` | bool | true | Toggle trade cycling button |
 | `tradeCycleEmeraldCost` | int | 6 | Emeralds per cycle |
 | `enableReputation` | bool | true | Toggle reputation system |
-| `reputationTradeGain` | int | 1 | Rep gained per trade |
-| `reputationCureGain` | int | 15 | Rep gained for curing a zombie villager |
-| `reputationAttackLoss` | int | 10 | Rep lost per villager attack |
-| `reputationKillLoss` | int | 25 | Rep lost for killing a villager |
-| `reputationCycleGain` | int | 2 | Rep gained per trade cycle |
+| `reputationTradeGain` | int | 1 | Rep gained per trade-gain pulse |
+| `reputationCureGain` | int | 5 | Rep gained for curing a zombie villager (bypasses daily cap) |
+| `reputationAttackLoss` | int | 15 | Rep lost per villager attack |
+| `reputationKillLoss` | int | 40 | Rep lost for killing a villager |
+| `reputationCycleGain` | int | 1 | Rep gained per trade cycle |
+| `reputationDailyCap` | int | 5 | Max total rep earnable per in-game day from trades + cycles + gifts (range 1–50) |
+| `reputationTradesPerGain` | int | 5 | Completed trades per trade-gain pulse (range 1–20) |
+| `reputationDailyMaxTradeRep` | int | 2 | Daily sub-cap on trade rep (range 1–10) |
+| `reputationDailyMaxCycleRep` | int | 1 | Daily sub-cap on cycle rep (range 1–10) |
 | `enableRaidReputation` | bool | true | Toggle reputation gain for defending raids |
 | `reputationRaidWinGain` | int | 10 | Rep granted for winning a raid (bypasses daily cap) |
 | `enableWanderingTraderRep` | bool | true | Toggle wandering-trader bonus offer at high reputation |
+| `enableGifting` | bool | true | Toggle accepting profession-matched item gifts for rep |
+| `reputationGiftGain` | int | 1 | Rep gained per accepted gift item |
+| `reputationDailyMaxGiftRep` | int | 2 | Daily sub-cap on gift rep (range 1–10) |
+| `reputationNegativeDecayPerDay` | int | 1 | Points a negative score recovers toward 0 per in-game day (0 disables) |
 | `enableFollowMode` | bool | true | Toggle villager follow mode |
 | `maxFollowingVillagers` | int | 3 | Max villagers following a player |
 | `enableSendHome` | bool | true | Released villagers walk back to bed/workstation |
@@ -959,9 +967,12 @@ All features are independently toggleable via ModMenu / Cloth Config screen and 
 | `enablePathfindingWater` | bool | true | Water avoidance |
 | `enableBulkTrading` | bool | true | Toggle shift-click bulk trades |
 | `enableProfessionLock` | bool | true | Toggle profession lock protection |
-| `healingMultiplier` | float | 2.0 | Potion healing multiplier for villagers |
+| `enableHealing` | bool | true | Toggle boosted potion healing for villagers |
+| `healingMultiplier` | float | 2.0 | Potion healing multiplier for villagers (range 1.0–10.0) |
 | `enableRestockIndicator` | bool | true | Toggle restock timer in trade GUI |
 | `enableDemandTransparency` | bool | true | Toggle price breakdown tooltip |
+| `enableBreedingTooltip` | bool | true | Toggle breeding-status tooltip (Jade/WTHIT) |
+| `enableStateIndicators` | bool | true | Toggle villager state indicators (Jade/WTHIT) |
 | `enableSentryPylon` | bool | true | Toggle sentry pylon block |
 | `enablePylonBellAlarm` | bool | true | Pylon rings the nearest village bell on threat detection |
 | `pylonDetectionRadius` | int | 32 | Sentry pylon hostile scan radius |
@@ -978,6 +989,10 @@ All features are independently toggleable via ModMenu / Cloth Config screen and 
 | `enableBellRadiusVis` | bool | true | Toggle bell radius visualization |
 | `enableVillageBoundaryVis` | bool | true | Toggle village boundary rendering |
 | `enableInfoPanel` | bool | true | Toggle extended info panel in trade GUI |
+| `enableReputationHud` | bool | true | Toggle the reputation tier HUD indicator |
+| `hudAnchor` | enum | TOP_LEFT | HUD corner anchor: TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT |
+| `hudOffsetX` | int | 4 | HUD horizontal inset from the anchored edge (range 0–10000) |
+| `hudOffsetY` | int | 4 | HUD vertical inset from the anchored edge (range 0–10000) |
 
 ---
 
