@@ -100,7 +100,7 @@ public final class SentryPylonScanner {
     public static Optional<BlockPos> findNearestBell(ServerLevel level, BlockPos center, int radius) {
         return level.getPoiManager().getInRange(holder ->
                         holder.value().matchingStates().stream().anyMatch(s -> s.is(Blocks.BELL)),
-                center, radius, net.minecraft.world.entity.ai.village.poi.PoiManager.Occupancy.HAS_SPACE)
+                center, radius, net.minecraft.world.entity.ai.village.poi.PoiManager.Occupancy.ANY)
                 .min(Comparator.comparingDouble(record -> record.getPos().distSqr(center)))
                 .map(net.minecraft.world.entity.ai.village.poi.PoiRecord::getPos);
     }

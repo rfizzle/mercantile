@@ -82,13 +82,12 @@ public class SentryPylonBellGameTest implements FabricGameTest {
         EmbeddedChannel channel = extractEmbeddedChannel(helper, player);
         channel.outboundMessages().clear();
 
-        boolean savedAlarm = MercantileConfig.get().enablePylonBellAlarm;
-        MercantileConfig.get().enablePylonBellAlarm = false;
-
         helper.spawn(EntityType.ZOMBIE, 3, 2, 1);
         pylon.setScanCooldownForTesting(0);
 
         helper.runAfterDelay(5, () -> {
+            boolean savedAlarm = MercantileConfig.get().enablePylonBellAlarm;
+            MercantileConfig.get().enablePylonBellAlarm = false;
             try {
                 pylon.tickServerCommon();
                 BellRingS2CPayload payload = findBellRingPayload(channel);
