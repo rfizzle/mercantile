@@ -217,8 +217,11 @@ This is distinct from vanilla's per-villager gossip system. Mercantile reputatio
 | Killing a villager | -25 | Stacks with attack penalty from the killing blow |
 | Proximity to villagers | +1 per 10 min | Passive accrual while within 16 blocks of any villager. Tracked via an internal tick counter (12,000 ticks = 10 min). Capped at +1 per in-game day |
 | Successful trade cycling | +2 | Per cycle |
+| Defending a village from a raid | +10 | Granted to each player vanilla awards Hero of the Village. Bypasses the daily cap (see below) |
 
 All values are configurable via the reputation config subsection.
+
+**Raid-defense rep is an intentional cap bypass.** Like the cure bonus, winning a raid skips the daily total cap and the per-source sub-caps, and does not count toward the day's earned total — defending a village is a rare, heroic act rewarded in full. It is gated behind both `enableReputation` and `enableRaidReputation`, and triggers off vanilla's Hero of the Village award, so any player vanilla credits for the raid is credited here too.
 
 ### Vanilla Gossip Interaction
 Mercantile reputation operates as a **parallel system** alongside vanilla gossip. Both independently contribute to the final trade price:
@@ -246,6 +249,7 @@ Mercantile reputation operates as a **parallel system** alongside vanilla gossip
 - Implementation approach: define a set of **bonus offers** per profession that are injected into the villager's trade list when the interacting player meets the reputation threshold.
 - These bonus trades are defined in data packs (`data/mercantile/exclusive_trades/<profession>.json`) so they are extensible.
 - **Per-profession primarily**, plus a small set of **cross-profession "mercantile" trades** available from any villager at Honored tier. Cross-profession trades are defined in `data/mercantile/exclusive_trades/_mercantile.json`.
+- **Wandering traders** also gain a bonus offer at Trusted tier and above, defined in `data/mercantile/exclusive_trades/wandering_trader.json`. Unlike villagers (which can accumulate several exclusive offers), each wandering trader receives exactly **one** bonus offer: the first time a qualifying player opens it, one offer is chosen from the qualifying pool and persisted to the trader's data, so it stays stable across re-opens even if the player's score later drifts. Gated behind `enableWanderingTraderRep`.
 - Bonus trades are **player-specific** — they appear for the high-rep player but not for others interacting with the same villager. This requires intercepting the trade list sent to the client and injecting/removing offers based on the player's reputation.
 
 **Trade Refusal:**
@@ -256,21 +260,21 @@ Mercantile reputation operates as a **parallel system** alongside vanilla gossip
 
 | Tier | Range | Effect |
 |---|---|---|
-| Reviled | -100 to -50 | Trade refusal, `angry_villager` particles |
-| Distrusted | -49 to -1 | Price markup (+10-25%, scaled linearly within range) |
-| Neutral | 0 | No modifier |
-| Liked | 1 to 49 | Small discount (5%) |
-| Trusted | 50 to 99 | Moderate discount (10%), profession-specific exclusive trades |
-| Honored | 100+ | Best discount (15%), all exclusive trades including cross-profession |
+| Reviled | -200 to -150 | Trade refusal, `angry_villager` particles |
+| Distrusted | -149 to -1 | Price markup (+10-25%, scaled linearly within range) |
+| Neutral | 0 to 74 | No modifier |
+| Liked | 75 to 299 | Small discount (5%) |
+| Trusted | 300 to 999 | Moderate discount (10%), profession-specific exclusive trades |
+| Honored | 1000+ | Best discount (15%), all exclusive trades including cross-profession |
 
 ### Reputation Bounds and Decay
-- **Hard cap:** -100 minimum, +200 maximum. The buffer above the Honored threshold (100) allows continued earning without wasted actions, while the cap prevents runaway values.
+- **Hard cap:** -200 minimum, +1500 maximum. The buffer above the Honored threshold (1000) allows continued earning without wasted actions, while the cap prevents runaway values.
 - **No decay.** Reputation is earned through deliberate action, not maintained through presence. Decay would punish players for exploring or working on other projects.
 - **Player death:** Full reputation is retained. Reputation represents a long-term relationship, not a resource.
 
 ### Exclusive Trades Datapack Schema
 
-Files at `data/mercantile/exclusive_trades/<profession>.json` and `data/mercantile/exclusive_trades/_mercantile.json`:
+Files at `data/mercantile/exclusive_trades/<profession>.json`, `data/mercantile/exclusive_trades/_mercantile.json` (cross-profession), and `data/mercantile/exclusive_trades/wandering_trader.json` (wandering-trader bonus offers) — all share the same schema:
 
 ```json
 {
@@ -297,8 +301,9 @@ Files at `data/mercantile/exclusive_trades/<profession>.json` and `data/mercanti
 ```
 
 - `replace`: If `true`, replaces the built-in exclusive trades for this profession.
-- `min_tier`: Default minimum reputation tier for all trades in this file.
+- `min_tier`: Default minimum reputation tier for all trades in this file (defaults to `trusted`).
 - `min_tier_override`: Per-trade override of the minimum tier.
+- `max_uses` (optional, default 12), `xp_gain` (optional, default 1), and `price_multiplier` (optional, default 0.05) tune each trade's stock, villager XP reward, and demand-based price scaling.
 - Trade format uses 1.21.1's **data component system** for item definitions. The `components` field accepts the same component structure as vanilla `/give` commands and recipe definitions. Items without special components omit the field entirely.
 
 ### Persistence
@@ -319,13 +324,14 @@ Villagers can be commanded to follow a player, replacing the need for minecarts/
 ### Interaction
 - **Trigger:** Sneak + right-click a villager while holding an **emerald**.
 - Emerald is the trigger item because bell is already overloaded (workstation visualization, bell radius, village boundary). Emerald is thematic — the player is "paying" for the villager's attention.
-- **Toggle:** Same action again to release the villager from follow mode.
+- **Toggle:** Same action again (sneak + right-click with an emerald) to release the villager from follow mode. Only the player the villager is following can release it.
 - Villager follows at a moderate pace, keeping within ~6 blocks of the player.
 
 ### Behavior
 - Following villager pathfinds toward the player using standard mob AI goals (injected at high priority).
 - If the player moves too far (>32 blocks), the villager gives up and stops following (prevents chunk-loading exploits).
 - Following villagers ignore their normal schedule (won't wander to workstations or beds until released).
+- **Return home on release.** When released, a villager that remembers a bed or workstation walks back to it (bed takes priority over workstation) at a steady pace, stopping once it arrives within ~4 blocks, gets stuck, or finishes pathing. A villager with neither memory simply resumes normal behavior in place. Taking damage cancels the return so it can defend itself or flee. Toggled by `enableSendHome` (independent of `enableFollowMode`).
 - **Following villagers are immune to entity collision pushing** (mob-on-mob pushing only — block collision and piston interactions are unaffected). Without this, other entities constantly shove them off their path, making the feature frustrating.
 - Visual indicator: Custom `mercantile:follow_trail` particles emitted periodically at the villager's feet while following (teal/cyan ground glow — distinct from trade cycling's gold flash and pickup's green starburst).
 
@@ -686,6 +692,11 @@ Shaped recipe (3x3 crafting grid):
 ### Out-of-Fuel Alert
 - When the pylon detects a hostile but has no fuel: `dust` particles in red pulse from the pylon and a **note block bass drum sound** (`minecraft:block.note_block.basedrum`) plays at low pitch (once per detection cycle, not continuously). Alerts nearby players to refuel.
 
+### Bell Alarm
+- On detecting a hostile, the pylon rings the **nearest village bell** within its detection radius using the standard vanilla bell ring (sound + swing), drawing players to the threat. Located via the village point-of-interest system; if no bell is in range, nothing happens.
+- The alarm fires on threat detection regardless of whether a golem is spawned, and is **rate-limited to once per 10 seconds** (200-tick cooldown, persisted across save/load) so a sustained threat does not ring continuously.
+- Toggled by `enablePylonBellAlarm` (requires the pylon itself to be enabled via `enableSentryPylon`).
+
 ### Redstone Interaction
 - A redstone signal **disables** the pylon (stops scanning and spawning). Allows players to toggle defense on/off.
 - Comparator output reflects fuel level (0–15 signal strength proportional to iron blocks stored).
@@ -901,8 +912,12 @@ All features are independently toggleable via ModMenu / Cloth Config screen and 
 | `reputationAttackLoss` | int | 10 | Rep lost per villager attack |
 | `reputationKillLoss` | int | 25 | Rep lost for killing a villager |
 | `reputationCycleGain` | int | 2 | Rep gained per trade cycle |
+| `enableRaidReputation` | bool | true | Toggle reputation gain for defending raids |
+| `reputationRaidWinGain` | int | 10 | Rep granted for winning a raid (bypasses daily cap) |
+| `enableWanderingTraderRep` | bool | true | Toggle wandering-trader bonus offer at high reputation |
 | `enableFollowMode` | bool | true | Toggle villager follow mode |
 | `maxFollowingVillagers` | int | 3 | Max villagers following a player |
+| `enableSendHome` | bool | true | Released villagers walk back to bed/workstation |
 | `enablePathfindingFixes` | bool | true | Toggle pathfinding improvements |
 | `enablePathfindingDoors` | bool | true | Door/gate fix |
 | `enablePathfindingStairs` | bool | true | Stair/slab fix |
@@ -914,6 +929,7 @@ All features are independently toggleable via ModMenu / Cloth Config screen and 
 | `enableRestockIndicator` | bool | true | Toggle restock timer in trade GUI |
 | `enableDemandTransparency` | bool | true | Toggle price breakdown tooltip |
 | `enableSentryPylon` | bool | true | Toggle sentry pylon block |
+| `enablePylonBellAlarm` | bool | true | Pylon rings the nearest village bell on threat detection |
 | `pylonDetectionRadius` | int | 32 | Sentry pylon hostile scan radius |
 | `pylonMaxFuel` | int | 8 | Max iron blocks a pylon can hold |
 | `pylonMaxGolems` | int | 3 | Max active sentry golems per pylon |
@@ -1134,4 +1150,3 @@ Visualization features (sections 11, 17, 18) use client-side world rendering. Th
 ## Future Considerations (Out of Scope for v0.1)
 - Villager trading post block (centralized trade access)
 - Villager happiness / mood system
-- Wandering trader improvements

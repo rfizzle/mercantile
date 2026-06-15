@@ -65,7 +65,7 @@
       "title": "3. Understanding Reputation",
       "titleGap": "4",
       "blocks": [
-        { "type": "prose", "html": ["Mercantile tracks a persistent <strong class='text-bone'>global reputation score</strong> per player, from −100 to +200. The score affects pricing across every villager in the world and survives death."] },
+        { "type": "prose", "html": ["Mercantile tracks a persistent <strong class='text-bone'>global reputation score</strong> per player, from −200 to +1500. The score affects pricing across every villager in the world and survives death."] },
         {
           "type": "sub",
           "title": "The five tiers",
@@ -75,12 +75,12 @@
               "bottomGap": true,
               "headers": ["Tier", "Range", "Effect"],
               "rows": [
-                ["Reviled", "−100 to −50", "Trade refusal, angry particles, head shake"],
-                ["Distrusted", "−49 to −1", "10–25% markup"],
-                ["Neutral", "0", "No effect"],
-                ["Liked", "1 to 49", "5% discount"],
-                ["Trusted", "50 to 99", "10% discount + profession-exclusive trades"],
-                ["Honored", "100 to 200", "15% discount + all exclusive trades"]
+                ["Reviled", "−200 to −150", "Trade refusal, angry particles, head shake"],
+                ["Distrusted", "−149 to −1", "10–25% markup"],
+                ["Neutral", "0 to 74", "No effect"],
+                ["Liked", "75 to 299", "5% discount"],
+                ["Trusted", "300 to 999", "10% discount + profession-exclusive trades"],
+                ["Honored", "1000+", "15% discount + all exclusive trades"]
               ]
             }
           ]
@@ -96,9 +96,10 @@
                 "Complete trades: <strong class='text-bone'>+1</strong> per 5 trades",
                 "Cure a zombie villager: <strong class='text-bone'>+5</strong> (one-time per villager UUID)",
                 "Cycle a villager's trades: <strong class='text-bone'>+1</strong>",
-                "Stand near a villager for 10 minutes: <strong class='text-bone'>+1</strong> (capped at +1/day total)"
+                "Stand near a villager for 10 minutes: <strong class='text-bone'>+1</strong> (capped at +1/day total)",
+                "Defend a village from a raid: <strong class='text-bone'>+10</strong> (awarded with Hero of the Village; bypasses the daily cap)"
               ,
-                "Earnings from trades and cycles are capped at <strong class='text-bone'>5 reputation per in-game day</strong> by default (<a href='/config.html#config-reputation' class='text-emerald hover:underline'>configurable</a>)."
+                "Earnings from trades and cycles are capped at <strong class='text-bone'>5 reputation per in-game day</strong> by default (<a href='/config.html#config-reputation' class='text-emerald hover:underline'>configurable</a>). Raid wins and zombie cures are granted in full on top of that cap."
               ]
             }
           ]

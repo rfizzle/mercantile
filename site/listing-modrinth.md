@@ -83,18 +83,20 @@ running parallel to vanilla gossip.
 
 | Tier | Range | Effect |
 |---|---|---|
-| Reviled | -100 to -50 | Trade refusal, angry villager particles |
-| Distrusted | -49 to -1 | Price markup (10-25%) |
-| Neutral | 0 | No modifier |
-| Liked | 1 to 49 | Small discount (5%) |
-| Trusted | 50 to 99 | Moderate discount (10%), profession-exclusive trades |
-| Honored | 100+ | Best discount (15%), all exclusive trades |
+| Reviled | -200 to -150 | Trade refusal, angry villager particles |
+| Distrusted | -149 to -1 | Price markup (10-25%) |
+| Neutral | 0 to 74 | No modifier |
+| Liked | 75 to 299 | Small discount (5%) |
+| Trusted | 300 to 999 | Moderate discount (10%), profession-exclusive trades |
+| Honored | 1000+ | Best discount (15%), all exclusive trades |
 
-Reputation goes up for trading, curing zombie villagers, cycling trades, and
-spending time near villagers; it goes down for hitting and killing them.
-Exclusive trades — both per-profession and cross-profession — appear in your
-trade list when you hit the right tier. Other players trading with the same
-villager see their own list at their own tier.
+Reputation goes up for trading, curing zombie villagers, cycling trades,
+spending time near villagers, and defending the village from raids (any player
+awarded Hero of the Village gains a full bonus, outside the daily cap); it
+goes down for hitting and killing them. Exclusive trades — per-profession,
+cross-profession, and a sticky bonus offer from wandering traders at Trusted
+tier and up — appear in your trade list when you hit the right tier. Other
+players trading with the same villager see their own list at their own tier.
 
 ### Trade Cycling
 
@@ -106,10 +108,12 @@ in the slots you want to keep. No cooldown; the emerald cost is the balance.
 ### Follow Mode
 
 Sneak-right-click a villager while holding an emerald to make them follow
-you. Same action again releases them. Up to 3 villagers can follow at once
-(configurable). Following villagers ignore their schedule, pathfind to you at
-moderate pace, and are immune to mob-on-mob pushing — no more being shoved
-off the path. Out of range (>32 blocks) they give up and stop.
+you. Same action again releases them — and a released villager walks back to
+its bed or workstation instead of standing where you left it. Up to 3
+villagers can follow at once (configurable). Following villagers ignore their
+schedule, pathfind to you at moderate pace, and are immune to mob-on-mob
+pushing — no more being shoved off the path. Out of range (>32 blocks) they
+give up and stop.
 
 ### Sentry Pylon
 
@@ -118,8 +122,9 @@ stone bricks). Insert iron blocks as fuel. When a hostile mob enters its
 32-block radius, the pylon spends one iron block to spawn a temporary iron
 golem that fights and then despawns after 30 seconds of peace. Up to 3 active
 sentries per pylon. Sentry golems don't drop loot, don't count toward iron
-farms, and don't count toward mob caps. Comparator output reflects fuel
-level; a redstone signal disables the pylon entirely.
+farms, and don't count toward mob caps. On spotting a threat the pylon also
+rings the nearest village bell to call players to the fight. Comparator output
+reflects fuel level; a redstone signal disables the pylon entirely.
 
 ### Quality-of-Life
 
