@@ -13,7 +13,6 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.block.Blocks;
@@ -25,7 +24,6 @@ public class SentryPylonBellGameTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void pylonRingsBellOnActivation(GameTestHelper helper) {
-        ServerLevel level = helper.getLevel();
         BlockPos pylonRel = new BlockPos(1, 2, 1);
         BlockPos pylonAbs = helper.absolutePos(pylonRel);
         BlockPos bellRel = new BlockPos(2, 2, 1);
@@ -66,7 +64,6 @@ public class SentryPylonBellGameTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void pylonRespectsBellConfig(GameTestHelper helper) {
-        ServerLevel level = helper.getLevel();
         BlockPos pylonRel = new BlockPos(1, 2, 1);
         BlockPos bellRel = new BlockPos(2, 2, 1);
 
@@ -110,10 +107,10 @@ public class SentryPylonBellGameTest implements FabricGameTest {
         channel.outboundMessages().clear();
 
         helper.spawn(EntityType.ZOMBIE, 3, 2, 1);
-        pylon.setScanCooldownForTesting(0);
 
         helper.runAfterDelay(5, () -> {
             try {
+                pylon.setScanCooldownForTesting(0);
                 pylon.tickServerCommon();
                 BellRingS2CPayload payload = findBellRingPayload(channel);
                 helper.assertTrue(payload == null, "Payload should be null when no bell is nearby");

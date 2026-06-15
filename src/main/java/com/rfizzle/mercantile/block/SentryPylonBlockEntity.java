@@ -467,7 +467,7 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
         fuel = Mth.clamp(tag.getInt("Fuel"), 0, getMaxFuel());
         outOfFuelCooldown = Mth.clamp(tag.getInt("OutOfFuelCooldown"), 0, OUT_OF_FUEL_ALERT_COOLDOWN_TICKS);
         scanCooldown = Mth.clamp(tag.getInt("ScanCooldown"), 0, SCAN_INTERVAL_TICKS);
-        bellCooldown = tag.contains("BellCooldown") ? tag.getInt("BellCooldown") : 0;
+        bellCooldown = Mth.clamp(tag.getInt("BellCooldown"), 0, BELL_RING_COOLDOWN_TICKS);
         int despawnThreshold = MercantileConfig.get().sentryDespawnSeconds * 20;
         idleTicks = Mth.clamp(tag.getInt("IdleTicks"), 0, despawnThreshold);
         idleHostileCheckCooldown = IDLE_HOSTILE_CHECK_INTERVAL_TICKS;
