@@ -41,6 +41,7 @@ public final class FollowManager {
         }
 
         ((FollowableVillager) villager).mercantile$setFollowingSync(true);
+        ((FollowableVillager) villager).mercantile$setReturningHomeSync(false);
         broadcastFollowState(villager, true);
         return true;
     }

@@ -4,6 +4,8 @@ import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.follow.FollowManager;
 import com.rfizzle.mercantile.follow.FollowableVillager;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
@@ -214,6 +216,114 @@ public class FollowModeGameTest implements FabricGameTest {
         helper.assertFalse(((FollowableVillager) villager).mercantile$isFollowingSync(),
                 "Synced data should be cleared after stopFollowing");
 
+        player.discard();
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void returnHomeToBed(GameTestHelper helper) {
+        Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
+        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        BlockPos bedPos = helper.absolutePos(new BlockPos(5, 1, 5));
+        villager.getBrain().setMemory(MemoryModuleType.HOME, GlobalPos.of(villager.level().dimension(), bedPos));
+
+        FollowManager.startFollowing(villager, player);
+        FollowManager.stopFollowing(villager);
+
+        helper.assertTrue(((FollowableVillager) villager).mercantile$isReturningHomeSync(),
+                "Villager should be in returning home state");
+
+        helper.onEachTick(() -> {
+            if (villager.position().distanceToSqr(bedPos.getBottomCenter()) < 4.0) {
+                helper.assertFalse(((FollowableVillager) villager).mercantile$isReturningHomeSync(),
+                        "Returning home state should be cleared upon arrival");
+                player.discard();
+                helper.succeed();
+            }
+        });
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void returnHomeToWorkstationFallback(GameTestHelper helper) {
+        Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
+        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        BlockPos jobPos = helper.absolutePos(new BlockPos(5, 1, 0));
+        villager.getBrain().setMemory(MemoryModuleType.JOB_SITE, GlobalPos.of(villager.level().dimension(), jobPos));
+
+        FollowManager.startFollowing(villager, player);
+        FollowManager.stopFollowing(villager);
+
+        helper.assertTrue(((FollowableVillager) villager).mercantile$isReturningHomeSync(),
+                "Villager should be in returning home state (workstation fallback)");
+
+        helper.onEachTick(() -> {
+            if (villager.position().distanceToSqr(jobPos.getBottomCenter()) < 4.0) {
+                helper.assertFalse(((FollowableVillager) villager).mercantile$isReturningHomeSync(),
+                        "Returning home state should be cleared upon arrival at workstation");
+                player.discard();
+                helper.succeed();
+            }
+        });
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void noClaimNoReturn(GameTestHelper helper) {
+        Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
+        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+
+        FollowManager.startFollowing(villager, player);
+        FollowManager.stopFollowing(villager);
+
+        helper.assertFalse(((FollowableVillager) villager).mercantile$isReturningHomeSync(),
+                "Villager should NOT be in returning home state if no bed/workstation");
+
+        player.discard();
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void cancelReturnOnHurt(GameTestHelper helper) {
+        Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
+        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        BlockPos bedPos = helper.absolutePos(new BlockPos(5, 1, 5));
+        villager.getBrain().setMemory(MemoryModuleType.HOME, GlobalPos.of(villager.level().dimension(), bedPos));
+
+        FollowManager.startFollowing(villager, player);
+        FollowManager.stopFollowing(villager);
+
+        helper.assertTrue(((FollowableVillager) villager).mercantile$isReturningHomeSync(),
+                "Villager should be in returning home state");
+
+        villager.hurt(villager.damageSources().generic(), 1.0f);
+
+        helper.assertFalse(((FollowableVillager) villager).mercantile$isReturningHomeSync(),
+                "Returning home state should be cancelled when hurt");
+
+        player.discard();
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void cancelReturnOnReEngage(GameTestHelper helper) {
+        Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
+        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        BlockPos bedPos = helper.absolutePos(new BlockPos(5, 1, 5));
+        villager.getBrain().setMemory(MemoryModuleType.HOME, GlobalPos.of(villager.level().dimension(), bedPos));
+
+        FollowManager.startFollowing(villager, player);
+        FollowManager.stopFollowing(villager);
+
+        helper.assertTrue(((FollowableVillager) villager).mercantile$isReturningHomeSync(),
+                "Villager should be in returning home state");
+
+        FollowManager.startFollowing(villager, player);
+
+        helper.assertFalse(((FollowableVillager) villager).mercantile$isReturningHomeSync(),
+                "Returning home state should be cancelled when follow is re-engaged");
+        helper.assertTrue(FollowManager.isFollowing(villager),
+                "Villager should be following again");
+
+        FollowManager.stopFollowing(villager);
         player.discard();
         helper.succeed();
     }

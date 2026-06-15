@@ -44,6 +44,7 @@ public class MercantileConfig {
     // Follow Mode
     public boolean enableFollowMode = true;
     public int maxFollowingVillagers = 3;
+    public boolean enableSendHome = true;
 
     // Pathfinding
     public boolean enablePathfindingFixes = true;

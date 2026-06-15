@@ -4,6 +4,7 @@ import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.follow.FollowManager;
 import com.rfizzle.mercantile.follow.FollowPlayerGoal;
 import com.rfizzle.mercantile.follow.FollowableVillager;
+import com.rfizzle.mercantile.follow.ReturnHomeGoal;
 import com.rfizzle.mercantile.particle.MercantileParticles;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -15,6 +16,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
@@ -48,6 +50,10 @@ public abstract class VillagerFollowMixin extends AbstractVillager implements Fo
     private static final EntityDataAccessor<Boolean> mercantile$DATA_FOLLOWING =
             SynchedEntityData.defineId(Villager.class, EntityDataSerializers.BOOLEAN);
 
+    @Unique
+    private static final EntityDataAccessor<Boolean> mercantile$DATA_RETURNING_HOME =
+            SynchedEntityData.defineId(Villager.class, EntityDataSerializers.BOOLEAN);
+
     protected VillagerFollowMixin(EntityType<? extends AbstractVillager> entityType, Level level) {
         super(entityType, level);
     }
@@ -55,6 +61,7 @@ public abstract class VillagerFollowMixin extends AbstractVillager implements Fo
     @Inject(method = "defineSynchedData", at = @At("TAIL"))
     private void mercantile$defineFollowData(SynchedEntityData.Builder builder, CallbackInfo ci) {
         builder.define(mercantile$DATA_FOLLOWING, false);
+        builder.define(mercantile$DATA_RETURNING_HOME, false);
     }
 
     @Override
@@ -67,11 +74,22 @@ public abstract class VillagerFollowMixin extends AbstractVillager implements Fo
         return this.entityData.get(mercantile$DATA_FOLLOWING);
     }
 
+    @Override
+    public void mercantile$setReturningHomeSync(boolean returning) {
+        this.entityData.set(mercantile$DATA_RETURNING_HOME, returning);
+    }
+
+    @Override
+    public boolean mercantile$isReturningHomeSync() {
+        return this.entityData.get(mercantile$DATA_RETURNING_HOME);
+    }
+
     @Inject(method = "<init>(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/npc/VillagerType;)V",
             at = @At("TAIL"))
     private void mercantile$addFollowGoal(CallbackInfo ci) {
         if (MercantileConfig.get().enableFollowMode) {
             this.goalSelector.addGoal(1, new FollowPlayerGoal((Villager) (Object) this));
+            this.goalSelector.addGoal(1, new ReturnHomeGoal((Villager) (Object) this));
         }
     }
 
@@ -92,10 +110,14 @@ public abstract class VillagerFollowMixin extends AbstractVillager implements Fo
         }
     }
 
+
     @Inject(method = "tick", at = @At("TAIL"))
     private void mercantile$followTick(CallbackInfo ci) {
         if (!this.level().isClientSide) return;
-        if (!this.entityData.get(mercantile$DATA_FOLLOWING)) return;
+
+        boolean following = this.entityData.get(mercantile$DATA_FOLLOWING);
+        boolean returning = this.entityData.get(mercantile$DATA_RETURNING_HOME);
+        if (!following && !returning) return;
 
         if (this.tickCount % 5 == 0) {
             double x = this.getX() + (this.random.nextDouble() - 0.5) * 0.6;
@@ -133,7 +155,15 @@ public abstract class VillagerFollowMixin extends AbstractVillager implements Fo
                 return;
             }
 
-            FollowManager.stopFollowing(self);
+            if (FollowManager.stopFollowing(self)) {
+                if (MercantileConfig.get().enableSendHome) {
+                    boolean hasBed = self.getBrain().hasMemoryValue(MemoryModuleType.HOME);
+                    boolean hasWorkstation = self.getBrain().hasMemoryValue(MemoryModuleType.JOB_SITE);
+                    if (hasBed || hasWorkstation) {
+                        this.mercantile$setReturningHomeSync(true);
+                    }
+                }
+            }
             self.playSound(SoundEvents.VILLAGER_AMBIENT, 1.0f, self.getVoicePitch());
             serverPlayer.displayClientMessage(
                     Component.translatable("mercantile.follow.stop")
