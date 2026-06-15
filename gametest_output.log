@@ -1,0 +1,451 @@
+
+> Configure project :
+Fabric Loom: 1.9.2
+
+> Task :compileJava UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :classes UP-TO-DATE
+> Task :compileGametestJava UP-TO-DATE
+> Task :generateLog4jConfig UP-TO-DATE
+> Task :generateRemapClasspath UP-TO-DATE
+> Task :generateDLIConfig UP-TO-DATE
+> Task :configureLaunch UP-TO-DATE
+> Task :processGametestResources NO-SOURCE
+> Task :gametestClasses UP-TO-DATE
+
+> Task :runGametest
+[07:11:07] [main/WARN] (FabricLoader/Knot) Class path entries reference missing files: /app/build/resources/gametest - the game may not load properly!
+[07:11:07] [main/INFO] (FabricLoader/GameProvider) Loading Minecraft 1.21.1 with Fabric Loader 0.16.10
+[07:11:07] [main/INFO] (FabricLoader) Loading 51 mods:
+	- architectury 13.0.6
+	- cloth-basic-math 0.6.1
+	- cloth-config 15.0.140
+	- emi 1.1.22+1.21.1+fabric
+	- error_notifier 1.0.11
+	- fabric-api 0.116.1+1.21.1
+	- fabric-api-base 0.4.42+6573ed8c19
+	- fabric-api-lookup-api-v1 1.6.71+b559734419
+	- fabric-biome-api-v1 13.0.31+d527f9fd19
+	- fabric-block-api-v1 1.1.0+0bc3503219
+	- fabric-block-view-api-v2 1.0.11+ebb2264e19
+	- fabric-command-api-v1 1.2.49+f71b366fd1
+	- fabric-command-api-v2 2.2.28+6ced4dd919
+	- fabric-commands-v0 0.2.66+df3654b319
+	- fabric-content-registries-v0 8.0.19+b559734419
+	- fabric-convention-tags-v1 2.1.5+7f945d5b19
+	- fabric-convention-tags-v2 2.11.1+a406e79519
+	- fabric-crash-report-info-v1 0.2.29+0af3f5a719
+	- fabric-data-attachment-api-v1 1.4.5+6116a37819
+	- fabric-data-generation-api-v1 20.2.29+16c4ae2519
+	- fabric-dimensions-v1 4.0.0+6fc22b9919
+	- fabric-entity-events-v1 1.8.0+2b27e0a419
+	- fabric-events-interaction-v0 0.7.13+ba9dae0619
+	- fabric-game-rule-api-v1 1.0.53+6ced4dd919
+	- fabric-gametest-api-v1 2.0.5+6fc22b9919
+	- fabric-item-api-v1 11.1.1+d5debaed19
+	- fabric-item-group-api-v1 4.1.7+def88e3a19
+	- fabric-lifecycle-events-v1 2.6.0+0865547519
+	- fabric-loot-api-v2 3.0.15+3f89f5a519
+	- fabric-loot-api-v3 1.0.3+3f89f5a519
+	- fabric-message-api-v1 6.0.14+8aaf3aca19
+	- fabric-networking-api-v1 4.3.0+c7469b2119
+	- fabric-object-builder-api-v1 15.2.1+40875a9319
+	- fabric-particles-v1 4.0.2+6573ed8c19
+	- fabric-recipe-api-v1 5.0.14+248df81c19
+	- fabric-registry-sync-v0 5.2.0+34f5d91419
+	- fabric-rendering-data-attachment-v1 0.3.49+73761d2e19
+	- fabric-rendering-fluids-v1 3.1.6+1daea21519
+	- fabric-resource-conditions-api-v1 4.3.0+8dc279b1d1
+	- fabric-resource-loader-v0 1.3.1+5b5275af19
+	- fabric-screen-handler-api-v1 1.3.88+b559734419
+	- fabric-transfer-api-v1 5.4.3+c24bd99419
+	- fabric-transitive-access-wideners-v1 6.2.0+45b9699719
+	- fabricloader 0.16.10
+	- jade 15.10.5+fabric
+	- java 21
+	- jei 19.27.0.340
+	- mercantile 0.1.0+g9e0ca7d.dirty
+	- minecraft 1.21.1
+	- mixinextras 0.4.1
+	- roughlyenoughitems 16.0.799
+[07:11:07] [main/INFO] (FabricLoader/Mixin) SpongePowered MIXIN Subsystem Version=0.8.7 Source=file:/home/jules/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.15.4+mixin.0.8.7/6a12aacc794f1078458433116e9ed42c1cc98096/sponge-mixin-0.15.4+mixin.0.8.7.jar Service=Knot/Fabric Env=SERVER
+[07:11:07] [main/INFO] (FabricLoader/Mixin) Loaded Fabric development mappings for mixin remapper!
+[07:11:07] [main/INFO] (FabricLoader/Mixin) Compatibility level set to JAVA_17
+[07:11:07] [main/INFO] (FabricLoader/Mixin) Compatibility level set to JAVA_21
+[07:11:09] [main/INFO] (FabricLoader/MixinExtras|Service) Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.4.1).
+[07:11:19] [main/INFO] (NetworkManagerImpl) Registering C2S receiver with id roughlyenoughitems:request_tags_c2s
+[07:11:19] [main/INFO] (REI) [REI] Registered plugin provider DefaultPlugin [roughlyenoughitems] for REIPlugin
+[07:11:19] [main/INFO] (REI) [REI] Registered plugin provider DefaultRuntimePlugin [roughlyenoughitems] for REIPlugin
+[07:11:19] [main/INFO] (REI) [REI] Registered plugin provider DefaultPlugin [roughlyenoughitems] for REIServerPlugin
+[07:11:19] [main/INFO] (REI) [REI] Registered plugin provider DefaultRuntimePlugin [roughlyenoughitems] for REIServerPlugin
+[07:11:19] [main/INFO] (REI) [REI] Registered plugin provider FabricFluidAPISupportPlugin for REIServerPlugin
+[07:11:19] [main/INFO] (REI) [REI] Registered plugin provider FabricFluidAPISupportPlugin for REIPlugin
+[07:11:19] [main/INFO] (NetworkManagerImpl) Registering C2S receiver with id roughlyenoughitems:delete_item
+[07:11:19] [main/INFO] (NetworkManagerImpl) Registering C2S receiver with id roughlyenoughitems:create_item
+[07:11:19] [main/INFO] (NetworkManagerImpl) Registering C2S receiver with id roughlyenoughitems:create_item_grab
+[07:11:19] [main/INFO] (NetworkManagerImpl) Registering C2S receiver with id roughlyenoughitems:create_item_hotbar
+[07:11:19] [main/INFO] (NetworkManagerImpl) Registering C2S receiver with id roughlyenoughitems:move_items
+[07:11:19] [main/INFO] (NetworkManagerImpl) Registering C2S receiver with id roughlyenoughitems:move_items_new
+[07:11:19] [main/INFO] (mercantile) Mercantile initialized
+[07:11:19] [main/INFO] (Minecraft) Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, name=PROD]
+[07:11:19] [main/INFO] (FabricGameTestHelper) Starting test server
+[07:11:22] [main/INFO] (Minecraft) Loaded 1292 recipes
+[07:11:22] [main/INFO] (Minecraft) Loaded 1401 advancements
+[07:11:22] [main/INFO] (REI) [REI] ########################################
+[07:11:22] [main/INFO] (REI) [REI] REIPlugin starting main-reload for START.
+[07:11:22] [main/INFO] (REI) [REI] Plugins (3):
+[07:11:22] [main/INFO] (REI) [REI]  - (-100.00) DefaultPlugin of DefaultPlugin [roughlyenoughitems]
+[07:11:22] [main/INFO] (REI) [REI]  - (0.00) FabricFluidAPISupportPlugin
+[07:11:22] [main/INFO] (REI) [REI]  - (0.00) DefaultRuntimePlugin of DefaultRuntimePlugin [roughlyenoughitems]
+[07:11:22] [main/INFO] (REI) [REI] ########################################
+[07:11:22] [main/INFO] (REI) [REI] ========================================
+[07:11:22] [main/INFO] (REI) [REI] REIServerPlugin starting main-reload for START.
+[07:11:22] [main/INFO] (REI) [REI] Plugins (3):
+[07:11:22] [main/INFO] (REI) [REI]  - (-100.00) DefaultPlugin of DefaultPlugin [roughlyenoughitems]
+[07:11:22] [main/INFO] (REI) [REI]  - (0.00) FabricFluidAPISupportPlugin
+[07:11:22] [main/INFO] (REI) [REI]  - (0.00) DefaultRuntimePlugin of DefaultRuntimePlugin [roughlyenoughitems]
+[07:11:22] [main/INFO] (REI) [REI] ========================================
+[07:11:22] [main/INFO] (REI) [REI] REIPlugin finished post-reload for START in 2.089 ms, totaling 40.82 ms.
+[07:11:22] [main/INFO] (REI) [REI] REIServerPlugin finished post-reload for START in 937.5 μs, totaling 6.200 ms.
+[07:11:22] [main/INFO] (REI) [REI] ----------------------------------------
+[07:11:22] [main/INFO] (REI) [REI] REIPlugin starting main-reload for END.
+[07:11:22] [main/INFO] (REI) [REI] Plugins (3):
+[07:11:22] [main/INFO] (REI) [REI]  - (-100.00) DefaultPlugin of DefaultPlugin [roughlyenoughitems]
+[07:11:22] [main/INFO] (REI) [REI]  - (0.00) FabricFluidAPISupportPlugin
+[07:11:22] [main/INFO] (REI) [REI]  - (0.00) DefaultRuntimePlugin of DefaultRuntimePlugin [roughlyenoughitems]
+[07:11:22] [main/INFO] (REI) [REI] ----------------------------------------
+[07:11:22] [main/INFO] (REI) [REI] ========================================
+[07:11:22] [main/INFO] (REI) [REI] REIServerPlugin starting main-reload for END.
+[07:11:22] [main/INFO] (REI) [REI] Plugins (3):
+[07:11:22] [main/INFO] (REI) [REI]  - (-100.00) DefaultPlugin of DefaultPlugin [roughlyenoughitems]
+[07:11:22] [main/INFO] (REI) [REI]  - (0.00) FabricFluidAPISupportPlugin
+[07:11:22] [main/INFO] (REI) [REI]  - (0.00) DefaultRuntimePlugin of DefaultRuntimePlugin [roughlyenoughitems]
+[07:11:22] [main/INFO] (REI) [REI] ========================================
+[07:11:22] [main/INFO] (REI) [REI] REIPlugin finished post-reload for END in 1.167 ms, totaling 29.18 ms.
+[07:11:22] [main/INFO] (REI) [REI] REIServerPlugin finished post-reload for END in 631.6 μs, totaling 8.693 ms.
+[07:11:22] [main/INFO] (mercantile) Loaded 5 exclusive trades (4 profession, 1 cross-profession)
+[07:11:22] [main/INFO] (mercantile) Built trade index with 98 entries
+[07:11:22] [main/INFO] (mercantile) Loaded 22 items across 6 profession gift mappings
+[07:11:22] [main/INFO] (mercantile) Loaded 400 villager names across 8 pools
+[07:11:23] [main/INFO] (BiomeModificationImpl) Applied 0 biome modifications to 0 of 64 new biomes in 3.075 ms
+[07:11:23] [Server thread/INFO] (Minecraft) Preparing start region for dimension minecraft:overworld
+[07:11:24] [Worker-Main-2/INFO] (Minecraft) Preparing spawn area: 2%
+[07:11:24] [Server thread/INFO] (Minecraft) Time elapsed: 290 ms
+[07:11:24] [Server thread/INFO] (Minecraft) Started game test server
+[07:11:24] [Server thread/INFO] (Jade) Start loading plugin from Jade: snownee.jade.addon.core.CorePlugin
+[07:11:24] [Server thread/INFO] (Jade) Loaded plugin from snownee.jade.addon.core.CorePlugin in 14.74 ms
+[07:11:24] [Server thread/INFO] (Jade) Start loading plugin from Jade: snownee.jade.addon.vanilla.VanillaPlugin
+[07:11:24] [Server thread/INFO] (Jade) Loaded plugin from snownee.jade.addon.vanilla.VanillaPlugin in 13.63 ms
+[07:11:24] [Server thread/INFO] (Jade) Start loading plugin from Jade: snownee.jade.addon.universal.UniversalPlugin
+[07:11:24] [Server thread/INFO] (Jade) Loaded plugin from snownee.jade.addon.universal.UniversalPlugin in 5.304 ms
+[07:11:24] [Server thread/INFO] (Jade) Start loading plugin from Jade: snownee.jade.addon.access.AccessibilityPlugin
+[07:11:24] [Server thread/INFO] (Jade) Loaded plugin from snownee.jade.addon.access.AccessibilityPlugin in 13.65 μs
+[07:11:24] [Server thread/INFO] (Jade) Start loading plugin from Jade: snownee.jade.addon.debug.DebugPlugin
+[07:11:24] [Server thread/INFO] (Jade) Loaded plugin from snownee.jade.addon.debug.DebugPlugin in 10.63 μs
+[07:11:24] [Server thread/INFO] (Jade) Start loading plugin from Mercantile: com.rfizzle.mercantile.compat.jade.MercantileJadePlugin
+[07:11:24] [Server thread/INFO] (Jade) Loaded plugin from com.rfizzle.mercantile.compat.jade.MercantileJadePlugin in 1.928 ms
+[07:11:24] [Server thread/INFO] (Minecraft) 192 tests are now running at position -11822339, -59, -10567101!
+[07:11:25] [Server thread/INFO] (Minecraft) Running test batch 'sentryDespawnAlone:0' (1 tests)...
+[07:11:25] [Server thread/INFO] (Minecraft) [                                                                                                                                                                                                ]
+[07:11:25] [Server thread/INFO] (Minecraft) [                                                                                                                                                                                                ]
+[07:11:26] [Server thread/INFO] (Minecraft) [_                                                                                                                                                                                               ]
+[07:11:26] [Server thread/INFO] (Minecraft) [_                                                                                                                                                                                               ]
+[07:11:26] [Server thread/INFO] (Minecraft) [_                                                                                                                                                                                               ]
+[07:11:26] [Server thread/INFO] (Minecraft) Running test batch 'defaultBatch:0' (50 tests)...
+[07:11:26] [Server thread/INFO] (Minecraft) [+                                                                                                                                                                                               ]
+[07:11:27] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 2 at (-1.5, -60.0, 7.5)
+[07:11:27] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:27] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 3 at (8.5, -60.0, -1.5)
+[07:11:27] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:27] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 4 at (4.5, -60.0, 10.5)
+[07:11:27] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:27] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 6 at (-5.5, -60.0, 4.5)
+[07:11:27] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:27] [Server thread/INFO] (Minecraft) test-mock-player has made the advancement [What a Deal!]
+[07:11:27] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 9 at (-2.5, -60.0, 9.5)
+[07:11:27] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:27] [Server thread/INFO] (Minecraft) test-mock-player has made the advancement [What a Deal!]
+[07:11:27] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 34 at (-5.5, -60.0, 7.5)
+[07:11:27] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:27] [Server thread/INFO] (Minecraft) [++++++++++++++++++++++++ +++++   +++++                                                                                                                                                          ]
+[07:11:28] [Server thread/INFO] (Minecraft) [+++++++++++++++++++++++++++++++++++++++++++__   +++                                                                                                                                             ]
+[07:11:28] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 56 at (1.5, -60.0, 9.5)
+[07:11:28] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:28] [Server thread/INFO] (Minecraft) Running test batch 'defaultBatch:1' (50 tests)...
+[07:11:29] [Server thread/INFO] (Minecraft) [+++++++++++++++++++++++++++++++++++++++++++++++++++                                                                                                                                             ]
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 57 at (4.5, -60.0, -5.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/WARN] (mercantile) Failed to deserialize entity from pickup item (id=<missing>); keeping item
+net.minecraft.ReportedException: Loading entity NBT
+	at knot/net.minecraft.world.entity.Entity.load(Entity.java:2035) ~[minecraft-common-6dd494ade5-1.21.1-loom.mappings.1_21_1.layered+hash.2198-v2.jar:?]
+	at knot/com.rfizzle.mercantile.data.VillagerPlacementHandler.lambda$init$0(VillagerPlacementHandler.java:66) ~[main/:?]
+	at knot/net.fabricmc.fabric.api.event.player.UseBlockCallback.lambda$static$0(UseBlockCallback.java:41) ~[fabric-events-interaction-v0-common-0.7.13+ba9dae0619.jar:?]
+	at knot/net.minecraft.server.level.ServerPlayerGameMode.handler$zna000$fabric-events-interaction-v0$interactBlock(ServerPlayerGameMode.java:1087) ~[minecraft-common-6dd494ade5-1.21.1-loom.mappings.1_21_1.layered+hash.2198-v2.jar:?]
+	at knot/net.minecraft.server.level.ServerPlayerGameMode.useItemOn(ServerPlayerGameMode.java) ~[minecraft-common-6dd494ade5-1.21.1-loom.mappings.1_21_1.layered+hash.2198-v2.jar:?]
+	at knot/com.rfizzle.mercantile.gametest.VillagerPickupGameTest.malformedNbtKeepsItem(VillagerPickupGameTest.java:129) ~[gametest/:?]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[?:?]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[?:?]
+	at knot/net.fabricmc.fabric.impl.gametest.FabricGameTestHelper.invokeTestMethod(FabricGameTestHelper.java:115) ~[fabric-gametest-api-v1-common-2.0.5+6fc22b9919.jar:?]
+	at knot/net.fabricmc.fabric.api.gametest.v1.FabricGameTest.invokeTestMethod(FabricGameTest.java:44) ~[fabric-gametest-api-v1-common-2.0.5+6fc22b9919.jar:?]
+	at knot/net.fabricmc.fabric.impl.gametest.FabricGameTestHelper.lambda$getTestMethodInvoker$1(FabricGameTestHelper.java:106) ~[fabric-gametest-api-v1-common-2.0.5+6fc22b9919.jar:?]
+	at knot/net.minecraft.gametest.framework.TestFunction.run(TestFunction.java:22) ~[minecraft-common-6dd494ade5-1.21.1-loom.mappings.1_21_1.layered+hash.2198-v2.jar:?]
+	at knot/net.minecraft.gametest.framework.GameTestInfo.startTest(GameTestInfo.java:182) ~[minecraft-common-6dd494ade5-1.21.1-loom.mappings.1_21_1.layered+hash.2198-v2.jar:?]
+	at knot/net.minecraft.gametest.framework.GameTestInfo.tickInternal(GameTestInfo.java:146) ~[minecraft-common-6dd494ade5-1.21.1-loom.mappings.1_21_1.layered+hash.2198-v2.jar:?]
+	at knot/net.minecraft.gametest.framework.GameTestInfo.tick(GameTestInfo.java:129) ~[minecraft-common-6dd494ade5-1.21.1-loom.mappings.1_21_1.layered+hash.2198-v2.jar:?]
+	at knot/net.minecraft.gametest.framework.GameTestTicker.method_56242(GameTestTicker.java:42) ~[minecraft-common-6dd494ade5-1.21.1-loom.mappings.1_21_1.layered+hash.2198-v2.jar:?]
+	at java.base/java.util.concurrent.CopyOnWriteArrayList.forEach(CopyOnWriteArrayList.java:891) ~[?:?]
+	at knot/net.minecraft.gametest.framework.GameTestTicker.tick(GameTestTicker.java:42) ~[minecraft-common-6dd494ade5-1.21.1-loom.mappings.1_21_1.layered+hash.2198-v2.jar:?]
+	at knot/net.minecraft.server.MinecraftServer.handler$zbk000$fabric-gametest-api-v1$tickWorlds(MinecraftServer.java:2632) ~[minecraft-common-6dd494ade5-1.21.1-loom.mappings.1_21_1.layered+hash.2198-v2.jar:?]
+	at knot/net.minecraft.server.MinecraftServer.tickChildren(MinecraftServer.java:1034) ~[minecraft-common-6dd494ade5-1.21.1-loom.mappings.1_21_1.layered+hash.2198-v2.jar:?]
+	at knot/net.minecraft.server.MinecraftServer.tickServer(MinecraftServer.java:912) ~[minecraft-common-6dd494ade5-1.21.1-loom.mappings.1_21_1.layered+hash.2198-v2.jar:?]
+	at knot/net.minecraft.gametest.framework.GameTestServer.tickServer(GameTestServer.java:159) ~[minecraft-common-6dd494ade5-1.21.1-loom.mappings.1_21_1.layered+hash.2198-v2.jar:?]
+	at knot/net.minecraft.server.MinecraftServer.runServer(MinecraftServer.java:697) ~[minecraft-common-6dd494ade5-1.21.1-loom.mappings.1_21_1.layered+hash.2198-v2.jar:?]
+	at knot/net.minecraft.server.MinecraftServer.method_29739(MinecraftServer.java:281) ~[minecraft-common-6dd494ade5-1.21.1-loom.mappings.1_21_1.layered+hash.2198-v2.jar:?]
+	at java.base/java.lang.Thread.run(Thread.java:1583) [?:?]
+Caused by: java.lang.IllegalStateException: Entity has invalid position
+	at knot/net.minecraft.world.entity.Entity.load(Entity.java:1993) ~[minecraft-common-6dd494ade5-1.21.1-loom.mappings.1_21_1.layered+hash.2198-v2.jar:?]
+	... 24 more
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 62 at (-4.5, -60.0, 7.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 69 at (8.5, -60.0, 0.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 74 at (4.5, -60.0, 7.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 82 at (5.5, -60.0, -8.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 89 at (4.5, -60.0, -3.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 92 at (-0.5, -60.0, -3.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 97 at (1.5, -60.0, -4.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 99 at (-9.5, -60.0, 9.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 101 at (6.5, -60.0, 8.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player has made the advancement [What a Deal!]
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 107 at (-4.5, -60.0, -8.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 109 at (0.5, -60.0, 10.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player has made the advancement [What a Deal!]
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 118 at (7.5, -60.0, -8.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 120 at (-7.5, -60.0, -3.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 121 at (-4.5, -60.0, 4.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 122 at (-0.5, -60.0, -0.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 123 at (8.5, -60.0, -6.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 125 at (10.5, -60.0, -5.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player has made the advancement [What a Deal!]
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 141 at (9.5, -60.0, -9.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 143 at (0.5, -60.0, 9.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player has made the advancement [What a Deal!]
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 170 at (-8.5, -60.0, 7.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 172 at (4.5, -60.0, -2.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) Villager Villager['Trudy'/171, l='ServerLevel[Test Level]', x=-11822260.50, y=-59.00, z=-10566988.50] died, message: 'Trudy was slain by test-mock-player'
+[07:11:29] [Server thread/INFO] (Minecraft) Named entity Villager['Trudy'/171, l='ServerLevel[Test Level]', x=-11822260.50, y=-59.00, z=-10566988.50] died: Trudy was slain by test-mock-player
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 174 at (5.5, -60.0, 8.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) Villager Villager['Edmund'/173, l='ServerLevel[Test Level]', x=-11822247.50, y=-59.00, z=-10566988.50] died, message: 'Edmund was slain by test-mock-player'
+[07:11:29] [Server thread/INFO] (Minecraft) Named entity Villager['Edmund'/173, l='ServerLevel[Test Level]', x=-11822247.50, y=-59.00, z=-10566988.50] died: Edmund was slain by test-mock-player
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 176 at (-2.5, -60.0, -3.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 177 at (-8.5, -60.0, -6.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 178 at (3.5, -60.0, 3.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 179 at (-7.5, -60.0, 2.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 181 at (0.5, -60.0, 8.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player has made the advancement [What a Deal!]
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 208 at (10.5, -60.0, 9.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player has made the advancement [What a Deal!]
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 213 at (-5.5, -60.0, -4.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 215 at (-2.5, -60.0, -4.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player has made the advancement [What a Deal!]
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 241 at (-1.5, -60.0, -3.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 243 at (-2.5, -60.0, -0.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player has made the advancement [What a Deal!]
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 275 at (-3.5, -60.0, 7.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player has made the advancement [What a Deal!]
+[07:11:29] [Server thread/INFO] (Minecraft) Villager Villager['Helena'/274, l='ServerLevel[Test Level]', x=-11822247.50, y=-59.00, z=-10566946.50] died, message: 'Helena was slain by test-mock-player'
+[07:11:29] [Server thread/INFO] (Minecraft) Named entity Villager['Helena'/274, l='ServerLevel[Test Level]', x=-11822247.50, y=-59.00, z=-10566946.50] died: Helena was slain by test-mock-player
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 302 at (-6.5, -60.0, -3.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player has made the advancement [What a Deal!]
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 328 at (7.5, -60.0, 10.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 329 at (-8.5, -60.0, -4.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 330 at (0.5, -60.0, -4.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 331 at (0.5, -60.0, 7.5)
+[07:11:29] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:30] [Server thread/INFO] (Minecraft) [++++++++++++++++++++++++++++++++++++++++++++++++++++++++_++++++++++++++++++++++++++++++++++++++++++++                                                                                           ]
+[07:11:30] [Server thread/INFO] (Minecraft) [++++++++++++++++++++++++++++++++++++++++++++++++++++++++_++++++++++++++++++++++++++++++++++++++++++++                                                                                           ]
+[07:11:30] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 332 at (-4.5, -60.0, -8.5)
+[07:11:30] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:30] [Server thread/INFO] (Minecraft) Running test batch 'defaultBatch:2' (50 tests)...
+[07:11:30] [Server thread/INFO] (Minecraft) [+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++                                                                                           ]
+[07:11:30] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 334 at (-5.5, -60.0, -0.5)
+[07:11:30] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:30] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 335 at (-8.5, -60.0, -2.5)
+[07:11:30] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:30] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 346 at (-0.5, -60.0, -2.5)
+[07:11:30] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:31] [Server thread/WARN] (mercantile) WorkstationMapService: bound cap 1024 exceeded near BlockPos{x=-11822274, y=-59, z=-10566891}
+[07:11:31] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 1424 at (7.5, -60.0, -9.5)
+[07:11:31] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:31] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 1426 at (-1.5, -60.0, -0.5)
+[07:11:31] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:31] [Server thread/WARN] (mercantile) BellRingService: villager cap 64 exceeded near BlockPos{x=-11822274, y=-59, z=-10566877}
+[07:11:31] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 1498 at (-6.5, -60.0, 3.5)
+[07:11:31] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:31] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 1499 at (-3.5, -60.0, 9.5)
+[07:11:31] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:31] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 1500 at (9.5, -60.0, -5.5)
+[07:11:31] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:31] [Server thread/INFO] (Minecraft) [+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++_++++++++++++ +++++                                                          ]
+[07:11:32] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 1505 at (3.5, -60.0, -9.5)
+[07:11:32] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:32] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 1508 at (1.5, -60.0, -2.5)
+[07:11:32] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:32] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 1510 at (-0.5, -60.0, -4.5)
+[07:11:32] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:32] [Server thread/INFO] (Minecraft) [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ +++++   +++++                                                  ]
+[07:11:32] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 1525 at (-5.5, -60.0, -2.5)
+[07:11:32] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:32] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 1527 at (-8.5, -60.0, -3.5)
+[07:11:32] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:32] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 1529 at (-2.5, -60.0, 5.5)
+[07:11:32] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:32] [Server thread/INFO] (Minecraft) Running test batch 'defaultBatch:3' (30 tests)...
+[07:11:32] [Server thread/INFO] (Minecraft) [+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++                                         ]
+[07:11:32] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 1532 at (0.5, -60.0, 7.5)
+[07:11:32] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:32] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 1534 at (-8.5, -60.0, 1.5)
+[07:11:32] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:32] [Server thread/INFO] (Minecraft) test-mock-player[embedded] logged in with entity id 1548 at (5.5, -60.0, 7.5)
+[07:11:32] [Server thread/INFO] (Minecraft) test-mock-player joined the game
+[07:11:32] [Server thread/INFO] (mercantile) Built trade index with 93 entries
+[07:11:32] [Server thread/INFO] (mercantile) Built trade index with 93 entries
+[07:11:32] [Server thread/INFO] (mercantile) Built trade index with 93 entries
+[07:11:32] [Server thread/INFO] (mercantile) Built trade index with 93 entries
+[07:11:32] [Server thread/INFO] (mercantile) Built trade index with 93 entries
+[07:11:32] [Server thread/INFO] (mercantile) Built trade index with 93 entries
+[07:11:32] [Server thread/INFO] (Minecraft) [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++____+           ]
+[07:11:32] [Server thread/INFO] (Minecraft) [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++__+_+           ]
+[07:11:32] [Server thread/INFO] (Minecraft) [+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++_+++           ]
+[07:11:33] [Server thread/INFO] (Minecraft) Running test batch 'sentryScan:0' (8 tests)...
+[07:11:33] [Server thread/INFO] (Minecraft) [+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++           ]
+[07:11:33] [Server thread/INFO] (Minecraft) [+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++_+_        ]
+[07:11:33] [Server thread/INFO] (Minecraft) [+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++_+______   ]
+[07:11:33] [Server thread/INFO] (Minecraft) [+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++_+______   ]
+[07:11:33] [Server thread/INFO] (Minecraft) [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++_++++   ]
+[07:11:33] [Server thread/INFO] (Minecraft) Running test batch 'sentryReturnGoalAlone:0' (1 tests)...
+[07:11:33] [Server thread/INFO] (Minecraft) [+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++   ]
+[07:11:33] [Server thread/INFO] (Minecraft) Running test batch 'sentryResetAlone:0' (1 tests)...
+[07:11:33] [Server thread/INFO] (Minecraft) [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  ]
+[07:11:33] [Server thread/INFO] (Minecraft) [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++_ ]
+[07:11:33] [Server thread/INFO] (Minecraft) [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++_ ]
+[07:11:33] [Server thread/INFO] (Minecraft) [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++_ ]
+[07:11:33] [Server thread/INFO] (Minecraft) Running test batch 'pathfindingConfig:0' (1 tests)...
+[07:11:34] [Server thread/INFO] (Minecraft) [+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ]
+[07:11:34] [Server thread/INFO] (Minecraft) [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++]
+[07:11:34] [Server thread/INFO] (Minecraft) ========= 192 GAME TESTS COMPLETE IN 9.812 s ======================
+[07:11:34] [Server thread/INFO] (Minecraft) All 192 required tests passed :)
+[07:11:34] [Server thread/INFO] (Minecraft) ====================================================
+[07:11:34] [Server thread/INFO] (Minecraft) Stopping server
+[07:11:34] [Server thread/INFO] (Minecraft) Saving players
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player lost connection: Server closed
+[07:11:34] [Server thread/INFO] (Minecraft) test-mock-player left the game
+[07:11:34] [Server thread/INFO] (Minecraft) Saving worlds
+[07:11:35] [Server thread/INFO] (Minecraft) Saving chunks for level 'ServerLevel[Test Level]'/minecraft:overworld
+[07:11:36] [Server thread/INFO] (Minecraft) Saving chunks for level 'ServerLevel[Test Level]'/minecraft:the_end
+[07:11:36] [Server thread/INFO] (Minecraft) Saving chunks for level 'ServerLevel[Test Level]'/minecraft:the_nether
+[07:11:36] [Server thread/INFO] (Minecraft) ThreadedAnvilChunkStorage (world): All chunks are saved
+[07:11:36] [Server thread/INFO] (Minecraft) ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[07:11:36] [Server thread/INFO] (Minecraft) ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[07:11:36] [Server thread/INFO] (Minecraft) ThreadedAnvilChunkStorage: All dimensions are saved
+[07:11:36] [Server thread/INFO] (Minecraft) Game test server shutting down
+
+BUILD SUCCESSFUL in 32s
+7 actionable tasks: 1 executed, 6 up-to-date

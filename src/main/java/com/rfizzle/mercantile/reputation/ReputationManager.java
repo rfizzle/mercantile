@@ -159,6 +159,23 @@ public final class ReputationManager {
     }
 
     /**
+     * Cap decision for gift-source rep (stateful — mutates {@code data}). Awards daily totals
+     * on success and rolls daily counters over when {@code currentDay} is newer than
+     * {@code data.lastCapResetDay}.
+     */
+    public static CapDecision evaluateGiftGain(PlayerData data, MercantileConfig config, long currentDay) {
+        rolloverIfNewDay(data, currentDay);
+        if (data.getDailyReputationEarned() >= config.reputationDailyCap) {
+            return CapDecision.TOTAL_CAP_HIT;
+        }
+        if (data.getDailyGiftRep() >= config.reputationDailyMaxGiftRep) {
+            return CapDecision.SUBCAP_HIT;
+        }
+        data.addDailyGiftRep(config.reputationGiftGain);
+        return CapDecision.AWARDED;
+    }
+
+    /**
      * Cap decision for trade-source rep (stateful — mutates {@code data}). Advances the trade
      * pulse counter on every call, awards daily totals on the gain pulse, and rolls daily
      * counters over when {@code currentDay} is newer than {@code data.lastCapResetDay}. No
@@ -202,6 +219,15 @@ public final class ReputationManager {
 
     public static void rolloverIfNewDay(PlayerData data, long currentDay) {
         if (currentDay > data.getLastCapResetDay()) {
+            if (data.getLastDecayDay() != -1L && data.getScore() < 0) {
+                int daysPassed = (int) (currentDay - data.getLastDecayDay());
+                if (daysPassed > 0) {
+                    int decay = daysPassed * MercantileConfig.get().reputationNegativeDecayPerDay;
+                    int newScore = Math.min(0, data.getScore() + decay);
+                    data.setScore(newScore);
+                }
+            }
+            data.setLastDecayDay(currentDay);
             data.resetDailyCounters(currentDay);
         }
     }
@@ -237,6 +263,23 @@ public final class ReputationManager {
             }
             case SUBCAP_HIT, TOTAL_CAP_HIT -> sendDailyCapMessage(player, data);
             case BELOW_TRADE_THRESHOLD -> { /* unreachable for cycles */ }
+        }
+    }
+
+    public static void tryGainGiftRep(ServerPlayer player) {
+        MercantileConfig config = MercantileConfig.get();
+        if (!config.enableReputation || !config.enableGifting) return;
+        PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
+        migrateIfNeeded(data);
+        long currentDay = player.serverLevel().getGameTime() / 24_000L;
+        CapDecision decision = evaluateGiftGain(data, config, currentDay);
+        switch (decision) {
+            case AWARDED -> {
+                changeScore(player, data, data.getScore() + config.reputationGiftGain);
+                syncToClient(player, data);
+            }
+            case SUBCAP_HIT, TOTAL_CAP_HIT -> sendDailyCapMessage(player, data);
+            case BELOW_TRADE_THRESHOLD -> { /* unreachable for gifts */ }
         }
     }
 
