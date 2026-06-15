@@ -24,9 +24,7 @@ public abstract class WanderingTraderTradeOpenMixin {
         ExclusiveTradesManager.stripInjectedOffers(self);
     }
 
-    @Inject(method = "mobInteract",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/npc/WanderingTrader;displayMerchantGui(Lnet/minecraft/world/entity/player/Player;)V"))
+    @Inject(method = "mobInteract", at = @At("HEAD"))
     private void mercantile$applyWanderingTraderReputation(Player player, InteractionHand hand,
                                                            CallbackInfoReturnable<InteractionResult> cir) {
         if (!MercantileConfig.get().enableReputation) return;
