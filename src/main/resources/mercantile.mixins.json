@@ -23,6 +23,7 @@
         "VillagerGoalPackagesMixin",
         "VillagerGolemSpawnCountMixin",
         "VillagerHealingMixin",
+        "VillagerHurtMixin",
         "VillagerPickupMixin",
         "VillagerProfessionLockMixin",
         "VillagerRestockAccessor",
