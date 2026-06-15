@@ -154,15 +154,7 @@ public abstract class VillagerFollowMixin extends AbstractVillager implements Fo
                 return;
             }
 
-            if (FollowManager.stopFollowing(self)) {
-                if (MercantileConfig.get().enableSendHome) {
-                    boolean hasBed = self.getBrain().hasMemoryValue(MemoryModuleType.HOME);
-                    boolean hasWorkstation = self.getBrain().hasMemoryValue(MemoryModuleType.JOB_SITE);
-                    if (hasBed || hasWorkstation) {
-                        this.mercantile$setReturningHomeSync(true);
-                    }
-                }
-            }
+            FollowManager.stopFollowing(self);
             self.playSound(SoundEvents.VILLAGER_AMBIENT, 1.0f, self.getVoicePitch());
             serverPlayer.displayClientMessage(
                     Component.translatable("mercantile.follow.stop")
