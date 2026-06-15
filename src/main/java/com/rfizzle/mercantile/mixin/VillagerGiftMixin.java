@@ -4,6 +4,7 @@ import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.GiftMappingManager;
 import com.rfizzle.mercantile.reputation.ReputationManager;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.npc.Villager;
@@ -22,7 +23,9 @@ public abstract class VillagerGiftMixin {
         if (!MercantileConfig.get().enableGifting) return;
 
         Villager self = (Villager) (Object) this;
-        String profession = BuiltInRegistries.VILLAGER_PROFESSION.getKey(self.getVillagerData().getProfession()).getPath();
+        ResourceLocation key = BuiltInRegistries.VILLAGER_PROFESSION.getKey(self.getVillagerData().getProfession());
+        if (key == null) return;
+        String profession = key.getPath();
 
         if (GiftMappingManager.isValidGift(profession, stack.getItem())) {
             cir.setReturnValue(true);
@@ -36,7 +39,9 @@ public abstract class VillagerGiftMixin {
         Villager self = (Villager) (Object) this;
         if (self.level().isClientSide) return;
 
-        String profession = BuiltInRegistries.VILLAGER_PROFESSION.getKey(self.getVillagerData().getProfession()).getPath();
+        ResourceLocation key = BuiltInRegistries.VILLAGER_PROFESSION.getKey(self.getVillagerData().getProfession());
+        if (key == null) return;
+        String profession = key.getPath();
         ItemStack stack = itemEntity.getItem();
 
         if (GiftMappingManager.isValidGift(profession, stack.getItem())) {
