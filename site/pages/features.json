@@ -178,9 +178,19 @@
                 "Kill a villager: <span class='text-bone'>−40</span>",
                 "Trade cycling: <span class='text-bone'>+2</span>",
                 "Proximity: <span class='text-bone'>+1 per 10 min</span> (capped at +1/day)",
+                "Gift a profession item: <span class='text-bone'>+1</span> (daily-capped)",
                 "Defend a village from a raid: <span class='text-bone'>+10</span> (bypasses the daily cap)"
               ],
-              "note": "Config: <code class='text-bone'>reputationTradeGain</code>, <code class='text-bone'>reputationCureGain</code>, <code class='text-bone'>reputationAttackLoss</code>, <code class='text-bone'>reputationKillLoss</code>, <code class='text-bone'>reputationCycleGain</code>, <code class='text-bone'>reputationRaidWinGain</code>"
+              "note": "Config: <code class='text-bone'>reputationTradeGain</code>, <code class='text-bone'>reputationCureGain</code>, <code class='text-bone'>reputationAttackLoss</code>, <code class='text-bone'>reputationKillLoss</code>, <code class='text-bone'>reputationCycleGain</code>, <code class='text-bone'>reputationGiftGain</code>, <code class='text-bone'>reputationRaidWinGain</code>"
+            },
+            {
+              "id": "reputation-redemption",
+              "title": "Redemption Path",
+              "html": [
+                "Climb back from Reviled without grinding refused trades. Toss a profession-appropriate item near a villager — crops to a Farmer, iron to an Armorer — and it walks over, accepts the gift, and rewards you with reputation and happy particles.",
+                "Negative reputation also recovers on its own: scores below 0 drift back toward Neutral by a configurable amount each in-game day. Positive reputation never decays."
+              ],
+              "note": "Config: <code class='text-bone'>enableGifting</code>, <code class='text-bone'>reputationDailyMaxGiftRep</code>, <code class='text-bone'>reputationNegativeDecayPerDay</code> · Datapack: <code class='text-bone'>data/mercantile/gift_mappings/</code>"
             },
             {
               "id": "reputation-raid-trader",

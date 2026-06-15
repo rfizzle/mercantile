@@ -159,6 +159,23 @@ public final class ReputationManager {
     }
 
     /**
+     * Cap decision for gift-source rep (stateful — mutates {@code data}). Awards daily totals
+     * on success and rolls daily counters over when {@code currentDay} is newer than
+     * {@code data.lastCapResetDay}.
+     */
+    public static CapDecision evaluateGiftGain(PlayerData data, MercantileConfig config, long currentDay) {
+        rolloverIfNewDay(data, currentDay);
+        if (data.getDailyReputationEarned() >= config.reputationDailyCap) {
+            return CapDecision.TOTAL_CAP_HIT;
+        }
+        if (data.getDailyGiftRep() >= config.reputationDailyMaxGiftRep) {
+            return CapDecision.SUBCAP_HIT;
+        }
+        data.addDailyGiftRep(config.reputationGiftGain);
+        return CapDecision.AWARDED;
+    }
+
+    /**
      * Cap decision for trade-source rep (stateful — mutates {@code data}). Advances the trade
      * pulse counter on every call, awards daily totals on the gain pulse, and rolls daily
      * counters over when {@code currentDay} is newer than {@code data.lastCapResetDay}. No
@@ -202,6 +219,29 @@ public final class ReputationManager {
 
     public static void rolloverIfNewDay(PlayerData data, long currentDay) {
         if (currentDay > data.getLastCapResetDay()) {
+            if (data.getLastDecayDay() != -1L && data.getScore() < 0) {
+                int daysPassed = (int) (currentDay - data.getLastDecayDay());
+                if (daysPassed > 0) {
+                    int decay = daysPassed * MercantileConfig.get().reputationNegativeDecayPerDay;
+                    data.setScore(Math.min(0, data.getScore() + decay));
+                }
+            }
+            data.setLastDecayDay(currentDay);
+            data.resetDailyCounters(currentDay);
+        }
+    }
+
+    // Player-aware overload: routes decay through changeScore so ReputationChangedCallback fires.
+    public static void rolloverIfNewDay(ServerPlayer player, PlayerData data, long currentDay) {
+        if (currentDay > data.getLastCapResetDay()) {
+            if (data.getLastDecayDay() != -1L && data.getScore() < 0) {
+                int daysPassed = (int) (currentDay - data.getLastDecayDay());
+                if (daysPassed > 0) {
+                    int decay = daysPassed * MercantileConfig.get().reputationNegativeDecayPerDay;
+                    changeScore(player, data, Math.min(0, data.getScore() + decay));
+                }
+            }
+            data.setLastDecayDay(currentDay);
             data.resetDailyCounters(currentDay);
         }
     }
@@ -212,6 +252,7 @@ public final class ReputationManager {
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         migrateIfNeeded(data);
         long currentDay = player.serverLevel().getGameTime() / 24_000L;
+        rolloverIfNewDay(player, data, currentDay);
         CapDecision decision = evaluateTradeGain(data, config, currentDay);
         switch (decision) {
             case AWARDED -> {
@@ -229,6 +270,7 @@ public final class ReputationManager {
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         migrateIfNeeded(data);
         long currentDay = player.serverLevel().getGameTime() / 24_000L;
+        rolloverIfNewDay(player, data, currentDay);
         CapDecision decision = evaluateCycleGain(data, config, currentDay);
         switch (decision) {
             case AWARDED -> {
@@ -238,6 +280,38 @@ public final class ReputationManager {
             case SUBCAP_HIT, TOTAL_CAP_HIT -> sendDailyCapMessage(player, data);
             case BELOW_TRADE_THRESHOLD -> { /* unreachable for cycles */ }
         }
+    }
+
+    public static void tryGainGiftRep(ServerPlayer player) {
+        MercantileConfig config = MercantileConfig.get();
+        if (!config.enableReputation || !config.enableGifting) return;
+        PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
+        migrateIfNeeded(data);
+        long currentDay = player.serverLevel().getGameTime() / 24_000L;
+        rolloverIfNewDay(player, data, currentDay);
+        CapDecision decision = evaluateGiftGain(data, config, currentDay);
+        switch (decision) {
+            case AWARDED -> {
+                changeScore(player, data, data.getScore() + config.reputationGiftGain);
+                syncToClient(player, data);
+            }
+            case SUBCAP_HIT, TOTAL_CAP_HIT -> sendDailyCapMessage(player, data);
+            case BELOW_TRADE_THRESHOLD -> { /* unreachable for gifts */ }
+        }
+    }
+
+    // Raid win rep is an intentional bypass similar to cure rep: it skips both the daily total
+    // cap and the per-source sub-caps, and does NOT contribute to dailyReputationEarned.
+    // Defending a village is a rare, heroic act that is rewarded in full.
+    public static void gainRaidWinRep(ServerPlayer player) {
+        MercantileConfig config = MercantileConfig.get();
+        if (!config.enableReputation || !config.enableRaidReputation) return;
+        PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
+        migrateIfNeeded(data);
+        long currentDay = player.serverLevel().getGameTime() / 24_000L;
+        rolloverIfNewDay(player, data, currentDay);
+        changeScore(player, data, data.getScore() + config.reputationRaidWinGain);
+        syncToClient(player, data);
     }
 
     // Cure rep is an intentional bypass: it skips both the daily total cap and the per-source
@@ -250,22 +324,8 @@ public final class ReputationManager {
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         migrateIfNeeded(data);
         long currentDay = player.serverLevel().getGameTime() / 24_000L;
-        rolloverIfNewDay(data, currentDay);
+        rolloverIfNewDay(player, data, currentDay);
         changeScore(player, data, data.getScore() + config.reputationCureGain);
-        syncToClient(player, data);
-    }
-
-    // Raid win rep is an intentional bypass similar to cure rep: it skips both the daily total
-    // cap and the per-source sub-caps, and does NOT contribute to dailyReputationEarned.
-    // Defending a village is a rare, heroic act that is rewarded in full.
-    public static void gainRaidWinRep(ServerPlayer player) {
-        MercantileConfig config = MercantileConfig.get();
-        if (!config.enableReputation || !config.enableRaidReputation) return;
-        PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
-        migrateIfNeeded(data);
-        long currentDay = player.serverLevel().getGameTime() / 24_000L;
-        rolloverIfNewDay(data, currentDay);
-        changeScore(player, data, data.getScore() + config.reputationRaidWinGain);
         syncToClient(player, data);
     }
 
@@ -289,7 +349,7 @@ public final class ReputationManager {
         // Roll daily counters before sending so the HUD reflects a fresh day immediately,
         // even if no rep-gain helper has run yet today.
         long currentDay = player.serverLevel().getGameTime() / 24_000L;
-        rolloverIfNewDay(data, currentDay);
+        rolloverIfNewDay(player, data, currentDay);
         String tierKey = ReputationTier.fromScore(data.getScore()).translationKey();
         MercantileConfig config = MercantileConfig.get();
         ServerPlayNetworking.send(player, new SyncReputationS2CPayload(

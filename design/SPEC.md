@@ -217,6 +217,7 @@ This is distinct from vanilla's per-villager gossip system. Mercantile reputatio
 | Killing a villager | -25 | Stacks with attack penalty from the killing blow |
 | Proximity to villagers | +1 per 10 min | Passive accrual while within 16 blocks of any villager. Tracked via an internal tick counter (12,000 ticks = 10 min). Capped at +1 per in-game day |
 | Successful trade cycling | +2 | Per cycle |
+| Gifting a profession item | +1 | Toss a profession-appropriate item to a villager. Daily-capped (see Gifting below) |
 | Defending a village from a raid | +10 | Granted to each player vanilla awards Hero of the Village. Bypasses the daily cap (see below) |
 
 All values are configurable via the reputation config subsection.
@@ -269,7 +270,8 @@ Mercantile reputation operates as a **parallel system** alongside vanilla gossip
 
 ### Reputation Bounds and Decay
 - **Hard cap:** -200 minimum, +1500 maximum. The buffer above the Honored threshold (1000) allows continued earning without wasted actions, while the cap prevents runaway values.
-- **No decay.** Reputation is earned through deliberate action, not maintained through presence. Decay would punish players for exploring or working on other projects.
+- **Positive reputation does not decay.** Reputation earned through deliberate action is never lost to absence — decay would punish players for exploring or working on other projects.
+- **Negative reputation recovers.** Scores below 0 climb back toward 0 at `reputationNegativeDecayPerDay` points per in-game day (default 1), evaluated at day rollover. This gives a passive redemption path that complements active gifting; positive scores are never touched.
 - **Player death:** Full reputation is retained. Reputation represents a long-term relationship, not a resource.
 
 ### Exclusive Trades Datapack Schema
@@ -305,6 +307,38 @@ Files at `data/mercantile/exclusive_trades/<profession>.json`, `data/mercantile/
 - `min_tier_override`: Per-trade override of the minimum tier.
 - `max_uses` (optional, default 12), `xp_gain` (optional, default 1), and `price_multiplier` (optional, default 0.05) tune each trade's stock, villager XP reward, and demand-based price scaling.
 - Trade format uses 1.21.1's **data component system** for item definitions. The `components` field accepts the same component structure as vanilla `/give` commands and recipe definitions. Items without special components omit the field entirely.
+
+### Gifting
+
+An active reputation-gain path: drop a profession-appropriate item near a villager and it walks over to pick it up, awarding the player who tossed it `reputationGiftGain` reputation (default +1) and emitting happy villager particles.
+
+- **Profession-matched.** A villager only accepts (and only rewards) items mapped to its current profession — a Farmer takes crops, an Armorer takes iron, etc. Items not in the villager's mapping are ignored and trigger no pickup.
+- **Daily-capped.** Gift reputation is bounded per in-game day by `reputationDailyMaxGiftRep` (default 2) and also counts against the shared `reputationDailyCap`, so gifting cannot bypass the overall daily ceiling.
+- **Attribution.** The reward goes to the player the dropped item is targeted at (vanilla item-throw ownership), so only the tosser gains reputation.
+- **Data-driven.** Item-to-profession mappings live in datapacks (see Gift Mappings Datapack Schema below) so packs can override or extend them. Defaults ship for armorer, cleric, farmer, librarian, toolsmith, and weaponsmith.
+- **Toggle:** `enableGifting` (default true). Gated behind `enableReputation`.
+
+Gifting and passive negative-rep decay together form the **redemption path**: a Reviled player can climb back to Neutral by gifting villagers and/or simply waiting, without grinding trades that may be refused at low tiers.
+
+### Gift Mappings Datapack Schema
+
+Files at `data/mercantile/gift_mappings/<profession>.json`, where `<profession>` is the villager profession path (e.g. `farmer`, `armorer`, `librarian`):
+
+```json
+{
+  "replace": false,
+  "items": [
+    "minecraft:wheat",
+    "minecraft:potato",
+    "minecraft:carrot"
+  ]
+}
+```
+
+- `items`: Item IDs this profession accepts as gifts. Unknown item IDs are skipped with a warning.
+- `replace` (optional, default `false`): If `true`, clears any items already mapped to this profession from earlier packs before applying this file's `items`.
+- Without `replace`, multiple packs targeting the same profession merge their `items` lists additively.
+- Mappings reload with the datapack reload lifecycle (`/reload`), like recipes and loot tables.
 
 ### Persistence
 - Stored via Fabric's Attachment API (see Reputation Storage above).

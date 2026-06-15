@@ -33,8 +33,9 @@ bar, vanilla assets where they already map cleanly; no balance-breaking shortcut
 - **Trade Cycling** — refresh a villager's trade pool with emeralds and emerald
   blocks instead of breaking and replacing their workstation.
 - **Reputation** — a five-tier global standing with persistent gossip that
-  travels with villagers across the world. Defend a village from a raid for a
-  bonus, and earn a wandering trader's exclusive offer at high standing.
+  travels with villagers across the world. Defend raids and gift villagers to
+  climb the tiers (or let negative standing decay back from Reviled); high
+  standing even unlocks a wandering trader's exclusive offer.
 - **Sentry Pylon** — an iron-fueled defense block that spawns temporary iron
   golems to guard your village.
 - **Reputation HUD** — a compact on-screen tier readout shown next to nearby

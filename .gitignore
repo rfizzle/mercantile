@@ -37,3 +37,4 @@ Thumbs.db
 # stray runtime artifacts
 replay_pid*.log
 hs_err_pid*.log
+gametest_output.log

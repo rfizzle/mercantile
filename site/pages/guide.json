@@ -97,9 +97,10 @@
                 "Cure a zombie villager: <strong class='text-bone'>+5</strong> (one-time per villager UUID)",
                 "Cycle a villager's trades: <strong class='text-bone'>+1</strong>",
                 "Stand near a villager for 10 minutes: <strong class='text-bone'>+1</strong> (capped at +1/day total)",
+                "Gift a villager a profession item: <strong class='text-bone'>+1</strong> (toss crops to a Farmer, iron to an Armorer, etc.)",
                 "Defend a village from a raid: <strong class='text-bone'>+10</strong> (awarded with Hero of the Village; bypasses the daily cap)"
               ,
-                "Earnings from trades and cycles are capped at <strong class='text-bone'>5 reputation per in-game day</strong> by default (<a href='/config.html#config-reputation' class='text-emerald hover:underline'>configurable</a>). Raid wins and zombie cures are granted in full on top of that cap."
+                "Earnings from trades, cycles, and gifts are capped at <strong class='text-bone'>5 reputation per in-game day</strong> by default (<a href='/config.html#config-reputation' class='text-emerald hover:underline'>configurable</a>). Raid wins and zombie cures are granted in full on top of that cap."
               ]
             }
           ]
@@ -116,6 +117,15 @@
                 "Kill a villager: <strong class='text-bone'>−40</strong>"
               ]
             }
+          ]
+        },
+        {
+          "type": "sub",
+          "title": "Recovering from a bad reputation",
+          "blocks": [
+            { "type": "prose", "html": [
+              "Fallen to <strong class='text-bone'>Reviled</strong> and finding villagers refuse to trade? There are two ways back. <strong class='text-bone'>Gifting</strong> — drop a profession-appropriate item next to a villager and it will walk over, accept the gift, and nudge your reputation up (with happy particles). And <strong class='text-bone'>time</strong> — a negative score slowly climbs back toward Neutral on its own, by default 1 point per in-game day. Positive reputation never decays, so you only ever drift upward."
+            ] }
           ]
         },
         {

@@ -235,6 +235,34 @@
                   "true",
                   "—",
                   "Offer a wandering trader a bonus trade at Trusted tier and above (one sticky offer per trader)."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>enableGifting</code>",
+                  "boolean",
+                  "true",
+                  "—",
+                  "Allow villagers to accept profession-matched item gifts for reputation. Gated behind <code class='text-bone'>enableReputation</code>."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>reputationGiftGain</code>",
+                  "int",
+                  "1",
+                  "0+",
+                  "Score gained per accepted gift item."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>reputationDailyMaxGiftRep</code>",
+                  "int",
+                  "2",
+                  "1–10",
+                  "Daily cap on reputation earned from gifting (also counts against <code class='text-bone'>reputationDailyCap</code>)."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>reputationNegativeDecayPerDay</code>",
+                  "int",
+                  "1",
+                  "0+",
+                  "Points a negative reputation recovers toward 0 each in-game day. <code class='text-bone'>0</code> disables decay; positive scores are never affected."
                 ]
               ]
             }
@@ -629,7 +657,7 @@
         {
           "type": "code",
           "small": true,
-          "code": "{\n  \"enableVillagerPickup\": true,\n  \"pickupXpCost\": 5,\n  \"enableNames\": true,\n  \"enableTradeCycling\": true,\n  \"tradeCycleEmeraldCost\": 6,\n  \"enableReputation\": true,\n  \"reputationTradeGain\": 1,\n  \"reputationCureGain\": 5,\n  \"reputationAttackLoss\": 15,\n  \"reputationKillLoss\": 40,\n  \"reputationCycleGain\": 1,\n  \"reputationDailyCap\": 5,\n  \"reputationTradesPerGain\": 5,\n  \"reputationDailyMaxTradeRep\": 2,\n  \"reputationDailyMaxCycleRep\": 1,\n  \"enableRaidReputation\": true,\n  \"reputationRaidWinGain\": 10,\n  \"enableWanderingTraderRep\": true,\n  \"enableFollowMode\": true,\n  \"maxFollowingVillagers\": 3,\n  \"enableSendHome\": true,\n  \"enablePathfindingFixes\": true,\n  \"enablePathfindingDoors\": true,\n  \"enablePathfindingStairs\": true,\n  \"enablePathfindingLadders\": true,\n  \"enablePathfindingWater\": true,\n  \"enableBulkTrading\": true,\n  \"enableProfessionLock\": true,\n  \"enableHealing\": true,\n  \"healingMultiplier\": 2.0,\n  \"enableRestockIndicator\": true,\n  \"enableDemandTransparency\": true,\n  \"enableBreedingTooltip\": true,\n  \"enableStateIndicators\": true,\n  \"enableSentryPylon\": true,\n  \"enablePylonBellAlarm\": true,\n  \"pylonDetectionRadius\": 32,\n  \"pylonMaxFuel\": 8,\n  \"pylonMaxGolems\": 3,\n  \"sentryDespawnSeconds\": 30,\n  \"villagerSoundVolume\": 1.0,\n  \"enableWorkstationVis\": true,\n  \"enableBellRadiusVis\": true,\n  \"enableInfoPanel\": true,\n  \"enableReputationHud\": true\n}"
+          "code": "{\n  \"enableVillagerPickup\": true,\n  \"pickupXpCost\": 5,\n  \"enableNames\": true,\n  \"enableTradeCycling\": true,\n  \"tradeCycleEmeraldCost\": 6,\n  \"enableReputation\": true,\n  \"reputationTradeGain\": 1,\n  \"reputationCureGain\": 5,\n  \"reputationAttackLoss\": 15,\n  \"reputationKillLoss\": 40,\n  \"reputationCycleGain\": 1,\n  \"reputationDailyCap\": 5,\n  \"reputationTradesPerGain\": 5,\n  \"reputationDailyMaxTradeRep\": 2,\n  \"reputationDailyMaxCycleRep\": 1,\n  \"enableRaidReputation\": true,\n  \"reputationRaidWinGain\": 10,\n  \"enableWanderingTraderRep\": true,\n  \"enableGifting\": true,\n  \"reputationGiftGain\": 1,\n  \"reputationDailyMaxGiftRep\": 2,\n  \"reputationNegativeDecayPerDay\": 1,\n  \"enableFollowMode\": true,\n  \"maxFollowingVillagers\": 3,\n  \"enableSendHome\": true,\n  \"enablePathfindingFixes\": true,\n  \"enablePathfindingDoors\": true,\n  \"enablePathfindingStairs\": true,\n  \"enablePathfindingLadders\": true,\n  \"enablePathfindingWater\": true,\n  \"enableBulkTrading\": true,\n  \"enableProfessionLock\": true,\n  \"enableHealing\": true,\n  \"healingMultiplier\": 2.0,\n  \"enableRestockIndicator\": true,\n  \"enableDemandTransparency\": true,\n  \"enableBreedingTooltip\": true,\n  \"enableStateIndicators\": true,\n  \"enableSentryPylon\": true,\n  \"enablePylonBellAlarm\": true,\n  \"pylonDetectionRadius\": 32,\n  \"pylonMaxFuel\": 8,\n  \"pylonMaxGolems\": 3,\n  \"sentryDespawnSeconds\": 30,\n  \"villagerSoundVolume\": 1.0,\n  \"enableWorkstationVis\": true,\n  \"enableBellRadiusVis\": true,\n  \"enableInfoPanel\": true,\n  \"enableReputationHud\": true\n}"
         }
       ]
     }

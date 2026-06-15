@@ -91,12 +91,15 @@ running parallel to vanilla gossip.
 | Honored | 1000+ | Best discount (15%), all exclusive trades |
 
 Reputation goes up for trading, curing zombie villagers, cycling trades,
-spending time near villagers, and defending the village from raids (any player
-awarded Hero of the Village gains a full bonus, outside the daily cap); it
-goes down for hitting and killing them. Exclusive trades — per-profession,
-cross-profession, and a sticky bonus offer from wandering traders at Trusted
-tier and up — appear in your trade list when you hit the right tier. Other
-players trading with the same villager see their own list at their own tier.
+spending time near villagers, gifting profession-appropriate items, and
+defending the village from raids (any player awarded Hero of the Village gains
+a full bonus, outside the daily cap); it goes down for hitting and killing
+them. Fallen out of favor? Negative reputation slowly recovers toward neutral
+on its own, and gifting villagers speeds the climb — even a Reviled player has
+a clear path back. Exclusive trades — per-profession, cross-profession, and a
+sticky bonus offer from wandering traders at Trusted tier and up — appear in
+your trade list when you hit the right tier. Other players trading with the
+same villager see their own list at their own tier.
 
 ### Trade Cycling
 
