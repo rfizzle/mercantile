@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.npc.Villager;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,6 +42,7 @@ public final class FollowManager {
         }
 
         ((FollowableVillager) villager).mercantile$setFollowingSync(true);
+        ((FollowableVillager) villager).mercantile$setReturningHomeSync(false);
         broadcastFollowState(villager, true);
         return true;
     }
@@ -80,6 +82,13 @@ public final class FollowManager {
             return false;
         }
         ((FollowableVillager) villager).mercantile$setFollowingSync(false);
+        if (MercantileConfig.get().enableSendHome) {
+            boolean hasBed = villager.getBrain().hasMemoryValue(MemoryModuleType.HOME);
+            boolean hasWorkstation = villager.getBrain().hasMemoryValue(MemoryModuleType.JOB_SITE);
+            if (hasBed || hasWorkstation) {
+                ((FollowableVillager) villager).mercantile$setReturningHomeSync(true);
+            }
+        }
         broadcastFollowState(villager, false);
         return true;
     }

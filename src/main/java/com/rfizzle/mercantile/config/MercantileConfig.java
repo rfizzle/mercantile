@@ -51,6 +51,7 @@ public class MercantileConfig {
     // Follow Mode
     public boolean enableFollowMode = true;
     public int maxFollowingVillagers = 3;
+    public boolean enableSendHome = true;
 
     // Pathfinding
     public boolean enablePathfindingFixes = true;
@@ -81,6 +82,7 @@ public class MercantileConfig {
 
     // Sentry Pylon
     public boolean enableSentryPylon = true;
+    public boolean enablePylonBellAlarm = true;
     public int pylonDetectionRadius = 32;
     public int pylonMaxFuel = 8;
     public int pylonMaxGolems = 3;
@@ -111,6 +113,7 @@ public class MercantileConfig {
         reputationAttackLoss = Math.clamp(reputationAttackLoss, 0, Integer.MAX_VALUE);
         reputationKillLoss = Math.clamp(reputationKillLoss, 0, Integer.MAX_VALUE);
         reputationCycleGain = Math.clamp(reputationCycleGain, 0, Integer.MAX_VALUE);
+        reputationRaidWinGain = Math.clamp(reputationRaidWinGain, 0, Integer.MAX_VALUE);
         reputationDailyCap = Math.clamp(reputationDailyCap, 1, 50);
         reputationTradesPerGain = Math.clamp(reputationTradesPerGain, 1, 20);
         reputationDailyMaxTradeRep = Math.clamp(reputationDailyMaxTradeRep, 1, 10);
