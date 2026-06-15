@@ -223,8 +223,22 @@ public final class ReputationManager {
                 int daysPassed = (int) (currentDay - data.getLastDecayDay());
                 if (daysPassed > 0) {
                     int decay = daysPassed * MercantileConfig.get().reputationNegativeDecayPerDay;
-                    int newScore = Math.min(0, data.getScore() + decay);
-                    data.setScore(newScore);
+                    data.setScore(Math.min(0, data.getScore() + decay));
+                }
+            }
+            data.setLastDecayDay(currentDay);
+            data.resetDailyCounters(currentDay);
+        }
+    }
+
+    // Player-aware overload: routes decay through changeScore so ReputationChangedCallback fires.
+    public static void rolloverIfNewDay(ServerPlayer player, PlayerData data, long currentDay) {
+        if (currentDay > data.getLastCapResetDay()) {
+            if (data.getLastDecayDay() != -1L && data.getScore() < 0) {
+                int daysPassed = (int) (currentDay - data.getLastDecayDay());
+                if (daysPassed > 0) {
+                    int decay = daysPassed * MercantileConfig.get().reputationNegativeDecayPerDay;
+                    changeScore(player, data, Math.min(0, data.getScore() + decay));
                 }
             }
             data.setLastDecayDay(currentDay);
@@ -238,6 +252,7 @@ public final class ReputationManager {
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         migrateIfNeeded(data);
         long currentDay = player.serverLevel().getGameTime() / 24_000L;
+        rolloverIfNewDay(player, data, currentDay);
         CapDecision decision = evaluateTradeGain(data, config, currentDay);
         switch (decision) {
             case AWARDED -> {
@@ -255,6 +270,7 @@ public final class ReputationManager {
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         migrateIfNeeded(data);
         long currentDay = player.serverLevel().getGameTime() / 24_000L;
+        rolloverIfNewDay(player, data, currentDay);
         CapDecision decision = evaluateCycleGain(data, config, currentDay);
         switch (decision) {
             case AWARDED -> {
@@ -272,6 +288,7 @@ public final class ReputationManager {
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         migrateIfNeeded(data);
         long currentDay = player.serverLevel().getGameTime() / 24_000L;
+        rolloverIfNewDay(player, data, currentDay);
         CapDecision decision = evaluateGiftGain(data, config, currentDay);
         switch (decision) {
             case AWARDED -> {
@@ -293,7 +310,7 @@ public final class ReputationManager {
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         migrateIfNeeded(data);
         long currentDay = player.serverLevel().getGameTime() / 24_000L;
-        rolloverIfNewDay(data, currentDay);
+        rolloverIfNewDay(player, data, currentDay);
         changeScore(player, data, data.getScore() + config.reputationCureGain);
         syncToClient(player, data);
     }
@@ -318,7 +335,7 @@ public final class ReputationManager {
         // Roll daily counters before sending so the HUD reflects a fresh day immediately,
         // even if no rep-gain helper has run yet today.
         long currentDay = player.serverLevel().getGameTime() / 24_000L;
-        rolloverIfNewDay(data, currentDay);
+        rolloverIfNewDay(player, data, currentDay);
         String tierKey = ReputationTier.fromScore(data.getScore()).translationKey();
         MercantileConfig config = MercantileConfig.get();
         ServerPlayNetworking.send(player, new SyncReputationS2CPayload(

@@ -106,7 +106,7 @@ public class GiftingGameTest implements FabricGameTest {
         data.resetDailyCounters(startDay);
 
         long nextDay = startDay + 1;
-        ReputationManager.rolloverIfNewDay(data, nextDay);
+        ReputationManager.rolloverIfNewDay(player, data, nextDay);
 
         int decayPerDay = MercantileConfig.get().reputationNegativeDecayPerDay;
         int expectedScore = -10 + decayPerDay;
@@ -114,13 +114,13 @@ public class GiftingGameTest implements FabricGameTest {
                 "Expected score " + expectedScore + " after 1 day decay, got " + data.getScore());
 
         long manyDaysLater = nextDay + 100;
-        ReputationManager.rolloverIfNewDay(data, manyDaysLater);
+        ReputationManager.rolloverIfNewDay(player, data, manyDaysLater);
         helper.assertTrue(data.getScore() == 0,
                 "Expected score 0 after long decay, got " + data.getScore());
 
         data.setScore(10);
         data.setLastDecayDay(manyDaysLater);
-        ReputationManager.rolloverIfNewDay(data, manyDaysLater + 1);
+        ReputationManager.rolloverIfNewDay(player, data, manyDaysLater + 1);
         helper.assertTrue(data.getScore() == 10,
                 "Positive reputation should not decay, got " + data.getScore());
 
