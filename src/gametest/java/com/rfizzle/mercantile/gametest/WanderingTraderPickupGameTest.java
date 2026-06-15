@@ -174,12 +174,17 @@ public class WanderingTraderPickupGameTest implements FabricGameTest {
         trader.setCustomName(Component.literal("Testname"));
         trader.setDespawnDelay(7777);
 
+        // A freshly spawned wandering trader carries a random selection of vanilla
+        // trades. Selecting our offer by result type alone risks matching one of those
+        // (a future trade-table change could add a wheat sale), so start from a clean
+        // list and add only the controlled offer this test asserts on.
         MerchantOffer offer = new MerchantOffer(
                 new ItemCost(Items.EMERALD, 3),
                 new ItemStack(Items.WHEAT, 8),
                 16, 1, 0.05f);
         offer.increaseUses();
         offer.increaseUses();
+        trader.getOffers().clear();
         trader.getOffers().add(offer);
 
         int snapshotDespawn = trader.getDespawnDelay();
@@ -363,11 +368,17 @@ public class WanderingTraderPickupGameTest implements FabricGameTest {
         trader.setCustomName(Component.literal("Caravan-Joe"));
         trader.setDespawnDelay(5432);
 
+        // A freshly spawned wandering trader carries a random selection of vanilla trades,
+        // and that pool includes a pumpkin sale (ItemsForEmeralds(Items.PUMPKIN, ...)) with
+        // uses=0. Selecting our offer by result type alone would intermittently match that
+        // vanilla offer instead, so start from a clean list and add only the controlled
+        // offer this test asserts on.
         MerchantOffer offer = new MerchantOffer(
                 new ItemCost(Items.EMERALD, 5),
                 new ItemStack(Items.PUMPKIN, 1),
                 12, 1, 0.05f);
         offer.increaseUses();
+        trader.getOffers().clear();
         trader.getOffers().add(offer);
 
         int snapshotDespawn = trader.getDespawnDelay();
