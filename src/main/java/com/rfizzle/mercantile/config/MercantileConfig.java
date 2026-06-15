@@ -77,6 +77,7 @@ public class MercantileConfig {
 
     // Sentry Pylon
     public boolean enableSentryPylon = true;
+    public boolean enablePylonBellAlarm = true;
     public int pylonDetectionRadius = 32;
     public int pylonMaxFuel = 8;
     public int pylonMaxGolems = 3;
