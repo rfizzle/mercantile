@@ -109,6 +109,7 @@ public abstract class VillagerFollowMixin extends AbstractVillager implements Fo
         }
     }
 
+
     @Inject(method = "tick", at = @At("TAIL"))
     private void mercantile$followTick(CallbackInfo ci) {
         if (!this.level().isClientSide) return;
