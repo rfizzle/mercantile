@@ -48,7 +48,8 @@
             "com.rfizzle.mercantile.gametest.BreedingTooltipGameTest",
             "com.rfizzle.mercantile.gametest.StateIndicatorGameTest",
             "com.rfizzle.mercantile.gametest.TradeIndexGameTest",
-            "com.rfizzle.mercantile.gametest.SentryPylonHopperGameTest"
+            "com.rfizzle.mercantile.gametest.SentryPylonHopperGameTest",
+            "com.rfizzle.mercantile.gametest.ExclusiveTradesGameTest"
         ]
     },
     "custom": {
