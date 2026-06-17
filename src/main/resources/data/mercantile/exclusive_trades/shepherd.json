@@ -1,0 +1,17 @@
+{
+  "replace": false,
+  "min_tier": "liked",
+  "trades": [
+    {
+      "input_1": { "item": "minecraft:emerald", "count": 1 },
+      "output": { "item": "minecraft:white_wool", "count": 16 },
+      "max_uses": 12
+    },
+    {
+      "input_1": { "item": "minecraft:emerald", "count": 2 },
+      "output": { "item": "minecraft:painting", "count": 1 },
+      "max_uses": 12,
+      "min_tier_override": "trusted"
+    }
+  ]
+}

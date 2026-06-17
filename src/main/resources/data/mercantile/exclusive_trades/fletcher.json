@@ -1,0 +1,17 @@
+{
+  "replace": false,
+  "min_tier": "trusted",
+  "trades": [
+    {
+      "input_1": { "item": "minecraft:emerald", "count": 2 },
+      "output": { "item": "minecraft:flint", "count": 16 },
+      "max_uses": 12
+    },
+    {
+      "input_1": { "item": "minecraft:emerald", "count": 4 },
+      "output": { "item": "minecraft:spectral_arrow", "count": 8 },
+      "max_uses": 12,
+      "min_tier_override": "honored"
+    }
+  ]
+}

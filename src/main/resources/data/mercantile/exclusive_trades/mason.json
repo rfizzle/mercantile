@@ -1,0 +1,17 @@
+{
+  "replace": false,
+  "min_tier": "trusted",
+  "trades": [
+    {
+      "input_1": { "item": "minecraft:emerald", "count": 1 },
+      "output": { "item": "minecraft:calcite", "count": 16 },
+      "max_uses": 12
+    },
+    {
+      "input_1": { "item": "minecraft:emerald", "count": 1 },
+      "output": { "item": "minecraft:tuff", "count": 16 },
+      "max_uses": 12,
+      "min_tier_override": "honored"
+    }
+  ]
+}
