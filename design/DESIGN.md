@@ -129,8 +129,9 @@ against it.
 
 The bell-vs-emerald motif question (§9) is **resolved: a single cut emerald
 gem**, the most legible motif at 16px and a direct tie to the reputation =
-emerald economy. Authored as an ASCII glyph spec with concord's glyph tool;
-master at `art/hud-icon-16.png`, source at `art/glyphs/hud-emerald-gem.glyph`.
+emerald economy. Authored as an ASCII glyph spec through Concord's glyph pipeline (`/glyph`,
+`mc-textures` skill); master at `art/hud-icon-16.png`, source at
+`art/glyphs/hud-emerald-gem.glyph`.
 To regenerate or revise:
 
 ```
@@ -140,8 +141,9 @@ Colors: Emerald (#50C878) body, Emerald Bright (#6DDB94) top facet, deeper
         emerald (#2C8A57) lower-right facet shadow, ink (#0A0A0A) outline,
         bone (#E8E0D4) glint; must read on a 50–60% black HUD box
 Notes: Stays legible next to Tribulation's skull and Prosperity's chest in
-       the HUD stack. Edit art/glyphs/hud-emerald-gem.glyph, then run
-       `python3 scripts/glyph.py <spec>` in the concord repo.
+       the HUD stack. Edit art/glyphs/hud-emerald-gem.glyph, then re-render
+       with `/glyph` (or `python3 .ai/skills/mc-textures/scripts/glyph.py
+       art/glyphs/hud-emerald-gem.glyph`).
 ```
 
 Logo regeneration prompts (if §9 resolves toward the stone-frame formula) belong
