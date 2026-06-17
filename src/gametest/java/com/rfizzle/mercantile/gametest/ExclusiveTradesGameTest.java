@@ -13,7 +13,6 @@ import net.minecraft.world.entity.npc.VillagerType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.trading.ItemCost;
-import net.minecraft.world.item.trading.MerchantOffers;
 
 import java.util.List;
 import java.util.Map;
