@@ -2,7 +2,7 @@
 
 Minecraft 1.21.1 Fabric mod. Villager and trade overhaul.
 
-**Asset philosophy:** Custom pixel-art textures for mod-specific visuals (authored through the Concord texture pipeline — `mc-textures` skill, concord `design/DESIGN-SYSTEM.md` §8 — with `.glyph` sources kept beside the masters); vanilla assets where they already map cleanly. All sounds use existing vanilla sound events. Custom particle textures are used for mod-specific effects (pickup, trade cycling, follow mode, sentry pylon) to give each feature a distinct visual identity. Visualization features (workstation links, bell radius) use vanilla `dust` particles since they are functional overlays, not themed effects. The sentry pylon has custom block textures (top/side/bottom). Villager pickup items use **player heads** with pre-existing skin textures sourced from minecraft-heads.com and hosted permanently on Mojang's CDN.
+**Asset philosophy:** Custom pixel-art textures for mod-specific visuals (authored through Concord's glyph pipeline — `/glyph`, `mc-textures` skill, concord `design/DESIGN-SYSTEM.md` §8 — with `.glyph` sources kept beside the masters), and vanilla assets where one is genuinely already right. Sounds stay vanilla where the cue is organic (villager voices, bells, anvil, iron-golem foley — which vanilla already nails); custom synthesized cues would be added through the `/sfx` pipeline where a sound benefits from its own identity (concord `design/DESIGN-SYSTEM.md` §9). Custom particle textures are used for mod-specific effects (pickup, trade cycling, follow mode, sentry pylon) to give each feature a distinct visual identity. Visualization features (workstation links, bell radius) use vanilla `dust` particles since they are functional overlays, not themed effects. The sentry pylon has custom block textures (top/side/bottom). Villager pickup items use **player heads** with pre-existing skin textures sourced from minecraft-heads.com and hosted permanently on Mojang's CDN.
 
 ---
 
@@ -1047,7 +1047,7 @@ Most complex feature. Custom block, block entity, AI goals, spawning logic, visu
 
 ## Sound Design
 
-All sounds use **vanilla Minecraft sound events** — no custom audio assets. This keeps the mod lightweight and consistent with the game's audio profile.
+Every cue here is **organic** — villager voices, bells, anvil, iron-golem foley — which vanilla already nails, so all current sounds map to vanilla `SoundEvent`s; pure synthesis would only make them feel fake. Custom synthesized cues (via the `/sfx` pipeline) are added where a sound benefits from its own identity, per concord `design/DESIGN-SYSTEM.md` §9.
 
 ### Sound Mapping
 
