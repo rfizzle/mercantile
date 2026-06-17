@@ -38,3 +38,9 @@ Thumbs.db
 replay_pid*.log
 hs_err_pid*.log
 gametest_output.log
+
+# art masters: commit the .sfx/.glyph sources of truth; ignore rendered byproducts
+# (the shipping copies live under src/main/resources/assets/mercantile/)
+art/audio/*.ogg
+art/audio/*.png
+art/glyphs/*.png
