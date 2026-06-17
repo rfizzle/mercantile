@@ -1,6 +1,7 @@
 {
     "itemGroup.mercantile": "Mercantile",
     "block.mercantile.sentry_pylon": "Sentry Pylon",
+    "mercantile.subtitle.sentry_pylon_alarm": "Sentry Pylon alarms",
     "item.mercantile.villager": "Villager",
     "command.mercantile.reload": "Mercantile config reloaded",
     "command.mercantile.reputation.self": "Your reputation: %1$s (%2$s) — %3$s/%4$s today",

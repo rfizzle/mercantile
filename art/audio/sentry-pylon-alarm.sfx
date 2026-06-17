@@ -1,0 +1,36 @@
+{
+  "name": "sentry-pylon-alarm",
+  "sample_rate": 44100,
+  "peak_dbfs": -1.0,
+  "subtitle": "mercantile.subtitle.sentry_pylon_alarm",
+  "seed": 7,
+  "layers": [
+    {
+      "waveform": "square",
+      "gain": 0.62,
+      "env": {"attack": 0.004, "decay": 0.03, "sustain": 0.85, "release": 0.06},
+      "filter": {"type": "lowpass", "cutoff": 3800},
+      "notes": [
+        {"freq": 740, "start": 0.0, "duration": 0.30},
+        {"freq": 523, "start": 0.34, "duration": 0.36}
+      ]
+    },
+    {
+      "waveform": "saw",
+      "gain": 0.34,
+      "env": {"attack": 0.004, "decay": 0.03, "sustain": 0.85, "release": 0.06},
+      "filter": {"type": "lowpass", "cutoff": 2600},
+      "notes": [
+        {"freq": 747, "start": 0.0, "duration": 0.30},
+        {"freq": 528, "start": 0.34, "duration": 0.36}
+      ]
+    },
+    {
+      "waveform": "noise",
+      "start": 0.0, "duration": 0.012, "gain": 0.28,
+      "env": {"attack": 0.0005, "decay": 0.01, "sustain": 0.0, "release": 0.015},
+      "filter": {"type": "highpass", "cutoff": 2500},
+      "repeat": {"count": 2, "interval": 0.34}
+    }
+  ]
+}

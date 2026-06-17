@@ -38,6 +38,17 @@
 | Pylon mote (particle) | **MISSING** | `assets/mercantile/textures/particle/pylon_mote.png` |
 | Pylon spark (particle) | **MISSING** | `assets/mercantile/textures/particle/pylon_spark.png` |
 
+## Audio (`.sfx` — procedural synthesis)
+
+Custom sound cues authored as `.sfx` specs and rendered to Ogg Vorbis through the
+`mc-audio` pipeline (concord [`design/DESIGN-SYSTEM.md`](../../concord/design/DESIGN-SYSTEM.md) §9).
+The `.sfx` is the source of truth; the rendered `.ogg`/`.report.png` byproducts are git-ignored
+under `art/audio/`, and the shipping copy lives under `assets/`.
+
+| Asset | `.sfx` source | Final asset |
+|---|---|---|
+| Sentry pylon alarm | `art/audio/sentry-pylon-alarm.sfx` | `assets/mercantile/sounds/sentry_pylon_alarm.ogg` |
+
 ## Not yet created
 
 | Asset | Source | Final asset |
