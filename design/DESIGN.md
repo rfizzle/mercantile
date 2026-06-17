@@ -95,31 +95,11 @@ against it.
 
 ---
 
-## 2. Asset Inventory
+## 2. Assets
 
-### Existing Assets
-
-| Asset | Location | Status |
-|-------|----------|--------|
-| Full logo (master) | `art/logo.png` | Final |
-| Mod icon 128×128 (master) | `art/icon-128.png` | Final |
-| Web logo | `docs/logo.png` | Derived copy |
-| Web icon | `docs/icon.png` | Derived copy |
-| In-jar icon | `src/main/resources/assets/mercantile/icon.png` | Final |
-| OG image (1200×630) | `docs/og-image.png` | Final |
-| Apple touch icon | `docs/apple-touch-icon.png` | Final |
-| Favicons | `docs/favicon.ico`, `docs/favicon-32.png` | Final |
-| Sentry pylon block textures | `assets/mercantile/textures/block/` | Final — the only custom block textures |
-| Custom particle textures | `assets/mercantile/textures/particle/` | Final (pickup, trade cycling, follow, pylon, profession-tinted link mote, workstation status markers ✓/?) |
-| GUI sprites | `assets/mercantile/textures/gui/sprites/` | Final (info/close buttons, merchant lock/unlock glyphs, reputation HUD emerald gem) |
-| HUD glyph master + sources | `art/hud-icon-16.png`, `art/glyphs/*.glyph` | Final — emerald-gem glyph; sources regenerate via concord's glyph tool |
-
-### Needed Assets
-
-| Asset | Generator | Priority | Spec |
-|-------|-----------|----------|------|
-| Store gallery screenshots | Screenshot | Medium | 1920×1080, 3–5 shots per `VISION.md` §4 listing standard; at least one captioned sibling-integration shot when those land |
-| `art/exploration/` | — | Low | Directory for style explorations and generation prompts, per `REPO-LAYOUT.md` §1 — empty until the logo-formula question (§9) is worked |
+The full asset manifest — every `.glyph` source under `art/`, the final
+resource/site path it ships as, and what is still `MISSING` a glyph source —
+lives in [`ASSETS.md`](ASSETS.md).
 
 ---
 
@@ -192,7 +172,7 @@ screen per the standard's visibility rules.
    which does not exist; creating it is Mercantile roadmap item 1
    (`VISION.md` §5.3, §6).
 3. ~~**Glyph.** Currently blits the full mod icon scaled to 16×16; needs the
-   dedicated `hud-icon-16.png` (§2).~~ **Done** — slot 2 now blits the custom
+   dedicated `hud-icon-16.png` (see [`ASSETS.md`](ASSETS.md)).~~ **Done** — slot 2 now blits the custom
    `mercantile:reputation_badge` emerald-gem sprite (master `art/hud-icon-16.png`).
 4. **Anchor config.** Top-left only today; the standard wants a corner anchor
    enum + pixel offsets.
@@ -278,7 +258,7 @@ Recorded so they read as *undecided*, not as omissions:
    neutrals? Recommendation in VISION is to adopt; no pair has been chosen.
 2. ~~**HUD glyph motif.** Bell vs. emerald.~~ Resolved 2026-06-14 — **single
    emerald gem** chosen (most legible at 16px; ties to reputation = emerald).
-   Shipped as `art/hud-icon-16.png` / `mercantile:reputation_badge` (§2, §3).
+   Shipped as `art/hud-icon-16.png` / `mercantile:reputation_badge` (see [`ASSETS.md`](ASSETS.md) and §3).
 3. ~~**Logo vs. stone-frame formula.**~~ Resolved 2026-06-12 — the shipped
    market-stall medallion is ratified as-is in `VISION.md` §3.2; the
    bell-over-emeralds arch proposal is retired. The stone-frame formula
