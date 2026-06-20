@@ -45,9 +45,9 @@ Custom sound cues authored as `.sfx` specs and rendered to Ogg Vorbis through th
 The `.sfx` is the source of truth; the rendered `.ogg`/`.report.png` byproducts are git-ignored
 under `art/audio/`, and the shipping copy lives under `assets/`.
 
-| Asset | `.sfx` source | Final asset |
-|---|---|---|
-| Sentry pylon alarm | `art/audio/sentry-pylon-alarm.sfx` | `assets/mercantile/sounds/sentry_pylon_alarm.ogg` |
+_None currently._ Every cue maps to a vanilla `SoundEvent` (see SPEC §Sound Design) — the
+sentry pylon's threat alert now rides the vanilla bell ring at extended range rather than a
+custom synthesized cue.
 
 ## Not yet created
 

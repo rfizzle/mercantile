@@ -700,8 +700,8 @@ Shaped recipe (3x3 crafting grid):
 
 ### Bell Alarm
 - On detecting a hostile, the pylon rings the **nearest village bell** within its detection radius using the standard vanilla bell ring (sound + swing), drawing players to the threat. Located via the village point-of-interest system; if no bell is in range, nothing happens.
-- Alongside the bell ring, the pylon emits a short synthesized **alarm cue** (`mercantile:block.sentry_pylon.alarm`) at its own position. The villager-glow broadcast accompanying a bell ring reaches 96 blocks, while the vanilla bell only carries ~16–32, so the pylon-local cue gives a distant player an audible, localizable alert instead of silently glowing villagers. It is a custom cue produced through the `mc-audio` `.sfx` pipeline (master at `art/audio/sentry-pylon-alarm.sfx`).
-- The alarm fires on threat detection regardless of whether a golem is spawned, and is **rate-limited to once per 10 seconds** (200-tick cooldown, persisted across save/load) so a sustained threat does not ring continuously. The bell ring and the pylon cue share this cooldown.
+- **Extended ring range:** because the villager-glow broadcast accompanying *any* bell ring reaches 96 blocks while the vanilla bell only carries ~16–32, the ring's own sound is amplified to cover the full 96-block radius (volume 6.0 on the variable-range `minecraft:block.bell.use` event ⇒ 16 × 6 = 96 blocks). This is a property of the bell ring itself, not the pylon — every bell ring (player-, pylon-, or otherwise-triggered) carries this far, so a distant player hears the ring and isn't left with silently glowing villagers. Implemented in `BellBlockMixin`; gated on `enableBellRadiusVis` (the same toggle as the glow visualization), so disabling the glow restores the vanilla ~32-block reach.
+- The bell ring fires on threat detection regardless of whether a golem is spawned, and is **rate-limited to once per 10 seconds** (200-tick cooldown, persisted across save/load) so a sustained threat does not ring continuously.
 - Toggled by `enablePylonBellAlarm` (requires the pylon itself to be enabled via `enableSentryPylon`).
 
 ### Redstone Interaction
