@@ -656,6 +656,7 @@ A crafted block placed in a village (or anywhere). Visually distinct — iron-an
 
 ### Spawning
 - When a hostile mob is detected and fuel is available, the pylon spawns an iron golem at a valid position near the threat (within the detection radius, on solid ground).
+- **Line of sight required:** the spawn position must have an unobstructed line to the pylon (block raycast from the candidate to the pylon). This keeps sentries from materializing underground or behind walls when the threat is in a sealed cave or a separate room — the pylon only conjures a golem where it can "see" the spot. If no in-sight position is found near the threat, no golem spawns that cycle.
 - Spawned golems are tagged as **sentries** (`MercantileSentry` NBT tag) to distinguish them from natural/player-built golems.
 - The pylon spawns at most **1 golem per detection cycle**, even if multiple hostiles are present (prevents mass-spawning).
 - Maximum **3 active sentry golems** per pylon at any time (configurable). Additional spawns are blocked until an existing sentry despawns.

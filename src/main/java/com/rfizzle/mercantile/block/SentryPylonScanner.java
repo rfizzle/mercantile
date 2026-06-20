@@ -8,9 +8,14 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
@@ -71,7 +76,7 @@ public final class SentryPylonScanner {
             for (int y = topY; y >= bottomY; y--) {
                 BlockPos candidate = new BlockPos(ox, y, oz);
                 if (!isWithinRadius(candidate, pylon, maxDistSq)) continue;
-                if (isValidSpawn(level, candidate)) {
+                if (isValidSpawn(level, candidate) && hasLineOfSight(level, pylon, candidate)) {
                     return candidate;
                 }
             }
@@ -84,6 +89,24 @@ public final class SentryPylonScanner {
         long dy = candidate.getY() - pylon.getY();
         long dz = candidate.getZ() - pylon.getZ();
         return dx * dx + dy * dy + dz * dz <= maxDistSq;
+    }
+
+    /**
+     * Require an unobstructed line from the pylon to the spawn position. A sentry can only
+     * materialize where the pylon can "see" it — so a threat in a sealed cave below, or behind
+     * a wall, won't conjure a golem buried underground.
+     *
+     * <p>The ray is cast from the candidate (always air — verified by {@link #isValidSpawn}) toward
+     * the pylon, never the reverse: starting inside the pylon's own collision shape would make the
+     * clip self-hit immediately. A clear path either misses every collider ({@link HitResult.Type#MISS})
+     * or its first hit is the pylon block itself — both mean nothing solid stands in between.
+     */
+    public static boolean hasLineOfSight(ServerLevel level, BlockPos pylon, BlockPos candidate) {
+        Vec3 from = Vec3.atCenterOf(candidate);
+        Vec3 to = Vec3.atCenterOf(pylon);
+        BlockHitResult hit = level.clip(new ClipContext(
+                from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
+        return hit.getType() == HitResult.Type.MISS || hit.getBlockPos().equals(pylon);
     }
 
     private static boolean isValidSpawn(ServerLevel level, BlockPos candidate) {
