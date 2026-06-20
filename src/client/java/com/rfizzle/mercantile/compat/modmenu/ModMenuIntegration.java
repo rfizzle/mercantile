@@ -124,6 +124,45 @@ public class ModMenuIntegration implements ModMenuApi {
                     .setTooltip(Component.translatable("mercantile.config.reputationDailyMaxCycleRep.tooltip"))
                     .setSaveConsumer(v -> config.reputationDailyMaxCycleRep = v)
                     .build());
+            reputation.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableRaidReputation"), config.enableRaidReputation)
+                    .setDefaultValue(defaults.enableRaidReputation)
+                    .setTooltip(Component.translatable("mercantile.config.enableRaidReputation.tooltip"))
+                    .setSaveConsumer(v -> config.enableRaidReputation = v)
+                    .build());
+            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.reputationRaidWinGain"), config.reputationRaidWinGain)
+                    .setDefaultValue(defaults.reputationRaidWinGain)
+                    .setMin(0)
+                    .setTooltip(Component.translatable("mercantile.config.reputationRaidWinGain.tooltip"))
+                    .setSaveConsumer(v -> config.reputationRaidWinGain = v)
+                    .build());
+            reputation.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableWanderingTraderRep"), config.enableWanderingTraderRep)
+                    .setDefaultValue(defaults.enableWanderingTraderRep)
+                    .setTooltip(Component.translatable("mercantile.config.enableWanderingTraderRep.tooltip"))
+                    .setSaveConsumer(v -> config.enableWanderingTraderRep = v)
+                    .build());
+            reputation.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableGifting"), config.enableGifting)
+                    .setDefaultValue(defaults.enableGifting)
+                    .setTooltip(Component.translatable("mercantile.config.enableGifting.tooltip"))
+                    .setSaveConsumer(v -> config.enableGifting = v)
+                    .build());
+            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.reputationGiftGain"), config.reputationGiftGain)
+                    .setDefaultValue(defaults.reputationGiftGain)
+                    .setMin(0)
+                    .setTooltip(Component.translatable("mercantile.config.reputationGiftGain.tooltip"))
+                    .setSaveConsumer(v -> config.reputationGiftGain = v)
+                    .build());
+            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.reputationDailyMaxGiftRep"), config.reputationDailyMaxGiftRep)
+                    .setDefaultValue(defaults.reputationDailyMaxGiftRep)
+                    .setMin(1).setMax(10)
+                    .setTooltip(Component.translatable("mercantile.config.reputationDailyMaxGiftRep.tooltip"))
+                    .setSaveConsumer(v -> config.reputationDailyMaxGiftRep = v)
+                    .build());
+            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.reputationNegativeDecayPerDay"), config.reputationNegativeDecayPerDay)
+                    .setDefaultValue(defaults.reputationNegativeDecayPerDay)
+                    .setMin(0)
+                    .setTooltip(Component.translatable("mercantile.config.reputationNegativeDecayPerDay.tooltip"))
+                    .setSaveConsumer(v -> config.reputationNegativeDecayPerDay = v)
+                    .build());
 
             // --- Follow Mode ---
             ConfigCategory follow = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.follow"));
@@ -137,6 +176,11 @@ public class ModMenuIntegration implements ModMenuApi {
                     .setMin(1)
                     .setTooltip(Component.translatable("mercantile.config.maxFollowingVillagers.tooltip"))
                     .setSaveConsumer(v -> config.maxFollowingVillagers = v)
+                    .build());
+            follow.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableSendHome"), config.enableSendHome)
+                    .setDefaultValue(defaults.enableSendHome)
+                    .setTooltip(Component.translatable("mercantile.config.enableSendHome.tooltip"))
+                    .setSaveConsumer(v -> config.enableSendHome = v)
                     .build());
 
             // --- Pathfinding ---
@@ -217,6 +261,11 @@ public class ModMenuIntegration implements ModMenuApi {
                     .setDefaultValue(defaults.enableSentryPylon)
                     .setTooltip(Component.translatable("mercantile.config.enableSentryPylon.tooltip"))
                     .setSaveConsumer(v -> config.enableSentryPylon = v)
+                    .build());
+            pylon.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enablePylonBellAlarm"), config.enablePylonBellAlarm)
+                    .setDefaultValue(defaults.enablePylonBellAlarm)
+                    .setTooltip(Component.translatable("mercantile.config.enablePylonBellAlarm.tooltip"))
+                    .setSaveConsumer(v -> config.enablePylonBellAlarm = v)
                     .build());
             pylon.addEntry(entry.startIntField(Component.translatable("mercantile.config.pylonDetectionRadius"), config.pylonDetectionRadius)
                     .setDefaultValue(defaults.pylonDetectionRadius)
