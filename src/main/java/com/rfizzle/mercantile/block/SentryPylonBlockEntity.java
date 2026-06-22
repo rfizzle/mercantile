@@ -3,7 +3,6 @@ package com.rfizzle.mercantile.block;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.particle.MercantileParticles;
 import com.rfizzle.mercantile.registry.MercantileRegistry;
-import com.rfizzle.mercantile.sound.MercantileSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -297,12 +296,9 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
                     BlockState state = server.getBlockState(bellPos);
                     if (state.getBlock() instanceof BellBlock bellBlock) {
                         BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(bellPos), Direction.UP, bellPos, false);
+                        // The ring itself carries to the 96-block glow broadcast (see BellBlockMixin),
+                        // so a distant player hears it and isn't left with silently glowing villagers.
                         bellBlock.onHit(server, state, hit, null, false);
-                        // Audible companion at the pylon for the villager glow broadcast, which
-                        // reaches 96 blocks while the bell ring only carries ~16-32 — so a distant
-                        // player has a sound to localize, not silent glowing villagers.
-                        server.playSound(null, worldPosition, MercantileSounds.SENTRY_PYLON_ALARM,
-                                SoundSource.BLOCKS, 0.9f, 1.0f);
                         bellCooldown = BELL_RING_COOLDOWN_TICKS;
                         setChanged();
                     }

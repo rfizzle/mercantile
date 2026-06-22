@@ -1,8 +1,0 @@
-{
-  "block.sentry_pylon.alarm": {
-    "sounds": [
-      "mercantile:sentry_pylon_alarm"
-    ],
-    "subtitle": "mercantile.subtitle.sentry_pylon_alarm"
-  }
-}

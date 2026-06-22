@@ -143,7 +143,8 @@
               "<strong class='text-bone'>Wandering-trader reputation bonus</strong>: wandering traders offer a rare bonus trade once a player reaches Trusted tier or above (one sticky offer per trader). Toggle with <code class='text-bone'>enableWanderingTraderRep</code> (S-021).",
               "<strong class='text-bone'>Send-home on dismiss</strong>: when a following villager is released, it now walks back to its bed (or workstation) instead of stopping in place. Toggle with <code class='text-bone'>enableSendHome</code> (S-022).",
               "Per-profession <strong class='text-bone'>exclusive trades</strong> shipped as datapacks for every remaining vanilla profession, completing the reputation-gated trade catalogue (S-017).",
-              "Sentry Pylon <strong class='text-bone'>alarm cue</strong>: on detecting a threat the pylon rings the nearest village bell within its radius, backed by a synthesized alarm sound event. Toggle with <code class='text-bone'>enablePylonBellAlarm</code> (S-019, S-025)."
+              "Sentry Pylon <strong class='text-bone'>bell alarm</strong>: on detecting a threat the pylon rings the nearest village bell within its radius. Toggle with <code class='text-bone'>enablePylonBellAlarm</code> (S-019, S-025).",
+              "<strong class='text-bone'>Extended bell ring range</strong>: a bell ring's see-through-walls villager glow carries to 96 blocks, so the ring's own sound is now amplified to match — every bell ring (not just the pylon's) is audible across the full glow radius instead of the vanilla ~16–32. Follows the glow toggle <code class='text-bone'>enableBellRadiusVis</code>."
             ] }
           ]
         },

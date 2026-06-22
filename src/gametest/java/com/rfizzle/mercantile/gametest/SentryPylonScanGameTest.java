@@ -3,6 +3,7 @@ package com.rfizzle.mercantile.gametest;
 import com.rfizzle.mercantile.block.SentryGolemTag;
 import com.rfizzle.mercantile.block.SentryPylonBlock;
 import com.rfizzle.mercantile.block.SentryPylonBlockEntity;
+import com.rfizzle.mercantile.block.SentryPylonScanner;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.registry.MercantileRegistry;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
@@ -168,6 +169,44 @@ public class SentryPylonScanGameTest implements FabricGameTest {
                 "sentries set size should round-trip (got " + reloaded.getSentries().size() + ")");
         helper.assertTrue(reloaded.getSentries().contains(id1), "sentry id1 should round-trip");
         helper.assertTrue(reloaded.getSentries().contains(id2), "sentry id2 should round-trip");
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE, batch = BATCH, timeoutTicks = 120)
+    public void doesNotSpawnBehindWalls(GameTestHelper helper) {
+        MercantileConfig.get().pylonDetectionRadius = 8;
+        for (int x = 0; x <= 7; x++) {
+            for (int z = 0; z <= 7; z++) {
+                helper.setBlock(new BlockPos(x, 1, z), Blocks.STONE);
+            }
+        }
+        helper.setBlock(PYLON, MercantileRegistry.SENTRY_PYLON);
+        // Solid wall splitting the pylon (x<4) from the threat side (x>4).
+        for (int z = 0; z <= 7; z++) {
+            for (int y = 2; y <= 6; y++) {
+                helper.setBlock(new BlockPos(4, y, z), Blocks.STONE);
+            }
+        }
+
+        BlockPos pylonAbs = helper.absolutePos(PYLON);
+        BlockPos clear = helper.absolutePos(new BlockPos(2, 2, 2));
+        BlockPos behind = helper.absolutePos(new BlockPos(6, 2, 6));
+
+        helper.assertTrue(SentryPylonScanner.hasLineOfSight(helper.getLevel(), pylonAbs, clear),
+                "open position on the pylon side should have line of sight");
+        helper.assertFalse(SentryPylonScanner.hasLineOfSight(helper.getLevel(), pylonAbs, behind),
+                "position behind a wall should not have line of sight");
+
+        // A threat across the wall must never yield a spawn position the pylon cannot see —
+        // this is what keeps sentries from materializing underground / behind walls.
+        BlockPos nearAbs = helper.absolutePos(new BlockPos(6, 2, 6));
+        for (int i = 0; i < 40; i++) {
+            BlockPos spawn = SentryPylonScanner.findSpawnPos(helper.getLevel(), nearAbs, pylonAbs, 8);
+            if (spawn != null) {
+                helper.assertTrue(SentryPylonScanner.hasLineOfSight(helper.getLevel(), pylonAbs, spawn),
+                        "findSpawnPos must only return positions with line of sight to the pylon");
+            }
+        }
         helper.succeed();
     }
 
