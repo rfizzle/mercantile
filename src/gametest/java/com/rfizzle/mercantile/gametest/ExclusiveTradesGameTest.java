@@ -2,7 +2,14 @@ package com.rfizzle.mercantile.gametest;
 
 import com.rfizzle.mercantile.api.ReputationTier;
 import com.rfizzle.mercantile.reputation.ExclusiveTradesManager;
+import com.rfizzle.mercantile.reputation.ExclusiveTradesManager.EnchantmentSpec;
+import com.rfizzle.mercantile.reputation.ExclusiveTradesManager.ExclusiveTrade;
+import com.rfizzle.mercantile.trade.OfferIdentityHash;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
+import net.minecraft.core.Holder;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.EntityType;
@@ -12,7 +19,11 @@ import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.npc.VillagerType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.item.trading.ItemCost;
+import net.minecraft.world.item.trading.MerchantOffer;
 
 import java.util.List;
 import java.util.Map;
@@ -82,5 +93,125 @@ public class ExclusiveTradesGameTest implements FabricGameTest {
             ExclusiveTradesManager.setSnapshotsForTesting(Map.of(), List.of());
             com.rfizzle.mercantile.config.MercantileConfig.get().enableReputation = savedEnableReputation;
         }
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void enchantedGearOutputRoundTrips(GameTestHelper helper) {
+        // Sharpness V + Unbreaking III diamond sword as an honored toolsmith-style reward.
+        ExclusiveTrade enchantedSword = new ExclusiveTrade(
+                new ItemCost(Items.EMERALD, 64), null,
+                new ItemStack(Items.DIAMOND_SWORD), 1, 1, 0.05f,
+                ReputationTier.HONORED.minScore(),
+                List.of(new EnchantmentSpec("minecraft:sharpness", 5),
+                        new EnchantmentSpec("minecraft:unbreaking", 3)),
+                List.of());
+
+        ExclusiveTradesManager.setSnapshotsForTesting(
+                Map.of("weaponsmith", List.of(enchantedSword)),
+                java.util.Collections.emptyList());
+
+        boolean savedEnableReputation = com.rfizzle.mercantile.config.MercantileConfig.get().enableReputation;
+        com.rfizzle.mercantile.config.MercantileConfig.get().enableReputation = true;
+
+        try {
+            Villager weaponsmith = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
+            weaponsmith.setVillagerData(new VillagerData(VillagerType.PLAINS, VillagerProfession.WEAPONSMITH, 1));
+
+            ExclusiveTradesManager.injectOffers(weaponsmith, ReputationTier.HONORED.minScore());
+
+            MerchantOffer injected = weaponsmith.getOffers().get(weaponsmith.getOffers().size() - 1);
+            helper.assertTrue(injected.getResult().is(Items.DIAMOND_SWORD), "Expected diamond sword reward");
+
+            ItemEnchantments enchantments = injected.getResult().get(DataComponents.ENCHANTMENTS);
+            helper.assertTrue(enchantments != null && !enchantments.isEmpty(),
+                    "Expected ENCHANTMENTS component on the result");
+
+            RegistryAccess registries = weaponsmith.level().registryAccess();
+            var lookup = registries.lookupOrThrow(Registries.ENCHANTMENT);
+            Holder<Enchantment> sharpness = lookup.getOrThrow(Enchantments.SHARPNESS);
+            Holder<Enchantment> unbreaking = lookup.getOrThrow(Enchantments.UNBREAKING);
+            helper.assertTrue(enchantments.getLevel(sharpness) == 5, "Expected Sharpness V");
+            helper.assertTrue(enchantments.getLevel(unbreaking) == 3, "Expected Unbreaking III");
+
+            helper.succeed();
+        } finally {
+            ExclusiveTradesManager.setSnapshotsForTesting(Map.of(), List.of());
+            com.rfizzle.mercantile.config.MercantileConfig.get().enableReputation = savedEnableReputation;
+        }
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void storedEnchantmentBookOutputRoundTrips(GameTestHelper helper) {
+        // stored_enchantments writes onto the book's STORED_ENCHANTMENTS, not ENCHANTMENTS.
+        ExclusiveTrade mendingBook = new ExclusiveTrade(
+                new ItemCost(Items.EMERALD, 32), null,
+                new ItemStack(Items.ENCHANTED_BOOK), 1, 1, 0.05f,
+                ReputationTier.HONORED.minScore(),
+                List.of(),
+                List.of(new EnchantmentSpec("minecraft:mending", 1)));
+
+        ExclusiveTradesManager.setSnapshotsForTesting(
+                Map.of("librarian", List.of(mendingBook)),
+                java.util.Collections.emptyList());
+
+        boolean savedEnableReputation = com.rfizzle.mercantile.config.MercantileConfig.get().enableReputation;
+        com.rfizzle.mercantile.config.MercantileConfig.get().enableReputation = true;
+
+        try {
+            Villager librarian = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
+            librarian.setVillagerData(new VillagerData(VillagerType.PLAINS, VillagerProfession.LIBRARIAN, 1));
+
+            ExclusiveTradesManager.injectOffers(librarian, ReputationTier.HONORED.minScore());
+
+            MerchantOffer injected = librarian.getOffers().get(librarian.getOffers().size() - 1);
+            helper.assertTrue(injected.getResult().is(Items.ENCHANTED_BOOK), "Expected enchanted book reward");
+
+            ItemEnchantments stored = injected.getResult().get(DataComponents.STORED_ENCHANTMENTS);
+            helper.assertTrue(stored != null && !stored.isEmpty(),
+                    "Expected STORED_ENCHANTMENTS component on the book");
+            helper.assertTrue(injected.getResult().get(DataComponents.ENCHANTMENTS) == null
+                            || injected.getResult().get(DataComponents.ENCHANTMENTS).isEmpty(),
+                    "stored_enchantments must not populate the gear ENCHANTMENTS component");
+
+            var lookup = librarian.level().registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
+            Holder<Enchantment> mending = lookup.getOrThrow(Enchantments.MENDING);
+            helper.assertTrue(stored.getLevel(mending) == 1, "Expected Mending I stored on the book");
+
+            helper.succeed();
+        } finally {
+            ExclusiveTradesManager.setSnapshotsForTesting(Map.of(), List.of());
+            com.rfizzle.mercantile.config.MercantileConfig.get().enableReputation = savedEnableReputation;
+        }
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void enchantmentLevelChangesOfferHash(GameTestHelper helper) {
+        // Two trades identical except enchantment level must produce distinct lock hashes (no collision),
+        // while a component-free offer hashes identically with or without registry resolution.
+        RegistryAccess registries = helper.getLevel().registryAccess();
+
+        ExclusiveTrade sharpness4 = new ExclusiveTrade(
+                new ItemCost(Items.EMERALD, 64), null, new ItemStack(Items.DIAMOND_SWORD),
+                1, 1, 0.05f, ReputationTier.HONORED.minScore(),
+                List.of(new EnchantmentSpec("minecraft:sharpness", 4)), List.of());
+        ExclusiveTrade sharpness5 = new ExclusiveTrade(
+                new ItemCost(Items.EMERALD, 64), null, new ItemStack(Items.DIAMOND_SWORD),
+                1, 1, 0.05f, ReputationTier.HONORED.minScore(),
+                List.of(new EnchantmentSpec("minecraft:sharpness", 5)), List.of());
+
+        String hash4 = OfferIdentityHash.compute(sharpness4.createOffer(registries));
+        String hash5 = OfferIdentityHash.compute(sharpness5.createOffer(registries));
+        helper.assertFalse(hash4.equals(hash5),
+                "Different enchant levels must yield distinct hashes (got " + hash4 + " for both)");
+
+        ExclusiveTrade plain = new ExclusiveTrade(
+                new ItemCost(Items.EMERALD, 64), null, new ItemStack(Items.DIAMOND_SWORD),
+                1, 1, 0.05f, ReputationTier.HONORED.minScore());
+        helper.assertTrue(
+                OfferIdentityHash.compute(plain.createOffer(registries))
+                        .equals(OfferIdentityHash.compute(plain.createOffer())),
+                "Component-free offer must hash identically with or without registry resolution");
+
+        helper.succeed();
     }
 }

@@ -10,7 +10,17 @@
     {
       "input_1": { "item": "minecraft:emerald", "count": 64 },
       "input_2": { "item": "minecraft:gold_ingot", "count": 32 },
-      "output": { "item": "minecraft:enchanted_golden_apple", "count": 1 },
+      "output": {
+        "item": "minecraft:diamond_sword",
+        "count": 1,
+        "components": {
+          "enchantments": [
+            { "id": "minecraft:sharpness", "level": 5 },
+            { "id": "minecraft:looting", "level": 3 },
+            { "id": "minecraft:unbreaking", "level": 3 }
+          ]
+        }
+      },
       "max_uses": 1,
       "min_tier_override": "honored"
     }
