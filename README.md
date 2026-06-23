@@ -67,6 +67,17 @@ the website for every behavior, tuning knob, and edge case.
 Mercantile is required on the server. The HUD overlay is the only client-side
 feature; install it on the client for the readout to appear.
 
+## Controls
+
+| Control | Default | Description |
+|---------|---------|-------------|
+| **Peek Reputation Detail** | _Unbound_ | Hold to overlay a framed panel showing your reputation score, standing, progress to the next standing, the perks that standing grants, and the villager professions standing nearby. Release to dismiss. |
+
+Bind it under **Options → Controls → Key Binds**, in the **Mercantile**
+category. It is unbound by default — assign a key to use it. The panel never
+captures the mouse or pauses the game (like vanilla's hold-Tab player list) and
+hides automatically during F1, open screens, and spectator mode.
+
 ## Optional integrations
 
 Mercantile detects and integrates with these mods when present (none are
