@@ -1,5 +1,7 @@
 package com.rfizzle.mercantile.client;
 
+import com.mojang.blaze3d.platform.InputConstants;
+import com.rfizzle.mercantile.client.hud.ReputationDetailPanelRenderer;
 import com.rfizzle.mercantile.client.hud.ReputationHudOverlay;
 import com.rfizzle.mercantile.client.network.ClientMercantileData;
 import com.rfizzle.mercantile.client.network.ClientNetworkHandler;
@@ -17,16 +19,34 @@ import com.rfizzle.mercantile.client.visualization.WorkstationLinkRenderer;
 import com.rfizzle.mercantile.particle.MercantileParticles;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.screens.inventory.MerchantScreen;
+import org.lwjgl.glfw.GLFW;
 
 public class MercantileClient implements ClientModInitializer {
+    /**
+     * Hold-to-peek keybind for the reputation detail panel. Unbound by default
+     * ({@link GLFW#GLFW_KEY_UNKNOWN}) so it never collides with another mod's
+     * binding — the player assigns it under Controls → Mercantile.
+     */
+    public static KeyMapping KEY_REPUTATION_DETAIL;
+
     @Override
     public void onInitializeClient() {
+        KEY_REPUTATION_DETAIL = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+                "key.mercantile.reputation_detail",
+                InputConstants.Type.KEYSYM,
+                GLFW.GLFW_KEY_UNKNOWN,
+                "key.categories.mercantile"));
+
         ClientNetworkHandler.init();
         ReputationHudOverlay.register();
+        HudRenderCallback.EVENT.register(new ReputationDetailPanelRenderer());
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             ClientMercantileData.clear();
             BellGlowTracker.clear();

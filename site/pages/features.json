@@ -205,10 +205,20 @@
               "id": "reputation-hud",
               "title": "Reputation HUD",
               "html": [
-                "A compact indicator in the top-left HUD strip shows your current tier when a villager is nearby (default 32-block radius). Auto-stacks with other rfizzle suite mods at priority 2.",
-                "Hidden during F1, open screens, and death. Uses a balance-scale icon plus the tier name in vanilla font."
+                "A compact indicator in the top-left HUD strip shows your current standing when a villager is nearby (default 32-block radius). Auto-stacks with other rfizzle suite mods at priority 2.",
+                "Hidden during F1, open screens, and death. A custom balance-scale glyph sits over a 2px bar tinted by standing — emerald at the top tiers, fading to orange and red as you slip — that fills toward the next standing."
               ],
               "note": "Client config: <code class='text-bone'>enableReputationHud</code>"
+            },
+            {
+              "id": "reputation-detail-panel",
+              "title": "Reputation Detail Panel",
+              "html": [
+                "The always-on badge tells you <em>roughly</em> where you stand; hold the <span class='text-bone'>Peek Reputation Detail</span> keybind and a framed panel tells you <em>everything</em>. While held it overlays your exact score, your standing in the standing color, a progress bar toward the next standing with the precise figures, and how much reputation you've banked against today's cap. Release to dismiss — it behaves like vanilla's hold-Tab player list, never capturing the mouse or pausing the game.",
+                "Below the progress block it lists the perks your current standing grants — the trade discount or markup, and which exclusive-trade pools have opened (profession-specific at Trusted, cross-profession at Honored). Those lines are generated from the same reputation rules the server prices and gates trades with, so the panel can never lie about what your standing is worth: retune a threshold in config and the panel follows.",
+                "Last, grouped by profession, it shows the villagers actually <em>around</em> you right now — a cached proximity scan throttled so it costs nothing per frame — and whether your standing has unlocked their exclusive trades yet. A crowd of professions pages through with a soft cross-fade and page dots, so the panel never overflows or scrolls. Framed in the mod's slate theme with emerald and standing-colored accents. Entirely client-side, hidden during F1, open screens, and spectator mode."
+              ],
+              "note": "Controls → Mercantile → <span class='text-bone'>Peek Reputation Detail</span> — unbound by default"
             }
           ]
         }
