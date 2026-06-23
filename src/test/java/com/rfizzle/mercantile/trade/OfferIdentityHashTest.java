@@ -170,4 +170,16 @@ class OfferIdentityHashTest {
         String hash = OfferIdentityHash.compute(noCostB1);
         assertTrue(hash.contains("||"), "Empty costB segment should produce || delimiter pair, got: " + hash);
     }
+
+    @Test
+    void componentFreeHashFormatUnchanged() {
+        // Regression guard: an unenchanted offer must hash byte-identically to the pre-enchantment
+        // format (item x count | costB | item x count) with NO trailing enchantment segment, so
+        // stored lock-hash data stays valid with no migration.
+        MerchantOffer offer = new MerchantOffer(
+                new ItemCost(Items.EMERALD, 5), Optional.of(new ItemCost(Items.DIAMOND, 4)),
+                new ItemStack(Items.DIAMOND_SWORD, 1), 1, 1, 0.05f);
+        assertEquals("minecraft:emeraldx5|minecraft:diamondx4|minecraft:diamond_swordx1",
+                OfferIdentityHash.compute(offer));
+    }
 }

@@ -157,9 +157,9 @@
                 ["Neutral", "0 to 74", "No effect"],
                 ["Liked", "75 to 299", "5% discount"],
                 ["Trusted", "300 to 999", "10% discount + profession-exclusive trades"],
-                ["Honored", "1000+", "15% discount + all exclusive trades"]
+                ["Honored", "1000+", "15% discount + all exclusive trades, including enchanted gear"]
               ],
-              "note": "Config: <code class='text-bone'>enableReputation</code>"
+              "note": "Config: <code class='text-bone'>enableReputation</code> · Honored-tier rewards can ship pre-enchanted gear (e.g. the toolsmith's Efficiency/Fortune diamond pickaxe, the weaponsmith's Sharpness V diamond sword). Datapacks set enchantments via an <code class='text-bone'>output.components.enchantments</code> array."
             }
           ]
         },

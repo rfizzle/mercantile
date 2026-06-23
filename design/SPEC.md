@@ -284,18 +284,19 @@ Files at `data/mercantile/exclusive_trades/<profession>.json`, `data/mercantile/
   "min_tier": "trusted",
   "trades": [
     {
-      "input_1": { "item": "minecraft:emerald", "count": 32 },
-      "input_2": { "item": "minecraft:diamond", "count": 1 },
+      "input_1": { "item": "minecraft:emerald", "count": 64 },
+      "input_2": { "item": "minecraft:diamond", "count": 4 },
       "output": {
-        "item": "minecraft:enchanted_book",
+        "item": "minecraft:diamond_sword",
         "count": 1,
         "components": {
-          "minecraft:stored_enchantments": {
-            "levels": { "minecraft:mending": 1 }
-          }
+          "enchantments": [
+            { "id": "minecraft:sharpness", "level": 5 },
+            { "id": "minecraft:unbreaking", "level": 3 }
+          ]
         }
       },
-      "max_uses": 3,
+      "max_uses": 1,
       "min_tier_override": "honored"
     }
   ]
@@ -306,7 +307,7 @@ Files at `data/mercantile/exclusive_trades/<profession>.json`, `data/mercantile/
 - `min_tier`: Default minimum reputation tier for all trades in this file (defaults to `trusted`).
 - `min_tier_override`: Per-trade override of the minimum tier.
 - `max_uses` (optional, default 12), `xp_gain` (optional, default 1), and `price_multiplier` (optional, default 0.05) tune each trade's stock, villager XP reward, and demand-based price scaling.
-- Trade format uses 1.21.1's **data component system** for item definitions. The `components` field accepts the same component structure as vanilla `/give` commands and recipe definitions. Items without special components omit the field entirely.
+- `components` (optional, **output only**): enchants the reward. `enchantments` applies to gear; `stored_enchantments` writes book enchantments onto an `enchanted_book`. Each is an array of `{ "id": "<enchantment>", "level": <int> }` (level defaults to 1). IDs are resolved against the live enchantment registry when the offer is built, so unknown IDs are skipped with a warning rather than failing the pack. Cost items (`input_1`/`input_2`) are plain item + count and take no components.
 
 ### Gifting
 
