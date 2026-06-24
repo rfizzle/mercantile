@@ -40,9 +40,13 @@ glow, on a field of glowing green brickwork with floating emerald particles.
 Below, "MERCANTILE" in blocky pixel type with the subtitle "MINECRAFT VILLAGER
 OVERHAUL". Vines frame the upper corners.
 
-**Icon (`art/icon-128.png`):** The circular medallion and market stall isolated
-on the green brickwork — no text. This is the master for the in-jar
-`assets/mercantile/icon.png` and store listing icons.
+**Icon (`art/glyphs/icon.glyph`):** A standing balance scale — the same
+brand motif as the reputation HUD glyph — in neutral emerald with a gold pivot
+and finial, set inside a circular dark green-stone medallion with an emerald
+rim-glow over a green-brickwork field. No text. This single glyph is the source
+for every icon surface: `art/icon-128.png` (128 native) and `art/icon-512.png`
+(512 store master) render from it, and the 256px in-jar `assets/mercantile/icon.png`
+(shown in Mod Menu) and website favicon/nav (`site/assets/icon.png`) ship from it.
 
 > **Formula note:** `VISION.md` §3.2 specs the suite logo formula as *dark
 > stone brickwork frame, one central glowing motif object, name in blocky pixel
@@ -135,11 +139,11 @@ in `art/exploration/` alongside their outputs, per `REPO-LAYOUT.md`.
 
 | Image | Reference Source | Notes |
 |-------|----------------|-------|
-| Market stall motif | `art/icon-128.png` | Awning, scales, coin pile, chest |
+| Market stall motif | `art/logo.png` | Awning, scales, coin pile, chest |
 | Emerald glow style | `art/logo.png` | Soft radial green glow on brick, floating particles |
 | Brickwork field | `art/logo.png` background | Green-tinted brick — divergence from suite dark-stone, see §9 |
 | Pixel type treatment | `art/logo.png` wordmark | Blocky pixel font, emerald fill |
-| Pixel art item style | `assets/mercantile/icon.png` | Sets the in-game pixel density |
+| Pixel art item style | `assets/mercantile/textures/gui/sprites/reputation_badge.png` | Reputation badge sprite — sets the in-game pixel density |
 | Sentry pylon | `assets/mercantile/textures/block/` | The mod's one custom block — top/side/bottom |
 
 ---

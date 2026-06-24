@@ -10,12 +10,12 @@
 > Final paths are under `src/main/resources/` unless noted. A separate report sweeps
 > the resource tree for any final asset lacking a `.glyph` source.
 
-## Branding masters (`.png` — not glyph-based)
+## Branding masters
 
-| Asset | `art/` master | Final / derived copies |
+| Asset | Source | Final / derived copies |
 |---|---|---|
-| Full logo | `art/logo.png` | `site/assets/logo.png` |
-| Mod icon (128) | `art/icon-128.png` | `assets/mercantile/icon.png` (in-jar), `site/assets/icon.png` |
+| Full logo | `art/logo.png` — `.png` master (not glyph-based) | `site/assets/logo.png` |
+| Mod icon | `art/glyphs/icon.glyph` → `art/icon-128.png` (128 native), `art/icon-512.png` (512 store master) | `assets/mercantile/icon.png` (256, in-jar Mod Menu), `site/assets/icon.png` (256, favicon/nav) |
 | OG image | — | `site/assets/og-image.png` |
 
 ## In-game pixel art
