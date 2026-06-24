@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.animal.IronGolem;
@@ -25,8 +26,19 @@ public final class SentryPylonScanner {
     private SentryPylonScanner() {
     }
 
+    /**
+     * The nearest hostile the pylon can actually <em>see</em> within {@code radius}. Detection is
+     * the trigger for every reaction the pylon makes — ringing the bell, holding sentries against
+     * their despawn countdown, and spawning a golem — so it is gated on an unobstructed line from
+     * the pylon to the mob (see {@link #hasLineOfSightToEntity}). A creeper sealed in a cave below
+     * or a zombie behind a wall is therefore ignored: it neither rings the bell forever nor pins an
+     * idle sentry in place against a threat it can never reach.
+     *
+     * <p>The candidate set is still a coarse AABB query; the line-of-sight clip runs only on mobs
+     * closer than the current best, so it costs at most a handful of raycasts per scan.
+     */
     @Nullable
-    public static LivingEntity findNearestHostile(ServerLevel level, BlockPos center, int radius) {
+    public static LivingEntity findNearestVisibleHostile(ServerLevel level, BlockPos center, int radius) {
         AABB box = new AABB(center).inflate(radius);
         LivingEntity best = null;
         double bestDistSq = Double.MAX_VALUE;
@@ -38,7 +50,7 @@ public final class SentryPylonScanner {
             double dy = e.getY() - cy;
             double dz = e.getZ() - cz;
             double dsq = dx * dx + dy * dy + dz * dz;
-            if (dsq < bestDistSq) {
+            if (dsq < bestDistSq && hasLineOfSightToEntity(level, center, e)) {
                 bestDistSq = dsq;
                 best = e;
             }
@@ -95,17 +107,32 @@ public final class SentryPylonScanner {
      * Require an unobstructed line from the pylon to the spawn position. A sentry can only
      * materialize where the pylon can "see" it — so a threat in a sealed cave below, or behind
      * a wall, won't conjure a golem buried underground.
-     *
-     * <p>The ray is cast from the candidate (always air — verified by {@link #isValidSpawn}) toward
-     * the pylon, never the reverse: starting inside the pylon's own collision shape would make the
-     * clip self-hit immediately. A clear path either misses every collider ({@link HitResult.Type#MISS})
-     * or its first hit is the pylon block itself — both mean nothing solid stands in between.
      */
     public static boolean hasLineOfSight(ServerLevel level, BlockPos pylon, BlockPos candidate) {
-        Vec3 from = Vec3.atCenterOf(candidate);
-        Vec3 to = Vec3.atCenterOf(pylon);
+        return clearPathToPylon(level, Vec3.atCenterOf(candidate), pylon);
+    }
+
+    /**
+     * Whether the pylon has an unobstructed line to a hostile mob. Both the mob's eyes and feet are
+     * tested, and a clear path from either point counts as visible — so a tall mob peeking over a
+     * one-block lip still registers, while one fully walled off does not.
+     */
+    public static boolean hasLineOfSightToEntity(ServerLevel level, BlockPos pylon, Entity entity) {
+        return clearPathToPylon(level, entity.getEyePosition(), pylon)
+                || clearPathToPylon(level, entity.position(), pylon);
+    }
+
+    /**
+     * Cast a single block raycast from {@code from} to the pylon's center. The ray always runs
+     * <em>toward</em> the pylon, never the reverse: starting inside the pylon's own collision shape
+     * would make the clip self-hit immediately. A clear path either misses every collider
+     * ({@link HitResult.Type#MISS}) or its first hit is the pylon block itself — both mean nothing
+     * solid stands in between.
+     */
+    private static boolean clearPathToPylon(ServerLevel level, Vec3 from, BlockPos pylon) {
         BlockHitResult hit = level.clip(new ClipContext(
-                from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
+                from, Vec3.atCenterOf(pylon), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE,
+                CollisionContext.empty()));
         return hit.getType() == HitResult.Type.MISS || hit.getBlockPos().equals(pylon);
     }
 

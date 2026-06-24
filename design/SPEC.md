@@ -654,6 +654,7 @@ A crafted block placed in a village (or anywhere). Visually distinct — iron-an
 - The pylon scans for hostile mobs within a **32-block radius** (configurable).
 - Scan runs every ~2 seconds (40 ticks) to avoid per-tick cost.
 - "Hostile" = any mob targeting a player or villager within range, or any undead/illager entity.
+- **Line of sight required:** a hostile only counts as detected when the pylon has an unobstructed line to it (block raycast from the mob to the pylon, testing the mob's eyes and feet — a clear path from either point registers). A mob sealed in a cave below or walled off in a separate room is ignored even when it sits inside the radius, so it never rings the bell endlessly or holds a sentry in place against a threat it cannot reach. Every reaction the pylon makes — spawning a golem, the bell alarm, and the despawn countdown — keys off this same in-sight detection.
 
 ### Spawning
 - When a hostile mob is detected and fuel is available, the pylon spawns an iron golem at a valid position near the threat (within the detection radius, on solid ground).
@@ -671,8 +672,8 @@ A crafted block placed in a village (or anywhere). Visually distinct — iron-an
 - Sentry golems do **not** count toward iron farm mechanics or mob caps. Implemented by tagging sentry golems with `MercantileSentry` and mixin into the mob spawning cap counter to exclude entities with this tag. This is a targeted check (only affects `IronGolem` entity type counting), not a broad mob cap override.
 
 ### Despawning
-- Once all hostile mobs within the pylon's radius are dead or have left, sentry golems begin a **despawn countdown** (default 30 seconds / 600 ticks, configurable).
-- If a new threat appears during the countdown, the timer resets and the golem re-engages.
+- Once no in-sight hostile remains within the pylon's radius — every threat dead, gone, or sealed out of line of sight — sentry golems begin a **despawn countdown** (default 30 seconds / 600 ticks, configurable).
+- If an in-sight threat appears during the countdown, the timer resets and the golem re-engages.
 r- Despawn is visual: the golem slowly fades/cracks (reuse iron golem damage texture stages) over the last few seconds, then disappears with iron particles and the iron golem damage sound. See Sound Design section for all sound mappings.
 - If a sentry golem is killed in combat, no despawn sequence — it simply dies (no drops).
 
@@ -702,7 +703,7 @@ Shaped recipe (3x3 crafting grid):
 ### Bell Alarm
 - On detecting a hostile, the pylon rings the **nearest village bell** within its detection radius using the standard vanilla bell ring (sound + swing), drawing players to the threat. Located via the village point-of-interest system; if no bell is in range, nothing happens.
 - **Extended ring range:** because the villager-glow broadcast accompanying *any* bell ring reaches 96 blocks while the vanilla bell only carries ~16–32, the ring's own sound is amplified to cover the full 96-block radius (volume 6.0 on the variable-range `minecraft:block.bell.use` event ⇒ 16 × 6 = 96 blocks). This is a property of the bell ring itself, not the pylon — every bell ring (player-, pylon-, or otherwise-triggered) carries this far, so a distant player hears the ring and isn't left with silently glowing villagers. Implemented in `BellBlockMixin`; gated on `enableBellRadiusVis` (the same toggle as the glow visualization), so disabling the glow restores the vanilla ~32-block reach.
-- The bell ring fires on threat detection regardless of whether a golem is spawned, and is **rate-limited to once per 10 seconds** (200-tick cooldown, persisted across save/load) so a sustained threat does not ring continuously.
+- The bell ring fires on threat detection regardless of whether a golem is spawned, and is **rate-limited to once per 10 seconds** (200-tick cooldown, persisted across save/load) so a sustained threat does not ring continuously. Detection requires line of sight (see Detection), so a mob sealed in a cave or behind a wall never rings the bell at all.
 - Toggled by `enablePylonBellAlarm` (requires the pylon itself to be enabled via `enableSentryPylon`).
 
 ### Redstone Interaction

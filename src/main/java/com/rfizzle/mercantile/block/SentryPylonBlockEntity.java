@@ -186,7 +186,7 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
         if (idleHostileCheckCooldown == 0) {
             idleHostileCheckCooldown = IDLE_HOSTILE_CHECK_INTERVAL_TICKS;
             int radius = MercantileConfig.get().pylonDetectionRadius;
-            LivingEntity threat = SentryPylonScanner.findNearestHostile(server, worldPosition, radius);
+            LivingEntity threat = SentryPylonScanner.findNearestVisibleHostile(server, worldPosition, radius);
             if (threat != null) {
                 if (idleTicks != 0) {
                     idleTicks = 0;
@@ -244,7 +244,7 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
         pruneSentries(server);
 
         int radius = MercantileConfig.get().pylonDetectionRadius;
-        LivingEntity threat = SentryPylonScanner.findNearestHostile(server, worldPosition, radius);
+        LivingEntity threat = SentryPylonScanner.findNearestVisibleHostile(server, worldPosition, radius);
         if (threat == null) {
             return;
         }
