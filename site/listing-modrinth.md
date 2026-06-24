@@ -226,7 +226,7 @@ enjoy:
 
 ## License & credits
 
-Licensed under the [MIT License](https://github.com/rfizzle/mercantile/blob/main/LICENSE).
+Licensed under the [MIT License](https://github.com/rfizzle/mercantile/blob/master/LICENSE).
 © 2025 rfizzle. Mercantile is not affiliated with Mojang Studios or
 Microsoft.
 

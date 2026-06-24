@@ -6,7 +6,7 @@
 
 [![Minecraft 1.21.1](https://img.shields.io/badge/Minecraft-1.21.1-62B47A?logo=minecraft&logoColor=white)](https://www.minecraft.net/)
 [![Fabric](https://img.shields.io/badge/Mod_Loader-Fabric-DBB69B)](https://fabricmc.net/)
-[![License: MIT](https://img.shields.io/github/license/rfizzle/mercantile)](https://github.com/rfizzle/mercantile/blob/main/LICENSE)
+[![License: MIT](https://img.shields.io/github/license/rfizzle/mercantile)](https://github.com/rfizzle/mercantile/blob/master/LICENSE)
 
 **Also on [Modrinth](https://modrinth.com/mod/mercantile).** Visit the
 [website](https://mercantile.rfizzle.com) for the full feature list, config
@@ -41,18 +41,22 @@ hosted on Mojang's CDN.
 <!-- TODO: replace these placeholders with real hosted PNGs before publishing -->
 
 ![Picking up a villager](https://mercantile.rfizzle.com/screenshots/pickup.png)
+
 *Sneak-right-click a villager to pick them up. Full NBT — profession, trades,
 gossip, XP — is preserved on the head item in your hand.*
 
 ![Reputation HUD over villagers](https://mercantile.rfizzle.com/screenshots/reputation-hud.png)
+
 *A compact tier readout shown next to nearby villagers so you can read the
 room at a glance.*
 
 ![Trade cycling in the merchant screen](https://mercantile.rfizzle.com/screenshots/trade-cycling.png)
+
 *Spend emeralds to re-roll a villager's unlocked trades. No more breaking and
 replacing workstations.*
 
 ![Sentry pylon defending a village](https://mercantile.rfizzle.com/screenshots/sentry-pylon.png)
+
 *The Sentry Pylon — an iron-fueled defense block that summons temporary iron
 golems when hostiles approach.*
 
@@ -227,7 +231,7 @@ enjoy:
 
 ## License & credits
 
-Licensed under the [MIT License](https://github.com/rfizzle/mercantile/blob/main/LICENSE).
+Licensed under the [MIT License](https://github.com/rfizzle/mercantile/blob/master/LICENSE).
 © 2025 rfizzle. Mercantile is not affiliated with Mojang Studios or
 Microsoft.
 

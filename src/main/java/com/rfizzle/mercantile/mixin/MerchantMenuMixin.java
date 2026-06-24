@@ -107,7 +107,13 @@ public abstract class MerchantMenuMixin extends AbstractContainerMenu {
 
         MercantileConfig config = MercantileConfig.get();
         if (tradeCount > 0 && config.enableReputation && player instanceof ServerPlayer serverPlayer) {
-            ReputationManager.modifyScore(serverPlayer, config.reputationTradeGain);
+            // One gain attempt per executed trade, mirroring the single-trade path
+            // (AbstractVillagerTradeMixin). This honors reputationTradesPerGain, the
+            // per-source sub-cap, and the daily total cap; a direct modifyScore here
+            // would award uncapped rep and let bulk trading bypass the daily cap.
+            for (int i = 0; i < tradeCount; i++) {
+                ReputationManager.tryGainTradeRep(serverPlayer);
+            }
         }
 
         if (tradeCount > 1) {

@@ -28,6 +28,7 @@ import net.minecraft.server.level.ServerPlayer;
  * corrupt the reputation flow, but it may prevent listeners registered after
  * it from seeing that change.
  */
+@Stable
 public interface ReputationChangedCallback {
 
     Event<ReputationChangedCallback> EVENT = EventFactory.createArrayBacked(ReputationChangedCallback.class,

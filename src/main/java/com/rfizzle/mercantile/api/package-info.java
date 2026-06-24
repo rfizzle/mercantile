@@ -8,11 +8,11 @@
  * the broken signature. Everything <em>outside</em> this package — attachments,
  * managers, mixins — is internal and may change without notice in any release.
  *
- * <p>Stability note: the standard calls for {@code @ApiStatus.Stable}, but no
- * such annotation exists in {@code org.jetbrains.annotations} (stability is its
- * implicit default; {@code ApiStatus} only marks deviations such as
- * {@code Internal} or {@code Experimental}). Stability is therefore declared
- * here and on each class's javadoc instead.
+ * <p>Every type here carries the suite's stability marker,
+ * {@link com.rfizzle.mercantile.api.Stable}. It is a local annotation rather
+ * than {@code @ApiStatus.Stable} (which has no member in
+ * {@code org.jetbrains.annotations}); per the suite's no-shared-jar rule each
+ * mod declares its own marker in its {@code api} package.
  *
  * <p>Consume as a soft dependency only: compile against the mod with
  * {@code modCompileOnly} and guard every call site with

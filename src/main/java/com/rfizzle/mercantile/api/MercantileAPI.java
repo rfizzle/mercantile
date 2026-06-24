@@ -28,6 +28,7 @@ import java.lang.invoke.MethodType;
  * and guard call sites with
  * {@code FabricLoader.getInstance().isModLoaded("mercantile")}.
  */
+@Stable
 public final class MercantileAPI {
 
     private MercantileAPI() {

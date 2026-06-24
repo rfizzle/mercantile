@@ -22,6 +22,7 @@ import net.minecraft.world.item.trading.MerchantOffer;
  * corrupt the trade, but it may prevent listeners registered after it from
  * seeing that trade.
  */
+@Stable
 public interface TradeExecutedCallback {
 
     Event<TradeExecutedCallback> EVENT = EventFactory.createArrayBacked(TradeExecutedCallback.class,
