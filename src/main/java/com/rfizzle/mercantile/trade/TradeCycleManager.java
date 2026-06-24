@@ -36,7 +36,6 @@ public final class TradeCycleManager {
 
         MercantileVillagerData villagerData = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
         MerchantOffers offers = villager.getOffers();
-        villagerData.migrateLockedTrades(offers);
 
         int playerScore = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA).getScore();
         evictInaccessibleExclusiveLocks(villager, villagerData, playerScore);
@@ -62,7 +61,6 @@ public final class TradeCycleManager {
 
         MercantileVillagerData villagerData = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
         MerchantOffers offers = villager.getOffers();
-        villagerData.migrateLockedTrades(offers);
 
         ExclusiveTradesManager.stripInjectedOffers(villager);
 
