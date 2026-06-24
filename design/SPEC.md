@@ -664,7 +664,7 @@ A crafted block placed in a village (or anywhere). Visually distinct — iron-an
 - **Sentry golems always spawn at full health.** They are temporary summons, not persistent entities — healing between fights is not applicable.
 
 ### Sentry Golem Behavior
-- Sentry golems behave like normal iron golems in combat — they target and attack hostile mobs.
+- Sentry golems target and attack hostile mobs, including **creepers** — which vanilla iron golems pointedly ignore. A creeper that is fighting a sentry is prevented from priming, so the golem can dispatch it without an explosion levelling what the pylon defends.
 - Their aggro range matches the pylon's detection radius (they don't wander beyond it).
 - Sentry golems have a **leash range** to their parent pylon — if pushed or pathing beyond the detection radius, they return.
 - Sentry golems do **not** drop iron ingots or poppies on death.
@@ -712,7 +712,7 @@ Shaped recipe (3x3 crafting grid):
 ### Implementation Notes
 - Custom block + block entity (`SentryPylonBlock` / `SentryPylonBlockEntity`).
 - Block entity handles: fuel storage (simple `int` count), scan tick, golem tracking (list of sentry golem UUIDs), spawn logic.
-- Sentry golems are vanilla `IronGolem` entities with an injected NBT tag and modified AI goals (custom `SentryTargetGoal` with range limit + return-to-pylon behavior).
+- Sentry golems are vanilla `IronGolem` entities with an injected NBT tag and added AI goals: `SentryTargetHostilesGoal` (creeper-inclusive target acquisition, gated on the sentry tag) and `ReturnToPylonGoal` (leash back inside the detection radius). A `Creeper` mixin suppresses swell while the creeper's target is a sentry.
 - Mixin or subclass to prevent sentry golems from dropping loot.
 - Despawn logic runs on the block entity tick — checks tracked golem UUIDs, if no hostiles in range, starts countdown per golem.
 - Golem spawn position: find valid spawn pos within detection radius near the closest hostile, using `SpawnPlacements` logic.

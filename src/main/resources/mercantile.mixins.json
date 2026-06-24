@@ -9,6 +9,7 @@
         "ItemEntityAccessor",
         "AreaEffectCloudMixin",
         "BellBlockMixin",
+        "CreeperMixin",
         "FenceGateBlockAccessor",
         "GroundPathNavigationMixin",
         "IronGolemMixin",
