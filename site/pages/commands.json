@@ -20,7 +20,7 @@
               "body": [
                 { "type": "code", "code": "/mercantile reputation" },
                 { "type": "prose", "html": "No permission required. Displays the executing player's reputation score and tier name (e.g. \"Liked\", \"Trusted\", \"Honored\"). Returns the score as the command result." },
-                { "type": "prose", "html": "<span class='text-smoke text-xs'><strong class='text-bone'>Example:</strong> <code>/mercantile reputation</code> → \"You: 42 (Liked)\"</span>" }
+                { "type": "prose", "html": "<span class='text-smoke text-xs'><strong class='text-bone'>Example:</strong> <code>/mercantile reputation</code> → \"You: 42 (Neutral)\"</span>" }
               ]
             },
             {
@@ -29,7 +29,7 @@
               "body": [
                 { "type": "code", "code": "/mercantile reputation <player>" },
                 { "type": "prose", "html": "Op-restricted. Reports another player's score and tier." },
-                { "type": "prose", "html": "<span class='text-smoke text-xs'><strong class='text-bone'>Example:</strong> <code>/mercantile reputation Steve</code> → \"Steve: 105 (Honored)\"</span>" }
+                { "type": "prose", "html": "<span class='text-smoke text-xs'><strong class='text-bone'>Example:</strong> <code>/mercantile reputation Steve</code> → \"Steve: 105 (Liked)\"</span>" }
               ]
             },
             {
@@ -37,8 +37,8 @@
               "suffix": "(op 2)",
               "body": [
                 { "type": "code", "code": "/mercantile reputation set <player> <value>" },
-                { "type": "prose", "html": "Op-restricted. Sets a player's reputation to an absolute value. Range: <code class='text-bone'>−100</code> to <code class='text-bone'>200</code>; Brigadier rejects out-of-range values at parse time." },
-                { "type": "prose", "html": "<span class='text-smoke text-xs'><strong class='text-bone'>Example:</strong> <code>/mercantile reputation set Steve 100</code> → broadcasts \"Set Steve's reputation to 100 (Honored)\"</span>" }
+                { "type": "prose", "html": "Op-restricted. Sets a player's reputation to an absolute value. Range: <code class='text-bone'>−200</code> to <code class='text-bone'>1500</code>; Brigadier rejects out-of-range values at parse time." },
+                { "type": "prose", "html": "<span class='text-smoke text-xs'><strong class='text-bone'>Example:</strong> <code>/mercantile reputation set Steve 100</code> → broadcasts \"Set Steve's reputation to 100 (Liked)\"</span>" }
               ]
             },
             {
@@ -46,8 +46,8 @@
               "suffix": "(op 2)",
               "body": [
                 { "type": "code", "code": "/mercantile reputation add <player> <value>" },
-                { "type": "prose", "html": "Op-restricted. Adds (or subtracts, with a negative value) to the current score, then clamps to <code class='text-bone'>[−100, 200]</code>. The <code class='text-bone'>&lt;value&gt;</code> argument is bounded to <code class='text-bone'>[−300, 300]</code> — wide enough to traverse the full range in one call, narrow enough to reject parser overflow." },
-                { "type": "prose", "html": "<span class='text-smoke text-xs'><strong class='text-bone'>Example:</strong> <code>/mercantile reputation add Steve -50</code> → \"Added -50 to Steve's reputation: 50 (Trusted)\"</span>" }
+                { "type": "prose", "html": "Op-restricted. Adds (or subtracts, with a negative value) to the current score, then clamps to <code class='text-bone'>[−200, 1500]</code>. The <code class='text-bone'>&lt;value&gt;</code> argument is bounded to <code class='text-bone'>[−1700, 1700]</code> — wide enough to traverse the full range in one call, narrow enough to reject parser overflow." },
+                { "type": "prose", "html": "<span class='text-smoke text-xs'><strong class='text-bone'>Example:</strong> <code>/mercantile reputation add Steve -50</code> → \"Added -50 to Steve's reputation: 50 (Neutral)\"</span>" }
               ]
             }
           ]
