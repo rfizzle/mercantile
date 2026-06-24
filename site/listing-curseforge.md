@@ -20,9 +20,11 @@ persistent characters — with pickup, biome-themed names, a five-tier
 reputation system, emerald-based trade cycling, and an iron-fueled sentry
 block that defends your village.
 
-**Vanilla-first by design.** No custom textures beyond the sentry pylon, no
+**Restrained by design.** Custom art is scoped to what earns its place — the
+sentry pylon block, a set of bespoke effect particles, and a handful of HUD/GUI
+glyphs in the Concord palette; everything else leans on vanilla. No
 balance-breaking shortcuts, no bundled dependencies you didn't ask for. Every
-sound is a vanilla sound. Every villager head uses a community skin already
+sound is a vanilla sound, and every villager head uses a community skin already
 hosted on Mojang's CDN.
 
 ## At a glance
@@ -231,5 +233,6 @@ Microsoft.
 
 Villager head skins are community-created textures sourced from
 [minecraft-heads.com](https://minecraft-heads.com), permanently hosted on
-Mojang's CDN. All sounds and particles (outside the sentry pylon) are
-vanilla — no resource-pack download, no surprises.
+Mojang's CDN. Every sound is vanilla, and the custom art — the sentry pylon,
+the effect particles, and the HUD/GUI glyphs — ships inside the jar, so there's
+no resource-pack download and no surprises.

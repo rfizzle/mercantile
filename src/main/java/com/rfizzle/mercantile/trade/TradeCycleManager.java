@@ -50,7 +50,7 @@ public final class TradeCycleManager {
         }
         if (!hasUnlocked) return false;
 
-        if (!player.isCreative()) {
+        if (!player.getAbilities().instabuild) {
             return countEmeralds(player) >= config.tradeCycleEmeraldCost;
         }
         return true;
@@ -85,7 +85,7 @@ public final class TradeCycleManager {
             return false;
         }
 
-        if (!player.isCreative()) {
+        if (!player.getAbilities().instabuild) {
             int cost = config.tradeCycleEmeraldCost;
             if (countEmeralds(player) < cost) {
                 ExclusiveTradesManager.injectOffers(villager, playerScore);

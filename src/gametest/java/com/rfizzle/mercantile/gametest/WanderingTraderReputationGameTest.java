@@ -1,6 +1,8 @@
 package com.rfizzle.mercantile.gametest;
 
+import com.rfizzle.mercantile.api.ReputationTier;
 import com.rfizzle.mercantile.config.MercantileConfig;
+import com.rfizzle.mercantile.reputation.ExclusiveTradesManager;
 import com.rfizzle.mercantile.reputation.ReputationManager;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.core.BlockPos;
@@ -13,6 +15,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.npc.WanderingTrader;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.trading.MerchantOffers;
 import net.minecraft.world.phys.BlockHitResult;
@@ -20,6 +23,7 @@ import net.minecraft.world.phys.Vec3;
 import com.rfizzle.mercantile.data.VillagerPickupHelper;
 
 import java.util.List;
+import java.util.Map;
 
 public class WanderingTraderReputationGameTest implements FabricGameTest {
 
@@ -45,22 +49,35 @@ public class WanderingTraderReputationGameTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void trustedPlayerSeesExactlyOneExtraOffer(GameTestHelper helper) {
-        WanderingTrader trader = helper.spawn(EntityType.WANDERING_TRADER, 0, 1, 0);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        // PROFESSION_TRADES is static and other gametests (e.g. TradeIndexGameTest) clear it via
+        // setSnapshotsForTesting, so provide a deterministic wandering_trader pool here rather than
+        // relying on datapack-load order.
+        ExclusiveTradesManager.setSnapshotsForTesting(
+                Map.of("wandering_trader", List.of(new ExclusiveTradesManager.ExclusiveTrade(
+                        new ItemCost(Items.EMERALD, 5), null,
+                        new ItemStack(Items.DIAMOND, 1),
+                        8, 1, 0.05f, ReputationTier.TRUSTED.minScore()))),
+                List.of());
+        try {
+            WanderingTrader trader = helper.spawn(EntityType.WANDERING_TRADER, 0, 1, 0);
+            ServerPlayer player = helper.makeMockServerPlayerInLevel();
 
-        // Set reputation to TRUSTED (300)
-        ReputationManager.setScore(player, 300);
+            // Set reputation to TRUSTED (300)
+            ReputationManager.setScore(player, 300);
 
-        int vanillaOfferCount = trader.getOffers().size();
+            int vanillaOfferCount = trader.getOffers().size();
 
-        // Interact to trigger trade injection
-        trader.interact(player, InteractionHand.MAIN_HAND);
+            // Interact to trigger trade injection
+            trader.interact(player, InteractionHand.MAIN_HAND);
 
-        helper.assertTrue(trader.getOffers().size() == vanillaOfferCount + 1,
-                "TRUSTED player should see exactly one extra offer (expected " + (vanillaOfferCount + 1) + ", got " + trader.getOffers().size() + ")");
+            helper.assertTrue(trader.getOffers().size() == vanillaOfferCount + 1,
+                    "TRUSTED player should see exactly one extra offer (expected " + (vanillaOfferCount + 1) + ", got " + trader.getOffers().size() + ")");
 
-        player.discard();
-        helper.succeed();
+            player.discard();
+            helper.succeed();
+        } finally {
+            ExclusiveTradesManager.setSnapshotsForTesting(Map.of(), List.of());
+        }
     }
 
     @GameTest(template = EMPTY_STRUCTURE)

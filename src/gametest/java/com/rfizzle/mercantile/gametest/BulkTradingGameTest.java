@@ -162,12 +162,17 @@ public class BulkTradingGameTest implements FabricGameTest {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
         villager.setTradingPlayer(player);
         // Enough emeralds for many trades but paper only for 8 — paper runs out first.
-        player.getInventory().add(new ItemStack(Items.EMERALD, 64));
-        player.getInventory().add(new ItemStack(Items.PAPER, 8));
+        // Seed the payment slots with exactly the cost and keep the rest in the inventory:
+        // vanilla tryMoveItems would dump full stacks into the payment slots, leaving a large
+        // legitimate residue (returned to the inventory on close) that masks the B-047 refill-cap
+        // invariant this test checks.
+        player.getInventory().add(new ItemStack(Items.EMERALD, 62));
+        player.getInventory().add(new ItemStack(Items.PAPER, 7));
 
         MerchantMenu menu = new MerchantMenu(0, player.getInventory(), villager);
         menu.setSelectionHint(0);
-        menu.tryMoveItems(0);
+        menu.getSlot(0).set(new ItemStack(Items.EMERALD, 2));
+        menu.getSlot(1).set(new ItemStack(Items.PAPER, 1));
         menu.quickMoveStack(player, 2);
 
         helper.assertTrue(offer.getUses() == 8,
@@ -242,7 +247,8 @@ public class BulkTradingGameTest implements FabricGameTest {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
         MerchantOffers offers = new MerchantOffers();
         offers.add(offer);
-        villager.overrideOffers(offers);
+        // Villager.setOffers persists; AbstractVillager.overrideOffers is a vanilla no-op.
+        villager.setOffers(offers);
         return villager;
     }
 

@@ -296,8 +296,10 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
                     BlockState state = server.getBlockState(bellPos);
                     if (state.getBlock() instanceof BellBlock bellBlock) {
                         BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(bellPos), Direction.UP, bellPos, false);
-                        // The ring itself carries to the 96-block glow broadcast (see BellBlockMixin),
-                        // so a distant player hears it and isn't left with silently glowing villagers.
+                        // onHit's final arg skips hit-position validation when false, forcing the ring
+                        // for this non-player (Direction.UP) trigger. The ring itself carries to the
+                        // 96-block glow broadcast (see BellBlockMixin), so a distant player hears it
+                        // and isn't left with silently glowing villagers.
                         bellBlock.onHit(server, state, hit, null, false);
                         bellCooldown = BELL_RING_COOLDOWN_TICKS;
                         setChanged();
