@@ -65,6 +65,9 @@ public class TradeCyclingGameTest implements FabricGameTest {
                 new ItemCost(Items.EMERALD, 1), new ItemStack(Items.APPLE, 1), 16, 1, 0.0f);
         Villager villager = spawnTraderWithOffers(helper, offer);
         ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        // Mock server players default to creative, which waives the emerald cost (SPEC §3/§21);
+        // force survival so the deduction path runs.
+        player.getAbilities().instabuild = false;
 
         int cost = MercantileConfig.get().tradeCycleEmeraldCost;
         player.getInventory().add(new ItemStack(Items.EMERALD, cost + 5));
@@ -101,6 +104,8 @@ public class TradeCyclingGameTest implements FabricGameTest {
                 new ItemCost(Items.EMERALD, 1), new ItemStack(Items.APPLE, 1), 16, 1, 0.0f);
         Villager villager = spawnTraderWithOffers(helper, offer);
         ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        // Force survival — creative would waive the emerald requirement (SPEC §3/§21).
+        player.getAbilities().instabuild = false;
 
         helper.assertFalse(TradeCycleManager.canCycle(player, villager),
                 "canCycle should be false when player has no emeralds");
@@ -133,6 +138,8 @@ public class TradeCyclingGameTest implements FabricGameTest {
                 new ItemCost(Items.EMERALD, 1), new ItemStack(Items.APPLE, 1), 16, 1, 0.0f);
         Villager villager = spawnTraderWithOffers(helper, offer);
         ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        // Force survival — creative would waive the emerald requirement (SPEC §3/§21).
+        player.getAbilities().instabuild = false;
 
         int cost = MercantileConfig.get().tradeCycleEmeraldCost;
         player.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(Items.EMERALD, cost + 3));
@@ -236,7 +243,8 @@ public class TradeCyclingGameTest implements FabricGameTest {
         for (MerchantOffer offer : offers) {
             merchantOffers.add(offer);
         }
-        villager.overrideOffers(merchantOffers);
+        // Villager.setOffers persists; AbstractVillager.overrideOffers is a vanilla no-op.
+        villager.setOffers(merchantOffers);
         return villager;
     }
 
