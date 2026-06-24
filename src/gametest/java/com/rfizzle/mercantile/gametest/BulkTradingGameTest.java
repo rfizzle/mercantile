@@ -200,12 +200,13 @@ public class BulkTradingGameTest implements FabricGameTest {
     }
 
     @GameTest(template = EMPTY_STRUCTURE)
-    public void bulkReputationCappedAtOnePerOperation(GameTestHelper helper) {
-        boolean savedRep = MercantileConfig.get().enableReputation;
-        boolean savedBulk = MercantileConfig.get().enableBulkTrading;
+    public void bulkReputationHonorsTradeCaps(GameTestHelper helper) {
+        MercantileConfig config = MercantileConfig.get();
+        boolean savedRep = config.enableReputation;
+        boolean savedBulk = config.enableBulkTrading;
         try {
-            MercantileConfig.get().enableReputation = true;
-            MercantileConfig.get().enableBulkTrading = true;
+            config.enableReputation = true;
+            config.enableBulkTrading = true;
 
             MerchantOffer offer = new MerchantOffer(
                     new ItemCost(Items.EMERALD, 1), new ItemStack(Items.APPLE, 1), 16, 1, 0.0f);
@@ -226,9 +227,15 @@ public class BulkTradingGameTest implements FabricGameTest {
             helper.assertTrue(offer.getUses() == 10,
                     "Expected 10 trades, got " + offer.getUses());
 
-            int expected = MercantileConfig.get().reputationTradeGain;
+            // Bulk trading accrues reputation through the same per-trade path as
+            // single trades: one gain pulse every reputationTradesPerGain trades,
+            // bounded by the per-source sub-cap and the daily total cap. It must not
+            // award a flat gain per operation or otherwise bypass the daily caps.
+            int pulses = 10 / config.reputationTradesPerGain;
+            int expected = Math.min(pulses * config.reputationTradeGain,
+                    Math.min(config.reputationDailyMaxTradeRep, config.reputationDailyCap));
             helper.assertTrue(data.getScore() == expected,
-                    "Bulk rep should be capped to " + expected + " (one gain), got " + data.getScore());
+                    "Bulk rep should honor the trade caps (" + expected + "), got " + data.getScore());
 
             // Counter is per-trade and not capped by BulkTradeContext.
             helper.assertTrue(data.getTradesWithVillager(villager.getUUID()) == 10,
@@ -238,8 +245,8 @@ public class BulkTradingGameTest implements FabricGameTest {
             player.discard();
             helper.succeed();
         } finally {
-            MercantileConfig.get().enableReputation = savedRep;
-            MercantileConfig.get().enableBulkTrading = savedBulk;
+            config.enableReputation = savedRep;
+            config.enableBulkTrading = savedBulk;
         }
     }
 
