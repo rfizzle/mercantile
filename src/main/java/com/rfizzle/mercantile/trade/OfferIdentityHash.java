@@ -35,8 +35,8 @@ public final class OfferIdentityHash {
 
     /**
      * Appends a sorted enchantment fingerprint, but only when the result stack actually carries
-     * enchantment components. Component-free offers therefore hash byte-identically to the
-     * pre-enchantment format, so stored lock-hash data stays valid with no migration.
+     * enchantment components. Component-free offers therefore omit the enchantment segment
+     * entirely, so an unenchanted offer's hash never depends on this method.
      */
     private static void appendEnchantmentFingerprint(StringBuilder sb, ItemStack result) {
         String enchanted = fingerprint(result.get(DataComponents.ENCHANTMENTS));
@@ -56,20 +56,5 @@ public final class OfferIdentityHash {
         }
         parts.sort(null);
         return String.join(",", parts);
-    }
-
-    /**
-     * Legacy hash format (no item counts) used before BUG-003 fix.
-     * Used only for migrating old world-save data — do not use for new hashes.
-     */
-    public static String computeLegacy(MerchantOffer offer) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(BuiltInRegistries.ITEM.getKey(offer.getBaseCostA().getItem()));
-        sb.append('|');
-        offer.getItemCostB().ifPresent(cost ->
-                sb.append(BuiltInRegistries.ITEM.getKey(cost.item().value())));
-        sb.append('|');
-        sb.append(BuiltInRegistries.ITEM.getKey(offer.getResult().getItem()));
-        return sb.toString();
     }
 }

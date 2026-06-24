@@ -101,7 +101,6 @@ public class VillagerPickupHelper {
         }
 
         MercantileVillagerData data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
-        data.migrateLockedTrades(villager.getOffers());
         appendTradesSection(lines, villager.getOffers(), data.getLockedTrades());
 
         return new ItemLore(lines, lines);

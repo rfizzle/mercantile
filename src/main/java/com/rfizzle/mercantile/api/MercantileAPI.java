@@ -100,9 +100,7 @@ public final class MercantileAPI {
      *
      * <p>Offers are identified by their item/count identity, so an
      * equivalent offer object (same costs, same result) matches the stored
-     * lock even if it is not the same instance. Locks written by very old
-     * Mercantile versions used a count-less identity; those are matched here
-     * too until the villager's stored locks are migrated.
+     * lock even if it is not the same instance.
      *
      * @param villager the villager owning the offer
      * @param offer    the offer to check
@@ -111,8 +109,7 @@ public final class MercantileAPI {
     public static boolean isTradeLocked(Villager villager, MerchantOffer offer) {
         MercantileVillagerData data = villager.getAttached(MercantileAttachments.VILLAGER_DATA);
         if (data == null) return false;
-        if (data.isTradeLocked(OfferIdentityHash.compute(offer))) return true;
-        return !data.isTradesMigrated() && data.isTradeLocked(OfferIdentityHash.computeLegacy(offer));
+        return data.isTradeLocked(OfferIdentityHash.compute(offer));
     }
 
     // Render-thread only — resolved once on the first ENV=CLIENT call.

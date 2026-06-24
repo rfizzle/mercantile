@@ -63,7 +63,7 @@ class MercantileVillagerDataCodecTest {
 
     @Test
     void constructorWithValues() {
-        MercantileVillagerData data = new MercantileVillagerData(true, Set.of("h1", "h2"), true, false);
+        MercantileVillagerData data = new MercantileVillagerData(true, Set.of("h1", "h2"), true);
 
         assertTrue(data.isProfessionLocked());
         assertEquals(2, data.getLockedTrades().size());
@@ -145,7 +145,7 @@ class MercantileVillagerDataCodecTest {
         input.add("alpha");
         input.add("november");
 
-        MercantileVillagerData data = new MercantileVillagerData(false, input, false, false);
+        MercantileVillagerData data = new MercantileVillagerData(false, input, false);
         JsonElement encoded = MercantileVillagerData.CODEC.encodeStart(JsonOps.INSTANCE, data).getOrThrow();
         JsonArray arr = encoded.getAsJsonObject().getAsJsonArray("lockedTrades");
 
@@ -166,5 +166,27 @@ class MercantileVillagerDataCodecTest {
 
         assertTrue(decoded.isProfessionLocked());
         assertTrue(decoded.isNameAssigned());
+    }
+
+    @Test
+    void tradesMigratedFieldIgnoredOnLoad() {
+        // Pre-release saves may carry the dropped "tradesMigrated" key. The codec must accept and
+        // silently ignore it, loading every other field correctly — including the locked-trade set.
+        JsonObject save = new JsonObject();
+        save.addProperty("professionLocked", true);
+        save.addProperty("nameAssigned", true);
+        save.addProperty("tradesMigrated", true);
+        JsonArray locked = new JsonArray();
+        locked.add("hash_one");
+        locked.add("hash_two");
+        save.add("lockedTrades", locked);
+
+        MercantileVillagerData decoded = MercantileVillagerData.CODEC.parse(JsonOps.INSTANCE, save).getOrThrow();
+
+        assertTrue(decoded.isProfessionLocked());
+        assertTrue(decoded.isNameAssigned());
+        assertEquals(2, decoded.getLockedTrades().size());
+        assertTrue(decoded.isTradeLocked("hash_one"));
+        assertTrue(decoded.isTradeLocked("hash_two"));
     }
 }

@@ -173,9 +173,9 @@ class OfferIdentityHashTest {
 
     @Test
     void componentFreeHashFormatUnchanged() {
-        // Regression guard: an unenchanted offer must hash byte-identically to the pre-enchantment
-        // format (item x count | costB | item x count) with NO trailing enchantment segment, so
-        // stored lock-hash data stays valid with no migration.
+        // Regression guard: an unenchanted offer hashes to exactly
+        // (item x count | costB | item x count) with NO trailing enchantment segment.
+        // Enchantment fingerprinting must never perturb the hash of a component-free offer.
         MerchantOffer offer = new MerchantOffer(
                 new ItemCost(Items.EMERALD, 5), Optional.of(new ItemCost(Items.DIAMOND, 4)),
                 new ItemStack(Items.DIAMOND_SWORD, 1), 1, 1, 0.05f);
