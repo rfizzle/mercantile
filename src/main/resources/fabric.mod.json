@@ -5,7 +5,11 @@
     "name": "Mercantile",
     "description": "A comprehensive villager and trade overhaul — pick up villagers, random names, trade cycling, reputation system, and more.",
     "authors": ["rfizzle"],
-    "contact": {},
+    "contact": {
+        "homepage": "https://mercantile.rfizzle.com",
+        "sources": "https://github.com/rfizzle/mercantile",
+        "issues": "https://github.com/rfizzle/mercantile/issues"
+    },
     "license": "MIT",
     "icon": "assets/mercantile/icon.png",
     "environment": "*",
