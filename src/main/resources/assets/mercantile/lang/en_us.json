@@ -210,7 +210,6 @@
     "gui.mercantile.info.workstation.bound": "Workstation: Bound",
     "gui.mercantile.info.workstation.missing": "Workstation: Missing",
     "gui.mercantile.info.xp": "%s / %s XP",
-    "gui.mercantile.info.master": "Master",
     "gui.mercantile.info.reputation": "%s (%s)",
     "gui.mercantile.info.unemployed": "Unemployed",
     "gui.mercantile.info.button.tooltip": "View villager info",
