@@ -3,6 +3,7 @@ package com.rfizzle.mercantile.gametest;
 import com.rfizzle.mercantile.block.ReturnToPylonGoal;
 import com.rfizzle.mercantile.block.SentryGolemTag;
 import com.rfizzle.mercantile.block.SentryPylonBlockEntity;
+import com.rfizzle.mercantile.block.SentryTargetHostilesGoal;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.registry.MercantileRegistry;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
@@ -18,6 +19,7 @@ import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.sensing.GolemSensor;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Husk;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.level.block.Blocks;
@@ -53,6 +55,12 @@ public class SentryGolemBehaviorGameTest implements FabricGameTest {
 
     private static GoalSelector readGoalSelector(Mob mob) throws ReflectiveOperationException {
         Field field = Mob.class.getDeclaredField("goalSelector");
+        field.setAccessible(true);
+        return (GoalSelector) field.get(mob);
+    }
+
+    private static GoalSelector readTargetSelector(Mob mob) throws ReflectiveOperationException {
+        Field field = Mob.class.getDeclaredField("targetSelector");
         field.setAccessible(true);
         return (GoalSelector) field.get(mob);
     }
@@ -175,6 +183,84 @@ public class SentryGolemBehaviorGameTest implements FabricGameTest {
         ReturnToPylonGoal goal = new ReturnToPylonGoal(golem);
         helper.assertFalse(goal.canUse(),
                 "goal should NOT be usable when pylon block is missing");
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE, timeoutTicks = 80)
+    public void sentryGoalAcquiresCreeper(GameTestHelper helper) {
+        SentryPylonBlockEntity be = placePylonOnFloor(helper);
+        IronGolem golem = spawnSentryAt(helper, be, new BlockPos(2, 2, 2));
+        helper.spawnWithNoFreeWill(EntityType.CREEPER, new BlockPos(4, 2, 2));
+
+        // Freshly spawned entities only enter the level's entity lookup once the spawn queue is
+        // drained next tick, so the goal's level scan can't see the creeper synchronously. Defer
+        // the check a couple ticks, then poll: the goal's randomInterval makes a single canUse()
+        // probabilistic, so attempt it enough times that acquisition is deterministic. The creeper
+        // is the only hostile present, so a positive canUse() means it was the target found.
+        helper.runAfterDelay(2, () -> {
+            SentryTargetHostilesGoal goal = new SentryTargetHostilesGoal(golem);
+            boolean acquired = false;
+            for (int i = 0; i < 200 && !acquired; i++) {
+                acquired = goal.canUse();
+            }
+            helper.assertTrue(acquired,
+                    "sentry goal should acquire a nearby creeper (vanilla golems exclude creepers)");
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE, timeoutTicks = 80)
+    public void sentryGoalInertOnPlainGolem(GameTestHelper helper) {
+        placePylonOnFloor(helper);
+        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new BlockPos(2, 2, 2));
+        helper.spawnWithNoFreeWill(EntityType.CREEPER, new BlockPos(4, 2, 2));
+
+        SentryTargetHostilesGoal goal = new SentryTargetHostilesGoal(golem);
+        for (int i = 0; i < 200; i++) {
+            helper.assertFalse(goal.canUse(),
+                    "the sentry target goal must stay inert on a non-sentry iron golem");
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE, timeoutTicks = 80)
+    public void ironGolemMixinAddsSentryTargetGoal(GameTestHelper helper) {
+        IronGolem golem = helper.spawn(EntityType.IRON_GOLEM, new BlockPos(2, 2, 2));
+        try {
+            GoalSelector selector = readTargetSelector(golem);
+            boolean hasTargetGoal = selector.getAvailableGoals().stream()
+                    .map(WrappedGoal::getGoal)
+                    .anyMatch(g -> g instanceof SentryTargetHostilesGoal);
+            helper.assertTrue(hasTargetGoal,
+                    "IronGolemMixin should have added SentryTargetHostilesGoal to targetSelector");
+            helper.succeed();
+        } catch (ReflectiveOperationException e) {
+            helper.fail("reflection failed: " + e.getMessage());
+        }
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE, timeoutTicks = 80)
+    public void creeperDoesNotPrimeAgainstSentry(GameTestHelper helper) {
+        SentryPylonBlockEntity be = placePylonOnFloor(helper);
+        IronGolem golem = spawnSentryAt(helper, be, new BlockPos(2, 2, 2));
+        Creeper creeper = helper.spawnWithNoFreeWill(EntityType.CREEPER, new BlockPos(3, 2, 2));
+
+        creeper.setTarget(golem);
+        creeper.setSwellDir(1);
+        helper.assertTrue(creeper.getSwellDir() < 0,
+                "a creeper targeting a sentry should be forced to de-swell, not prime");
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE, timeoutTicks = 80)
+    public void creeperStillPrimesAgainstNonSentry(GameTestHelper helper) {
+        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new BlockPos(2, 2, 2));
+        Creeper creeper = helper.spawnWithNoFreeWill(EntityType.CREEPER, new BlockPos(3, 2, 2));
+
+        creeper.setTarget(golem);
+        creeper.setSwellDir(1);
+        helper.assertTrue(creeper.getSwellDir() > 0,
+                "the no-detonate guard must be scoped to sentries; a plain golem still primes the creeper");
         helper.succeed();
     }
 
