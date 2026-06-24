@@ -17,6 +17,7 @@ import java.util.Locale;
  * gameplay tuning and may shift in minor releases — compare tiers, don't
  * hardcode scores.
  */
+@Stable
 public enum ReputationTier {
     // Declared in descending minScore order so fromScore() can walk values() once.
     // minScore = lowest score in the tier's range (range extends up to the next tier's minScore - 1).
