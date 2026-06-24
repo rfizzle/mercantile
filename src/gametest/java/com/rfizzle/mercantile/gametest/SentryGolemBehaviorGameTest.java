@@ -113,6 +113,40 @@ public class SentryGolemBehaviorGameTest implements FabricGameTest {
         });
     }
 
+    @GameTest(template = EMPTY_STRUCTURE, batch = "sentrySealedAlone", timeoutTicks = 200)
+    public void countdownNotResetForSealedThreat(GameTestHelper helper) {
+        // A hostile inside the radius but walled off from the pylon must not keep a sentry alive —
+        // otherwise the golem stands around indefinitely, unable to reach a threat it can't see.
+        // The despawn countdown should run to completion exactly as if no threat were present.
+        final int savedDespawn = MercantileConfig.get().sentryDespawnSeconds;
+        MercantileConfig.get().sentryDespawnSeconds = 1;
+        SentryPylonBlockEntity be = placePylonOnFloor(helper);
+        spawnSentryAt(helper, be, new BlockPos(2, 2, 2));
+
+        // Wall at x=3 seals the threat side (x>3) off from the pylon at (1,2,1).
+        for (int z = 0; z <= 7; z++) {
+            for (int y = 2; y <= 6; y++) {
+                helper.setBlock(new BlockPos(3, y, z), Blocks.STONE);
+            }
+        }
+        Husk husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new BlockPos(4, 2, 1));
+        helper.assertTrue(husk.isAlive(), "sealed husk should spawn");
+
+        helper.runAfterDelay(60, () -> {
+            try {
+                List<IronGolem> golems = helper.getEntities(EntityType.IRON_GOLEM);
+                helper.assertTrue(golems.isEmpty(),
+                        "sentry should despawn — a walled-off threat must not reset the countdown "
+                                + "(got " + golems.size() + ")");
+                helper.assertTrue(be.getSentries().isEmpty(),
+                        "tracked sentries should be cleared");
+                helper.succeed();
+            } finally {
+                MercantileConfig.get().sentryDespawnSeconds = savedDespawn;
+            }
+        });
+    }
+
     @GameTest(template = EMPTY_STRUCTURE, timeoutTicks = 120)
     public void sentryDropsNothingOnKill(GameTestHelper helper) {
         SentryPylonBlockEntity be = placePylonOnFloor(helper);

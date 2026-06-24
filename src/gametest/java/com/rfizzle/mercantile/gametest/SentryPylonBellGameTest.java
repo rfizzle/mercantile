@@ -33,7 +33,9 @@ public class SentryPylonBellGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void pylonRingsBellOnActivation(GameTestHelper helper) {
         BlockPos pylonRel = new BlockPos(1, 2, 1);
-        BlockPos bellRel = new BlockPos(2, 2, 1);
+        // Bell beside the pylon, not between it and the threat: detection is line-of-sight gated,
+        // so a bell sitting on the pylon-to-zombie line would occlude the very threat it announces.
+        BlockPos bellRel = new BlockPos(1, 2, 2);
         buildFloor(helper);
         SentryPylonBlockEntity pylon = fueledPylon(helper, pylonRel);
         helper.setBlock(bellRel, Blocks.BELL);
@@ -58,7 +60,7 @@ public class SentryPylonBellGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void pylonRespectsBellConfig(GameTestHelper helper) {
         BlockPos pylonRel = new BlockPos(1, 2, 1);
-        BlockPos bellRel = new BlockPos(2, 2, 1);
+        BlockPos bellRel = new BlockPos(1, 2, 2);
         buildFloor(helper);
         SentryPylonBlockEntity pylon = fueledPylon(helper, pylonRel);
         helper.setBlock(bellRel, Blocks.BELL);
@@ -76,6 +78,48 @@ public class SentryPylonBellGameTest implements FabricGameTest {
                     "Bell should NOT ring when enablePylonBellAlarm is false");
             helper.succeed();
         } finally {
+            MercantileConfig.get().enablePylonBellAlarm = savedAlarm;
+        }
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void pylonDoesNotRingForSealedThreat(GameTestHelper helper) {
+        // A hostile inside the detection radius but walled off from the pylon must NOT ring the
+        // bell — otherwise a mob in a cave or a sealed room rings it endlessly. This is the core
+        // of the line-of-sight detection fix.
+        int savedRadius = MercantileConfig.get().pylonDetectionRadius;
+        boolean savedAlarm = MercantileConfig.get().enablePylonBellAlarm;
+        MercantileConfig.get().pylonDetectionRadius = 8;
+        MercantileConfig.get().enablePylonBellAlarm = true;
+        try {
+            for (int x = 0; x <= 6; x++) {
+                for (int z = 0; z <= 2; z++) {
+                    helper.setBlock(new BlockPos(x, 1, z), Blocks.STONE);
+                }
+            }
+            BlockPos pylonRel = new BlockPos(1, 2, 1);
+            BlockPos bellRel = new BlockPos(1, 2, 2);
+            SentryPylonBlockEntity pylon = fueledPylon(helper, pylonRel);
+            helper.setBlock(bellRel, Blocks.BELL);
+
+            // Solid wall at x=3 sealing the threat side (x>3) off from the pylon (x=1).
+            for (int z = 0; z <= 2; z++) {
+                for (int y = 2; y <= 4; y++) {
+                    helper.setBlock(new BlockPos(3, y, z), Blocks.STONE);
+                }
+            }
+            helper.spawn(EntityType.ZOMBIE, 5, 2, 1);
+
+            pylon.setScanCooldownForTesting(0);
+            pylon.tickServerCommon();
+
+            BellBlockEntity bell = (BellBlockEntity) helper.getBlockEntity(bellRel);
+            helper.assertTrue(bell != null, "Bell block entity should exist");
+            helper.assertFalse(bell.shaking,
+                    "Bell must NOT ring for a threat the pylon has no line of sight to");
+            helper.succeed();
+        } finally {
+            MercantileConfig.get().pylonDetectionRadius = savedRadius;
             MercantileConfig.get().enablePylonBellAlarm = savedAlarm;
         }
     }
