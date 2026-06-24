@@ -34,7 +34,8 @@ in the local workspace. Normative for this repo:
 ```
 
 A `Makefile` wraps these (`make build`, `make test`, `make run-client`, etc.)
-and adds `make release BUMP=patch|minor|major`.
+and adds `make release VERSION=X.Y.Z` (tags `vX.Y.Z` and pushes it to trigger
+the release).
 
 Run a single JUnit test:
 `./gradlew test --tests "com.rfizzle.mercantile.SomeTest"`
