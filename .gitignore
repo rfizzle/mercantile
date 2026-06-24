@@ -1,46 +1,60 @@
-# gradle
-.gradle/
-build/
-out/
-classes/
+# concord:gitignore:start
+# Concord-managed — synced from concord; edit there, not here. Root-only build,
+# runtime, and tooling artifacts are anchored with a leading "/" so they can
+# never match a nested package/resource directory of the same name. Put
+# repo-specific ignores OUTSIDE this block.
 
-# loom dev runtime
-run/
-mods/
-logs/
-config/
+# Gradle / compile output
+/.gradle/
+/build/
+/out/
+/bin/
+/classes/
+/net/
 
-# IDE
-.idea/
-*.iml
-*.ipr
-*.iws
-.settings/
-.vscode/
-.classpath
-.project
-*.launch
+# Loom dev runtime
+/run/
+/mods/
+/logs/
+/config/
 
-# generated website (built by concord template)
-_site/
+# Generated website (concord template)
+/_site/
 
-# local AI / planning state
+# Local AI / planning state
+/.plan/
 .claude/settings.local.json
 .claude/projects/
 .claude/scheduled_tasks.lock
-.plan/
+
+# IDE / editor (global — these names never collide with a source dir)
+.idea/
+.vscode/
+.settings/
+.classpath
+.project
+*.iml
+*.ipr
+*.iws
+*.launch
 
 # OS junk
 .DS_Store
 Thumbs.db
 
-# stray runtime artifacts
-replay_pid*.log
+# JVM crash dumps & loom dev-runtime logs (never source; match anywhere)
 hs_err_pid*.log
+replay_pid*.log
 gametest_output.log
 
-# art masters: commit the .sfx/.glyph sources of truth; ignore rendered byproducts
-# (the shipping copies live under src/main/resources/assets/mercantile/)
-art/audio/*.ogg
-art/audio/*.png
-art/glyphs/*.png
+# Glyph & SFX pipeline byproducts (mc-textures /glyph, mc-audio /sfx). art/ holds
+# the .glyph/.sfx specs — the committed source of truth. Every rendered byproduct
+# is throwaway: the shipping master lives in the mod's src/main/resources/assets/
+# tree (textures/, sounds/), never in art/. Ignore the renders:
+art/glyphs/**/*.png
+art/glyphs/**/*.gif
+art/glyphs/**/*.mcmeta
+art/audio/**/*.ogg
+art/audio/**/*.wav
+art/audio/**/*.report.png
+# concord:gitignore:end
