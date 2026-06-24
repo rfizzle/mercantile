@@ -397,13 +397,8 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
             y += this.font.lineHeight + 4;
         }
 
-        // XP bar (or "Master" at level 5).
-        if (info.level() >= 5) {
-            Component master = Component.translatable("gui.mercantile.info.master")
-                    .withStyle(ChatFormatting.GOLD);
-            guiGraphics.drawString(this.font, master, contentX, y, INFO_PANEL_TEXT_COLOR, false);
-            y += this.font.lineHeight + 4;
-        } else {
+        // XP bar — omitted at max level, where the level label already reads "Master".
+        if (info.level() < 5) {
             int barWidth = contentWidth;
             int barHeight = 5;
             int filled = info.xpToNextLevel() > 0
