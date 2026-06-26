@@ -46,11 +46,6 @@ public class ClientNetworkHandler {
                     ClientMercantileData.setServerConfig(MercantileConfig.fromJson(payload.configJson())));
         });
 
-        ClientPlayNetworking.registerGlobalReceiver(PylonStateS2CPayload.TYPE, (payload, context) -> {
-            context.client().execute(() ->
-                    ClientMercantileData.setPylonState(payload));
-        });
-
         ClientPlayNetworking.registerGlobalReceiver(BellRingS2CPayload.TYPE, (payload, context) -> {
             context.client().execute(() -> {
                 Minecraft client = context.client();
