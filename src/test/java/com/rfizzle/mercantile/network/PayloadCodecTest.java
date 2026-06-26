@@ -284,5 +284,6 @@ class PayloadCodecTest {
                 new VillagerInfoPanelS2CPayload(0, "", 0, 0, 0, 0, "", 0, false, false).type());
         assertEquals(WorkstationMapS2CPayload.TYPE, new WorkstationMapS2CPayload(Map.of(), List.of(), List.of()).type());
         assertEquals(ConfigSyncS2CPayload.TYPE, new ConfigSyncS2CPayload("").type());
+        assertEquals(TradeIndexS2CPayload.TYPE, new TradeIndexS2CPayload(List.of()).type());
     }
 }

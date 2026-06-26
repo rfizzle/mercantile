@@ -4,18 +4,25 @@ import com.rfizzle.mercantile.Mercantile;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.reputation.ReputationManager;
 import com.rfizzle.mercantile.trade.TradeCycleManager;
+import com.rfizzle.mercantile.trade.index.TradeIndexDataSource;
+import com.rfizzle.mercantile.trade.index.TradeIndexEntry;
 import com.rfizzle.mercantile.visualization.WorkstationMapService;
+import io.netty.buffer.Unpooled;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.npc.Villager;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MercantileNetworking {
 
@@ -30,10 +37,14 @@ public class MercantileNetworking {
     private static final long CYCLE_TRADES_COOLDOWN_MS = 500;
     private static final long REQUEST_QUERY_COOLDOWN_MS = 2000;
 
+    // Tracks whether the trade index payload size has been logged at least once per session.
+    private static final AtomicBoolean tradeIndexSizeLogged = new AtomicBoolean(false);
+
     public static void init() {
         registerPayloadTypes();
         registerServerHandlers();
         registerJoinSync();
+        registerReloadSync();
         registerDisconnectCleanup();
     }
 
@@ -49,6 +60,7 @@ public class MercantileNetworking {
         PayloadTypeRegistry.playS2C().register(WorkstationMapS2CPayload.TYPE, WorkstationMapS2CPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(BellRingS2CPayload.TYPE, BellRingS2CPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(ConfigSyncS2CPayload.TYPE, ConfigSyncS2CPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(TradeIndexS2CPayload.TYPE, TradeIndexS2CPayload.CODEC);
     }
 
     private static void registerServerHandlers() {
@@ -69,6 +81,18 @@ public class MercantileNetworking {
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> sendJoinSync(handler.getPlayer()));
     }
 
+    private static void registerReloadSync() {
+        ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, success) -> {
+            if (!success) return;
+            TradeIndexS2CPayload payload = new TradeIndexS2CPayload(TradeIndexDataSource.snapshot());
+            for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+                if (player.connection != null) {
+                    ServerPlayNetworking.send(player, payload);
+                }
+            }
+        });
+    }
+
     // Public so gametests can drive the same emission without the real
     // ServerPlayConnectionEvents.JOIN event firing on mock players, and so future
     // admin commands could resync a specific player without restarting their session.
@@ -79,6 +103,21 @@ public class MercantileNetworking {
         // one-frame mismatch on the HUD at login.
         ServerPlayNetworking.send(player, new ConfigSyncS2CPayload(MercantileConfig.get().toJson()));
         ReputationManager.syncToClient(player);
+        List<TradeIndexEntry> snapshot = TradeIndexDataSource.snapshot();
+        if (tradeIndexSizeLogged.compareAndSet(false, true) && Mercantile.LOGGER.isDebugEnabled()) {
+            RegistryFriendlyByteBuf probe = new RegistryFriendlyByteBuf(
+                    Unpooled.buffer(), player.server.registryAccess());
+            try {
+                TradeIndexS2CPayload.CODEC.encode(probe, new TradeIndexS2CPayload(snapshot));
+                Mercantile.LOGGER.debug("Trade index payload: {} bytes ({} entries)",
+                        probe.readableBytes(), snapshot.size());
+            } catch (Exception e) {
+                Mercantile.LOGGER.debug("Trade index size probe failed: {}", e.getMessage());
+            } finally {
+                probe.release();
+            }
+        }
+        ServerPlayNetworking.send(player, new TradeIndexS2CPayload(snapshot));
     }
 
     private static void registerDisconnectCleanup() {

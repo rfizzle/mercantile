@@ -2,9 +2,11 @@ package com.rfizzle.mercantile.client.network;
 
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.network.*;
+import com.rfizzle.mercantile.trade.index.TradeIndexEntry;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ClientMercantileData {
@@ -22,6 +24,18 @@ public class ClientMercantileData {
     private static final Map<Integer, Boolean> followStates = new HashMap<>();
 
     private static @Nullable MercantileConfig serverConfig;
+
+    // --- Trade index ---
+
+    private static volatile List<TradeIndexEntry> tradeIndex = List.of();
+
+    public static List<TradeIndexEntry> getTradeIndex() {
+        return tradeIndex;
+    }
+
+    public static void setTradeIndex(List<TradeIndexEntry> entries) {
+        tradeIndex = entries;
+    }
 
     // --- Reputation ---
 
@@ -157,5 +171,6 @@ public class ClientMercantileData {
         workstationMap = null;
         followStates.clear();
         serverConfig = null;
+        tradeIndex = List.of();
     }
 }
