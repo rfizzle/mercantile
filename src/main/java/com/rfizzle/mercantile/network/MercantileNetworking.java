@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MercantileNetworking {
 
@@ -41,7 +42,7 @@ public class MercantileNetworking {
     private static final long FOLLOW_TOGGLE_COOLDOWN_MS = 500;
 
     // Tracks whether the trade index payload size has been logged at least once per session.
-    private static volatile boolean tradeIndexSizeLogged = false;
+    private static final AtomicBoolean tradeIndexSizeLogged = new AtomicBoolean(false);
 
     public static void init() {
         registerPayloadTypes();
@@ -115,8 +116,7 @@ public class MercantileNetworking {
         ServerPlayNetworking.send(player, new ConfigSyncS2CPayload(MercantileConfig.get().toJson()));
         ReputationManager.syncToClient(player);
         List<TradeIndexEntry> snapshot = TradeIndexDataSource.snapshot();
-        if (!tradeIndexSizeLogged && Mercantile.LOGGER.isDebugEnabled()) {
-            tradeIndexSizeLogged = true;
+        if (tradeIndexSizeLogged.compareAndSet(false, true) && Mercantile.LOGGER.isDebugEnabled()) {
             RegistryFriendlyByteBuf probe = new RegistryFriendlyByteBuf(
                     Unpooled.buffer(), player.server.registryAccess());
             try {
