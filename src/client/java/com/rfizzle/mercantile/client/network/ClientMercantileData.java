@@ -3,7 +3,6 @@ package com.rfizzle.mercantile.client.network;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.network.*;
 import com.rfizzle.mercantile.trade.index.TradeIndexEntry;
-import net.minecraft.core.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -22,9 +21,7 @@ public class ClientMercantileData {
     private static @Nullable VillagerInfoPanelS2CPayload villagerInfo;
 
     private static @Nullable WorkstationMapS2CPayload workstationMap;
-
     private static final Map<Integer, Boolean> followStates = new HashMap<>();
-    private static final Map<BlockPos, PylonStateS2CPayload> pylonStates = new HashMap<>();
 
     private static @Nullable MercantileConfig serverConfig;
 
@@ -153,16 +150,6 @@ public class ClientMercantileData {
         }
     }
 
-    // --- Pylon state ---
-
-    public static @Nullable PylonStateS2CPayload getPylonState(BlockPos pos) {
-        return pylonStates.get(pos);
-    }
-
-    public static void setPylonState(PylonStateS2CPayload payload) {
-        pylonStates.put(payload.pylonPos(), payload);
-    }
-
     // --- Server config ---
 
     public static @Nullable MercantileConfig getServerConfig() {
@@ -183,7 +170,6 @@ public class ClientMercantileData {
         villagerInfo = null;
         workstationMap = null;
         followStates.clear();
-        pylonStates.clear();
         serverConfig = null;
         tradeIndex = List.of();
     }

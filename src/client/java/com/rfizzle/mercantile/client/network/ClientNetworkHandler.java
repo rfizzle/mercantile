@@ -46,11 +46,6 @@ public class ClientNetworkHandler {
                     ClientMercantileData.setServerConfig(MercantileConfig.fromJson(payload.configJson())));
         });
 
-        ClientPlayNetworking.registerGlobalReceiver(PylonStateS2CPayload.TYPE, (payload, context) -> {
-            context.client().execute(() ->
-                    ClientMercantileData.setPylonState(payload));
-        });
-
         ClientPlayNetworking.registerGlobalReceiver(TradeIndexS2CPayload.TYPE, (payload, context) -> {
             context.client().execute(() ->
                     ClientMercantileData.setTradeIndex(payload.entries()));

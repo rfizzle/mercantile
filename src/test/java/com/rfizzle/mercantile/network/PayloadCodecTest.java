@@ -39,12 +39,6 @@ class PayloadCodecTest {
     }
 
     @Test
-    void followVillagerC2S() {
-        var original = new FollowVillagerC2SPayload(99);
-        assertEquals(original, roundTrip(FollowVillagerC2SPayload.CODEC, original));
-    }
-
-    @Test
     void requestWorkstationMapC2SEmpty() {
         var original = new RequestWorkstationMapC2SPayload();
         assertEquals(original, roundTrip(RequestWorkstationMapC2SPayload.CODEC, original));
@@ -202,19 +196,6 @@ class PayloadCodecTest {
         assertEquals(original, roundTrip(ConfigSyncS2CPayload.CODEC, original));
     }
 
-    @Test
-    void pylonStateS2C() {
-        var original = new PylonStateS2CPayload(
-                new BlockPos(100, 64, -50), 5, 8, false, true);
-        assertEquals(original, roundTrip(PylonStateS2CPayload.CODEC, original));
-    }
-
-    @Test
-    void pylonStateS2CEmpty() {
-        var original = new PylonStateS2CPayload(BlockPos.ZERO, 0, 8, true, false);
-        assertEquals(original, roundTrip(PylonStateS2CPayload.CODEC, original));
-    }
-
     // --- Payload type identity ---
 
     // --- Size guards ---
@@ -294,7 +275,6 @@ class PayloadCodecTest {
     @Test
     void allPayloadsReturnCorrectType() {
         assertEquals(CycleTradesC2SPayload.TYPE, new CycleTradesC2SPayload(0).type());
-        assertEquals(FollowVillagerC2SPayload.TYPE, new FollowVillagerC2SPayload(0).type());
         assertEquals(RequestWorkstationMapC2SPayload.TYPE, new RequestWorkstationMapC2SPayload().type());
         assertEquals(SyncReputationS2CPayload.TYPE, new SyncReputationS2CPayload(0, "", 0, 0).type());
         assertEquals(FollowStateS2CPayload.TYPE, new FollowStateS2CPayload(0, false).type());
@@ -304,8 +284,6 @@ class PayloadCodecTest {
                 new VillagerInfoPanelS2CPayload(0, "", 0, 0, 0, 0, "", 0, false, false).type());
         assertEquals(WorkstationMapS2CPayload.TYPE, new WorkstationMapS2CPayload(Map.of(), List.of(), List.of()).type());
         assertEquals(ConfigSyncS2CPayload.TYPE, new ConfigSyncS2CPayload("").type());
-        assertEquals(PylonStateS2CPayload.TYPE,
-                new PylonStateS2CPayload(BlockPos.ZERO, 0, 0, false, false).type());
         assertEquals(TradeIndexS2CPayload.TYPE, new TradeIndexS2CPayload(List.of()).type());
     }
 }
