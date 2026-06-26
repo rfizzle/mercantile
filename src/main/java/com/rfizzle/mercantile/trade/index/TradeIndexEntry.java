@@ -34,10 +34,12 @@ public record TradeIndexEntry(
         buf.writeResourceLocation(entry.profession);
         buf.writeVarInt(entry.level);
         buf.writeVarInt(entry.source.ordinal());
-        ItemStack.STREAM_CODEC.encode(buf, entry.inputA);
-        ItemStack.STREAM_CODEC.encode(buf, entry.inputB);
-        ItemStack.STREAM_CODEC.encode(buf, entry.output);
-        ItemStack.STREAM_CODEC.encode(buf, entry.workstation);
+        // OPTIONAL codec: inputB is empty for single-input trades and workstation is
+        // empty for professions without one. ItemStack.STREAM_CODEC rejects empty stacks.
+        ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, entry.inputA);
+        ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, entry.inputB);
+        ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, entry.output);
+        ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, entry.workstation);
         buf.writeVarInt(entry.maxUses);
         buf.writeVarInt(entry.xpGain);
         buf.writeFloat(entry.priceMultiplier);
@@ -56,10 +58,10 @@ public record TradeIndexEntry(
             throw new DecoderException("Unknown TradeIndexEntry.Source ordinal: " + sourceOrdinal);
         }
         Source source = sources[sourceOrdinal];
-        ItemStack inputA = ItemStack.STREAM_CODEC.decode(buf);
-        ItemStack inputB = ItemStack.STREAM_CODEC.decode(buf);
-        ItemStack output = ItemStack.STREAM_CODEC.decode(buf);
-        ItemStack workstation = ItemStack.STREAM_CODEC.decode(buf);
+        ItemStack inputA = ItemStack.OPTIONAL_STREAM_CODEC.decode(buf);
+        ItemStack inputB = ItemStack.OPTIONAL_STREAM_CODEC.decode(buf);
+        ItemStack output = ItemStack.OPTIONAL_STREAM_CODEC.decode(buf);
+        ItemStack workstation = ItemStack.OPTIONAL_STREAM_CODEC.decode(buf);
         int maxUses = buf.readVarInt();
         int xpGain = buf.readVarInt();
         float priceMultiplier = buf.readFloat();

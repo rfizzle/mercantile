@@ -6,6 +6,7 @@ import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import net.minecraft.SharedConstants;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
@@ -25,14 +26,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TradeIndexPayloadCodecTest {
 
+    // ItemStack's stream codec resolves item IDs against the item registry, so the
+    // buffer needs a populated RegistryAccess — RegistryAccess.EMPTY has no registries.
+    // Built after Bootstrap.bootStrap() populates the built-in registries.
+    private static RegistryAccess registryAccess;
+
     @BeforeAll
     static void bootstrap() {
         SharedConstants.tryDetectVersion();
         Bootstrap.bootStrap();
+        registryAccess = RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY);
     }
 
     private RegistryFriendlyByteBuf registryBuf() {
-        return new RegistryFriendlyByteBuf(Unpooled.buffer(), RegistryAccess.EMPTY);
+        return new RegistryFriendlyByteBuf(Unpooled.buffer(), registryAccess);
     }
 
     private <T> T roundTrip(StreamCodec<? super RegistryFriendlyByteBuf, T> codec, T original) {
