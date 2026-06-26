@@ -3,6 +3,7 @@ package com.rfizzle.mercantile.client.network;
 import com.rfizzle.mercantile.network.DemandPriceS2CPayload;
 import com.rfizzle.mercantile.network.RestockTimerS2CPayload;
 import com.rfizzle.mercantile.network.VillagerInfoPanelS2CPayload;
+import com.rfizzle.mercantile.trade.index.TradeIndexEntry;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -11,6 +12,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ClientMercantileDataTest {
 
@@ -128,5 +130,31 @@ class ClientMercantileDataTest {
         assertNull(ClientMercantileData.getVillagerInfo());
         assertNull(ClientMercantileData.getRestockTimer());
         assertNull(ClientMercantileData.getDemandPrice());
+    }
+
+    // --- Trade index ---
+
+    @Test
+    void tradeIndexIsEmptyByDefault() {
+        assertTrue(ClientMercantileData.getTradeIndex().isEmpty(),
+                "trade index must be empty before any payload is received");
+    }
+
+    @Test
+    void setTradeIndexStoresList() {
+        // No MC bootstrap needed — TradeIndexEntry is not constructed here; we only
+        // verify the list reference round-trips correctly.
+        List<TradeIndexEntry> list = List.of();
+        ClientMercantileData.setTradeIndex(list);
+        assertSame(list, ClientMercantileData.getTradeIndex(),
+                "getTradeIndex() must return the same list instance that was set");
+    }
+
+    @Test
+    void clearResetsTradeIndex() {
+        ClientMercantileData.setTradeIndex(List.of());
+        ClientMercantileData.clear();
+        assertTrue(ClientMercantileData.getTradeIndex().isEmpty(),
+                "clear() must reset trade index to empty");
     }
 }

@@ -51,6 +51,11 @@ public class ClientNetworkHandler {
                     ClientMercantileData.setPylonState(payload));
         });
 
+        ClientPlayNetworking.registerGlobalReceiver(TradeIndexS2CPayload.TYPE, (payload, context) -> {
+            context.client().execute(() ->
+                    ClientMercantileData.setTradeIndex(payload.entries()));
+        });
+
         ClientPlayNetworking.registerGlobalReceiver(BellRingS2CPayload.TYPE, (payload, context) -> {
             context.client().execute(() -> {
                 Minecraft client = context.client();

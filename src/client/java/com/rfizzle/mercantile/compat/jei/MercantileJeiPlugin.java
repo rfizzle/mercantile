@@ -1,9 +1,9 @@
 package com.rfizzle.mercantile.compat.jei;
 
 import com.rfizzle.mercantile.Mercantile;
+import com.rfizzle.mercantile.client.network.ClientMercantileData;
 import com.rfizzle.mercantile.compat.tradeindex.TradeIndexIcon;
 import com.rfizzle.mercantile.trade.index.ProfessionWorkstations;
-import com.rfizzle.mercantile.trade.index.TradeIndexDataSource;
 import com.rfizzle.mercantile.trade.index.TradeIndexEntry;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
@@ -40,14 +40,16 @@ public class MercantileJeiPlugin implements IModPlugin {
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
-        registration.addRecipes(VillagerTradeJeiCategory.TYPE, List.copyOf(TradeIndexDataSource.snapshot()));
+        List<TradeIndexEntry> entries = ClientMercantileData.getTradeIndex();
+        registration.addRecipes(VillagerTradeJeiCategory.TYPE, List.copyOf(entries));
     }
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
         Set<ResourceLocation> profIds = new HashSet<>();
         Set<Item> workstationItems = new LinkedHashSet<>();
-        for (TradeIndexEntry entry : TradeIndexDataSource.snapshot()) {
+        List<TradeIndexEntry> entries = ClientMercantileData.getTradeIndex();
+        for (TradeIndexEntry entry : entries) {
             profIds.add(entry.profession());
             if (!entry.workstation().isEmpty()) {
                 workstationItems.add(entry.workstation().getItem());

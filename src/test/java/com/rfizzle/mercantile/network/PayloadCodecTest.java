@@ -306,5 +306,6 @@ class PayloadCodecTest {
         assertEquals(ConfigSyncS2CPayload.TYPE, new ConfigSyncS2CPayload("").type());
         assertEquals(PylonStateS2CPayload.TYPE,
                 new PylonStateS2CPayload(BlockPos.ZERO, 0, 0, false, false).type());
+        assertEquals(TradeIndexS2CPayload.TYPE, new TradeIndexS2CPayload(List.of()).type());
     }
 }

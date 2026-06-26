@@ -1,8 +1,8 @@
 package com.rfizzle.mercantile.compat.rei;
 
+import com.rfizzle.mercantile.client.network.ClientMercantileData;
 import com.rfizzle.mercantile.compat.tradeindex.TradeIndexIcon;
 import com.rfizzle.mercantile.trade.index.ProfessionWorkstations;
-import com.rfizzle.mercantile.trade.index.TradeIndexDataSource;
 import com.rfizzle.mercantile.trade.index.TradeIndexEntry;
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
@@ -30,7 +30,8 @@ public class MercantileReiClientPlugin implements REIClientPlugin {
 
         Set<ResourceLocation> profIds = new HashSet<>();
         Set<Item> workstationItems = new LinkedHashSet<>();
-        for (TradeIndexEntry entry : TradeIndexDataSource.snapshot()) {
+        List<TradeIndexEntry> entries = ClientMercantileData.getTradeIndex();
+        for (TradeIndexEntry entry : entries) {
             profIds.add(entry.profession());
             if (!entry.workstation().isEmpty()) {
                 workstationItems.add(entry.workstation().getItem());
@@ -61,7 +62,8 @@ public class MercantileReiClientPlugin implements REIClientPlugin {
 
     @Override
     public void registerDisplays(DisplayRegistry registry) {
-        for (TradeIndexEntry entry : TradeIndexDataSource.snapshot()) {
+        List<TradeIndexEntry> entries = ClientMercantileData.getTradeIndex();
+        for (TradeIndexEntry entry : entries) {
             registry.add(new VillagerTradeDisplay(entry));
         }
     }
