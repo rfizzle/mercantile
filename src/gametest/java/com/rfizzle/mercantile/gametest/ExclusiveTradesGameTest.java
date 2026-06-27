@@ -12,6 +12,9 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerData;
@@ -25,6 +28,8 @@ import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
 
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -213,5 +218,145 @@ public class ExclusiveTradesGameTest implements FabricGameTest {
                 "Component-free offer must hash identically with or without registry resolution");
 
         helper.succeed();
+    }
+
+    // ---- Fabric resource-condition gating (data/mercantile/exclusive_trades) ----
+
+    /** Clearly fictional mod ID for the "condition fails" branch — must never be a loaded mod. */
+    private static final String ABSENT_MOD_ID = "mercantile_test_absent_xxxxxx";
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void fileConditionPresentLoadsTrades(GameTestHelper helper) {
+        String json = """
+                {
+                  "fabric:load_conditions": [
+                    { "condition": "fabric:all_mods_loaded", "values": ["minecraft"] }
+                  ],
+                  "min_tier": "trusted",
+                  "trades": [
+                    { "input_1": { "item": "minecraft:emerald" },
+                      "output": { "item": "minecraft:calcite", "count": 16 } }
+                  ]
+                }
+                """;
+        try {
+            ExclusiveTradesManager.loadTrades(stubManager(Map.of("mason", json)));
+            List<ExclusiveTrade> mason = ExclusiveTradesManager.professionTradesSnapshot().get("mason");
+            helper.assertTrue(mason != null && mason.size() == 1,
+                    "Expected the mason trade to load when 'minecraft' is present");
+            helper.succeed();
+        } finally {
+            ExclusiveTradesManager.setSnapshotsForTesting(Map.of(), List.of());
+        }
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void fileConditionAbsentSkipsFile(GameTestHelper helper) {
+        String json = """
+                {
+                  "fabric:load_conditions": [
+                    { "condition": "fabric:all_mods_loaded", "values": ["%s"] }
+                  ],
+                  "min_tier": "trusted",
+                  "trades": [
+                    { "input_1": { "item": "minecraft:emerald" },
+                      "output": { "item": "minecraft:calcite", "count": 16 } }
+                  ]
+                }
+                """.formatted(ABSENT_MOD_ID);
+        try {
+            ExclusiveTradesManager.loadTrades(stubManager(Map.of("mason", json)));
+            List<ExclusiveTrade> mason = ExclusiveTradesManager.professionTradesSnapshot().get("mason");
+            helper.assertTrue(mason == null || mason.isEmpty(),
+                    "Expected no mason trades when the gating mod is absent");
+            helper.succeed();
+        } finally {
+            ExclusiveTradesManager.setSnapshotsForTesting(Map.of(), List.of());
+        }
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void perTradeConditionGatesSingleEntry(GameTestHelper helper) {
+        // Two trades in one file: an unconditioned one and one gated on an absent mod.
+        // Only the unconditioned trade should survive.
+        String json = """
+                {
+                  "min_tier": "trusted",
+                  "trades": [
+                    { "input_1": { "item": "minecraft:emerald" },
+                      "output": { "item": "minecraft:calcite", "count": 16 } },
+                    { "fabric:load_conditions": [
+                        { "condition": "fabric:all_mods_loaded", "values": ["%s"] } ],
+                      "input_1": { "item": "minecraft:emerald" },
+                      "output": { "item": "minecraft:tuff", "count": 16 } }
+                  ]
+                }
+                """.formatted(ABSENT_MOD_ID);
+        try {
+            ExclusiveTradesManager.loadTrades(stubManager(Map.of("mason", json)));
+            List<ExclusiveTrade> mason = ExclusiveTradesManager.professionTradesSnapshot().get("mason");
+            helper.assertTrue(mason != null && mason.size() == 1,
+                    "Expected only the unconditioned trade to load");
+            helper.assertTrue(mason.get(0).output().is(Items.CALCITE),
+                    "Expected the surviving trade to be the unconditioned calcite trade");
+            helper.succeed();
+        } finally {
+            ExclusiveTradesManager.setSnapshotsForTesting(Map.of(), List.of());
+        }
+    }
+
+    /**
+     * Minimal in-memory {@link ResourceManager} that serves the given JSON strings as
+     * {@code exclusive_trades/<profession>.json} resources. Only {@code listResourceStacks} is wired —
+     * the seam {@code loadTrades} actually uses; every other method throws.
+     */
+    private static ResourceManager stubManager(Map<String, String> filesByProfession) {
+        Map<ResourceLocation, List<Resource>> stacks = new java.util.HashMap<>();
+        filesByProfession.forEach((profession, json) -> {
+            ResourceLocation id = ResourceLocation.fromNamespaceAndPath(
+                    "mercantile", "exclusive_trades/" + profession + ".json");
+            Resource resource = new Resource(null,
+                    () -> new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8)));
+            stacks.put(id, List.of(resource));
+        });
+        return new ResourceManager() {
+            @Override
+            public Map<ResourceLocation, List<Resource>> listResourceStacks(
+                    String path, java.util.function.Predicate<ResourceLocation> filter) {
+                Map<ResourceLocation, List<Resource>> result = new java.util.HashMap<>();
+                stacks.forEach((id, list) -> {
+                    if (id.getPath().startsWith(path + "/") && filter.test(id)) {
+                        result.put(id, list);
+                    }
+                });
+                return result;
+            }
+
+            @Override
+            public java.util.Set<String> getNamespaces() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public List<Resource> getResourceStack(ResourceLocation id) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public Map<ResourceLocation, Resource> listResources(
+                    String path, java.util.function.Predicate<ResourceLocation> filter) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public java.util.stream.Stream<net.minecraft.server.packs.PackResources> listPacks() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public java.util.Optional<Resource> getResource(ResourceLocation id) {
+                throw new UnsupportedOperationException();
+            }
+        };
     }
 }
