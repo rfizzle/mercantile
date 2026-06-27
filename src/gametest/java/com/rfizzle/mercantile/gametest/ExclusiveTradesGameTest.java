@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.gametest;
 
+import com.rfizzle.mercantile.Mercantile;
 import com.rfizzle.mercantile.api.ReputationTier;
 import com.rfizzle.mercantile.reputation.ExclusiveTradesManager;
 import com.rfizzle.mercantile.reputation.ExclusiveTradesManager.EnchantmentSpec;
@@ -313,8 +314,7 @@ public class ExclusiveTradesGameTest implements FabricGameTest {
     private static ResourceManager stubManager(Map<String, String> filesByProfession) {
         Map<ResourceLocation, List<Resource>> stacks = new java.util.HashMap<>();
         filesByProfession.forEach((profession, json) -> {
-            ResourceLocation id = ResourceLocation.fromNamespaceAndPath(
-                    "mercantile", "exclusive_trades/" + profession + ".json");
+            ResourceLocation id = Mercantile.id("exclusive_trades/" + profession + ".json");
             Resource resource = new Resource(null,
                     () -> new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8)));
             stacks.put(id, List.of(resource));
