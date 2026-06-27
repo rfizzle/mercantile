@@ -4,11 +4,14 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.JsonOps;
 import com.rfizzle.mercantile.Mercantile;
 import com.rfizzle.mercantile.api.ReputationTier;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.trade.OfferIdentityHash;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.conditions.v1.ResourceCondition;
+import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
@@ -211,6 +214,10 @@ public final class ExclusiveTradesManager {
                     JsonObject json = GSON.fromJson(reader, JsonObject.class);
                     if (json == null) continue;
 
+                    // File-level Fabric resource conditions: a failing gate skips the whole file
+                    // silently — the entries are intentionally absent, not malformed.
+                    if (!conditionsMatch(json)) continue;
+
                     if (json.has("replace") && json.get("replace").getAsBoolean()) {
                         merged.clear();
                     }
@@ -222,8 +229,15 @@ public final class ExclusiveTradesManager {
 
                     JsonArray trades = json.getAsJsonArray("trades");
                     for (JsonElement tradeElem : trades) {
+                        if (!tradeElem.isJsonObject()) continue;
+                        JsonObject tradeJson = tradeElem.getAsJsonObject();
+
+                        // Per-trade Fabric resource conditions: a failing gate skips this entry
+                        // silently. It is not a malformed trade, so no warning and no error count.
+                        if (!conditionsMatch(tradeJson)) continue;
+
                         try {
-                            ExclusiveTrade trade = parseTrade(tradeElem.getAsJsonObject(), defaultMinScore);
+                            ExclusiveTrade trade = parseTrade(tradeJson, defaultMinScore);
                             if (trade != null) {
                                 merged.add(trade);
                             }
@@ -242,13 +256,35 @@ public final class ExclusiveTradesManager {
         for (var e : nextProf.entrySet()) {
             immutableProf.put(e.getKey(), List.copyOf(e.getValue()));
         }
+        // Compute summary counts from the local accumulators before publishing — never read back
+        // the volatile fields we just wrote (mc-shared-state Rule 2: compute before publish).
+        int profCount = immutableProf.values().stream().mapToInt(List::size).sum();
+        int crossCount = nextCross.size();
+
         PROFESSION_TRADES = Map.copyOf(immutableProf);
         CROSS_PROFESSION_TRADES = List.copyOf(nextCross);
 
-        int profCount = PROFESSION_TRADES.values().stream().mapToInt(List::size).sum();
-        int crossCount = CROSS_PROFESSION_TRADES.size();
         Mercantile.LOGGER.info("Loaded {} exclusive trades ({} profession, {} cross-profession)",
                 profCount + crossCount, profCount, crossCount);
+    }
+
+    /**
+     * Evaluates a {@code fabric:load_conditions} array on a trade file root or an individual trade
+     * entry. An object with no conditions is unconditionally present. A failed decode is treated as a
+     * non-match — the entry is skipped silently rather than spamming the log.
+     *
+     * <p>Conditions are tested against {@link RegistryAccess#EMPTY} because this reload listener is not
+     * threaded a live registry. Mod-presence gates ({@code fabric:all_mods_loaded}, {@code fabric:not},
+     * …) never dereference the provider and work here; registry-dependent conditions
+     * ({@code fabric:registry_contains}, {@code fabric:tags_populated}) are out of scope.
+     */
+    private static boolean conditionsMatch(JsonObject json) {
+        JsonElement conditions = json.get(ResourceConditions.CONDITIONS_KEY);
+        if (conditions == null) return true;
+        return ResourceCondition.LIST_CODEC.parse(JsonOps.INSTANCE, conditions)
+                .result()
+                .map(list -> list.stream().allMatch(condition -> condition.test(RegistryAccess.EMPTY)))
+                .orElse(false);
     }
 
     @VisibleForTesting

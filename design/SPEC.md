@@ -308,6 +308,24 @@ Files at `data/mercantile/exclusive_trades/<profession>.json`, `data/mercantile/
 - `min_tier_override`: Per-trade override of the minimum tier.
 - `max_uses` (optional, default 12), `xp_gain` (optional, default 1), and `price_multiplier` (optional, default 0.05) tune each trade's stock, villager XP reward, and demand-based price scaling.
 - `components` (optional, **output only**): enchants the reward. `enchantments` applies to gear; `stored_enchantments` writes book enchantments onto an `enchanted_book`. Each is an array of `{ "id": "<enchantment>", "level": <int> }` (level defaults to 1). IDs are resolved against the live enchantment registry when the offer is built, so unknown IDs are skipped with a warning rather than failing the pack. Cost items (`input_1`/`input_2`) are plain item + count and take no components.
+- `fabric:load_conditions` (optional): a [Fabric resource-condition](https://docs.fabricmc.net/develop/data-generation/conditions) array, honored at **both** the file root and the individual trade-entry scope. A trade pack uses this to gate entries on another mod being present — e.g. shipping a sibling-mod trade pack in-jar that only loads when that mod is installed. A failing condition skips the gated entries (or the whole file) silently at load, with no warning. Conditions are re-evaluated on every resource reload (`/reload`, world load). Only **mod-presence** conditions (`fabric:all_mods_loaded`, `fabric:any_mods_loaded`, `fabric:not`, `fabric:and`, `fabric:or`) are evaluated here; registry-dependent conditions (`fabric:registry_contains`, `fabric:tags_populated`) are out of scope because the loader runs without a live registry.
+
+```json
+{
+  "fabric:load_conditions": [
+    { "condition": "fabric:all_mods_loaded", "values": ["meridian"] }
+  ],
+  "trades": [
+    {
+      "fabric:load_conditions": [
+        { "condition": "fabric:all_mods_loaded", "values": ["tribulation"] }
+      ],
+      "input_1": { "item": "minecraft:emerald", "count": 16 },
+      "output": { "item": "minecraft:book", "count": 1 }
+    }
+  ]
+}
+```
 
 ### Gifting
 
