@@ -274,8 +274,8 @@ Recorded so they read as *undecided*, not as omissions:
 
 ## 10. Concord Context
 
-Mercantile is a member of **Concord** — *a Vanilla+ collection. Install any,
-combine all.* (That sentence is the entire cross-promotion allowance per
+Mercantile is a member of **Concord** — *a modular collection of system
+overhauls. Install any, combine all.* (That sentence is the entire cross-promotion allowance per
 `VISION.md` §2.) Mercantile is the suite's **economic connective tissue**:
 sibling integration flows through trade content — reputation-gated exclusive
 trades selling sibling items — never through stat leakage (reputation → loot
