@@ -4,13 +4,10 @@
 
 ![Mercantile logo](https://raw.githubusercontent.com/rfizzle/mercantile/master/art/logo.png)
 
-[![Minecraft 1.21.1](https://img.shields.io/badge/Minecraft-1.21.1-62B47A?logo=minecraft&logoColor=white)](https://www.minecraft.net/)
-[![Fabric](https://img.shields.io/badge/Mod_Loader-Fabric-DBB69B)](https://fabricmc.net/)
-[![License: MIT](https://img.shields.io/github/license/rfizzle/mercantile)](https://github.com/rfizzle/mercantile/blob/master/LICENSE)
-
-**Also on [Modrinth](https://modrinth.com/mod/mercantile).** Visit the
-[website](https://mercantile.rfizzle.com) for the full feature list, config
-reference, and command guide.
+**Also on [Modrinth](https://modrinth.com/mod/mercantile-villager-overhaul)
+and [GitHub Releases](https://github.com/rfizzle/mercantile/releases).**
+Visit the [website](https://mercantile.rfizzle.com) for the full feature
+list, config reference, and command guide.
 
 ---
 
@@ -215,7 +212,7 @@ bundled** — install whichever you already use.
 ## Links
 
 - **Website:** <https://mercantile.rfizzle.com>
-- **Modrinth:** <https://modrinth.com/mod/mercantile>
+- **Modrinth:** <https://modrinth.com/mod/mercantile-villager-overhaul>
 - **GitHub:** <https://github.com/rfizzle/mercantile>
 - **Report an issue:** <https://github.com/rfizzle/mercantile/issues>
 - **Changelog:** <https://mercantile.rfizzle.com/changelog.html>
