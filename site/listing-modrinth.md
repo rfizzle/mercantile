@@ -2,7 +2,10 @@
 
 **_Every villager remembers._**
 
-**Also on [CurseForge](https://www.curseforge.com/minecraft/mc-mods/mercantile).**
+![Mercantile logo](https://raw.githubusercontent.com/rfizzle/mercantile/master/art/logo.png)
+
+**Also on [CurseForge](https://www.curseforge.com/minecraft/mc-mods/mercantile-villager-overhaul)
+and [GitHub Releases](https://github.com/rfizzle/mercantile/releases).**
 Visit the [website](https://mercantile.rfizzle.com) for the full feature
 list, config reference, and command guide.
 
@@ -210,7 +213,7 @@ bundled** — install whichever you already use.
 ## Links
 
 - **Website:** <https://mercantile.rfizzle.com>
-- **CurseForge:** <https://www.curseforge.com/minecraft/mc-mods/mercantile>
+- **CurseForge:** <https://www.curseforge.com/minecraft/mc-mods/mercantile-villager-overhaul>
 - **GitHub:** <https://github.com/rfizzle/mercantile>
 - **Report an issue:** <https://github.com/rfizzle/mercantile/issues>
 - **Changelog:** <https://mercantile.rfizzle.com/changelog.html>
