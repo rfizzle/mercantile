@@ -14,6 +14,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
+import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.sensing.GolemSensor;
@@ -241,6 +242,54 @@ public class SentryGolemBehaviorGameTest implements FabricGameTest {
                     "sentry goal should acquire a nearby creeper (vanilla golems exclude creepers)");
             helper.succeed();
         });
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE, timeoutTicks = 80)
+    public void sentryGoalIgnoresThreatOutsidePylonZone(GameTestHelper helper) {
+        // Aggro is pinned to the pylon's radius measured from the PYLON, not the golem. The creeper
+        // sits ~4.1 blocks from the pylon (outside the radius-4 zone) but only 3 from the golem
+        // (inside its search reach), so only the zone filter — not the search box — can reject it.
+        SentryPylonBlockEntity be = placePylonOnFloor(helper);
+        IronGolem golem = spawnSentryAt(helper, be, new BlockPos(2, 2, 2));
+        helper.spawnWithNoFreeWill(EntityType.CREEPER, new BlockPos(5, 2, 2));
+
+        helper.runAfterDelay(2, () -> {
+            SentryTargetHostilesGoal goal = new SentryTargetHostilesGoal(golem);
+            for (int i = 0; i < 200; i++) {
+                helper.assertFalse(goal.canUse(),
+                        "a sentry must not acquire a hostile beyond its pylon's radius");
+            }
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE, timeoutTicks = 80)
+    public void returnToPylonGoalOutranksMelee(GameTestHelper helper) {
+        // A sentry led past its radius must abandon the chase and walk home, so the return goal has
+        // to outrank vanilla's MeleeAttackGoal in the goal selector.
+        IronGolem golem = helper.spawn(EntityType.IRON_GOLEM, new BlockPos(2, 2, 2));
+        try {
+            GoalSelector selector = readGoalSelector(golem);
+            WrappedGoal returnGoal = null;
+            WrappedGoal meleeGoal = null;
+            for (WrappedGoal w : selector.getAvailableGoals()) {
+                if (w.getGoal() instanceof ReturnToPylonGoal) {
+                    returnGoal = w;
+                }
+                if (w.getGoal() instanceof MeleeAttackGoal
+                        && (meleeGoal == null || w.getPriority() < meleeGoal.getPriority())) {
+                    meleeGoal = w;
+                }
+            }
+            helper.assertTrue(returnGoal != null, "ReturnToPylonGoal not registered");
+            helper.assertTrue(meleeGoal != null, "vanilla MeleeAttackGoal not found on iron golem");
+            helper.assertTrue(returnGoal.getPriority() < meleeGoal.getPriority(),
+                    "ReturnToPylonGoal (" + returnGoal.getPriority() + ") must outrank vanilla "
+                            + "MeleeAttackGoal (" + meleeGoal.getPriority() + ")");
+            helper.succeed();
+        } catch (ReflectiveOperationException e) {
+            helper.fail("reflection failed: " + e.getMessage());
+        }
     }
 
     @GameTest(template = EMPTY_STRUCTURE, timeoutTicks = 80)
