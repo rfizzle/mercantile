@@ -23,7 +23,12 @@ public abstract class IronGolemMixin extends AbstractGolem {
     @Inject(method = "registerGoals", at = @At("TAIL"))
     private void mercantile$addSentryGoals(CallbackInfo ci) {
         IronGolem self = (IronGolem) (Object) this;
-        this.goalSelector.addGoal(2, new ReturnToPylonGoal(self));
+        // Priority 0 — above vanilla's MeleeAttackGoal (1) and MoveTowardsTargetGoal (2) — so a
+        // sentry pushed or led beyond its pylon's radius abandons the chase and walks home instead
+        // of being dragged ever further out by a fleeing target. The goal is inert (canUse false)
+        // on non-sentry golems and while a sentry is inside its radius, so it never disturbs normal
+        // iron-golem combat.
+        this.goalSelector.addGoal(0, new ReturnToPylonGoal(self));
         // Higher priority (lower number) than vanilla's creeper-excluding target goal at slot 3,
         // so sentries acquire creepers; the goal is inert on non-sentry golems.
         this.targetSelector.addGoal(2, new SentryTargetHostilesGoal(self));
