@@ -75,7 +75,7 @@
             { "type": "prose", "html": ["<strong class='text-bone'>Website &amp; Distribution (E-012)</strong>"] },
             { "type": "list", "spacing": 1, "items": [
               "Public website at <a href='https://mercantile.rfizzle.com' class='text-accent hover:text-accent2 underline'>mercantile.rfizzle.com</a> with feature documentation, config reference, command reference, and getting-started guide (S-037).",
-              "Modrinth and CurseForge project listings with screenshots and feature documentation (S-038)."
+              "Modrinth and CurseForge project listings with feature documentation (S-038)."
             ] },
             { "type": "prose", "html": ["<strong class='text-bone'>CI/CD &amp; Automation (E-013)</strong>"] },
             { "type": "list", "spacing": 1, "items": [
