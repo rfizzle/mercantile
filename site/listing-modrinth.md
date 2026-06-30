@@ -33,30 +33,6 @@ hosted on Mojang's CDN.
   or `config/mercantile.json`.
 - MIT licensed.
 
-## Screenshots
-
-<!-- TODO: replace these placeholders with real hosted PNGs before publishing -->
-
-![Picking up a villager](https://mercantile.rfizzle.com/screenshots/pickup.png)
-
-*Sneak-right-click a villager to pick them up. Full NBT — profession, trades,
-gossip, XP — is preserved on the head item in your hand.*
-
-![Reputation HUD over villagers](https://mercantile.rfizzle.com/screenshots/reputation-hud.png)
-
-*A compact tier readout shown next to nearby villagers so you can read the
-room at a glance.*
-
-![Trade cycling in the merchant screen](https://mercantile.rfizzle.com/screenshots/trade-cycling.png)
-
-*Spend emeralds to re-roll a villager's unlocked trades. No more breaking and
-replacing workstations.*
-
-![Sentry pylon defending a village](https://mercantile.rfizzle.com/screenshots/sentry-pylon.png)
-
-*The Sentry Pylon — an iron-fueled defense block that summons temporary iron
-golems when hostiles approach.*
-
 ## Features
 
 ### Villager Pickup
