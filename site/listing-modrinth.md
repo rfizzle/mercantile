@@ -26,7 +26,7 @@ hosted on Mojang's CDN.
 
 ## At a glance
 
-- Minecraft **1.21.1**, **Fabric** loader (0.16+), **Fabric API** required.
+- Minecraft **1.21.1**, **Fabric** loader (0.16.10+), **Fabric API** required.
 - Required on the **server**. The reputation HUD is the only client-only
   feature — install it client-side too if you want the readout.
 - Every feature is **individually toggleable** through Mod Menu / Cloth Config
@@ -170,8 +170,9 @@ bundled** — install whichever you already use.
 ## Requirements
 
 - Minecraft **1.21.1**
-- Fabric Loader **0.16+**
+- Fabric Loader **0.16.10+**
 - Fabric API
+- Java **21+**
 - Required on the **server**. Install on the client as well if you want the
   reputation HUD.
 
@@ -196,12 +197,12 @@ bundled** — install whichever you already use.
 
 ## Companion mods
 
-Mercantile is part of the rfizzle mod suite. If you like it, you may also
-enjoy:
+Mercantile is part of [Concord](https://github.com/rfizzle/concord) — a
+modular collection of system overhauls. Install any, combine all:
 
-- [Meridian](https://meridian.rfizzle.com)
-- [Tribulation](https://tribulation.rfizzle.com)
-- [Prosperity](https://prosperity.rfizzle.com)
+- [Meridian](https://meridian.rfizzle.com) — Chart your enchantments.
+- [Tribulation](https://tribulation.rfizzle.com) — Survive what comes next.
+- [Prosperity](https://prosperity.rfizzle.com) — Every chest, yours to discover.
 
 ## License & credits
 
