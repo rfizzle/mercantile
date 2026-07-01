@@ -27,6 +27,15 @@ import java.util.Set;
 public class VillagerPickupHelper {
     public static final int CURRENT_DATA_VERSION = 1;
 
+    /**
+     * Whether a pickup head stamped with the given {@code MercantileDataVersion} can be restored by
+     * this build. A head from a future schema is refused rather than loaded with fields this version
+     * cannot interpret.
+     */
+    public static boolean isReadable(int dataVersion) {
+        return dataVersion <= CURRENT_DATA_VERSION;
+    }
+
     public static ItemStack createHeadItem(Villager villager) {
         CompoundTag nbt = new CompoundTag();
         villager.saveWithoutId(nbt);
