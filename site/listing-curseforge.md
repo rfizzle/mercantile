@@ -13,7 +13,7 @@ list, config reference, and command guide.
 
 Mercantile is a villager and trade overhaul for **Minecraft 1.21.1 (Fabric)**.
 It turns villagers from disposable trade machines into mobile, named,
-persistent characters — with pickup, biome-themed names, a five-tier
+persistent characters — with pickup, biome-themed names, a six-tier
 reputation system, emerald-based trade cycling, and an iron-fueled sentry
 block that defends your village.
 
