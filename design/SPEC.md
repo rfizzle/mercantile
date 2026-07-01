@@ -670,7 +670,7 @@ A crafted block placed in a village (or anywhere). Visually distinct — iron-an
 
 ### Detection
 - The pylon scans for hostile mobs within a **32-block radius** (configurable).
-- Scan runs every ~2 seconds (40 ticks) to avoid per-tick cost.
+- Scan runs every ~2 seconds (40 ticks) at the default radius to avoid per-tick cost. The interval scales up with the detection radius — a scan sweeps a volume that grows with the cube of the radius, so a wider-radius pylon scans proportionally less often (linear in radius above the 32-block reference, e.g. ~8 seconds at the 128-block maximum). Each pylon's scan is also phase-offset by its position, so a cluster of pylons spreads its scans across ticks rather than all firing on the same one.
 - "Hostile" = any mob targeting a player or villager within range, or any undead/illager entity.
 - **Line of sight required:** a hostile only counts as detected when the pylon has an unobstructed line to it (block raycast from the mob to the pylon, testing the mob's eyes and feet — a clear path from either point registers). A mob sealed in a cave below or walled off in a separate room is ignored even when it sits inside the radius, so it never rings the bell endlessly or holds a sentry in place against a threat it cannot reach. Every reaction the pylon makes — spawning a golem, the bell alarm, and the despawn countdown — keys off this same in-sight detection.
 

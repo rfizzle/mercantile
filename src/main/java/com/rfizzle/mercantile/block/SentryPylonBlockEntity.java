@@ -44,6 +44,11 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
     private static final Vector3f RED = new Vector3f(1.0f, 0.0f, 0.0f);
     private static final int OUT_OF_FUEL_ALERT_COOLDOWN_TICKS = 40;
     private static final int SCAN_INTERVAL_TICKS = 40;
+    /** Radius at which {@link #SCAN_INTERVAL_TICKS} holds; beyond it the cadence stretches. */
+    private static final int SCAN_INTERVAL_BASE_RADIUS = 32;
+    /** Mirror of the config clamp ceiling on {@code pylonDetectionRadius}; bounds the saved cooldown. */
+    private static final int MAX_DETECTION_RADIUS = 128;
+    private static final int MAX_SCAN_INTERVAL_TICKS = scanIntervalTicks(MAX_DETECTION_RADIUS);
     private static final int IDLE_HOSTILE_CHECK_INTERVAL_TICKS = 10;
     private static final int BELL_RING_COOLDOWN_TICKS = 200;
 
@@ -55,7 +60,7 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
     private ItemStack virtualSlot = ItemStack.EMPTY;
     private boolean syncingSlot = false;
     private int outOfFuelCooldown = 0;
-    private int scanCooldown = SCAN_INTERVAL_TICKS;
+    private int scanCooldown;
     private int bellCooldown = 0;
     private int idleTicks = 0;
     private int idleHostileCheckCooldown = IDLE_HOSTILE_CHECK_INTERVAL_TICKS;
@@ -63,6 +68,36 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
 
     public SentryPylonBlockEntity(BlockPos pos, BlockState state) {
         super(MercantileRegistry.SENTRY_PYLON_BE, pos, state);
+        // Stagger the first scan by a position-derived phase so pylons loaded on the same tick
+        // don't all sweep on the same tick. loadAdditional overrides this for an existing pylon,
+        // preserving the phase it was placed with.
+        int interval = scanIntervalTicks(MercantileConfig.get().pylonDetectionRadius);
+        this.scanCooldown = scanPhaseOffset(pos, interval);
+    }
+
+    /**
+     * Scan cadence scaled by detection radius. Each scan sweeps an AABB whose volume grows with the
+     * cube of the radius (plus per-candidate line-of-sight raycasts), so a wide-radius pylon scans
+     * proportionally less often: the baseline holds up to {@link #SCAN_INTERVAL_BASE_RADIUS} and
+     * stretches linearly beyond it. Paired with the per-pylon phase stagger, this caps the tick cost
+     * a field of maxed-out pylons can impose without making a default-radius pylon feel sluggish.
+     */
+    static int scanIntervalTicks(int radius) {
+        long scaled = Math.round((double) SCAN_INTERVAL_TICKS * radius / SCAN_INTERVAL_BASE_RADIUS);
+        return (int) Math.max(SCAN_INTERVAL_TICKS, scaled);
+    }
+
+    /**
+     * A deterministic phase offset in {@code [0, interval)} derived from the block position, so two
+     * pylons at different positions land on different ticks in the scan cycle. Uses an avalanche mix
+     * of the packed position to spread axis-aligned grids evenly rather than clustering on the low bits.
+     */
+    static int scanPhaseOffset(BlockPos pos, int interval) {
+        long h = pos.asLong();
+        h ^= h >>> 33;
+        h *= 0xff51afd7ed558ccdL;
+        h ^= h >>> 33;
+        return (int) Math.floorMod(h, (long) interval);
     }
 
     public int getFuel() {
@@ -162,7 +197,7 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
             bellCooldown--;
         }
         if (scanCooldown == 0) {
-            scanCooldown = SCAN_INTERVAL_TICKS;
+            scanCooldown = scanIntervalTicks(MercantileConfig.get().pylonDetectionRadius);
             if (level instanceof ServerLevel server) {
                 runScanCycle(server);
             }
@@ -470,7 +505,7 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
         super.loadAdditional(tag, lookup);
         fuel = Mth.clamp(tag.getInt("Fuel"), 0, getMaxFuel());
         outOfFuelCooldown = Mth.clamp(tag.getInt("OutOfFuelCooldown"), 0, OUT_OF_FUEL_ALERT_COOLDOWN_TICKS);
-        scanCooldown = Mth.clamp(tag.getInt("ScanCooldown"), 0, SCAN_INTERVAL_TICKS);
+        scanCooldown = Mth.clamp(tag.getInt("ScanCooldown"), 0, MAX_SCAN_INTERVAL_TICKS);
         bellCooldown = Mth.clamp(tag.getInt("BellCooldown"), 0, BELL_RING_COOLDOWN_TICKS);
         int despawnThreshold = MercantileConfig.get().sentryDespawnSeconds * 20;
         idleTicks = Mth.clamp(tag.getInt("IdleTicks"), 0, despawnThreshold);
