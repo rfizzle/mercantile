@@ -27,12 +27,8 @@ public final class FollowManager {
         UUID villagerUuid = villager.getUUID();
         UUID playerUuid = player.getUUID();
 
-        UUID currentTarget = villagerToPlayer.get(villagerUuid);
-        if (currentTarget != null && !currentTarget.equals(playerUuid)) {
-            return false;
-        }
-
-        if (currentTarget != null && currentTarget.equals(playerUuid)) {
+        // Already claimed — by this player or another — so there is nothing to start.
+        if (villagerToPlayer.containsKey(villagerUuid)) {
             return false;
         }
 
