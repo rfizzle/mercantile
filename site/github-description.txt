@@ -1,0 +1,1 @@
+A standalone Minecraft 1.21.1 Fabric mod overhauling villagers and trade. Every villager remembers — pick them up, learn their names, and build a per-player reputation that unlocks exclusive trades, gifting, and iron-golem sentry defense. Part of the Concord collection.
