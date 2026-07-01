@@ -518,6 +518,31 @@ class MercantileConfigTest {
     }
 
     @Test
+    void defaultConfigIsCurrentVersion() {
+        assertEquals(ConfigMigrator.CURRENT_VERSION, new MercantileConfig().configVersion,
+                "a freshly constructed config must already be at the current schema version");
+    }
+
+    @Test
+    void loadStampsAndPersistsConfigVersionOntoPreVersioningFile(@TempDir Path tempDir) throws IOException {
+        Path configFile = tempDir.resolve("mercantile.json");
+        Files.writeString(configFile, """
+                {
+                  "pickupXpCost": 8
+                }
+                """);
+
+        MercantileConfig loaded = MercantileConfig.load(configFile);
+
+        assertEquals(8, loaded.pickupXpCost, "existing settings must survive migration");
+        assertEquals(ConfigMigrator.CURRENT_VERSION, loaded.configVersion);
+
+        String persisted = Files.readString(configFile);
+        assertTrue(persisted.contains("\"configVersion\": " + ConfigMigrator.CURRENT_VERSION),
+                "the upgraded schema must be written back to disk, got: " + persisted);
+    }
+
+    @Test
     void enableReputationHudExplicitFalseRoundTripsThroughFile(@TempDir Path tempDir) throws IOException {
         Path configFile = tempDir.resolve("mercantile.json");
         Files.writeString(configFile, """

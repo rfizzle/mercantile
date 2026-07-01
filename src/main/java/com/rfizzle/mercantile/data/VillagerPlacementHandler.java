@@ -46,7 +46,7 @@ public final class VillagerPlacementHandler {
 
             CompoundTag nbt = customData.copyTag();
             int dataVersion = nbt.getInt("MercantileDataVersion");
-            if (dataVersion > VillagerPickupHelper.CURRENT_DATA_VERSION) {
+            if (!VillagerPickupHelper.isReadable(dataVersion)) {
                 ((ServerPlayer) player).displayClientMessage(
                         Component.translatable("mercantile.placement.newer_version")
                                 .withStyle(ChatFormatting.RED),

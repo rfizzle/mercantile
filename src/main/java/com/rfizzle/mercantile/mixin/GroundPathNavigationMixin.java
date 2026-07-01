@@ -22,8 +22,9 @@ public abstract class GroundPathNavigationMixin extends PathNavigation {
     private void mercantile$allowPathUpdateWhileClimbing(CallbackInfoReturnable<Boolean> cir) {
         if (cir.getReturnValue()) return;
         if (!(this.mob instanceof Villager)) return;
-        if (!MercantileConfig.get().enablePathfindingFixes) return;
-        if (!MercantileConfig.get().enablePathfindingLadders) return;
+        MercantileConfig config = MercantileConfig.get();
+        if (!config.enablePathfindingFixes) return;
+        if (!config.enablePathfindingLadders) return;
         if (this.mob.onClimbable()) {
             cir.setReturnValue(true);
         }
