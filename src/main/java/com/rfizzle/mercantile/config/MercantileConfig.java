@@ -2,6 +2,9 @@ package com.rfizzle.mercantile.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.rfizzle.mercantile.Mercantile;
 import net.fabricmc.loader.api.FabricLoader;
 
@@ -15,6 +18,10 @@ public class MercantileConfig {
     private static volatile MercantileConfig INSTANCE;
 
     static final Gson GSON = new GsonBuilder().setPrettyPrinting().setLenient().create();
+
+    // Schema version of the on-disk file. Bumped by ConfigMigrator when the shape changes; a
+    // freshly constructed config is already current. Not player-tunable — leave it out of clamp().
+    public int configVersion = ConfigMigrator.CURRENT_VERSION;
 
     // --- Server Config ---
 
@@ -203,22 +210,35 @@ public class MercantileConfig {
     }
 
     static MercantileConfig load(Path path) {
-        if (Files.exists(path)) {
-            try {
-                String json = Files.readString(path);
-                MercantileConfig config = GSON.fromJson(json, MercantileConfig.class);
-                if (config == null) {
-                    config = new MercantileConfig();
-                }
-                config.clamp();
-                return config;
-            } catch (Exception e) {
-                Mercantile.LOGGER.error("Failed to load config, using defaults (corrupted file preserved at {})", path, e);
+        if (!Files.exists(path)) {
+            MercantileConfig defaults = new MercantileConfig();
+            defaults.save(path);
+            return defaults;
+        }
+        try {
+            // Migrate the raw JSON before Gson so renamed/restructured fields survive the upgrade,
+            // then deserialize, clamp, and persist the upgraded schema back to disk.
+            String json = Files.readString(path);
+            JsonElement element = JsonParser.parseString(json);
+            if (element == null || !element.isJsonObject()) {
+                Mercantile.LOGGER.error("Config at {} is not a JSON object; using defaults (existing file left untouched)", path);
                 return new MercantileConfig();
             }
+            JsonObject raw = element.getAsJsonObject();
+            boolean migrated = ConfigMigrator.migrate(raw);
+
+            MercantileConfig config = GSON.fromJson(raw, MercantileConfig.class);
+            if (config == null) {
+                config = new MercantileConfig();
+            }
+            config.clamp();
+            if (migrated) {
+                config.save(path);
+            }
+            return config;
+        } catch (Exception e) {
+            Mercantile.LOGGER.error("Failed to load config, using defaults (corrupted file preserved at {})", path, e);
+            return new MercantileConfig();
         }
-        MercantileConfig defaults = new MercantileConfig();
-        defaults.save(path);
-        return defaults;
     }
 }
