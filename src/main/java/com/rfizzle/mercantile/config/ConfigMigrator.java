@@ -15,7 +15,7 @@ import com.rfizzle.mercantile.Mercantile;
  */
 final class ConfigMigrator {
 
-    static final int CURRENT_VERSION = 1;
+    static final int CURRENT_VERSION = 2;
 
     @FunctionalInterface
     interface Migration {
@@ -27,7 +27,20 @@ final class ConfigMigrator {
         // v0 -> v1: baseline. Files written before config versioning existed carry no configVersion,
         // read as v0, and are stamped configVersion=1 as-is (their fields already match the v1 schema).
         json -> {},
+        // v1 -> v2: Sentry Pylon × Tribulation scaling fields, seeded at their defaults.
+        json -> {
+            MercantileConfig defaults = new MercantileConfig();
+            addIfAbsent(json, "pylonTribulationGolemBonusPerTier", defaults.pylonTribulationGolemBonusPerTier);
+            addIfAbsent(json, "pylonTribulationRadiusBonusPerTier", defaults.pylonTribulationRadiusBonusPerTier);
+            addIfAbsent(json, "pylonTribulationMaxGolems", defaults.pylonTribulationMaxGolems);
+        },
     };
+
+    private static void addIfAbsent(JsonObject json, String key, int value) {
+        if (!json.has(key)) {
+            json.addProperty(key, value);
+        }
+    }
 
     /**
      * Applies every migration from the file's version up to {@link #CURRENT_VERSION} in place.

@@ -115,6 +115,12 @@
     "mercantile.config.pylonMaxGolems.tooltip": "Maximum active sentry golems per pylon",
     "mercantile.config.sentryDespawnSeconds": "Sentry Despawn Time",
     "mercantile.config.sentryDespawnSeconds.tooltip": "Seconds before idle sentry golems despawn",
+    "mercantile.config.pylonTribulationGolemBonusPerTier": "Tribulation Golem Bonus Per Tier",
+    "mercantile.config.pylonTribulationGolemBonusPerTier.tooltip": "Extra sentry golems allowed per Tribulation threat tier (only active when Tribulation is installed)",
+    "mercantile.config.pylonTribulationRadiusBonusPerTier": "Tribulation Radius Bonus Per Tier",
+    "mercantile.config.pylonTribulationRadiusBonusPerTier.tooltip": "Extra detection radius in blocks per Tribulation threat tier (only active when Tribulation is installed)",
+    "mercantile.config.pylonTribulationMaxGolems": "Tribulation Max Golems",
+    "mercantile.config.pylonTribulationMaxGolems.tooltip": "Hard cap on sentry golems per pylon under Tribulation scaling (only active when Tribulation is installed)",
 
     "mercantile.config.villagerSoundVolume": "Villager Sound Volume",
     "mercantile.config.villagerSoundVolume.tooltip": "Volume for villager sounds (0.0 = muted, 1.0 = full)",

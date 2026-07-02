@@ -291,6 +291,24 @@ public class ModMenuIntegration implements ModMenuApi {
                     .setTooltip(Component.translatable("mercantile.config.sentryDespawnSeconds.tooltip"))
                     .setSaveConsumer(v -> config.sentryDespawnSeconds = v)
                     .build());
+            pylon.addEntry(entry.startIntField(Component.translatable("mercantile.config.pylonTribulationGolemBonusPerTier"), config.pylonTribulationGolemBonusPerTier)
+                    .setDefaultValue(defaults.pylonTribulationGolemBonusPerTier)
+                    .setMin(0)
+                    .setTooltip(Component.translatable("mercantile.config.pylonTribulationGolemBonusPerTier.tooltip"))
+                    .setSaveConsumer(v -> config.pylonTribulationGolemBonusPerTier = v)
+                    .build());
+            pylon.addEntry(entry.startIntField(Component.translatable("mercantile.config.pylonTribulationRadiusBonusPerTier"), config.pylonTribulationRadiusBonusPerTier)
+                    .setDefaultValue(defaults.pylonTribulationRadiusBonusPerTier)
+                    .setMin(0)
+                    .setTooltip(Component.translatable("mercantile.config.pylonTribulationRadiusBonusPerTier.tooltip"))
+                    .setSaveConsumer(v -> config.pylonTribulationRadiusBonusPerTier = v)
+                    .build());
+            pylon.addEntry(entry.startIntField(Component.translatable("mercantile.config.pylonTribulationMaxGolems"), config.pylonTribulationMaxGolems)
+                    .setDefaultValue(defaults.pylonTribulationMaxGolems)
+                    .setMin(1)
+                    .setTooltip(Component.translatable("mercantile.config.pylonTribulationMaxGolems.tooltip"))
+                    .setSaveConsumer(v -> config.pylonTribulationMaxGolems = v)
+                    .build());
 
             // --- Client ---
             ConfigCategory client = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.client"));
