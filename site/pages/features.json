@@ -242,6 +242,14 @@
                 "<strong class='text-bone'>Hopper &amp; pipe fueling:</strong> hoppers attached to any face (top, sides, bottom) feed iron blocks into the pylon one at a time, up to the fuel cap. Non-iron items are rejected, so hoppers cycling mixed inventories don't deadlock, and overflow is left in the hopper rather than destroyed. Hoppers cannot extract — fuel only flows in. Modded item pipes (Pipez, etc.) work via the Fabric Transfer API (<code class='text-bone'>ItemStorage.SIDED</code>). Disabled when <code class='text-bone'>enableSentryPylon</code> is off."
               ],
               "note": "Config: <code class='text-bone'>enableSentryPylon</code>, <code class='text-bone'>enablePylonBellAlarm</code>, <code class='text-bone'>pylonDetectionRadius</code> (4–128), <code class='text-bone'>pylonMaxFuel</code>, <code class='text-bone'>pylonMaxGolems</code>, <code class='text-bone'>sentryDespawnSeconds</code> (min 5)"
+            },
+            {
+              "title": "Tribulation Threat Scaling",
+              "html": [
+                "With <a class='text-bone underline' href='https://github.com/rfizzle/tribulation'>Tribulation</a> installed, the pylon reads the local threat tier (from the nearest player within its radius) and scales its defense to match: each tier raises the golem cap and widens the detection radius, so village defense keeps pace with Tribulation's harder raids. A hard cap keeps a max-tier pylon from fielding an unkillable golem army, and each extra golem still costs its iron block of fuel.",
+                "This is a soft integration — without Tribulation the pylon behaves exactly as configured, and Tribulation is never required."
+              ],
+              "note": "Config: <code class='text-bone'>pylonTribulationGolemBonusPerTier</code>, <code class='text-bone'>pylonTribulationRadiusBonusPerTier</code>, <code class='text-bone'>pylonTribulationMaxGolems</code> — only active when Tribulation is installed"
             }
           ]
         }

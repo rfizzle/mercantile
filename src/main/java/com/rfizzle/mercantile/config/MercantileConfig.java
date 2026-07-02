@@ -96,6 +96,10 @@ public class MercantileConfig {
     public int pylonMaxFuel = 8;
     public int pylonMaxGolems = 3;
     public int sentryDespawnSeconds = 30;
+    // Sentry Pylon × Tribulation scaling — only active when Tribulation is installed.
+    public int pylonTribulationGolemBonusPerTier = 1;
+    public int pylonTribulationRadiusBonusPerTier = 4;
+    public int pylonTribulationMaxGolems = 6;
 
     // --- Client Config ---
 
@@ -136,6 +140,10 @@ public class MercantileConfig {
         pylonMaxFuel = Math.clamp(pylonMaxFuel, 1, Integer.MAX_VALUE);
         pylonMaxGolems = Math.clamp(pylonMaxGolems, 1, Integer.MAX_VALUE);
         sentryDespawnSeconds = Math.clamp(sentryDespawnSeconds, 5, Integer.MAX_VALUE);
+        pylonTribulationGolemBonusPerTier = Math.clamp(pylonTribulationGolemBonusPerTier, 0, Integer.MAX_VALUE);
+        pylonTribulationRadiusBonusPerTier = Math.clamp(pylonTribulationRadiusBonusPerTier, 0, Integer.MAX_VALUE);
+        // The Tribulation cap can never sit below the un-integrated golem cap it extends.
+        pylonTribulationMaxGolems = Math.max(pylonTribulationMaxGolems, pylonMaxGolems);
         villagerSoundVolume = Math.clamp(villagerSoundVolume, 0.0f, 1.0f);
         // Gson leaves enum fields null on unknown/missing values.
         if (hudAnchor == null) hudAnchor = Anchor.TOP_LEFT;

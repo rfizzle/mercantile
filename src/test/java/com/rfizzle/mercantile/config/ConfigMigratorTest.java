@@ -71,6 +71,27 @@ class ConfigMigratorTest {
     }
 
     @Test
+    void v1FileGainsTribulationFieldsAtDefaults() {
+        JsonObject raw = parse("""
+                {
+                  "configVersion": 1,
+                  "pylonMaxGolems": 4
+                }
+                """);
+
+        boolean migrated = ConfigMigrator.migrate(raw);
+        MercantileConfig defaults = new MercantileConfig();
+
+        assertTrue(migrated, "a v1 file must migrate to v2");
+        assertEquals(ConfigMigrator.CURRENT_VERSION, raw.get("configVersion").getAsInt());
+        assertEquals(defaults.pylonTribulationGolemBonusPerTier, raw.get("pylonTribulationGolemBonusPerTier").getAsInt());
+        assertEquals(defaults.pylonTribulationRadiusBonusPerTier, raw.get("pylonTribulationRadiusBonusPerTier").getAsInt());
+        assertEquals(defaults.pylonTribulationMaxGolems, raw.get("pylonTribulationMaxGolems").getAsInt());
+        // Existing fields are carried forward untouched.
+        assertEquals(4, raw.get("pylonMaxGolems").getAsInt());
+    }
+
+    @Test
     void nonNumericVersionTreatedAsPreVersioning() {
         JsonObject raw = parse("{ \"configVersion\": \"garbage\" }");
 

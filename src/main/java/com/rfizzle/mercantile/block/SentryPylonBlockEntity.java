@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.block;
 
+import com.rfizzle.mercantile.compat.tribulation.TribulationCompat;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.particle.MercantileParticles;
 import com.rfizzle.mercantile.registry.MercantileRegistry;
@@ -278,7 +279,11 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
 
         pruneSentries(server);
 
-        int radius = MercantileConfig.get().pylonDetectionRadius;
+        // With Tribulation installed the golem cap and detection radius scale with the local
+        // threat tier; otherwise these are exactly the configured defaults.
+        TribulationCompat.EffectivePylonLimits limits =
+                TribulationCompat.effectiveLimits(server, worldPosition, MercantileConfig.get());
+        int radius = limits.detectionRadius();
         LivingEntity threat = SentryPylonScanner.findNearestVisibleHostile(server, worldPosition, radius);
         if (threat == null) {
             return;
@@ -288,7 +293,7 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
             tryRingBell(server);
         }
 
-        if (sentries.size() >= MercantileConfig.get().pylonMaxGolems) {
+        if (sentries.size() >= limits.maxGolems()) {
             return;
         }
 
