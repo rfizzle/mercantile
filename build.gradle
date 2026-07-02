@@ -112,6 +112,19 @@ repositories {
             includeGroup 'mcp.mobius.waila'
         }
     }
+    // Concord sibling mods publish their jars only as GitHub release assets — resolve
+    // them straight off the release download URL.
+    ivy {
+        name = 'GitHubReleases'
+        url = 'https://github.com'
+        patternLayout {
+            artifact '[organisation]/[module]/releases/download/v[revision]/[module]-[revision].jar'
+        }
+        metadataSources { artifact() }
+        content {
+            includeGroup 'rfizzle'
+        }
+    }
 }
 
 sourceSets {
@@ -176,6 +189,8 @@ dependencies {
     "modClientCompileOnly"("me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:${project.rei_version}")
     modLocalRuntime "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
     modLocalRuntime "dev.architectury:architectury-fabric:${project.architectury_version}"
+
+    modCompileOnly "rfizzle:tribulation:${project.tribulation_version}"
 
     modCompileOnly "mezz.jei:jei-1.21.1-fabric-api:${project.jei_version}"
     "modClientCompileOnly"("mezz.jei:jei-1.21.1-fabric-api:${project.jei_version}")

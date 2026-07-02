@@ -2,33 +2,28 @@ package com.rfizzle.mercantile.compat.tribulation;
 
 import com.rfizzle.mercantile.Mercantile;
 import com.rfizzle.mercantile.config.MercantileConfig;
+import com.rfizzle.tribulation.api.TribulationAPI;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Soft integration with Tribulation: when it is loaded, the Sentry Pylon reads the local threat
  * tier and scales its golem cap and detection radius upward so village defense keeps pace with
- * Tribulation's harder raids. Without Tribulation every accessor returns the configured defaults.
- *
- * <p>Tribulation publishes no maven artifact, so its {@code api} package is consumed by
- * reflection — each target method is resolved once into a cached {@link MethodHandle} and any
- * failure (mod absent, older API, a throwing call) falls back to the configured defaults. A
- * misbehaving integration never crashes the host (Concord API Standard).
+ * Tribulation's harder raids. Without Tribulation every accessor returns the configured defaults,
+ * and any API failure falls back to them too — a misbehaving integration never crashes the host
+ * (Concord API Standard). All {@code TribulationAPI} references live in the nested {@link Api}
+ * holder, which is only class-loaded once the {@code isModLoaded} guard has passed.
  *
  * <p>Tier resolution: Tribulation has no position-only level accessor, so the pylon derives its
- * local threat from the nearest player within its configured detection radius via
- * {@code TribulationAPI.getEffectiveLevel(Entity)}, mapped to a tier against
- * {@code TribulationAPI.getTierThresholds()} (inclusive thresholds, tiers 0–5). No player in
- * range means no scaling.
+ * local threat from the nearest survival-mode player within its configured detection radius via
+ * {@link TribulationAPI#getEffectiveLevel}, mapped to a tier against
+ * {@link TribulationAPI#getTierThresholds} (inclusive thresholds, tiers 0–5). No player in range
+ * means no scaling.
  */
 public final class TribulationCompat {
 
@@ -36,25 +31,21 @@ public final class TribulationCompat {
     public record EffectivePylonLimits(int maxGolems, int detectionRadius) {}
 
     private static final String MOD_ID = "tribulation";
-    private static final String API_CLASS = "com.rfizzle.tribulation.api.TribulationAPI";
     /** Mirror of the config clamp ceiling on {@code pylonDetectionRadius}. */
     static final int MAX_DETECTION_RADIUS = 128;
+
+    private static final AtomicBoolean CALL_FAILURE_LOGGED = new AtomicBoolean(false);
 
     private TribulationCompat() {}
 
     /**
      * Resolve the pylon limits to use for a scan cycle at {@code pos}. Returns the configured
-     * defaults when Tribulation is absent, its API is unavailable, no player is within the
-     * configured detection radius, or the API call fails.
+     * defaults when Tribulation is absent, no player is within the configured detection radius,
+     * or the API call fails.
      */
     public static EffectivePylonLimits effectiveLimits(ServerLevel level, BlockPos pos, MercantileConfig config) {
         EffectivePylonLimits base = new EffectivePylonLimits(config.pylonMaxGolems, config.pylonDetectionRadius);
         if (!FabricLoader.getInstance().isModLoaded(MOD_ID)) {
-            return base;
-        }
-        MethodHandle effectiveLevel = EFFECTIVE_LEVEL.resolve();
-        MethodHandle tierThresholds = TIER_THRESHOLDS.resolve();
-        if (effectiveLevel == null || tierThresholds == null) {
             return base;
         }
         try {
@@ -66,9 +57,7 @@ public final class TribulationCompat {
             if (!(nearest instanceof ServerPlayer player)) {
                 return base;
             }
-            int threatLevel = (int) effectiveLevel.invokeExact((Entity) player);
-            int[] thresholds = (int[]) tierThresholds.invokeExact();
-            return scaledLimits(tierFor(threatLevel, thresholds), config);
+            return scaledLimits(tierFor(Api.effectiveLevel(player), Api.tierThresholds()), config);
         } catch (Throwable t) {
             if (CALL_FAILURE_LOGGED.compareAndSet(false, true)) {
                 Mercantile.LOGGER.warn("Tribulation API call failed; sentry pylon using configured defaults", t);
@@ -109,52 +98,20 @@ public final class TribulationCompat {
         return new EffectivePylonLimits(maxGolems, detectionRadius);
     }
 
-    private static final AtomicBoolean CALL_FAILURE_LOGGED = new AtomicBoolean(false);
-
-    private static final ApiAccessor EFFECTIVE_LEVEL =
-            new ApiAccessor("getEffectiveLevel", MethodType.methodType(int.class, Entity.class));
-    private static final ApiAccessor TIER_THRESHOLDS =
-            new ApiAccessor("getTierThresholds", MethodType.methodType(int[].class));
-
     /**
-     * Resolve-once, memoized handle to a static {@code TribulationAPI} method. The first
-     * resolution failure is logged; thereafter {@code null} is returned silently so the per-scan
-     * hot path never re-pays reflection cost.
+     * The only class that touches {@code TribulationAPI}. Kept nested so the JVM never resolves
+     * the Tribulation classes unless the {@code isModLoaded} guard in
+     * {@link #effectiveLimits} has already passed.
      */
-    private static final class ApiAccessor {
-        private final String methodName;
-        private final MethodType type;
-        private final AtomicBoolean logged = new AtomicBoolean(false);
-        private volatile boolean resolved;
-        private volatile MethodHandle handle;
+    private static final class Api {
+        private Api() {}
 
-        ApiAccessor(String methodName, MethodType type) {
-            this.methodName = methodName;
-            this.type = type;
+        static int effectiveLevel(ServerPlayer player) {
+            return TribulationAPI.getEffectiveLevel(player);
         }
 
-        MethodHandle resolve() {
-            if (resolved) {
-                return handle;
-            }
-            synchronized (this) {
-                if (resolved) {
-                    return handle;
-                }
-                MethodHandle resolvedHandle = null;
-                try {
-                    Class<?> api = Class.forName(API_CLASS);
-                    resolvedHandle = MethodHandles.publicLookup().findStatic(api, methodName, type);
-                } catch (Throwable t) {
-                    if (logged.compareAndSet(false, true)) {
-                        Mercantile.LOGGER.warn("Tribulation accessor {}.{} unavailable; sentry pylon using configured defaults",
-                                API_CLASS, methodName, t);
-                    }
-                }
-                handle = resolvedHandle;
-                resolved = true;
-                return handle;
-            }
+        static int[] tierThresholds() {
+            return TribulationAPI.getTierThresholds();
         }
     }
 }
