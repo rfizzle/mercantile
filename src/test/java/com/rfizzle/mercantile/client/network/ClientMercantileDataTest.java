@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -130,6 +131,28 @@ class ClientMercantileDataTest {
         assertNull(ClientMercantileData.getVillagerInfo());
         assertNull(ClientMercantileData.getRestockTimer());
         assertNull(ClientMercantileData.getDemandPrice());
+    }
+
+    // --- Follow count ---
+
+    @Test
+    void followCountIsZeroByDefault() {
+        assertEquals(0, ClientMercantileData.getFollowCount());
+    }
+
+    @Test
+    void setFollowCountStoresValueAndClampsNegative() {
+        ClientMercantileData.setFollowCount(2);
+        assertEquals(2, ClientMercantileData.getFollowCount());
+        ClientMercantileData.setFollowCount(-1);
+        assertEquals(0, ClientMercantileData.getFollowCount());
+    }
+
+    @Test
+    void clearResetsFollowCount() {
+        ClientMercantileData.setFollowCount(3);
+        ClientMercantileData.clear();
+        assertEquals(0, ClientMercantileData.getFollowCount());
     }
 
     // --- Trade index ---

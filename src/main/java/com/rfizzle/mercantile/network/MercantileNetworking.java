@@ -2,6 +2,7 @@ package com.rfizzle.mercantile.network;
 
 import com.rfizzle.mercantile.Mercantile;
 import com.rfizzle.mercantile.config.MercantileConfig;
+import com.rfizzle.mercantile.follow.FollowManager;
 import com.rfizzle.mercantile.reputation.ReputationManager;
 import com.rfizzle.mercantile.trade.TradeCycleManager;
 import com.rfizzle.mercantile.trade.index.TradeIndexDataSource;
@@ -54,6 +55,7 @@ public class MercantileNetworking {
 
         PayloadTypeRegistry.playS2C().register(SyncReputationS2CPayload.TYPE, SyncReputationS2CPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(FollowStateS2CPayload.TYPE, FollowStateS2CPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(FollowCountS2CPayload.TYPE, FollowCountS2CPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(RestockTimerS2CPayload.TYPE, RestockTimerS2CPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(DemandPriceS2CPayload.TYPE, DemandPriceS2CPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(VillagerInfoPanelS2CPayload.TYPE, VillagerInfoPanelS2CPayload.CODEC);
@@ -103,6 +105,7 @@ public class MercantileNetworking {
         // one-frame mismatch on the HUD at login.
         ServerPlayNetworking.send(player, new ConfigSyncS2CPayload(MercantileConfig.get().toJson()));
         ReputationManager.syncToClient(player);
+        ServerPlayNetworking.send(player, new FollowCountS2CPayload(FollowManager.getFollowerCount(player.getUUID())));
         List<TradeIndexEntry> snapshot = TradeIndexDataSource.snapshot();
         if (tradeIndexSizeLogged.compareAndSet(false, true) && Mercantile.LOGGER.isDebugEnabled()) {
             RegistryFriendlyByteBuf probe = new RegistryFriendlyByteBuf(

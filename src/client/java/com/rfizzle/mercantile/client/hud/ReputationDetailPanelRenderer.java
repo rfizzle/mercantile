@@ -6,6 +6,7 @@ import com.rfizzle.mercantile.client.MercantileClient;
 import com.rfizzle.mercantile.client.network.ClientMercantileData;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.VillagerHeadTextures;
+import com.rfizzle.mercantile.market.MarketDayMath;
 import com.rfizzle.mercantile.reputation.ReputationPerks;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.DeltaTracker;
@@ -141,6 +142,32 @@ public final class ReputationDetailPanelRenderer implements HudRenderCallback {
         Component dailyText = Component.translatable("hud.mercantile.rep_detail.daily",
                 ClientMercantileData.getReputationDailyEarned(), ClientMercantileData.getReputationDailyCap());
 
+        // ---- Status rows: market day + follow count (both need the synced config) ----
+        MercantileConfig synced = ClientMercantileData.getServerConfig();
+        boolean marketActive = false;
+        Component marketText = null;
+        if (synced != null && synced.enableMarketDay && mc.level != null) {
+            long dayTime = mc.level.getDayTime();
+            marketActive = MarketDayMath.isMarketDay(dayTime, synced.marketDayIntervalDays);
+            if (marketActive) {
+                marketText = Component.translatable("hud.mercantile.rep_detail.market_day.active",
+                        synced.marketDayDiscountPercent);
+            } else {
+                long days = MarketDayMath.daysUntilNextMarketDay(dayTime, synced.marketDayIntervalDays);
+                marketText = days == 1
+                        ? Component.translatable("hud.mercantile.rep_detail.market_day.tomorrow")
+                        : Component.translatable("hud.mercantile.rep_detail.market_day.next", days);
+            }
+        }
+        int followCount = ClientMercantileData.getFollowCount();
+        Component followText = synced != null && followCount > 0
+                ? Component.translatable("hud.mercantile.rep_detail.following",
+                        followCount, synced.maxFollowingVillagers)
+                : null;
+        int statusRows = (marketText != null ? 1 : 0) + (followText != null ? 1 : 0);
+        // Rows + gap plus the section's own trailing divider.
+        int statusH = statusRows == 0 ? 0 : statusRows * LINE_H + SECTION_GAP + 1 + SECTION_GAP;
+
         // Fixed-height "chrome": everything above the paged nearby list.
         int perksH = LINE_H + perks.size() * LINE_H + SECTION_GAP;  // heading + lines
         int chromeH = 2 * INSET
@@ -150,6 +177,7 @@ public final class ReputationDetailPanelRenderer implements HudRenderCallback {
                 + 1 + SECTION_GAP                                          // divider
                 + perksH                                                   // perks block
                 + 1 + SECTION_GAP                                          // divider
+                + statusH                                                  // market day + follow rows (if any)
                 + LINE_H;                                                  // nearby heading
 
         // Paginate the nearby list to a comfortable, bounded height.
@@ -182,7 +210,10 @@ public final class ReputationDetailPanelRenderer implements HudRenderCallback {
         for (Component perk : perks) {
             perksW = Math.max(perksW, ROW_INDENT + font.width(bullet(perk)));
         }
-        int contentW = max(MIN_CONTENT_W, headerW, scoreRowW, figuresW, perksW, nearbyW, headingRowW);
+        int statusW = 0;
+        if (marketText != null) statusW = Math.max(statusW, font.width(marketText));
+        if (followText != null) statusW = Math.max(statusW, font.width(followText));
+        int contentW = max(MIN_CONTENT_W, headerW, scoreRowW, figuresW, perksW, statusW, nearbyW, headingRowW);
 
         int contentH = chromeH - 2 * INSET + bodyRows * LINE_H;
         int panelW = contentW + 2 * INSET;
@@ -250,6 +281,20 @@ public final class ReputationDetailPanelRenderer implements HudRenderCallback {
         y += SECTION_GAP;
 
         y = divider(graphics, contentX, y, contentW, tierColor);
+
+        // Status rows: market day (accented while active) + follow count.
+        if (statusRows > 0) {
+            if (marketText != null) {
+                graphics.drawString(font, marketText, contentX, y, marketActive ? tierColor : COLOR_ASH, true);
+                y += LINE_H;
+            }
+            if (followText != null) {
+                graphics.drawString(font, followText, contentX, y, COLOR_BONE, true);
+                y += LINE_H;
+            }
+            y += SECTION_GAP;
+            y = divider(graphics, contentX, y, contentW, tierColor);
+        }
 
         // ---- Nearby list: static caption + dots, page cross-fading ----
         if (!hasNearby) {

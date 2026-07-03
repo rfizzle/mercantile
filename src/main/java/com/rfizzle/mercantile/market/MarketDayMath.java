@@ -31,6 +31,20 @@ public final class MarketDayMath {
     }
 
     /**
+     * Whole calendar days until the next market day starts: 0 while market day is in
+     * effect, otherwise the days from the current calendar day to the next scheduled
+     * one (a scheduled day past dusk counts as over, so the answer is a full interval).
+     * Returns -1 for a non-positive interval, which disables the schedule.
+     */
+    public static long daysUntilNextMarketDay(long dayTime, int intervalDays) {
+        if (intervalDays <= 0) return -1;
+        if (isMarketDay(dayTime, intervalDays)) return 0;
+        long day = dayOf(dayTime);
+        long next = (day / intervalDays + 1) * intervalDays;
+        return next - day;
+    }
+
+    /**
      * Market-day price adjustment for one offer: a flat discount of {@code discountPercent}
      * of the base price, floored. Zero or negative — never a markup.
      */

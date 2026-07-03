@@ -1,11 +1,13 @@
 package com.rfizzle.mercantile.follow;
 
 import com.rfizzle.mercantile.config.MercantileConfig;
+import com.rfizzle.mercantile.network.FollowCountS2CPayload;
 import com.rfizzle.mercantile.network.FollowStateS2CPayload;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
@@ -40,6 +42,7 @@ public final class FollowManager {
         ((FollowableVillager) villager).mercantile$setFollowingSync(true);
         ((FollowableVillager) villager).mercantile$setReturningHomeSync(false);
         broadcastFollowState(villager, true);
+        sendFollowCount(player.server, playerUuid);
         return true;
     }
 
@@ -66,15 +69,14 @@ public final class FollowManager {
 
     public static boolean stopFollowing(Villager villager) {
         UUID villagerUuid = villager.getUUID();
-        boolean wasFollowing;
+        UUID playerUuid;
         synchronized (LOCK) {
-            UUID playerUuid = villagerToPlayer.remove(villagerUuid);
-            wasFollowing = playerUuid != null;
-            if (wasFollowing) {
+            playerUuid = villagerToPlayer.remove(villagerUuid);
+            if (playerUuid != null) {
                 removeFromPlayerSetLocked(playerUuid, villagerUuid);
             }
         }
-        if (!wasFollowing) {
+        if (playerUuid == null) {
             return false;
         }
         ((FollowableVillager) villager).mercantile$setFollowingSync(false);
@@ -86,18 +88,23 @@ public final class FollowManager {
             }
         }
         broadcastFollowState(villager, false);
+        if (villager.level() instanceof ServerLevel serverLevel) {
+            sendFollowCount(serverLevel.getServer(), playerUuid);
+        }
         return true;
     }
 
     // Map-only cleanup. Does NOT clear synced data or broadcast S2C state.
     // Only use when the live Villager reference is unavailable (e.g. cross-map race cleanup
-    // where the villager has already been GC'd or unloaded).
-    public static void stopFollowing(UUID villagerUuid) {
+    // where the villager has already been GC'd or unloaded). Returns the player the
+    // villager was following, if any, so callers with a server handle can resync counts.
+    public static @Nullable UUID stopFollowing(UUID villagerUuid) {
         synchronized (LOCK) {
             UUID playerUuid = villagerToPlayer.remove(villagerUuid);
             if (playerUuid != null) {
                 removeFromPlayerSetLocked(playerUuid, villagerUuid);
             }
+            return playerUuid;
         }
     }
 
@@ -163,11 +170,25 @@ public final class FollowManager {
 
         ServerEntityEvents.ENTITY_UNLOAD.register((entity, world) -> {
             if (entity instanceof Villager villager) {
-                stopFollowing(villager.getUUID());
+                UUID playerUuid = stopFollowing(villager.getUUID());
+                if (playerUuid != null) {
+                    sendFollowCount(world.getServer(), playerUuid);
+                }
             }
         });
 
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> clearAll());
+    }
+
+    /**
+     * Push the owning player's follower count to just that player, if online.
+     * Count is read outside LOCK — safe because all follow mutations run on the
+     * server thread, so no interleaving can reorder the pushes.
+     */
+    private static void sendFollowCount(MinecraftServer server, UUID playerUuid) {
+        ServerPlayer player = server.getPlayerList().getPlayer(playerUuid);
+        if (player == null || player.connection == null) return;
+        ServerPlayNetworking.send(player, new FollowCountS2CPayload(getFollowerCount(playerUuid)));
     }
 
     private static void broadcastFollowState(Villager villager, boolean following) {

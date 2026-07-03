@@ -138,6 +138,22 @@ public class ClientMercantileData {
 
     // --- Follow state ---
 
+    /**
+     * The local player's follower count as reported by {@link
+     * com.rfizzle.mercantile.network.FollowCountS2CPayload}. Server-authoritative
+     * — unlike {@link #followStates}, which aggregates the level-wide broadcast
+     * across all players' followers.
+     */
+    private static int followCount = 0;
+
+    public static int getFollowCount() {
+        return followCount;
+    }
+
+    public static void setFollowCount(int count) {
+        followCount = Math.max(0, count);
+    }
+
     public static boolean isFollowing(int entityId) {
         return followStates.getOrDefault(entityId, false);
     }
@@ -170,6 +186,7 @@ public class ClientMercantileData {
         villagerInfo = null;
         workstationMap = null;
         followStates.clear();
+        followCount = 0;
         serverConfig = null;
         tradeIndex = List.of();
     }

@@ -53,6 +53,39 @@ class MarketDayMathTest {
     }
 
     @Test
+    void daysUntilNextIsZeroWhileMarketDayIsActive() {
+        assertEquals(0L, MarketDayMath.daysUntilNextMarketDay(7 * 24_000L, 7));
+        assertEquals(0L, MarketDayMath.daysUntilNextMarketDay(7 * 24_000L + 11_999L, 7));
+    }
+
+    @Test
+    void daysUntilNextCountsDownAcrossTheInterval() {
+        assertEquals(7L, MarketDayMath.daysUntilNextMarketDay(0L, 7));
+        assertEquals(6L, MarketDayMath.daysUntilNextMarketDay(1 * 24_000L + 500L, 7));
+        assertEquals(1L, MarketDayMath.daysUntilNextMarketDay(6 * 24_000L + 500L, 7));
+    }
+
+    @Test
+    void marketDayPastDuskIsAFullIntervalFromTheNext() {
+        assertEquals(7L, MarketDayMath.daysUntilNextMarketDay(7 * 24_000L + 12_000L, 7));
+        assertEquals(7L, MarketDayMath.daysUntilNextMarketDay(7 * 24_000L + 23_999L, 7));
+    }
+
+    @Test
+    void daysUntilNextWithIntervalOfOne() {
+        // Morning of any day (past day 0) is active; evening looks to tomorrow.
+        assertEquals(0L, MarketDayMath.daysUntilNextMarketDay(3 * 24_000L + 100L, 1));
+        assertEquals(1L, MarketDayMath.daysUntilNextMarketDay(3 * 24_000L + 13_000L, 1));
+        assertEquals(1L, MarketDayMath.daysUntilNextMarketDay(500L, 1));
+    }
+
+    @Test
+    void daysUntilNextWithNonPositiveIntervalIsDisabled() {
+        assertEquals(-1L, MarketDayMath.daysUntilNextMarketDay(7 * 24_000L, 0));
+        assertEquals(-1L, MarketDayMath.daysUntilNextMarketDay(7 * 24_000L, -3));
+    }
+
+    @Test
     void discountIsFlooredPercentOfBaseAndNeverAMarkup() {
         assertEquals(-3, MarketDayMath.discount(64, 5));
         assertEquals(-1, MarketDayMath.discount(20, 5));
