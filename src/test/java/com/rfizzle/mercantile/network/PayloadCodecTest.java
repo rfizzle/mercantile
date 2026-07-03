@@ -82,21 +82,21 @@ class PayloadCodecTest {
 
     @Test
     void restockTimerS2C() {
-        var original = new RestockTimerS2CPayload(10, 6000, 1, true);
+        var original = new RestockTimerS2CPayload(10, 6000, 1, true, 2400);
         assertEquals(original, roundTrip(RestockTimerS2CPayload.CODEC, original));
     }
 
     @Test
     void restockTimerS2CNoWorkstation() {
-        var original = new RestockTimerS2CPayload(10, 0, 0, false);
+        var original = new RestockTimerS2CPayload(10, 0, 0, false, 2400);
         assertEquals(original, roundTrip(RestockTimerS2CPayload.CODEC, original));
     }
 
     @Test
     void demandPriceS2CWithComponents() {
         var components = List.of(
-                new DemandPriceS2CPayload.PriceComponent(10, 2, -1, -3, 0, 8),
-                new DemandPriceS2CPayload.PriceComponent(32, 0, -5, 0, 0, 27)
+                new DemandPriceS2CPayload.PriceComponent(10, 2, -1, 0, -3, 0, 8),
+                new DemandPriceS2CPayload.PriceComponent(32, 0, -5, 0, 0, 0, 27)
         );
         var original = new DemandPriceS2CPayload(42, components);
         assertEquals(original, roundTrip(DemandPriceS2CPayload.CODEC, original));
@@ -110,14 +110,22 @@ class PayloadCodecTest {
 
     @Test
     void priceComponentDirect() {
-        var original = new DemandPriceS2CPayload.PriceComponent(64, 5, -10, -2, 0, 57);
+        var original = new DemandPriceS2CPayload.PriceComponent(64, 5, -10, 0, -2, 0, 57);
         assertEquals(original, roundTrip(DemandPriceS2CPayload.PriceComponent.STREAM_CODEC, original));
+    }
+
+    @Test
+    void priceComponentWithMoodModifier() {
+        var discount = new DemandPriceS2CPayload.PriceComponent(20, 0, 0, -1, 0, 0, 19);
+        assertEquals(discount, roundTrip(DemandPriceS2CPayload.PriceComponent.STREAM_CODEC, discount));
+        var markup = new DemandPriceS2CPayload.PriceComponent(20, 0, 0, 1, 0, 0, 21);
+        assertEquals(markup, roundTrip(DemandPriceS2CPayload.PriceComponent.STREAM_CODEC, markup));
     }
 
     @Test
     void priceComponentWithOtherAdjust() {
         // Simulates Hero of the Village discount: finalPrice < basePrice with no other modifiers.
-        var original = new DemandPriceS2CPayload.PriceComponent(10, 0, 0, 0, -3, 7);
+        var original = new DemandPriceS2CPayload.PriceComponent(10, 0, 0, 0, 0, -3, 7);
         assertEquals(original, roundTrip(DemandPriceS2CPayload.PriceComponent.STREAM_CODEC, original));
     }
 
@@ -132,14 +140,14 @@ class PayloadCodecTest {
     @Test
     void villagerInfoPanelS2C() {
         var original = new VillagerInfoPanelS2CPayload(
-                42, "farmer", 3, 150, 250, 75, "mercantile.tier.trusted", 28, true, true);
+                42, "farmer", 3, 150, 250, 75, "mercantile.tier.trusted", 28, true, true, "mercantile.mood.content");
         assertEquals(original, roundTrip(VillagerInfoPanelS2CPayload.CODEC, original));
     }
 
     @Test
     void villagerInfoPanelS2CDefaults() {
         var original = new VillagerInfoPanelS2CPayload(
-                1, "none", 1, 0, 10, 0, "mercantile.tier.neutral", 0, false, false);
+                1, "none", 1, 0, 10, 0, "mercantile.tier.neutral", 0, false, false, "");
         assertEquals(original, roundTrip(VillagerInfoPanelS2CPayload.CODEC, original));
     }
 
@@ -278,10 +286,10 @@ class PayloadCodecTest {
         assertEquals(RequestWorkstationMapC2SPayload.TYPE, new RequestWorkstationMapC2SPayload().type());
         assertEquals(SyncReputationS2CPayload.TYPE, new SyncReputationS2CPayload(0, "", 0, 0).type());
         assertEquals(FollowStateS2CPayload.TYPE, new FollowStateS2CPayload(0, false).type());
-        assertEquals(RestockTimerS2CPayload.TYPE, new RestockTimerS2CPayload(0, 0, 0, false).type());
+        assertEquals(RestockTimerS2CPayload.TYPE, new RestockTimerS2CPayload(0, 0, 0, false, 2400).type());
         assertEquals(DemandPriceS2CPayload.TYPE, new DemandPriceS2CPayload(0, List.of()).type());
         assertEquals(VillagerInfoPanelS2CPayload.TYPE,
-                new VillagerInfoPanelS2CPayload(0, "", 0, 0, 0, 0, "", 0, false, false).type());
+                new VillagerInfoPanelS2CPayload(0, "", 0, 0, 0, 0, "", 0, false, false, "").type());
         assertEquals(WorkstationMapS2CPayload.TYPE, new WorkstationMapS2CPayload(Map.of(), List.of(), List.of()).type());
         assertEquals(ConfigSyncS2CPayload.TYPE, new ConfigSyncS2CPayload("").type());
         assertEquals(TradeIndexS2CPayload.TYPE, new TradeIndexS2CPayload(List.of()).type());

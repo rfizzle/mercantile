@@ -8,6 +8,7 @@ import com.rfizzle.mercantile.data.VillagerHeadTextures;
 import com.rfizzle.mercantile.data.VillagerNameManager;
 import com.rfizzle.mercantile.data.VillagerPlacementHandler;
 import com.rfizzle.mercantile.follow.FollowManager;
+import com.rfizzle.mercantile.mood.MoodManager;
 import com.rfizzle.mercantile.network.MercantileNetworking;
 import com.rfizzle.mercantile.particle.MercantileParticles;
 import com.rfizzle.mercantile.registry.MercantileRegistry;
@@ -30,6 +31,7 @@ public class Mercantile implements ModInitializer {
         MercantileRegistry.registerApiLookups();
         MercantileAttachments.init();
         ReputationManager.init();
+        MoodManager.init();
         ExclusiveTradesManager.init();
         TradeIndexDataSource.init();
         GiftMappingManager.init();

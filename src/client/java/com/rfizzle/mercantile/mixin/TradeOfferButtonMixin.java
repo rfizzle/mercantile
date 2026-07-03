@@ -98,6 +98,12 @@ public abstract class TradeOfferButtonMixin {
             lines.add(Component.translatable("gui.mercantile.price.reputation", value)
                     .withStyle(color));
         }
+        if (c.moodModifier() != 0) {
+            ChatFormatting color = c.moodModifier() < 0 ? ChatFormatting.GREEN : ChatFormatting.RED;
+            String value = (c.moodModifier() > 0 ? "+" : "") + c.moodModifier();
+            lines.add(Component.translatable("gui.mercantile.price.mood", value)
+                    .withStyle(color));
+        }
         if (c.gossipModifier() != 0) {
             ChatFormatting color = c.gossipModifier() < 0 ? ChatFormatting.GREEN : ChatFormatting.RED;
             String value = (c.gossipModifier() > 0 ? "+" : "") + c.gossipModifier();

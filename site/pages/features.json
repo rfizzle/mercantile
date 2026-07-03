@@ -74,6 +74,16 @@
               "note": "Config: <code class='text-bone'>enableProfessionLock</code>"
             },
             {
+              "id": "villager-mood",
+              "title": "Villager Mood",
+              "html": [
+                "Each villager tracks a mood from its living conditions — a claimed bed, a workstation, recent sleep, a stocked food inventory, staying unharmed, and not witnessing another villager's death. The score drifts gradually toward what conditions dictate and settles into one of four tiers: Miserable, Unhappy, Content, or Happy.",
+                "Mood is a gentle nudge, not a gate: Happy villagers offer a small discount and restock sooner; Miserable ones add a small markup and restock later. The current tier shows in Jade/WTHIT tooltips and the trade-GUI info panel, and the price effect appears as its own \"Mood\" line in the demand price breakdown — stacking with, never replacing, gossip and reputation. Happy villagers occasionally emit happy particles; Miserable ones emit angry ones.",
+                "Mood belongs to the villager and is the same for every player; it persists across save/reload and pickup/place."
+              ],
+              "note": "Config: <code class='text-bone'>enableMood</code>, <code class='text-bone'>moodPriceModifierPercent</code> (default 5), <code class='text-bone'>moodRestockSpeedPercent</code> (default 20), <code class='text-bone'>moodAmbientParticles</code>"
+            },
+            {
               "id": "pathfinding",
               "title": "Smarter Pathfinding",
               "html": [
@@ -124,7 +134,7 @@
               "id": "demand-transparency",
               "title": "Demand Transparency",
               "html": [
-                "Hover over a trade price to see a breakdown: base price, demand adjustment, reputation modifier, gossip modifier, final price. Discounts appear in green, markups in red."
+                "Hover over a trade price to see a breakdown: base price, demand adjustment, reputation modifier, mood modifier, gossip modifier, final price. Discounts appear in green, markups in red."
               ],
               "note": "Config: <code class='text-bone'>enableDemandTransparency</code>"
             }
@@ -138,7 +148,7 @@
               "id": "info-panel",
               "title": "Villager Info Panel",
               "html": [
-                "A side panel in the merchant screen showing the villager's name, profession and level with XP progress bar, your reputation standing with them, total trades completed, workstation status (bound/unbound and type), and the profession-locked indicator.",
+                "A side panel in the merchant screen showing the villager's name, profession and level with XP progress bar, your reputation standing with them, total trades completed, workstation status (bound/unbound and type), the villager\u2019s mood tier, and the profession-locked indicator.",
                 "<strong class='text-bone'>Small-screen fallback:</strong> when the window is too narrow to fit the side panel next to the trade GUI, a small <code class='text-bone'>i</code> icon appears beside the villager title. Click it to open the same info as a centered overlay; press <code class='text-bone'>Esc</code> or the <code class='text-bone'>x</code> in the corner to close."
               ],
               "note": "Client config: <code class='text-bone'>enableInfoPanel</code>"
@@ -292,9 +302,9 @@
               "id": "jade-wthit",
               "title": "Jade / WTHIT Tooltips",
               "html": [
-                "Look at a villager with Jade or WTHIT installed to see a single color-coded breeding line — Ready, Hungry (with food progress), Needs bed, or Cooldown; babies show a Growing countdown on WTHIT, while on Jade its native growing-time line is used instead — plus contextual state icons: \"Needs workstation\", \"Panicking\", \"Trading with &lt;player&gt;\". Sentry golems show their parent pylon coordinates, despawn countdown, and a \"No Drops\" indicator. Both plugins work simultaneously without conflict."
+                "Look at a villager with Jade or WTHIT installed to see a single color-coded breeding line — Ready, Hungry (with food progress), Needs bed, or Cooldown; babies show a Growing countdown on WTHIT, while on Jade its native growing-time line is used instead — plus a color-coded mood tier line and contextual state icons: \"Needs workstation\", \"Panicking\", \"Trading with &lt;player&gt;\". Sentry golems show their parent pylon coordinates, despawn countdown, and a \"No Drops\" indicator. Both plugins work simultaneously without conflict."
               ],
-              "note": "Config: <code class='text-bone'>enableBreedingTooltip</code>, <code class='text-bone'>enableStateIndicators</code>"
+              "note": "Config: <code class='text-bone'>enableBreedingTooltip</code>, <code class='text-bone'>enableStateIndicators</code>, <code class='text-bone'>enableMood</code>"
             }
           ]
         }

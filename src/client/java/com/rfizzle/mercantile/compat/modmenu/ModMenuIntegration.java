@@ -272,6 +272,37 @@ public class ModMenuIntegration implements ModMenuApi {
                     .setSaveConsumer(v -> config.enableStateIndicators = v)
                     .build());
 
+            // --- Mood ---
+            ConfigCategory mood = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.mood"));
+            mood.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableMood"), config.enableMood)
+                    .setDefaultValue(defaults.enableMood)
+                    .setTooltip(Component.translatable("mercantile.config.enableMood.tooltip"))
+                    .setSaveConsumer(v -> config.enableMood = v)
+                    .build());
+            mood.addEntry(entry.startIntField(Component.translatable("mercantile.config.moodPriceModifierPercent"), config.moodPriceModifierPercent)
+                    .setDefaultValue(defaults.moodPriceModifierPercent)
+                    .setMin(0).setMax(50)
+                    .setTooltip(Component.translatable("mercantile.config.moodPriceModifierPercent.tooltip"))
+                    .setSaveConsumer(v -> config.moodPriceModifierPercent = v)
+                    .build());
+            mood.addEntry(entry.startIntField(Component.translatable("mercantile.config.moodRestockSpeedPercent"), config.moodRestockSpeedPercent)
+                    .setDefaultValue(defaults.moodRestockSpeedPercent)
+                    .setMin(0).setMax(80)
+                    .setTooltip(Component.translatable("mercantile.config.moodRestockSpeedPercent.tooltip"))
+                    .setSaveConsumer(v -> config.moodRestockSpeedPercent = v)
+                    .build());
+            mood.addEntry(entry.startIntField(Component.translatable("mercantile.config.moodRecalcIntervalTicks"), config.moodRecalcIntervalTicks)
+                    .setDefaultValue(defaults.moodRecalcIntervalTicks)
+                    .setMin(20).setMax(24_000)
+                    .setTooltip(Component.translatable("mercantile.config.moodRecalcIntervalTicks.tooltip"))
+                    .setSaveConsumer(v -> config.moodRecalcIntervalTicks = v)
+                    .build());
+            mood.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.moodAmbientParticles"), config.moodAmbientParticles)
+                    .setDefaultValue(defaults.moodAmbientParticles)
+                    .setTooltip(Component.translatable("mercantile.config.moodAmbientParticles.tooltip"))
+                    .setSaveConsumer(v -> config.moodAmbientParticles = v)
+                    .build());
+
             // --- Sentry Pylon ---
             ConfigCategory pylon = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.pylon"));
             pylon.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableSentryPylon"), config.enableSentryPylon)

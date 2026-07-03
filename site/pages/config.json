@@ -574,6 +574,60 @@
         },
         {
           "type": "sub",
+          "id": "config-mood",
+          "title": "Mood",
+          "blocks": [
+            {
+              "type": "table",
+              "headers": [
+                "Key",
+                "Type",
+                "Default",
+                "Range",
+                "Description"
+              ],
+              "rows": [
+                [
+                  "<code class='text-bone whitespace-nowrap'>enableMood</code>",
+                  "boolean",
+                  "true",
+                  "—",
+                  "Master toggle for the villager mood system — living conditions drive a 0–100 mood that nudges prices and restock speed."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>moodPriceModifierPercent</code>",
+                  "int",
+                  "5",
+                  "0–50",
+                  "Price nudge as a percent of base price: Happy villagers discount by this much, Miserable ones mark up. 0 disables the price effect."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>moodRestockSpeedPercent</code>",
+                  "int",
+                  "20",
+                  "0–80",
+                  "Restock interval change: Happy villagers restock this percent sooner, Miserable ones later. 0 disables the restock effect."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>moodRecalcIntervalTicks</code>",
+                  "int",
+                  "100",
+                  "20–24000",
+                  "Ticks between mood re-evaluations; mood drifts 2 points toward current conditions per interval."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>moodAmbientParticles</code>",
+                  "boolean",
+                  "true",
+                  "—",
+                  "Happy villagers occasionally emit happy particles; Miserable ones emit angry particles."
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "type": "sub",
           "id": "config-sentry-pylon",
           "title": "Sentry Pylon",
           "blocks": [
@@ -739,7 +793,7 @@
         {
           "type": "code",
           "small": true,
-          "code": "{\n  \"enableVillagerPickup\": true,\n  \"pickupXpCost\": 5,\n  \"enableNames\": true,\n  \"enableTradeCycling\": true,\n  \"tradeCycleEmeraldCost\": 6,\n  \"enableReputation\": true,\n  \"reputationTradeGain\": 1,\n  \"reputationCureGain\": 5,\n  \"reputationAttackLoss\": 15,\n  \"reputationKillLoss\": 40,\n  \"reputationCycleGain\": 1,\n  \"reputationDailyCap\": 5,\n  \"reputationTradesPerGain\": 5,\n  \"reputationDailyMaxTradeRep\": 2,\n  \"reputationDailyMaxCycleRep\": 1,\n  \"enableRaidReputation\": true,\n  \"reputationRaidWinGain\": 10,\n  \"enableWanderingTraderRep\": true,\n  \"enableGifting\": true,\n  \"reputationGiftGain\": 1,\n  \"reputationDailyMaxGiftRep\": 2,\n  \"reputationNegativeDecayPerDay\": 1,\n  \"enableFollowMode\": true,\n  \"maxFollowingVillagers\": 3,\n  \"enableSendHome\": true,\n  \"enablePathfindingFixes\": true,\n  \"enablePathfindingDoors\": true,\n  \"enablePathfindingStairs\": true,\n  \"enablePathfindingLadders\": true,\n  \"enablePathfindingWater\": true,\n  \"enableBulkTrading\": true,\n  \"enableProfessionLock\": true,\n  \"enableHealing\": true,\n  \"healingMultiplier\": 2.0,\n  \"enableRestockIndicator\": true,\n  \"enableDemandTransparency\": true,\n  \"enableBreedingTooltip\": true,\n  \"enableStateIndicators\": true,\n  \"enableSentryPylon\": true,\n  \"enablePylonBellAlarm\": true,\n  \"pylonDetectionRadius\": 32,\n  \"pylonMaxFuel\": 8,\n  \"pylonMaxGolems\": 3,\n  \"sentryDespawnSeconds\": 30,\n  \"pylonTribulationGolemBonusPerTier\": 1,\n  \"pylonTribulationRadiusBonusPerTier\": 4,\n  \"pylonTribulationMaxGolems\": 6,\n  \"villagerSoundVolume\": 1.0,\n  \"enableWorkstationVis\": true,\n  \"enableBellRadiusVis\": true,\n  \"enableInfoPanel\": true,\n  \"enableReputationHud\": true,\n  \"hudAnchor\": \"TOP_LEFT\",\n  \"hudOffsetX\": 4,\n  \"hudOffsetY\": 4\n}"
+          "code": "{\n  \"enableVillagerPickup\": true,\n  \"pickupXpCost\": 5,\n  \"enableNames\": true,\n  \"enableTradeCycling\": true,\n  \"tradeCycleEmeraldCost\": 6,\n  \"enableReputation\": true,\n  \"reputationTradeGain\": 1,\n  \"reputationCureGain\": 5,\n  \"reputationAttackLoss\": 15,\n  \"reputationKillLoss\": 40,\n  \"reputationCycleGain\": 1,\n  \"reputationDailyCap\": 5,\n  \"reputationTradesPerGain\": 5,\n  \"reputationDailyMaxTradeRep\": 2,\n  \"reputationDailyMaxCycleRep\": 1,\n  \"enableRaidReputation\": true,\n  \"reputationRaidWinGain\": 10,\n  \"enableWanderingTraderRep\": true,\n  \"enableGifting\": true,\n  \"reputationGiftGain\": 1,\n  \"reputationDailyMaxGiftRep\": 2,\n  \"reputationNegativeDecayPerDay\": 1,\n  \"enableFollowMode\": true,\n  \"maxFollowingVillagers\": 3,\n  \"enableSendHome\": true,\n  \"enablePathfindingFixes\": true,\n  \"enablePathfindingDoors\": true,\n  \"enablePathfindingStairs\": true,\n  \"enablePathfindingLadders\": true,\n  \"enablePathfindingWater\": true,\n  \"enableBulkTrading\": true,\n  \"enableProfessionLock\": true,\n  \"enableHealing\": true,\n  \"healingMultiplier\": 2.0,\n  \"enableRestockIndicator\": true,\n  \"enableDemandTransparency\": true,\n  \"enableBreedingTooltip\": true,\n  \"enableStateIndicators\": true,\n  \"enableMood\": true,\n  \"moodPriceModifierPercent\": 5,\n  \"moodRestockSpeedPercent\": 20,\n  \"moodRecalcIntervalTicks\": 100,\n  \"moodAmbientParticles\": true,\n  \"enableSentryPylon\": true,\n  \"enablePylonBellAlarm\": true,\n  \"pylonDetectionRadius\": 32,\n  \"pylonMaxFuel\": 8,\n  \"pylonMaxGolems\": 3,\n  \"sentryDespawnSeconds\": 30,\n  \"pylonTribulationGolemBonusPerTier\": 1,\n  \"pylonTribulationRadiusBonusPerTier\": 4,\n  \"pylonTribulationMaxGolems\": 6,\n  \"villagerSoundVolume\": 1.0,\n  \"enableWorkstationVis\": true,\n  \"enableBellRadiusVis\": true,\n  \"enableInfoPanel\": true,\n  \"enableReputationHud\": true,\n  \"hudAnchor\": \"TOP_LEFT\",\n  \"hudOffsetX\": 4,\n  \"hudOffsetY\": 4\n}"
         }
       ]
     }

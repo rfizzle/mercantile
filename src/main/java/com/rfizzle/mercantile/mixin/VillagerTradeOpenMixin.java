@@ -3,6 +3,8 @@ package com.rfizzle.mercantile.mixin;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
+import com.rfizzle.mercantile.mood.MoodManager;
+import com.rfizzle.mercantile.mood.MoodMath;
 import com.rfizzle.mercantile.network.DemandPriceS2CPayload;
 import com.rfizzle.mercantile.network.RestockTimerS2CPayload;
 import com.rfizzle.mercantile.network.VillagerInfoPanelSync;
@@ -58,27 +60,36 @@ public abstract class VillagerTradeOpenMixin {
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/npc/Villager;openTradingScreen(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/network/chat/Component;I)V"))
     private void mercantile$applyReputationEffects(Player player, CallbackInfo ci) {
-        if (!MercantileConfig.get().enableReputation) return;
+        MercantileConfig config = MercantileConfig.get();
+        if (!config.enableReputation && !config.enableMood) return;
         if (!(player instanceof ServerPlayer serverPlayer)) return;
         if (serverPlayer.connection == null) return;
 
-        PlayerData data = serverPlayer.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
-        int score = data.getScore();
-
         Villager self = (Villager) (Object) this;
 
-        if (score != 0) {
-            for (MerchantOffer offer : self.getOffers()) {
-                int basePrice = offer.getBaseCostA().getCount();
-                int modifier = ReputationManager.getPriceModifier(score, basePrice);
-                if (modifier != 0) {
-                    // Intentional absolute set: mod fully owns reputation pricing, superseding vanilla's Hero-of-the-Village discount.
-                    offer.setSpecialPriceDiff(modifier);
-                }
+        int score = 0;
+        if (config.enableReputation) {
+            PlayerData data = serverPlayer.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
+            score = data.getScore();
+        }
+
+        for (MerchantOffer offer : self.getOffers()) {
+            int basePrice = offer.getBaseCostA().getCount();
+            int reputationModifier = score != 0 ? ReputationManager.getPriceModifier(score, basePrice) : 0;
+            int moodModifier = MoodManager.priceModifier(self, basePrice, config);
+            if (reputationModifier != 0) {
+                // Intentional absolute set: mod fully owns reputation pricing, superseding
+                // vanilla's gossip and Hero-of-the-Village discounts. Mood stacks on top.
+                offer.setSpecialPriceDiff(reputationModifier + moodModifier);
+            } else if (moodModifier != 0) {
+                // No reputation modifier: mood stacks on the vanilla gossip/HotV special price.
+                offer.setSpecialPriceDiff(offer.getSpecialPriceDiff() + moodModifier);
             }
         }
 
-        ExclusiveTradesManager.injectOffers(self, score);
+        if (config.enableReputation) {
+            ExclusiveTradesManager.injectOffers(self, score);
+        }
     }
 
     @Inject(method = "startTrading", at = @At("TAIL"))
@@ -111,7 +122,10 @@ public abstract class VillagerTradeOpenMixin {
         boolean hasWorkstation = self.getBrain()
                 .getMemory(MemoryModuleType.JOB_SITE).isPresent();
 
+        int restockIntervalTicks = (int) MoodManager.restockIntervalTicks(
+                self, MoodMath.BASE_RESTOCK_INTERVAL_TICKS);
+
         ServerPlayNetworking.send(serverPlayer, new RestockTimerS2CPayload(
-                self.getId(), lastRestockGameTime, restocksToday, hasWorkstation));
+                self.getId(), lastRestockGameTime, restocksToday, hasWorkstation, restockIntervalTicks));
     }
 }

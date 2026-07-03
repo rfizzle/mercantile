@@ -34,7 +34,7 @@ public class RestockIndicatorGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void payloadRoundTripsCorrectFields(GameTestHelper helper) {
         RestockTimerS2CPayload original = new RestockTimerS2CPayload(
-                42, 123456789012345L, 1, true);
+                42, 123456789012345L, 1, true, 2400);
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         try {
             RestockTimerS2CPayload.CODEC.encode(buf, original);

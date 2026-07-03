@@ -10,7 +10,8 @@ public record RestockTimerS2CPayload(
         int villagerEntityId,
         long lastRestockGameTime,
         int restockCountToday,
-        boolean hasWorkstation
+        boolean hasWorkstation,
+        int restockIntervalTicks
 ) implements CustomPacketPayload {
 
     public static final Type<RestockTimerS2CPayload> TYPE =
@@ -22,6 +23,7 @@ public record RestockTimerS2CPayload(
                     ByteBufCodecs.VAR_LONG, RestockTimerS2CPayload::lastRestockGameTime,
                     ByteBufCodecs.VAR_INT, RestockTimerS2CPayload::restockCountToday,
                     ByteBufCodecs.BOOL, RestockTimerS2CPayload::hasWorkstation,
+                    ByteBufCodecs.VAR_INT, RestockTimerS2CPayload::restockIntervalTicks,
                     RestockTimerS2CPayload::new);
 
     @Override

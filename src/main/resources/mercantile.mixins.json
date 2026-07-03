@@ -32,6 +32,7 @@
         "VillagerPickupMixin",
         "VillagerProfessionLockMixin",
         "VillagerRestockAccessor",
+        "VillagerRestockMoodMixin",
         "VillagerTradeOpenMixin",
         "WanderingTraderPickupMixin",
         "WanderingTraderTradeOpenMixin",
