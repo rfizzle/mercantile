@@ -115,6 +115,44 @@ class ConfigMigratorTest {
     }
 
     @Test
+    void v3FileGainsMarketDayFieldsAtDefaults() {
+        JsonObject raw = parse("""
+                {
+                  "configVersion": 3,
+                  "enableMood": false
+                }
+                """);
+
+        boolean migrated = ConfigMigrator.migrate(raw);
+        MercantileConfig defaults = new MercantileConfig();
+
+        assertTrue(migrated, "a v3 file must migrate to v4");
+        assertEquals(ConfigMigrator.CURRENT_VERSION, raw.get("configVersion").getAsInt());
+        assertEquals(defaults.enableMarketDay, raw.get("enableMarketDay").getAsBoolean());
+        assertEquals(defaults.marketDayIntervalDays, raw.get("marketDayIntervalDays").getAsInt());
+        assertEquals(defaults.marketDayDiscountPercent, raw.get("marketDayDiscountPercent").getAsInt());
+        // Existing fields are carried forward untouched.
+        assertFalse(raw.get("enableMood").getAsBoolean());
+    }
+
+    @Test
+    void marketDayMigrationPreservesExplicitValues() {
+        JsonObject raw = parse("""
+                {
+                  "configVersion": 3,
+                  "enableMarketDay": false,
+                  "marketDayIntervalDays": 3
+                }
+                """);
+
+        ConfigMigrator.migrate(raw);
+
+        assertFalse(raw.get("enableMarketDay").getAsBoolean(),
+                "an explicitly set enableMarketDay must not be overwritten by the migration");
+        assertEquals(3, raw.get("marketDayIntervalDays").getAsInt());
+    }
+
+    @Test
     void moodMigrationPreservesExplicitValues() {
         JsonObject raw = parse("""
                 {

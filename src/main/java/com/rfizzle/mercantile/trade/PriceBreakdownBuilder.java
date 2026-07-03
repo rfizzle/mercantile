@@ -3,6 +3,7 @@ package com.rfizzle.mercantile.trade;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
+import com.rfizzle.mercantile.market.MarketDayManager;
 import com.rfizzle.mercantile.mixin.MerchantOfferDemandAccessor;
 import com.rfizzle.mercantile.mood.MoodManager;
 import com.rfizzle.mercantile.network.DemandPriceS2CPayload;
@@ -40,6 +41,7 @@ public final class PriceBreakdownBuilder {
                     : 0;
 
             int moodModifier = MoodManager.priceModifier(villager, basePrice, config);
+            int marketDayModifier = MarketDayManager.priceModifier(villager, basePrice, config);
 
             // Mirrors VillagerTradeOpenMixin: an absolute setSpecialPriceDiff from
             // reputation supersedes vanilla's gossip special price; mood stacks on top
@@ -49,10 +51,12 @@ public final class PriceBreakdownBuilder {
                     : -Mth.floor(gossipReputation * priceMultiplier);
 
             int finalPrice = offer.getCostA().getCount();
-            int otherAdjust = finalPrice - basePrice - demandAdjust - reputationModifier - moodModifier - gossipModifier;
+            int otherAdjust = finalPrice - basePrice - demandAdjust - reputationModifier - moodModifier
+                    - gossipModifier - marketDayModifier;
 
             components.add(new DemandPriceS2CPayload.PriceComponent(
-                    basePrice, demandAdjust, reputationModifier, moodModifier, gossipModifier, otherAdjust, finalPrice));
+                    basePrice, demandAdjust, reputationModifier, moodModifier, gossipModifier,
+                    marketDayModifier, otherAdjust, finalPrice));
         }
         return components;
     }

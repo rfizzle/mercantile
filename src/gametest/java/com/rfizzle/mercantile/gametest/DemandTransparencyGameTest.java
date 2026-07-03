@@ -35,8 +35,8 @@ public class DemandTransparencyGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void payloadRoundTripsCorrectFields(GameTestHelper helper) {
         DemandPriceS2CPayload original = new DemandPriceS2CPayload(42,
-                List.of(new DemandPriceS2CPayload.PriceComponent(3, 2, -1, 0, 0, 0, 4),
-                        new DemandPriceS2CPayload.PriceComponent(10, 0, 0, 0, -2, 0, 8)));
+                List.of(new DemandPriceS2CPayload.PriceComponent(3, 2, -1, 0, 0, 0, 0, 4),
+                        new DemandPriceS2CPayload.PriceComponent(10, 0, 0, 0, -2, 0, 0, 8)));
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         try {
             DemandPriceS2CPayload.CODEC.encode(buf, original);

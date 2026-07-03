@@ -461,7 +461,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
                             .withStyle(ChatFormatting.GREEN),
                     contentX, y, INFO_PANEL_TEXT_COLOR, false);
             y += this.font.lineHeight + 4;
-        } else if (timer.restockCountToday() < 2) {
+        } else if (timer.restockCountToday() < timer.maxRestocksToday()) {
             long now = this.minecraft.level == null ? 0L : this.minecraft.level.getGameTime();
             long nextTick = timer.lastRestockGameTime() + timer.restockIntervalTicks();
             long remaining = Math.max(0L, nextTick - now);
@@ -475,9 +475,13 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
             y += this.font.lineHeight + 4;
         }
 
+        // A cap above the vanilla two restocks per day means market day is in effect.
+        String countKey = timer.maxRestocksToday() > 2
+                ? "gui.mercantile.restock.count.market_day"
+                : "gui.mercantile.restock.count";
         guiGraphics.drawString(this.font,
-                Component.translatable("gui.mercantile.restock.count",
-                        timer.restockCountToday(), 2),
+                Component.translatable(countKey,
+                        timer.restockCountToday(), timer.maxRestocksToday()),
                 contentX, y, INFO_PANEL_DIM_COLOR, false);
     }
 

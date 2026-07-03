@@ -31,7 +31,7 @@ class ClientMercantileDataTest {
     }
 
     private static RestockTimerS2CPayload restockFor(int entityId) {
-        return new RestockTimerS2CPayload(entityId, 0L, 0, true, 2400);
+        return new RestockTimerS2CPayload(entityId, 0L, 0, true, 2400, 2);
     }
 
     private static DemandPriceS2CPayload demandFor(int entityId) {
