@@ -86,6 +86,11 @@ public class MercantileConfig {
     // Breeding Tooltip (Jade/WTHIT)
     public boolean enableBreedingTooltip = true;
 
+    // Baby Feeding
+    public boolean enableBabyFeeding = true;
+    public int babyFeedPercentPerFeed = 10;
+    public int babyFeedMaxReductionPercent = 50;
+
     // State Indicators (Jade/WTHIT)
     public boolean enableStateIndicators = true;
 
@@ -136,6 +141,8 @@ public class MercantileConfig {
         reputationNegativeDecayPerDay = Math.clamp(reputationNegativeDecayPerDay, 0, Integer.MAX_VALUE);
         maxFollowingVillagers = Math.clamp(maxFollowingVillagers, 1, Integer.MAX_VALUE);
         healingMultiplier = Math.clamp(healingMultiplier, 1.0f, 10.0f);
+        babyFeedPercentPerFeed = Math.clamp(babyFeedPercentPerFeed, 1, 100);
+        babyFeedMaxReductionPercent = Math.clamp(babyFeedMaxReductionPercent, 0, 100);
         pylonDetectionRadius = Math.clamp(pylonDetectionRadius, 4, 128);
         pylonMaxFuel = Math.clamp(pylonMaxFuel, 1, Integer.MAX_VALUE);
         pylonMaxGolems = Math.clamp(pylonMaxGolems, 1, Integer.MAX_VALUE);

@@ -20,6 +20,7 @@
         "SentryGolemDropsMixin",
         "ThrownPotionSplashMixin",
         "VillagerAccessor",
+        "VillagerBabyFeedMixin",
         "VillagerDoorMixin",
         "VillagerFollowMixin",
         "VillagerFollowPushMixin",

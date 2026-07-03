@@ -19,15 +19,22 @@ public class MercantileVillagerData {
                     Codec.BOOL.optionalFieldOf("nameAssigned", false)
                             .forGetter(MercantileVillagerData::isNameAssigned),
                     CompoundTag.CODEC.optionalFieldOf("wanderingTraderOfferTag")
-                            .forGetter(data -> Optional.ofNullable(data.wanderingTraderOfferTag))
-            ).apply(instance, (professionLocked, lockedTrades, nameAssigned, wanderingTraderOfferTag) ->
-                    new MercantileVillagerData(professionLocked, lockedTrades, nameAssigned, wanderingTraderOfferTag.orElse(null)))
+                            .forGetter(data -> Optional.ofNullable(data.wanderingTraderOfferTag)),
+                    Codec.INT.optionalFieldOf("fedGrowthTicks", 0)
+                            .forGetter(MercantileVillagerData::getFedGrowthTicks)
+            ).apply(instance, (professionLocked, lockedTrades, nameAssigned, wanderingTraderOfferTag, fedGrowthTicks) -> {
+                    MercantileVillagerData data = new MercantileVillagerData(
+                            professionLocked, lockedTrades, nameAssigned, wanderingTraderOfferTag.orElse(null));
+                    data.setFedGrowthTicks(fedGrowthTicks);
+                    return data;
+            })
     );
 
     private boolean professionLocked;
     private final Set<String> lockedTrades;
     private boolean nameAssigned;
     private CompoundTag wanderingTraderOfferTag;
+    private int fedGrowthTicks;
 
     public MercantileVillagerData() {
         this(false, Set.of(), false, null);
@@ -82,5 +89,14 @@ public class MercantileVillagerData {
 
     public void setWanderingTraderOfferTag(CompoundTag tag) {
         this.wanderingTraderOfferTag = tag;
+    }
+
+    /** Total growth-time ticks this baby has been accelerated by feeding (see BabyFeeding). */
+    public int getFedGrowthTicks() {
+        return fedGrowthTicks;
+    }
+
+    public void setFedGrowthTicks(int ticks) {
+        this.fedGrowthTicks = Math.max(0, ticks);
     }
 }
