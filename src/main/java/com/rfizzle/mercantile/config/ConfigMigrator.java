@@ -15,7 +15,7 @@ import com.rfizzle.mercantile.Mercantile;
  */
 final class ConfigMigrator {
 
-    static final int CURRENT_VERSION = 3;
+    static final int CURRENT_VERSION = 4;
 
     @FunctionalInterface
     interface Migration {
@@ -42,6 +42,13 @@ final class ConfigMigrator {
             addIfAbsent(json, "moodRestockSpeedPercent", defaults.moodRestockSpeedPercent);
             addIfAbsent(json, "moodRecalcIntervalTicks", defaults.moodRecalcIntervalTicks);
             addIfAbsent(json, "moodAmbientParticles", defaults.moodAmbientParticles);
+        },
+        // v3 -> v4: market day fields, seeded at their defaults.
+        json -> {
+            MercantileConfig defaults = new MercantileConfig();
+            addIfAbsent(json, "enableMarketDay", defaults.enableMarketDay);
+            addIfAbsent(json, "marketDayIntervalDays", defaults.marketDayIntervalDays);
+            addIfAbsent(json, "marketDayDiscountPercent", defaults.marketDayDiscountPercent);
         },
     };
 

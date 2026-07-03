@@ -113,6 +113,11 @@ public class MercantileConfig {
     public int moodRecalcIntervalTicks = 100;
     public boolean moodAmbientParticles = true;
 
+    // Market Day
+    public boolean enableMarketDay = true;
+    public int marketDayIntervalDays = 7;
+    public int marketDayDiscountPercent = 5;
+
     // --- Client Config ---
 
     public float villagerSoundVolume = 1.0f;
@@ -161,6 +166,8 @@ public class MercantileConfig {
         moodPriceModifierPercent = Math.clamp(moodPriceModifierPercent, 0, 50);
         moodRestockSpeedPercent = Math.clamp(moodRestockSpeedPercent, 0, 80);
         moodRecalcIntervalTicks = Math.clamp(moodRecalcIntervalTicks, 20, 24_000);
+        marketDayIntervalDays = Math.clamp(marketDayIntervalDays, 1, 1_000);
+        marketDayDiscountPercent = Math.clamp(marketDayDiscountPercent, 0, 100);
         villagerSoundVolume = Math.clamp(villagerSoundVolume, 0.0f, 1.0f);
         // Gson leaves enum fields null on unknown/missing values.
         if (hudAnchor == null) hudAnchor = Anchor.TOP_LEFT;

@@ -224,6 +224,7 @@
 
     "gui.mercantile.restock.timer": "Restock in ~%s",
     "gui.mercantile.restock.count": "Restocks: %s/%s today",
+    "gui.mercantile.restock.count.market_day": "Restocks: %s/%s today — market day",
     "gui.mercantile.restock.fully_stocked": "Fully stocked",
     "gui.mercantile.restock.no_workstation": "No workstation",
 
@@ -232,6 +233,7 @@
     "gui.mercantile.price.reputation": "Reputation: %s",
     "gui.mercantile.price.mood": "Mood: %s",
     "gui.mercantile.price.gossip": "Gossip: %s",
+    "gui.mercantile.price.marketday": "Market Day: %s",
     "gui.mercantile.price.other": "Other: %s",
     "gui.mercantile.price.final": "Final: %s",
 
@@ -282,6 +284,16 @@
     "mercantile.config.moodRecalcIntervalTicks.tooltip": "Ticks between mood re-evaluations; mood drifts a couple of points toward current conditions per interval",
     "mercantile.config.moodAmbientParticles": "Mood Ambient Particles",
     "mercantile.config.moodAmbientParticles.tooltip": "Happy villagers occasionally emit happy particles; Miserable ones emit angry particles",
+
+    "mercantile.message.market_day": "Market day! Trades are discounted and villagers restock more.",
+
+    "mercantile.config.category.market": "Market Day",
+    "mercantile.config.enableMarketDay": "Enable Market Day",
+    "mercantile.config.enableMarketDay.tooltip": "Every few days villages hold a dawn-to-dusk market day with discounted trades and an extra restock cycle",
+    "mercantile.config.marketDayIntervalDays": "Market Day Interval",
+    "mercantile.config.marketDayIntervalDays.tooltip": "In-game days between market days; the schedule is shared by the whole world",
+    "mercantile.config.marketDayDiscountPercent": "Market Day Discount Percent",
+    "mercantile.config.marketDayDiscountPercent.tooltip": "Discount on every trade during market day, as a percent of base price; stacks with reputation and gossip (0 disables the discount)",
 
     "tooltip.mercantile.state.needs_workstation": "Needs a workstation",
     "tooltip.mercantile.state.panicking": "Panicking",

@@ -3,6 +3,7 @@ package com.rfizzle.mercantile.mixin;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
+import com.rfizzle.mercantile.market.MarketDayManager;
 import com.rfizzle.mercantile.mood.MoodManager;
 import com.rfizzle.mercantile.mood.MoodMath;
 import com.rfizzle.mercantile.network.DemandPriceS2CPayload;
@@ -61,7 +62,7 @@ public abstract class VillagerTradeOpenMixin {
                     target = "Lnet/minecraft/world/entity/npc/Villager;openTradingScreen(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/network/chat/Component;I)V"))
     private void mercantile$applyReputationEffects(Player player, CallbackInfo ci) {
         MercantileConfig config = MercantileConfig.get();
-        if (!config.enableReputation && !config.enableMood) return;
+        if (!config.enableReputation && !config.enableMood && !config.enableMarketDay) return;
         if (!(player instanceof ServerPlayer serverPlayer)) return;
         if (serverPlayer.connection == null) return;
 
@@ -77,13 +78,16 @@ public abstract class VillagerTradeOpenMixin {
             int basePrice = offer.getBaseCostA().getCount();
             int reputationModifier = score != 0 ? ReputationManager.getPriceModifier(score, basePrice) : 0;
             int moodModifier = MoodManager.priceModifier(self, basePrice, config);
+            int marketDayModifier = MarketDayManager.priceModifier(self, basePrice, config);
             if (reputationModifier != 0) {
                 // Intentional absolute set: mod fully owns reputation pricing, superseding
-                // vanilla's gossip and Hero-of-the-Village discounts. Mood stacks on top.
-                offer.setSpecialPriceDiff(reputationModifier + moodModifier);
-            } else if (moodModifier != 0) {
-                // No reputation modifier: mood stacks on the vanilla gossip/HotV special price.
-                offer.setSpecialPriceDiff(offer.getSpecialPriceDiff() + moodModifier);
+                // vanilla's gossip and Hero-of-the-Village discounts. Mood and the market-day
+                // discount stack on top.
+                offer.setSpecialPriceDiff(reputationModifier + moodModifier + marketDayModifier);
+            } else if (moodModifier != 0 || marketDayModifier != 0) {
+                // No reputation modifier: mood and market day stack on the vanilla gossip/HotV
+                // special price.
+                offer.setSpecialPriceDiff(offer.getSpecialPriceDiff() + moodModifier + marketDayModifier);
             }
         }
 
@@ -126,6 +130,7 @@ public abstract class VillagerTradeOpenMixin {
                 self, MoodMath.BASE_RESTOCK_INTERVAL_TICKS);
 
         ServerPlayNetworking.send(serverPlayer, new RestockTimerS2CPayload(
-                self.getId(), lastRestockGameTime, restocksToday, hasWorkstation, restockIntervalTicks));
+                self.getId(), lastRestockGameTime, restocksToday, hasWorkstation, restockIntervalTicks,
+                MarketDayManager.maxRestocksToday(self)));
     }
 }

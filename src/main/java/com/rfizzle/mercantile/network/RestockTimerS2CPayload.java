@@ -11,7 +11,8 @@ public record RestockTimerS2CPayload(
         long lastRestockGameTime,
         int restockCountToday,
         boolean hasWorkstation,
-        int restockIntervalTicks
+        int restockIntervalTicks,
+        int maxRestocksToday
 ) implements CustomPacketPayload {
 
     public static final Type<RestockTimerS2CPayload> TYPE =
@@ -24,6 +25,7 @@ public record RestockTimerS2CPayload(
                     ByteBufCodecs.VAR_INT, RestockTimerS2CPayload::restockCountToday,
                     ByteBufCodecs.BOOL, RestockTimerS2CPayload::hasWorkstation,
                     ByteBufCodecs.VAR_INT, RestockTimerS2CPayload::restockIntervalTicks,
+                    ByteBufCodecs.VAR_INT, RestockTimerS2CPayload::maxRestocksToday,
                     RestockTimerS2CPayload::new);
 
     @Override

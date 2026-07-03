@@ -134,9 +134,18 @@
               "id": "demand-transparency",
               "title": "Demand Transparency",
               "html": [
-                "Hover over a trade price to see a breakdown: base price, demand adjustment, reputation modifier, mood modifier, gossip modifier, final price. Discounts appear in green, markups in red."
+                "Hover over a trade price to see a breakdown: base price, demand adjustment, reputation modifier, mood modifier, gossip modifier, market-day discount, final price. Discounts appear in green, markups in red."
               ],
               "note": "Config: <code class='text-bone'>enableDemandTransparency</code>"
+            },
+            {
+              "id": "market-day",
+              "title": "Market Day",
+              "html": [
+                "Every 7 in-game days (configurable) the whole world holds a market day from dawn to dusk. Every villager trade gets a global discount (default 5% of base price) that stacks with reputation and gossip and shows as its own line in the price breakdown, and villagers gain one extra restock cycle — the restock indicator reads \u201cRestocks: x/3 today \u2014 market day\u201d.",
+                "The day opens with a bell ring, happy-villager particles, and an action-bar announcement for everyone online. The schedule is shared world-wide, so market day is predictable and easy to plan around."
+              ],
+              "note": "Config: <code class='text-bone'>enableMarketDay</code>, <code class='text-bone'>marketDayIntervalDays</code>, <code class='text-bone'>marketDayDiscountPercent</code>"
             }
           ]
         },

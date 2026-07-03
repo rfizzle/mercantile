@@ -303,6 +303,26 @@ public class ModMenuIntegration implements ModMenuApi {
                     .setSaveConsumer(v -> config.moodAmbientParticles = v)
                     .build());
 
+            // --- Market Day ---
+            ConfigCategory market = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.market"));
+            market.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableMarketDay"), config.enableMarketDay)
+                    .setDefaultValue(defaults.enableMarketDay)
+                    .setTooltip(Component.translatable("mercantile.config.enableMarketDay.tooltip"))
+                    .setSaveConsumer(v -> config.enableMarketDay = v)
+                    .build());
+            market.addEntry(entry.startIntField(Component.translatable("mercantile.config.marketDayIntervalDays"), config.marketDayIntervalDays)
+                    .setDefaultValue(defaults.marketDayIntervalDays)
+                    .setMin(1).setMax(1_000)
+                    .setTooltip(Component.translatable("mercantile.config.marketDayIntervalDays.tooltip"))
+                    .setSaveConsumer(v -> config.marketDayIntervalDays = v)
+                    .build());
+            market.addEntry(entry.startIntField(Component.translatable("mercantile.config.marketDayDiscountPercent"), config.marketDayDiscountPercent)
+                    .setDefaultValue(defaults.marketDayDiscountPercent)
+                    .setMin(0).setMax(100)
+                    .setTooltip(Component.translatable("mercantile.config.marketDayDiscountPercent.tooltip"))
+                    .setSaveConsumer(v -> config.marketDayDiscountPercent = v)
+                    .build());
+
             // --- Sentry Pylon ---
             ConfigCategory pylon = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.pylon"));
             pylon.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableSentryPylon"), config.enableSentryPylon)
