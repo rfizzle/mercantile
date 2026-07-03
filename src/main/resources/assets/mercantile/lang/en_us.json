@@ -71,6 +71,10 @@
     "mercantile.config.reputationDailyMaxGiftRep.tooltip": "Threshold at or above which no further reputation is awarded from gifting that day (sub-cap within Daily Rep Cap)",
     "mercantile.config.reputationNegativeDecayPerDay": "Negative Decay Per Day",
     "mercantile.config.reputationNegativeDecayPerDay.tooltip": "Points a negative reputation recovers toward 0 each in-game day (0 disables decay; positive scores are never affected)",
+    "mercantile.config.enableGratitudeGifts": "Enable Gratitude Gifts",
+    "mercantile.config.enableGratitudeGifts.tooltip": "Villagers occasionally toss a small profession-flavored gift to Honored players who spend time near them",
+    "mercantile.config.gratitudeGiftsPerDay": "Gratitude Gifts Per Day",
+    "mercantile.config.gratitudeGiftsPerDay.tooltip": "Maximum gratitude gifts a player can receive per in-game day (0 disables)",
 
     "mercantile.config.enableFollowMode": "Enable Follow Mode",
     "mercantile.config.enableFollowMode.tooltip": "Allow villagers to follow the player",

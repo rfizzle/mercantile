@@ -57,6 +57,10 @@ public class MercantileConfig {
     public int reputationDailyMaxGiftRep = 2;
     public int reputationNegativeDecayPerDay = 1;
 
+    // Gratitude Gifts
+    public boolean enableGratitudeGifts = true;
+    public int gratitudeGiftsPerDay = 1;
+
     // Follow Mode
     public boolean enableFollowMode = true;
     public int maxFollowingVillagers = 3;
@@ -151,6 +155,7 @@ public class MercantileConfig {
         reputationGiftGain = Math.clamp(reputationGiftGain, 0, Integer.MAX_VALUE);
         reputationDailyMaxGiftRep = Math.clamp(reputationDailyMaxGiftRep, 1, 10);
         reputationNegativeDecayPerDay = Math.clamp(reputationNegativeDecayPerDay, 0, Integer.MAX_VALUE);
+        gratitudeGiftsPerDay = Math.clamp(gratitudeGiftsPerDay, 0, 10);
         maxFollowingVillagers = Math.clamp(maxFollowingVillagers, 1, Integer.MAX_VALUE);
         healingMultiplier = Math.clamp(healingMultiplier, 1.0f, 10.0f);
         babyFeedPercentPerFeed = Math.clamp(babyFeedPercentPerFeed, 1, 100);

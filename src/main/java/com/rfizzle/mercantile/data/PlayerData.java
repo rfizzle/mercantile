@@ -35,7 +35,8 @@ public class PlayerData {
                     Codec.LONG.optionalFieldOf("lastDecayDay", -1L).forGetter(PlayerData::getLastDecayDay),
                     Codec.INT.optionalFieldOf("tradesSinceLastRepGain", 0).forGetter(PlayerData::getTradesSinceLastRepGain),
                     Codec.BOOL.optionalFieldOf("reputationMigrated", false).forGetter(PlayerData::isReputationMigrated),
-                    Codec.BOOL.optionalFieldOf("dailyCapNotified", false).forGetter(PlayerData::isDailyCapNotified)
+                    Codec.BOOL.optionalFieldOf("dailyCapNotified", false).forGetter(PlayerData::isDailyCapNotified),
+                    Codec.INT.optionalFieldOf("dailyGratitudeGifts", 0).forGetter(PlayerData::getDailyGratitudeGifts)
             ).apply(instance, PlayerData::new)
     );
 
@@ -53,14 +54,16 @@ public class PlayerData {
     private int tradesSinceLastRepGain;
     private boolean reputationMigrated;
     private boolean dailyCapNotified;
+    private int dailyGratitudeGifts;
 
     public PlayerData() {
-        this(0, 0, -1L, Set.of(), Map.of(), 0, -1L, 0, 0, 0, -1L, 0, false, false);
+        this(0, 0, -1L, Set.of(), Map.of(), 0, -1L, 0, 0, 0, -1L, 0, false, false, 0);
     }
 
     public PlayerData(int score, int proximityTicks, long lastProximityDay, Set<UUID> curedVillagers, Map<UUID, Integer> tradeStats,
                       int dailyReputationEarned, long lastCapResetDay, int dailyTradeRep, int dailyCycleRep, int dailyGiftRep,
-                      long lastDecayDay, int tradesSinceLastRepGain, boolean reputationMigrated, boolean dailyCapNotified) {
+                      long lastDecayDay, int tradesSinceLastRepGain, boolean reputationMigrated, boolean dailyCapNotified,
+                      int dailyGratitudeGifts) {
         this.score = Math.clamp(score, MIN_SCORE, MAX_SCORE);
         this.proximityTicks = proximityTicks;
         this.lastProximityDay = lastProximityDay;
@@ -87,6 +90,7 @@ public class PlayerData {
         this.tradesSinceLastRepGain = Math.max(0, tradesSinceLastRepGain);
         this.reputationMigrated = reputationMigrated;
         this.dailyCapNotified = dailyCapNotified;
+        this.dailyGratitudeGifts = Math.max(0, dailyGratitudeGifts);
     }
 
     public int getScore() {
@@ -195,6 +199,15 @@ public class PlayerData {
         this.dailyGiftRep = 0;
         this.tradesSinceLastRepGain = 0;
         this.dailyCapNotified = false;
+        this.dailyGratitudeGifts = 0;
+    }
+
+    public int getDailyGratitudeGifts() {
+        return dailyGratitudeGifts;
+    }
+
+    public void incrementDailyGratitudeGifts() {
+        this.dailyGratitudeGifts++;
     }
 
     public void addDailyTradeRep(int amount) {
@@ -269,6 +282,7 @@ public class PlayerData {
         private int tradesSinceLastRepGain = 0;
         private boolean reputationMigrated = false;
         private boolean dailyCapNotified = false;
+        private int dailyGratitudeGifts = 0;
 
         private Builder() {
         }
@@ -287,11 +301,12 @@ public class PlayerData {
         public Builder tradesSinceLastRepGain(int v) { this.tradesSinceLastRepGain = v; return this; }
         public Builder reputationMigrated(boolean v) { this.reputationMigrated = v; return this; }
         public Builder dailyCapNotified(boolean v) { this.dailyCapNotified = v; return this; }
+        public Builder dailyGratitudeGifts(int v) { this.dailyGratitudeGifts = v; return this; }
 
         public PlayerData build() {
             return new PlayerData(score, proximityTicks, lastProximityDay, curedVillagers, tradeStats,
                     dailyReputationEarned, lastCapResetDay, dailyTradeRep, dailyCycleRep, dailyGiftRep,
-                    lastDecayDay, tradesSinceLastRepGain, reputationMigrated, dailyCapNotified);
+                    lastDecayDay, tradesSinceLastRepGain, reputationMigrated, dailyCapNotified, dailyGratitudeGifts);
         }
     }
 }

@@ -371,6 +371,8 @@ public final class ReputationManager {
 
         if (nearby.isEmpty()) return;
 
+        GratitudeGiftManager.maybeGift(player, nearby);
+
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         int ticks = data.getProximityTicks() + PROXIMITY_CHECK_INTERVAL;
 

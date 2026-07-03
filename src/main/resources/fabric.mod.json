@@ -58,6 +58,7 @@
             "com.rfizzle.mercantile.gametest.TradeCyclingGameTest",
             "com.rfizzle.mercantile.gametest.FollowModeGameTest",
             "com.rfizzle.mercantile.gametest.GiftingGameTest",
+            "com.rfizzle.mercantile.gametest.GratitudeGiftGameTest",
             "com.rfizzle.mercantile.gametest.SentryPylonBellGameTest",
             "com.rfizzle.mercantile.gametest.SentryPylonTribulationGameTest",
             "com.rfizzle.mercantile.gametest.WanderingTraderReputationGameTest",

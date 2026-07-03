@@ -163,6 +163,17 @@ public class ModMenuIntegration implements ModMenuApi {
                     .setTooltip(Component.translatable("mercantile.config.reputationNegativeDecayPerDay.tooltip"))
                     .setSaveConsumer(v -> config.reputationNegativeDecayPerDay = v)
                     .build());
+            reputation.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableGratitudeGifts"), config.enableGratitudeGifts)
+                    .setDefaultValue(defaults.enableGratitudeGifts)
+                    .setTooltip(Component.translatable("mercantile.config.enableGratitudeGifts.tooltip"))
+                    .setSaveConsumer(v -> config.enableGratitudeGifts = v)
+                    .build());
+            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.gratitudeGiftsPerDay"), config.gratitudeGiftsPerDay)
+                    .setDefaultValue(defaults.gratitudeGiftsPerDay)
+                    .setMin(0).setMax(10)
+                    .setTooltip(Component.translatable("mercantile.config.gratitudeGiftsPerDay.tooltip"))
+                    .setSaveConsumer(v -> config.gratitudeGiftsPerDay = v)
+                    .build());
 
             // --- Follow Mode ---
             ConfigCategory follow = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.follow"));

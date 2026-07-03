@@ -15,7 +15,7 @@ import com.rfizzle.mercantile.Mercantile;
  */
 final class ConfigMigrator {
 
-    static final int CURRENT_VERSION = 4;
+    static final int CURRENT_VERSION = 5;
 
     @FunctionalInterface
     interface Migration {
@@ -49,6 +49,12 @@ final class ConfigMigrator {
             addIfAbsent(json, "enableMarketDay", defaults.enableMarketDay);
             addIfAbsent(json, "marketDayIntervalDays", defaults.marketDayIntervalDays);
             addIfAbsent(json, "marketDayDiscountPercent", defaults.marketDayDiscountPercent);
+        },
+        // v4 -> v5: gratitude gift fields, seeded at their defaults.
+        json -> {
+            MercantileConfig defaults = new MercantileConfig();
+            addIfAbsent(json, "enableGratitudeGifts", defaults.enableGratitudeGifts);
+            addIfAbsent(json, "gratitudeGiftsPerDay", defaults.gratitudeGiftsPerDay);
         },
     };
 
