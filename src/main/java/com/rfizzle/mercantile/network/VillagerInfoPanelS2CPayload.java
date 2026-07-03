@@ -15,7 +15,8 @@ public record VillagerInfoPanelS2CPayload(
         String reputationTier,  // translation key; display via Component.translatable(reputationTier)
         int totalTrades,
         boolean hasWorkstation,
-        boolean professionLocked
+        boolean professionLocked,
+        String moodTier  // translation key; empty when the mood system is disabled
 ) implements CustomPacketPayload {
 
     public static final Type<VillagerInfoPanelS2CPayload> TYPE =
@@ -35,6 +36,7 @@ public record VillagerInfoPanelS2CPayload(
         buf.writeVarInt(payload.totalTrades);
         buf.writeBoolean(payload.hasWorkstation);
         buf.writeBoolean(payload.professionLocked);
+        buf.writeUtf(payload.moodTier);
     }
 
     private static VillagerInfoPanelS2CPayload decode(FriendlyByteBuf buf) {
@@ -48,7 +50,8 @@ public record VillagerInfoPanelS2CPayload(
                 buf.readUtf(),
                 buf.readVarInt(),
                 buf.readBoolean(),
-                buf.readBoolean()
+                buf.readBoolean(),
+                buf.readUtf()
         );
     }
 

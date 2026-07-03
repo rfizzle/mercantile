@@ -106,6 +106,13 @@ public class MercantileConfig {
     public int pylonTribulationRadiusBonusPerTier = 4;
     public int pylonTribulationMaxGolems = 6;
 
+    // Mood
+    public boolean enableMood = true;
+    public int moodPriceModifierPercent = 5;
+    public int moodRestockSpeedPercent = 20;
+    public int moodRecalcIntervalTicks = 100;
+    public boolean moodAmbientParticles = true;
+
     // --- Client Config ---
 
     public float villagerSoundVolume = 1.0f;
@@ -151,6 +158,9 @@ public class MercantileConfig {
         pylonTribulationRadiusBonusPerTier = Math.clamp(pylonTribulationRadiusBonusPerTier, 0, Integer.MAX_VALUE);
         // The Tribulation cap can never sit below the un-integrated golem cap it extends.
         pylonTribulationMaxGolems = Math.max(pylonTribulationMaxGolems, pylonMaxGolems);
+        moodPriceModifierPercent = Math.clamp(moodPriceModifierPercent, 0, 50);
+        moodRestockSpeedPercent = Math.clamp(moodRestockSpeedPercent, 0, 80);
+        moodRecalcIntervalTicks = Math.clamp(moodRecalcIntervalTicks, 20, 24_000);
         villagerSoundVolume = Math.clamp(villagerSoundVolume, 0.0f, 1.0f);
         // Gson leaves enum fields null on unknown/missing values.
         if (hudAnchor == null) hudAnchor = Anchor.TOP_LEFT;

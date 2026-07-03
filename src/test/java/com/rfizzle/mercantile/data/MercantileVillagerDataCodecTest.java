@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
+import com.rfizzle.mercantile.mood.MoodMath;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
@@ -53,6 +54,41 @@ class MercantileVillagerDataCodecTest {
         MercantileVillagerData data = new MercantileVillagerData();
         data.setFedGrowthTicks(-50);
         assertEquals(0, data.getFedGrowthTicks());
+    }
+
+    @Test
+    void moodFieldsRoundTrip() {
+        MercantileVillagerData original = new MercantileVillagerData();
+        original.setMood(83);
+        original.setLastMoodUpdateTime(120_000L);
+        original.setLastHurtGameTime(119_000L);
+        original.setLastWitnessedDeathGameTime(100_000L);
+
+        JsonElement encoded = MercantileVillagerData.CODEC.encodeStart(JsonOps.INSTANCE, original).getOrThrow();
+        MercantileVillagerData decoded = MercantileVillagerData.CODEC.parse(JsonOps.INSTANCE, encoded).getOrThrow();
+
+        assertEquals(83, decoded.getMood());
+        assertEquals(120_000L, decoded.getLastMoodUpdateTime());
+        assertEquals(119_000L, decoded.getLastHurtGameTime());
+        assertEquals(100_000L, decoded.getLastWitnessedDeathGameTime());
+    }
+
+    @Test
+    void moodFieldsDefaultOnOldSaves() {
+        MercantileVillagerData decoded = MercantileVillagerData.CODEC.parse(JsonOps.INSTANCE, new JsonObject()).getOrThrow();
+        assertEquals(MoodMath.DEFAULT_MOOD, decoded.getMood());
+        assertEquals(-1L, decoded.getLastMoodUpdateTime());
+        assertEquals(-1L, decoded.getLastHurtGameTime());
+        assertEquals(-1L, decoded.getLastWitnessedDeathGameTime());
+    }
+
+    @Test
+    void moodClampedToRange() {
+        MercantileVillagerData data = new MercantileVillagerData();
+        data.setMood(250);
+        assertEquals(MoodMath.MAX_MOOD, data.getMood());
+        data.setMood(-10);
+        assertEquals(MoodMath.MIN_MOOD, data.getMood());
     }
 
     @Test

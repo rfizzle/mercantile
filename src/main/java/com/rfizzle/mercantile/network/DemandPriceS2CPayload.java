@@ -20,19 +20,35 @@ public record DemandPriceS2CPayload(
             int basePrice,
             int demandAdjust,
             int reputationModifier,
+            int moodModifier,
             int gossipModifier,
             int otherAdjust,
             int finalPrice
     ) {
+        // StreamCodec.composite tops out at 6 fields; this record has 7.
         public static final StreamCodec<ByteBuf, PriceComponent> STREAM_CODEC =
-                StreamCodec.composite(
-                        ByteBufCodecs.VAR_INT, PriceComponent::basePrice,
-                        ByteBufCodecs.VAR_INT, PriceComponent::demandAdjust,
-                        ByteBufCodecs.VAR_INT, PriceComponent::reputationModifier,
-                        ByteBufCodecs.VAR_INT, PriceComponent::gossipModifier,
-                        ByteBufCodecs.VAR_INT, PriceComponent::otherAdjust,
-                        ByteBufCodecs.VAR_INT, PriceComponent::finalPrice,
-                        PriceComponent::new);
+                StreamCodec.of(PriceComponent::encode, PriceComponent::decode);
+
+        private static void encode(ByteBuf buf, PriceComponent c) {
+            ByteBufCodecs.VAR_INT.encode(buf, c.basePrice);
+            ByteBufCodecs.VAR_INT.encode(buf, c.demandAdjust);
+            ByteBufCodecs.VAR_INT.encode(buf, c.reputationModifier);
+            ByteBufCodecs.VAR_INT.encode(buf, c.moodModifier);
+            ByteBufCodecs.VAR_INT.encode(buf, c.gossipModifier);
+            ByteBufCodecs.VAR_INT.encode(buf, c.otherAdjust);
+            ByteBufCodecs.VAR_INT.encode(buf, c.finalPrice);
+        }
+
+        private static PriceComponent decode(ByteBuf buf) {
+            return new PriceComponent(
+                    ByteBufCodecs.VAR_INT.decode(buf),
+                    ByteBufCodecs.VAR_INT.decode(buf),
+                    ByteBufCodecs.VAR_INT.decode(buf),
+                    ByteBufCodecs.VAR_INT.decode(buf),
+                    ByteBufCodecs.VAR_INT.decode(buf),
+                    ByteBufCodecs.VAR_INT.decode(buf),
+                    ByteBufCodecs.VAR_INT.decode(buf));
+        }
     }
 
     public static final Type<DemandPriceS2CPayload> TYPE =

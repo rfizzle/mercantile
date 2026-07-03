@@ -212,6 +212,7 @@
     "gui.mercantile.profession.locked": "Profession: Locked",
     "gui.mercantile.profession.unlocked": "Profession: Unlocked",
 
+    "gui.mercantile.info.mood": "Mood: %s",
     "gui.mercantile.info.trades": "Trades: %s",
     "gui.mercantile.info.workstation.bound": "Workstation: Bound",
     "gui.mercantile.info.workstation.missing": "Workstation: Missing",
@@ -229,6 +230,7 @@
     "gui.mercantile.price.base": "Base: %s",
     "gui.mercantile.price.demand": "Demand: +%s",
     "gui.mercantile.price.reputation": "Reputation: %s",
+    "gui.mercantile.price.mood": "Mood: %s",
     "gui.mercantile.price.gossip": "Gossip: %s",
     "gui.mercantile.price.other": "Other: %s",
     "gui.mercantile.price.final": "Final: %s",
@@ -262,6 +264,24 @@
     "mercantile.config.babyFeedMaxReductionPercent.tooltip": "Cap on total growth time a single baby can have removed by feeding, as a percent of the full growth time",
 
     "mercantile.feeding.capped": "This baby villager cannot be fed any further",
+
+    "tooltip.mercantile.mood.label": "Mood: %s",
+    "mercantile.mood.miserable": "Miserable",
+    "mercantile.mood.unhappy": "Unhappy",
+    "mercantile.mood.content": "Content",
+    "mercantile.mood.happy": "Happy",
+
+    "mercantile.config.category.mood": "Mood",
+    "mercantile.config.enableMood": "Enable Mood",
+    "mercantile.config.enableMood.tooltip": "Villagers track a mood from living conditions (bed, workstation, sleep, food, safety) that gently nudges prices and restock speed",
+    "mercantile.config.moodPriceModifierPercent": "Mood Price Percent",
+    "mercantile.config.moodPriceModifierPercent.tooltip": "Price nudge as a percent of base price: Happy villagers discount by this much, Miserable ones mark up (0 disables)",
+    "mercantile.config.moodRestockSpeedPercent": "Mood Restock Percent",
+    "mercantile.config.moodRestockSpeedPercent.tooltip": "Restock interval change: Happy villagers restock this percent sooner, Miserable ones later (0 disables)",
+    "mercantile.config.moodRecalcIntervalTicks": "Mood Recalc Interval",
+    "mercantile.config.moodRecalcIntervalTicks.tooltip": "Ticks between mood re-evaluations; mood drifts a couple of points toward current conditions per interval",
+    "mercantile.config.moodAmbientParticles": "Mood Ambient Particles",
+    "mercantile.config.moodAmbientParticles.tooltip": "Happy villagers occasionally emit happy particles; Miserable ones emit angry particles",
 
     "tooltip.mercantile.state.needs_workstation": "Needs a workstation",
     "tooltip.mercantile.state.panicking": "Panicking",

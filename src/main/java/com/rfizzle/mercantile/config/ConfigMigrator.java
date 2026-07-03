@@ -15,7 +15,7 @@ import com.rfizzle.mercantile.Mercantile;
  */
 final class ConfigMigrator {
 
-    static final int CURRENT_VERSION = 2;
+    static final int CURRENT_VERSION = 3;
 
     @FunctionalInterface
     interface Migration {
@@ -34,7 +34,22 @@ final class ConfigMigrator {
             addIfAbsent(json, "pylonTribulationRadiusBonusPerTier", defaults.pylonTribulationRadiusBonusPerTier);
             addIfAbsent(json, "pylonTribulationMaxGolems", defaults.pylonTribulationMaxGolems);
         },
+        // v2 -> v3: villager mood system fields, seeded at their defaults.
+        json -> {
+            MercantileConfig defaults = new MercantileConfig();
+            addIfAbsent(json, "enableMood", defaults.enableMood);
+            addIfAbsent(json, "moodPriceModifierPercent", defaults.moodPriceModifierPercent);
+            addIfAbsent(json, "moodRestockSpeedPercent", defaults.moodRestockSpeedPercent);
+            addIfAbsent(json, "moodRecalcIntervalTicks", defaults.moodRecalcIntervalTicks);
+            addIfAbsent(json, "moodAmbientParticles", defaults.moodAmbientParticles);
+        },
     };
+
+    private static void addIfAbsent(JsonObject json, String key, boolean value) {
+        if (!json.has(key)) {
+            json.addProperty(key, value);
+        }
+    }
 
     private static void addIfAbsent(JsonObject json, String key, int value) {
         if (!json.has(key)) {

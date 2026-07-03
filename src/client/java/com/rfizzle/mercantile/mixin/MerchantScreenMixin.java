@@ -2,6 +2,7 @@ package com.rfizzle.mercantile.mixin;
 
 import com.rfizzle.mercantile.Mercantile;
 import com.rfizzle.mercantile.client.network.ClientMercantileData;
+import com.rfizzle.mercantile.compat.MoodTooltipFormatter;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.network.CycleTradesC2SPayload;
 import com.rfizzle.mercantile.network.RestockTimerS2CPayload;
@@ -421,6 +422,15 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         guiGraphics.drawString(this.font, repLine, contentX, y, INFO_PANEL_TEXT_COLOR, false);
         y += this.font.lineHeight + 4;
 
+        // Mood tier — empty key means the mood system is disabled server-side.
+        if (info.moodTier() != null && !info.moodTier().isEmpty()) {
+            Component moodName = Component.translatable(info.moodTier())
+                    .withStyle(MoodTooltipFormatter.colorForTier(info.moodTier()));
+            Component moodLine = Component.translatable("gui.mercantile.info.mood", moodName);
+            guiGraphics.drawString(this.font, moodLine, contentX, y, INFO_PANEL_TEXT_COLOR, false);
+            y += this.font.lineHeight + 4;
+        }
+
         // Trade count.
         Component trades = Component.translatable("gui.mercantile.info.trades", info.totalTrades());
         guiGraphics.drawString(this.font, trades, contentX, y, INFO_PANEL_TEXT_COLOR, false);
@@ -453,7 +463,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
             y += this.font.lineHeight + 4;
         } else if (timer.restockCountToday() < 2) {
             long now = this.minecraft.level == null ? 0L : this.minecraft.level.getGameTime();
-            long nextTick = timer.lastRestockGameTime() + 2400L;
+            long nextTick = timer.lastRestockGameTime() + timer.restockIntervalTicks();
             long remaining = Math.max(0L, nextTick - now);
             long totalSeconds = remaining / 20L;
             long minutes = totalSeconds / 60L;

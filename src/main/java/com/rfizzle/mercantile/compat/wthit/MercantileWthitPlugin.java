@@ -18,6 +18,9 @@ public class MercantileWthitPlugin implements IWailaPlugin {
         registrar.addComponent(BreedingWthitProvider.INSTANCE, TooltipPosition.BODY, Villager.class);
         registrar.addEntityData(BreedingWthitDataProvider.INSTANCE, Villager.class);
 
+        registrar.addComponent(MoodWthitProvider.INSTANCE, TooltipPosition.BODY, Villager.class);
+        registrar.addEntityData(MoodWthitDataProvider.INSTANCE, Villager.class);
+
         registrar.addComponent(SentryPylonWthitProvider.INSTANCE, TooltipPosition.BODY, SentryPylonBlock.class);
         registrar.addBlockData(SentryPylonWthitDataProvider.INSTANCE, SentryPylonBlockEntity.class);
 

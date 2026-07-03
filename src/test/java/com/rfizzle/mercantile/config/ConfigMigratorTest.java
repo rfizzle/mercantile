@@ -92,6 +92,46 @@ class ConfigMigratorTest {
     }
 
     @Test
+    void v2FileGainsMoodFieldsAtDefaults() {
+        JsonObject raw = parse("""
+                {
+                  "configVersion": 2,
+                  "enableReputation": false
+                }
+                """);
+
+        boolean migrated = ConfigMigrator.migrate(raw);
+        MercantileConfig defaults = new MercantileConfig();
+
+        assertTrue(migrated, "a v2 file must migrate to v3");
+        assertEquals(ConfigMigrator.CURRENT_VERSION, raw.get("configVersion").getAsInt());
+        assertEquals(defaults.enableMood, raw.get("enableMood").getAsBoolean());
+        assertEquals(defaults.moodPriceModifierPercent, raw.get("moodPriceModifierPercent").getAsInt());
+        assertEquals(defaults.moodRestockSpeedPercent, raw.get("moodRestockSpeedPercent").getAsInt());
+        assertEquals(defaults.moodRecalcIntervalTicks, raw.get("moodRecalcIntervalTicks").getAsInt());
+        assertEquals(defaults.moodAmbientParticles, raw.get("moodAmbientParticles").getAsBoolean());
+        // Existing fields are carried forward untouched.
+        assertFalse(raw.get("enableReputation").getAsBoolean());
+    }
+
+    @Test
+    void moodMigrationPreservesExplicitValues() {
+        JsonObject raw = parse("""
+                {
+                  "configVersion": 2,
+                  "enableMood": false,
+                  "moodPriceModifierPercent": 12
+                }
+                """);
+
+        ConfigMigrator.migrate(raw);
+
+        assertFalse(raw.get("enableMood").getAsBoolean(),
+                "an explicitly set enableMood must not be overwritten by the migration");
+        assertEquals(12, raw.get("moodPriceModifierPercent").getAsInt());
+    }
+
+    @Test
     void nonNumericVersionTreatedAsPreVersioning() {
         JsonObject raw = parse("{ \"configVersion\": \"garbage\" }");
 

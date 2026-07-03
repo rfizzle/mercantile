@@ -4,6 +4,7 @@ import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
 import com.rfizzle.mercantile.api.ReputationTier;
+import com.rfizzle.mercantile.mood.MoodManager;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
@@ -36,9 +37,14 @@ public final class VillagerInfoPanelSync {
         boolean hasWorkstation = villager.getBrain()
                 .getMemory(MemoryModuleType.JOB_SITE).isPresent();
 
+        MercantileConfig config = MercantileConfig.get();
+        String moodTier = config.enableMood
+                ? MoodManager.tier(villager).translationKey()
+                : "";
+
         ServerPlayNetworking.send(player, new VillagerInfoPanelS2CPayload(
                 villager.getId(), profession, level, xp, xpToNextLevel,
                 reputation, reputationTier, totalTrades, hasWorkstation,
-                villagerData.isProfessionLocked()));
+                villagerData.isProfessionLocked(), moodTier));
     }
 }
