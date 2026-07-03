@@ -23,7 +23,8 @@ public enum BreedingComponentProvider implements IEntityComponentProvider {
         CompoundTag data = accessor.getServerData();
         if (!data.getBoolean(BreedingTooltipData.KEY_PRESENT)) return;
 
-        List<Component> lines = BreedingTooltipFormatter.format(data);
+        // Jade natively renders a "Growing time" line for baby mobs — skip ours.
+        List<Component> lines = BreedingTooltipFormatter.format(data, false);
         for (Component line : lines) {
             tooltip.add(line);
         }
