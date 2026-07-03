@@ -254,6 +254,15 @@
     "mercantile.config.enableBreedingTooltip": "Enable Breeding Tooltip",
     "mercantile.config.enableBreedingTooltip.tooltip": "Show villager breeding status, cooldown, food, and baby age in Jade/WTHIT tooltips",
 
+    "mercantile.config.enableBabyFeeding": "Enable Baby Feeding",
+    "mercantile.config.enableBabyFeeding.tooltip": "Right-click a baby villager with villager food to speed up its growth",
+    "mercantile.config.babyFeedPercentPerFeed": "Feed Growth Percent",
+    "mercantile.config.babyFeedPercentPerFeed.tooltip": "Percent of remaining growth time removed per bread fed (lower-value foods scale down)",
+    "mercantile.config.babyFeedMaxReductionPercent": "Max Feed Reduction Percent",
+    "mercantile.config.babyFeedMaxReductionPercent.tooltip": "Cap on total growth time a single baby can have removed by feeding, as a percent of the full growth time",
+
+    "mercantile.feeding.capped": "This baby villager cannot be fed any further",
+
     "tooltip.mercantile.state.needs_workstation": "Needs a workstation",
     "tooltip.mercantile.state.panicking": "Panicking",
     "tooltip.mercantile.state.trading": "Trading with %s",

@@ -508,6 +508,46 @@
         },
         {
           "type": "sub",
+          "id": "config-baby-feeding",
+          "title": "Baby Feeding",
+          "blocks": [
+            {
+              "type": "table",
+              "headers": [
+                "Key",
+                "Type",
+                "Default",
+                "Range",
+                "Description"
+              ],
+              "rows": [
+                [
+                  "<code class='text-bone whitespace-nowrap'>enableBabyFeeding</code>",
+                  "boolean",
+                  "true",
+                  "—",
+                  "Feed baby villagers villager food to speed up growth."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>babyFeedPercentPerFeed</code>",
+                  "int",
+                  "10",
+                  "1 – 100",
+                  "Percent of remaining growth time removed per bread fed; lower-value foods scale down proportionally."
+                ],
+                [
+                  "<code class='text-bone whitespace-nowrap'>babyFeedMaxReductionPercent</code>",
+                  "int",
+                  "50",
+                  "0 – 100",
+                  "Cap on total growth time a single baby can have removed by feeding, as a percent of the full growth time."
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "type": "sub",
           "id": "config-state-indicators",
           "title": "State Indicators",
           "blocks": [

@@ -249,6 +249,23 @@ public class ModMenuIntegration implements ModMenuApi {
                     .setTooltip(Component.translatable("mercantile.config.enableBreedingTooltip.tooltip"))
                     .setSaveConsumer(v -> config.enableBreedingTooltip = v)
                     .build());
+            trading.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableBabyFeeding"), config.enableBabyFeeding)
+                    .setDefaultValue(defaults.enableBabyFeeding)
+                    .setTooltip(Component.translatable("mercantile.config.enableBabyFeeding.tooltip"))
+                    .setSaveConsumer(v -> config.enableBabyFeeding = v)
+                    .build());
+            trading.addEntry(entry.startIntField(Component.translatable("mercantile.config.babyFeedPercentPerFeed"), config.babyFeedPercentPerFeed)
+                    .setDefaultValue(defaults.babyFeedPercentPerFeed)
+                    .setMin(1).setMax(100)
+                    .setTooltip(Component.translatable("mercantile.config.babyFeedPercentPerFeed.tooltip"))
+                    .setSaveConsumer(v -> config.babyFeedPercentPerFeed = v)
+                    .build());
+            trading.addEntry(entry.startIntField(Component.translatable("mercantile.config.babyFeedMaxReductionPercent"), config.babyFeedMaxReductionPercent)
+                    .setDefaultValue(defaults.babyFeedMaxReductionPercent)
+                    .setMin(0).setMax(100)
+                    .setTooltip(Component.translatable("mercantile.config.babyFeedMaxReductionPercent.tooltip"))
+                    .setSaveConsumer(v -> config.babyFeedMaxReductionPercent = v)
+                    .build());
             trading.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableStateIndicators"), config.enableStateIndicators)
                     .setDefaultValue(defaults.enableStateIndicators)
                     .setTooltip(Component.translatable("mercantile.config.enableStateIndicators.tooltip"))

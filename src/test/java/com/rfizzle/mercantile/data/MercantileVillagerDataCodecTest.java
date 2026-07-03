@@ -29,6 +29,7 @@ class MercantileVillagerDataCodecTest {
         original.addLockedTrade("hash_abc");
         original.addLockedTrade("hash_def");
         original.setNameAssigned(true);
+        original.setFedGrowthTicks(4200);
 
         JsonElement encoded = MercantileVillagerData.CODEC.encodeStart(JsonOps.INSTANCE, original).getOrThrow();
         MercantileVillagerData decoded = MercantileVillagerData.CODEC.parse(JsonOps.INSTANCE, encoded).getOrThrow();
@@ -38,6 +39,20 @@ class MercantileVillagerDataCodecTest {
         assertTrue(decoded.isTradeLocked("hash_abc"));
         assertTrue(decoded.isTradeLocked("hash_def"));
         assertTrue(decoded.isNameAssigned());
+        assertEquals(4200, decoded.getFedGrowthTicks());
+    }
+
+    @Test
+    void fedGrowthTicksDefaultsToZero() {
+        MercantileVillagerData decoded = MercantileVillagerData.CODEC.parse(JsonOps.INSTANCE, new JsonObject()).getOrThrow();
+        assertEquals(0, decoded.getFedGrowthTicks());
+    }
+
+    @Test
+    void fedGrowthTicksNeverNegative() {
+        MercantileVillagerData data = new MercantileVillagerData();
+        data.setFedGrowthTicks(-50);
+        assertEquals(0, data.getFedGrowthTicks());
     }
 
     @Test
