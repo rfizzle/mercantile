@@ -168,7 +168,16 @@ public class FollowModeGameTest implements FabricGameTest {
             villager.tick();
         }
 
-        helper.assertFalse(villager.getBrain().hasMemoryValue(MemoryModuleType.WALK_TARGET),
+        // The suppression erases WALK_TARGET at the head of customServerAiStep, but the brain
+        // ticks afterward and may plant a fresh target in the same tick (e.g. socializing with a
+        // villager in a neighboring test structure — batch layout puts strangers within range).
+        // Assert the planted schedule target is gone rather than that no target exists at all.
+        // WalkTarget(Vec3, ...) stores a BlockPosTracker, so compare block positions — a
+        // Vec3 comparison against the raw farTarget would always miss the block-center offset.
+        var walkTarget = villager.getBrain().getMemory(MemoryModuleType.WALK_TARGET);
+        boolean plantedTargetErased = walkTarget.isEmpty()
+                || !walkTarget.get().getTarget().currentBlockPosition().equals(BlockPos.containing(farTarget));
+        helper.assertTrue(plantedTargetErased,
                 "Walk target should be erased after follow tick (non-survival activity)");
         helper.assertTrue(FollowManager.isFollowing(villager),
                 "Villager should still be following after AI step");
