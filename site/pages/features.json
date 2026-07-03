@@ -59,7 +59,7 @@
               "id": "baby-feeding",
               "title": "Baby Feeding",
               "html": [
-                "Right-click a baby villager with villager food — bread, carrot, potato, or beetroot — to feed it and shave a percentage off its remaining growth time (default 10% per bread; lower-value foods scale down). The Jade/WTHIT \"Growing\" countdown reflects every feed immediately.",
+                "Right-click a baby villager with villager food — bread, carrot, potato, or beetroot — to feed it and shave a percentage off its remaining growth time (default 10% per bread; lower-value foods scale down). The growing countdown shown by Jade natively (or by Mercantile's WTHIT line) reflects every feed immediately.",
                 "Each baby caps out at a configurable share of its total growth time (default 50%); once capped, further food is refused and not consumed."
               ],
               "note": "Config: <code class='text-bone'>enableBabyFeeding</code>, <code class='text-bone'>babyFeedPercentPerFeed</code> (default 10), <code class='text-bone'>babyFeedMaxReductionPercent</code> (default 50)"
@@ -292,7 +292,7 @@
               "id": "jade-wthit",
               "title": "Jade / WTHIT Tooltips",
               "html": [
-                "Look at a villager with Jade or WTHIT installed to see a single color-coded breeding line — Ready, Hungry (with food progress), Needs bed, Cooldown, or Growing — plus contextual state icons: \"Needs workstation\", \"Panicking\", \"Trading with &lt;player&gt;\". Sentry golems show their parent pylon coordinates, despawn countdown, and a \"No Drops\" indicator. Both plugins work simultaneously without conflict."
+                "Look at a villager with Jade or WTHIT installed to see a single color-coded breeding line — Ready, Hungry (with food progress), Needs bed, or Cooldown; babies show a Growing countdown on WTHIT, while on Jade its native growing-time line is used instead — plus contextual state icons: \"Needs workstation\", \"Panicking\", \"Trading with &lt;player&gt;\". Sentry golems show their parent pylon coordinates, despawn countdown, and a \"No Drops\" indicator. Both plugins work simultaneously without conflict."
               ],
               "note": "Config: <code class='text-bone'>enableBreedingTooltip</code>, <code class='text-bone'>enableStateIndicators</code>"
             }

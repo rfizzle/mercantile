@@ -17,7 +17,8 @@ public enum BreedingWthitProvider implements IEntityComponentProvider {
     public void appendBody(ITooltip tooltip, IEntityAccessor accessor, IPluginConfig config) {
         var raw = accessor.getData().raw();
         if (!raw.getBoolean(BreedingTooltipData.KEY_PRESENT)) return;
-        List<Component> lines = BreedingTooltipFormatter.format(raw);
+        // WTHIT has no native growing-time line, so keep ours.
+        List<Component> lines = BreedingTooltipFormatter.format(raw, true);
         for (Component line : lines) {
             tooltip.addLine(line);
         }

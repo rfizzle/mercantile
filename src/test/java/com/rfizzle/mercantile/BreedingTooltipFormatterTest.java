@@ -17,7 +17,7 @@ class BreedingTooltipFormatterTest {
 
     @Test
     void emptyTagProducesNoLines() {
-        assertEquals(0, BreedingTooltipFormatter.format(new CompoundTag()).size());
+        assertEquals(0, BreedingTooltipFormatter.format(new CompoundTag(), true).size());
     }
 
     @Test
@@ -27,7 +27,7 @@ class BreedingTooltipFormatterTest {
         tag.putBoolean(BreedingTooltipData.KEY_IS_BABY, true);
         tag.putInt(BreedingTooltipData.KEY_BABY_AGE, 12000);
 
-        List<Component> lines = BreedingTooltipFormatter.format(tag);
+        List<Component> lines = BreedingTooltipFormatter.format(tag, true);
 
         assertEquals(1, lines.size(), "baby: single breeding line, no food line");
         Component state = stateArg(lines.get(0));
@@ -38,8 +38,28 @@ class BreedingTooltipFormatterTest {
     }
 
     @Test
+    void babyProducesNoLinesWhenGrowingLineExcluded() {
+        CompoundTag tag = new CompoundTag();
+        tag.putBoolean(BreedingTooltipData.KEY_PRESENT, true);
+        tag.putBoolean(BreedingTooltipData.KEY_IS_BABY, true);
+        tag.putInt(BreedingTooltipData.KEY_BABY_AGE, 12000);
+
+        assertEquals(0, BreedingTooltipFormatter.format(tag, false).size(),
+                "host tooltip already shows a growing-time line");
+    }
+
+    @Test
+    void adultLinesUnaffectedByGrowingLineFlag() {
+        List<Component> lines = BreedingTooltipFormatter.format(adultTag(0, true, 12), false);
+
+        assertEquals(1, lines.size());
+        TranslatableContents stateContents = (TranslatableContents) stateArg(lines.get(0)).getContents();
+        assertEquals("tooltip.mercantile.breeding.state.ready", stateContents.getKey());
+    }
+
+    @Test
     void cooldownProducesSingleYellowLineNoFoodLine() {
-        List<Component> lines = BreedingTooltipFormatter.format(adultTag(6000, true, 12));
+        List<Component> lines = BreedingTooltipFormatter.format(adultTag(6000, true, 12), true);
 
         assertEquals(1, lines.size(), "cooldown: single breeding line, no food line");
         Component state = stateArg(lines.get(0));
@@ -50,7 +70,7 @@ class BreedingTooltipFormatterTest {
 
     @Test
     void noBedProducesSingleRedLineNoFoodLine() {
-        List<Component> lines = BreedingTooltipFormatter.format(adultTag(0, false, 0));
+        List<Component> lines = BreedingTooltipFormatter.format(adultTag(0, false, 0), true);
 
         assertEquals(1, lines.size(), "no bed: single breeding line, no food line");
         Component state = stateArg(lines.get(0));
@@ -61,7 +81,7 @@ class BreedingTooltipFormatterTest {
 
     @Test
     void hungryZeroFoodProducesTwoLinesWithRedFood() {
-        List<Component> lines = BreedingTooltipFormatter.format(adultTag(0, true, 0));
+        List<Component> lines = BreedingTooltipFormatter.format(adultTag(0, true, 0), true);
 
         assertEquals(2, lines.size(), "hungry: breeding line + food progress line");
         Component state = stateArg(lines.get(0));
@@ -76,7 +96,7 @@ class BreedingTooltipFormatterTest {
 
     @Test
     void hungryPartialFoodProducesTwoLinesWithYellowFood() {
-        List<Component> lines = BreedingTooltipFormatter.format(adultTag(0, true, 4));
+        List<Component> lines = BreedingTooltipFormatter.format(adultTag(0, true, 4), true);
 
         assertEquals(2, lines.size());
         assertEquals(TextColor.fromLegacyFormat(ChatFormatting.YELLOW), lines.get(1).getStyle().getColor());
@@ -84,7 +104,7 @@ class BreedingTooltipFormatterTest {
 
     @Test
     void readyProducesSingleGreenLine() {
-        List<Component> lines = BreedingTooltipFormatter.format(adultTag(0, true, 12));
+        List<Component> lines = BreedingTooltipFormatter.format(adultTag(0, true, 12), true);
 
         assertEquals(1, lines.size(), "ready: single breeding line, no food line");
         Component state = stateArg(lines.get(0));
@@ -95,7 +115,7 @@ class BreedingTooltipFormatterTest {
 
     @Test
     void breedingLineLabelIsGray() {
-        List<Component> lines = BreedingTooltipFormatter.format(adultTag(0, true, 12));
+        List<Component> lines = BreedingTooltipFormatter.format(adultTag(0, true, 12), true);
 
         assertEquals(1, lines.size());
         Component line = lines.get(0);
@@ -106,7 +126,7 @@ class BreedingTooltipFormatterTest {
 
     @Test
     void cooldownTakesPrecedenceOverNoBed() {
-        List<Component> lines = BreedingTooltipFormatter.format(adultTag(1000, false, 0));
+        List<Component> lines = BreedingTooltipFormatter.format(adultTag(1000, false, 0), true);
 
         assertEquals(1, lines.size());
         Component state = stateArg(lines.get(0));

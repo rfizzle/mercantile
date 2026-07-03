@@ -12,15 +12,23 @@ public final class BreedingTooltipFormatter {
 
     private BreedingTooltipFormatter() {}
 
-    public static List<Component> format(CompoundTag data) {
+    /**
+     * @param includeGrowingLine whether to emit the baby grow-up countdown line;
+     *                           pass {@code false} when the host tooltip already
+     *                           shows a native growing-time line (Jade does,
+     *                           WTHIT does not)
+     */
+    public static List<Component> format(CompoundTag data, boolean includeGrowingLine) {
         List<Component> lines = new ArrayList<>();
         if (!data.getBoolean(BreedingTooltipData.KEY_PRESENT)) return lines;
 
         if (data.getBoolean(BreedingTooltipData.KEY_IS_BABY)) {
-            int babyAge = data.getInt(BreedingTooltipData.KEY_BABY_AGE);
-            lines.add(breedingLine(
-                    Component.translatable("tooltip.mercantile.breeding.state.growing", formatTicks(babyAge))
-                            .withStyle(ChatFormatting.AQUA)));
+            if (includeGrowingLine) {
+                int babyAge = data.getInt(BreedingTooltipData.KEY_BABY_AGE);
+                lines.add(breedingLine(
+                        Component.translatable("tooltip.mercantile.breeding.state.growing", formatTicks(babyAge))
+                                .withStyle(ChatFormatting.AQUA)));
+            }
             return lines;
         }
 
