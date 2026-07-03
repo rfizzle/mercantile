@@ -21,6 +21,11 @@ public class ClientNetworkHandler {
                     ClientMercantileData.setFollowing(payload.villagerEntityId(), payload.following()));
         });
 
+        ClientPlayNetworking.registerGlobalReceiver(FollowCountS2CPayload.TYPE, (payload, context) -> {
+            context.client().execute(() ->
+                    ClientMercantileData.setFollowCount(payload.count()));
+        });
+
         ClientPlayNetworking.registerGlobalReceiver(RestockTimerS2CPayload.TYPE, (payload, context) -> {
             context.client().execute(() ->
                     ClientMercantileData.setRestockTimer(payload));

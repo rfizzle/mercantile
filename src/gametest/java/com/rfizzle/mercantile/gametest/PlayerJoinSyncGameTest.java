@@ -4,6 +4,7 @@ import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
 import com.rfizzle.mercantile.network.ConfigSyncS2CPayload;
+import com.rfizzle.mercantile.network.FollowCountS2CPayload;
 import com.rfizzle.mercantile.network.MercantileNetworking;
 import com.rfizzle.mercantile.network.SyncReputationS2CPayload;
 import io.netty.channel.embedded.EmbeddedChannel;
@@ -81,6 +82,25 @@ public class PlayerJoinSyncGameTest implements FabricGameTest {
     }
 
     @GameTest(template = EMPTY_STRUCTURE)
+    public void joinSendsFollowCountPayload(GameTestHelper helper) {
+        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
+        int before = GametestNetUtil.countPayloads(channel, FollowCountS2CPayload.class);
+
+        MercantileNetworking.sendJoinSync(player);
+
+        int after = GametestNetUtil.countPayloads(channel, FollowCountS2CPayload.class);
+        helper.assertTrue(after - before == 1,
+                "sendJoinSync must send exactly 1 FollowCountS2CPayload; saw delta " + (after - before));
+
+        FollowCountS2CPayload payload = findLastFollowCountPayload(channel);
+        helper.assertTrue(payload != null && payload.count() == 0,
+                "join with no followers must sync a count of 0");
+
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
     public void joinTriggersReputationMigration(GameTestHelper helper) {
         ServerPlayer player = helper.makeMockServerPlayerInLevel();
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
@@ -104,6 +124,17 @@ public class PlayerJoinSyncGameTest implements FabricGameTest {
             if (msg instanceof ClientboundCustomPayloadPacket custom
                     && custom.payload() instanceof ConfigSyncS2CPayload config) {
                 last = config;
+            }
+        }
+        return last;
+    }
+
+    private static FollowCountS2CPayload findLastFollowCountPayload(EmbeddedChannel channel) {
+        FollowCountS2CPayload last = null;
+        for (Object msg : channel.outboundMessages()) {
+            if (msg instanceof ClientboundCustomPayloadPacket custom
+                    && custom.payload() instanceof FollowCountS2CPayload count) {
+                last = count;
             }
         }
         return last;

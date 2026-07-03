@@ -3,6 +3,7 @@ package com.rfizzle.mercantile.gametest;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.follow.FollowManager;
 import com.rfizzle.mercantile.follow.FollowableVillager;
+import com.rfizzle.mercantile.network.FollowCountS2CPayload;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
@@ -44,6 +45,46 @@ public class FollowModeGameTest implements FabricGameTest {
         FollowManager.stopFollowing(villager);
         player.discard();
         helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void followCountPushedToOwnerOnStartAndStop(GameTestHelper helper) {
+        Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
+        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        io.netty.channel.embedded.EmbeddedChannel channel =
+                GametestNetUtil.extractEmbeddedChannel(helper, player);
+        int before = GametestNetUtil.countPayloads(channel, FollowCountS2CPayload.class);
+
+        helper.assertTrue(FollowManager.startFollowing(villager, player),
+                "Villager should start following");
+        int afterStart = GametestNetUtil.countPayloads(channel, FollowCountS2CPayload.class);
+        helper.assertTrue(afterStart - before == 1,
+                "start must push exactly 1 FollowCountS2CPayload; saw delta " + (afterStart - before));
+        FollowCountS2CPayload payload = lastFollowCount(channel);
+        helper.assertTrue(payload != null && payload.count() == 1,
+                "count after start should be 1, got " + (payload == null ? "none" : payload.count()));
+
+        FollowManager.stopFollowing(villager);
+        int afterStop = GametestNetUtil.countPayloads(channel, FollowCountS2CPayload.class);
+        helper.assertTrue(afterStop - afterStart == 1,
+                "stop must push exactly 1 FollowCountS2CPayload; saw delta " + (afterStop - afterStart));
+        payload = lastFollowCount(channel);
+        helper.assertTrue(payload != null && payload.count() == 0,
+                "count after stop should be 0, got " + (payload == null ? "none" : payload.count()));
+
+        player.discard();
+        helper.succeed();
+    }
+
+    private static FollowCountS2CPayload lastFollowCount(io.netty.channel.embedded.EmbeddedChannel channel) {
+        FollowCountS2CPayload last = null;
+        for (Object msg : channel.outboundMessages()) {
+            if (msg instanceof net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket custom
+                    && custom.payload() instanceof FollowCountS2CPayload count) {
+                last = count;
+            }
+        }
+        return last;
     }
 
     @GameTest(template = EMPTY_STRUCTURE)

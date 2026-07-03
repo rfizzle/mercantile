@@ -81,6 +81,18 @@ class PayloadCodecTest {
     }
 
     @Test
+    void followCountS2C() {
+        var original = new FollowCountS2CPayload(2);
+        assertEquals(original, roundTrip(FollowCountS2CPayload.CODEC, original));
+    }
+
+    @Test
+    void followCountS2CZero() {
+        var original = new FollowCountS2CPayload(0);
+        assertEquals(original, roundTrip(FollowCountS2CPayload.CODEC, original));
+    }
+
+    @Test
     void restockTimerS2C() {
         var original = new RestockTimerS2CPayload(10, 6000, 1, true, 2400, 2);
         assertEquals(original, roundTrip(RestockTimerS2CPayload.CODEC, original));
@@ -295,6 +307,7 @@ class PayloadCodecTest {
         assertEquals(RequestWorkstationMapC2SPayload.TYPE, new RequestWorkstationMapC2SPayload().type());
         assertEquals(SyncReputationS2CPayload.TYPE, new SyncReputationS2CPayload(0, "", 0, 0).type());
         assertEquals(FollowStateS2CPayload.TYPE, new FollowStateS2CPayload(0, false).type());
+        assertEquals(FollowCountS2CPayload.TYPE, new FollowCountS2CPayload(0).type());
         assertEquals(RestockTimerS2CPayload.TYPE, new RestockTimerS2CPayload(0, 0, 0, false, 2400, 2).type());
         assertEquals(DemandPriceS2CPayload.TYPE, new DemandPriceS2CPayload(0, List.of()).type());
         assertEquals(VillagerInfoPanelS2CPayload.TYPE,
