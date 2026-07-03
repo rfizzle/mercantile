@@ -1,0 +1,8 @@
+{
+  "items": [
+    { "item": "minecraft:bread", "weight": 4, "count": [1, 3] },
+    { "item": "minecraft:carrot", "weight": 3, "count": [2, 4] },
+    { "item": "minecraft:potato", "weight": 3, "count": [2, 4] },
+    { "item": "minecraft:pumpkin_pie", "weight": 1, "count": 1 }
+  ]
+}

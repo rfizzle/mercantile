@@ -136,6 +136,43 @@ class ConfigMigratorTest {
     }
 
     @Test
+    void v4FileGainsGratitudeGiftFieldsAtDefaults() {
+        JsonObject raw = parse("""
+                {
+                  "configVersion": 4,
+                  "enableMarketDay": false
+                }
+                """);
+
+        boolean migrated = ConfigMigrator.migrate(raw);
+        MercantileConfig defaults = new MercantileConfig();
+
+        assertTrue(migrated, "a v4 file must migrate to v5");
+        assertEquals(ConfigMigrator.CURRENT_VERSION, raw.get("configVersion").getAsInt());
+        assertEquals(defaults.enableGratitudeGifts, raw.get("enableGratitudeGifts").getAsBoolean());
+        assertEquals(defaults.gratitudeGiftsPerDay, raw.get("gratitudeGiftsPerDay").getAsInt());
+        // Existing fields are carried forward untouched.
+        assertFalse(raw.get("enableMarketDay").getAsBoolean());
+    }
+
+    @Test
+    void gratitudeGiftMigrationPreservesExplicitValues() {
+        JsonObject raw = parse("""
+                {
+                  "configVersion": 4,
+                  "enableGratitudeGifts": false,
+                  "gratitudeGiftsPerDay": 3
+                }
+                """);
+
+        ConfigMigrator.migrate(raw);
+
+        assertFalse(raw.get("enableGratitudeGifts").getAsBoolean(),
+                "an explicitly set enableGratitudeGifts must not be overwritten by the migration");
+        assertEquals(3, raw.get("gratitudeGiftsPerDay").getAsInt());
+    }
+
+    @Test
     void marketDayMigrationPreservesExplicitValues() {
         JsonObject raw = parse("""
                 {

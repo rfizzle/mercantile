@@ -1,0 +1,7 @@
+{
+  "items": [
+    { "item": "minecraft:iron_nugget", "weight": 4, "count": [3, 6] },
+    { "item": "minecraft:coal", "weight": 3, "count": [2, 4] },
+    { "item": "minecraft:stone_sword", "weight": 1, "count": 1 }
+  ]
+}

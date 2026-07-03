@@ -3,6 +3,7 @@ package com.rfizzle.mercantile;
 import com.rfizzle.mercantile.command.MercantileCommands;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.GiftMappingManager;
+import com.rfizzle.mercantile.data.GratitudeGiftTables;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.VillagerHeadTextures;
 import com.rfizzle.mercantile.data.VillagerNameManager;
@@ -37,6 +38,7 @@ public class Mercantile implements ModInitializer {
         ExclusiveTradesManager.init();
         TradeIndexDataSource.init();
         GiftMappingManager.init();
+        GratitudeGiftTables.init();
         VillagerHeadTextures.init();
         VillagerNameManager.init();
         FollowManager.init();

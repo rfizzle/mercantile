@@ -221,6 +221,15 @@
               "note": "Config: <code class='text-bone'>enableGifting</code>, <code class='text-bone'>reputationDailyMaxGiftRep</code>, <code class='text-bone'>reputationNegativeDecayPerDay</code> · Datapack: <code class='text-bone'>data/mercantile/gift_mappings/</code>"
             },
             {
+              "id": "gratitude-gifts",
+              "title": "Gratitude Gifts",
+              "html": [
+                "At Honored standing the gifting flows both ways: spend time near villagers and one will occasionally walk over and toss you a small profession-flavored thank-you — bread from a farmer, arrows from a fletcher — with happy particles and a villager \"yes\". Professions without a table draw from a generic pool of bread and seeds.",
+                "It's flavor, not income: at most one gift per player per in-game day by default, and the shipped tables contain only modest items. Datapacks can override or extend tables per profession via <code class='text-bone text-xs'>data/mercantile/gratitude_gifts/&lt;profession&gt;.json</code> with the same replace/append semantics as the gift mappings."
+              ],
+              "note": "Config: <code class='text-bone'>enableGratitudeGifts</code>, <code class='text-bone'>gratitudeGiftsPerDay</code> (default 1)"
+            },
+            {
               "id": "reputation-raid-trader",
               "title": "Raid Defense &amp; Traders",
               "html": [

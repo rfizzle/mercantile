@@ -1,0 +1,7 @@
+{
+  "items": [
+    { "item": "minecraft:arrow", "weight": 4, "count": [4, 8] },
+    { "item": "minecraft:feather", "weight": 2, "count": [2, 4] },
+    { "item": "minecraft:flint", "weight": 2, "count": [2, 4] }
+  ]
+}

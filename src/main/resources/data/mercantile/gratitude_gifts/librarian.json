@@ -1,0 +1,7 @@
+{
+  "items": [
+    { "item": "minecraft:paper", "weight": 4, "count": [2, 5] },
+    { "item": "minecraft:book", "weight": 2, "count": 1 },
+    { "item": "minecraft:ink_sac", "weight": 2, "count": [1, 2] }
+  ]
+}
