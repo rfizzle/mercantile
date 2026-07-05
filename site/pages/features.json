@@ -74,6 +74,15 @@
               "note": "Config: <code class='text-bone'>enableProfessionLock</code>"
             },
             {
+              "id": "work-orders",
+              "title": "Work Orders",
+              "html": [
+                "Stop playing workstation roulette. Sneak-right-click an <strong class='text-bone'>unemployed</strong> adult villager while holding a profession workstation item — a lectern, smithing table, composter, any job-site block — and it walks to the nearest <em>unclaimed</em> workstation of that type and claims it, taking the matching profession. The held item only identifies the job and is never consumed; the workstation block itself must already be placed in the world.",
+                "Each accepted order costs a small emerald fee (default 1, waived in creative), answered with a villager \"yes\" and happy particles; the profession-tinted workstation link mote then shows the new binding. If no free workstation of that type is within range the order is refused with an action-bar message and nothing is charged. Employed villagers, nitwits, and babies ignore the interaction entirely, and the job is resolved from the block's point-of-interest registration, so modded professions work automatically. One vanilla quirk carries over: while the claim is still in progress, a nearby established villager of the matching profession that lost its own workstation can inherit it."
+              ],
+              "note": "Config: <code class='text-bone'>enableWorkOrders</code>, <code class='text-bone'>workOrderEmeraldCost</code> (default 1)"
+            },
+            {
               "id": "villager-mood",
               "title": "Villager Mood",
               "html": [

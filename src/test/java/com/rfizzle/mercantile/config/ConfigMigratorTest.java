@@ -222,6 +222,43 @@ class ConfigMigratorTest {
     }
 
     @Test
+    void v8FileGainsWorkOrderFieldsAtDefaults() {
+        JsonObject raw = parse("""
+                {
+                  "configVersion": 8,
+                  "enableTradePinning": false
+                }
+                """);
+
+        boolean migrated = ConfigMigrator.migrate(raw);
+        MercantileConfig defaults = new MercantileConfig();
+
+        assertTrue(migrated, "a v8 file must migrate to v9");
+        assertEquals(ConfigMigrator.CURRENT_VERSION, raw.get("configVersion").getAsInt());
+        assertEquals(defaults.enableWorkOrders, raw.get("enableWorkOrders").getAsBoolean());
+        assertEquals(defaults.workOrderEmeraldCost, raw.get("workOrderEmeraldCost").getAsInt());
+        // Existing fields are carried forward untouched.
+        assertFalse(raw.get("enableTradePinning").getAsBoolean());
+    }
+
+    @Test
+    void workOrderMigrationPreservesExplicitValues() {
+        JsonObject raw = parse("""
+                {
+                  "configVersion": 8,
+                  "enableWorkOrders": false
+                }
+                """);
+
+        ConfigMigrator.migrate(raw);
+
+        assertFalse(raw.get("enableWorkOrders").getAsBoolean(),
+                "an explicitly set enableWorkOrders must not be overwritten by the migration");
+        assertEquals(new MercantileConfig().workOrderEmeraldCost, raw.get("workOrderEmeraldCost").getAsInt(),
+                "the absent field must still be seeded at its default alongside preserved keys");
+    }
+
+    @Test
     void tradePinningMigrationPreservesExplicitValues() {
         JsonObject raw = parse("""
                 {

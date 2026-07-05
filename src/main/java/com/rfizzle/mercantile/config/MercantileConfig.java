@@ -126,6 +126,10 @@ public class MercantileConfig {
     public boolean enableNitwitRehab = true;
     public int nitwitRehabEmeraldCost = 16;
 
+    // Work Orders
+    public boolean enableWorkOrders = true;
+    public int workOrderEmeraldCost = 1;
+
     // Memorials & Mourning
     public boolean enableMemorials = true;
     public boolean enableMourning = true;
@@ -194,6 +198,7 @@ public class MercantileConfig {
         marketDayIntervalDays = Math.clamp(marketDayIntervalDays, 1, 1_000);
         marketDayDiscountPercent = Math.clamp(marketDayDiscountPercent, 0, 100);
         nitwitRehabEmeraldCost = Math.clamp(nitwitRehabEmeraldCost, 0, Integer.MAX_VALUE);
+        workOrderEmeraldCost = Math.clamp(workOrderEmeraldCost, 0, Integer.MAX_VALUE);
         fearKillThreshold = Math.clamp(fearKillThreshold, 1, 20);
         fearKillWindowMinutes = Math.clamp(fearKillWindowMinutes, 1, 120);
         fearMarkupPercent = Math.clamp(fearMarkupPercent, 0, 200);

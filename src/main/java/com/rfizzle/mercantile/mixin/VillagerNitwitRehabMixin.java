@@ -34,9 +34,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * {@link NitwitRehabManager}). The item-hand guards across the mobInteract mixins are mutually
  * exclusive: {@link VillagerPickupMixin} requires an empty hand, {@link VillagerFollowMixin}
  * requires an emerald, {@link VillagerBabyFeedMixin} requires a villager breeding food
- * (bread/carrot/potato/beetroot — never a golden apple), and this mixin requires a golden apple in
- * the main hand targeting a nitwit. Future authors must preserve this invariant so no two
- * mobInteract injections can fire for the same interaction.
+ * (bread/carrot/potato/beetroot — never a golden apple), {@link VillagerWorkOrderMixin} requires
+ * a workstation block item, and this mixin requires a golden apple in the main hand targeting a
+ * nitwit. Future authors must preserve this invariant so no two mobInteract injections can fire
+ * for the same interaction.
  */
 @Mixin(Villager.class)
 public abstract class VillagerNitwitRehabMixin extends AbstractVillager {

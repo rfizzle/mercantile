@@ -15,7 +15,7 @@ import com.rfizzle.mercantile.Mercantile;
  */
 final class ConfigMigrator {
 
-    static final int CURRENT_VERSION = 8;
+    static final int CURRENT_VERSION = 9;
 
     @FunctionalInterface
     interface Migration {
@@ -79,6 +79,12 @@ final class ConfigMigrator {
             addIfAbsent(json, "enableTradePinning", defaults.enableTradePinning);
             addIfAbsent(json, "maxPinnedTradesPerPlayer", defaults.maxPinnedTradesPerPlayer);
             addIfAbsent(json, "pinRestockNotifyRange", defaults.pinRestockNotifyRange);
+        },
+        // v8 -> v9: work order fields, seeded at their defaults.
+        json -> {
+            MercantileConfig defaults = new MercantileConfig();
+            addIfAbsent(json, "enableWorkOrders", defaults.enableWorkOrders);
+            addIfAbsent(json, "workOrderEmeraldCost", defaults.workOrderEmeraldCost);
         },
     };
 
