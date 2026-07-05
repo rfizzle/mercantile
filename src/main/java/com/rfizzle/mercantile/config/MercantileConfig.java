@@ -172,59 +172,87 @@ public class MercantileConfig {
     }
 
     public void clamp() {
-        pickupXpCost = Math.clamp(pickupXpCost, 0, Integer.MAX_VALUE);
-        tradeCycleEmeraldCost = Math.clamp(tradeCycleEmeraldCost, 0, Integer.MAX_VALUE);
-        reputationTradeGain = Math.clamp(reputationTradeGain, 0, Integer.MAX_VALUE);
-        reputationCureGain = Math.clamp(reputationCureGain, 0, Integer.MAX_VALUE);
-        reputationAttackLoss = Math.clamp(reputationAttackLoss, 0, Integer.MAX_VALUE);
-        reputationKillLoss = Math.clamp(reputationKillLoss, 0, Integer.MAX_VALUE);
-        reputationCycleGain = Math.clamp(reputationCycleGain, 0, Integer.MAX_VALUE);
-        reputationRaidWinGain = Math.clamp(reputationRaidWinGain, 0, Integer.MAX_VALUE);
-        reputationDailyCap = Math.clamp(reputationDailyCap, 1, 50);
-        reputationTradesPerGain = Math.clamp(reputationTradesPerGain, 1, 20);
-        reputationDailyMaxTradeRep = Math.clamp(reputationDailyMaxTradeRep, 1, 10);
-        reputationDailyMaxCycleRep = Math.clamp(reputationDailyMaxCycleRep, 1, 10);
-        reputationGiftGain = Math.clamp(reputationGiftGain, 0, Integer.MAX_VALUE);
-        reputationDailyMaxGiftRep = Math.clamp(reputationDailyMaxGiftRep, 1, 10);
-        reputationNegativeDecayPerDay = Math.clamp(reputationNegativeDecayPerDay, 0, Integer.MAX_VALUE);
-        gratitudeGiftsPerDay = Math.clamp(gratitudeGiftsPerDay, 0, 10);
-        maxFollowingVillagers = Math.clamp(maxFollowingVillagers, 1, Integer.MAX_VALUE);
-        healingMultiplier = Math.clamp(healingMultiplier, 1.0f, 10.0f);
-        babyFeedPercentPerFeed = Math.clamp(babyFeedPercentPerFeed, 1, 100);
-        babyFeedMaxReductionPercent = Math.clamp(babyFeedMaxReductionPercent, 0, 100);
-        pylonDetectionRadius = Math.clamp(pylonDetectionRadius, 4, 128);
-        pylonMaxFuel = Math.clamp(pylonMaxFuel, 1, Integer.MAX_VALUE);
-        pylonMaxGolems = Math.clamp(pylonMaxGolems, 1, Integer.MAX_VALUE);
-        sentryDespawnSeconds = Math.clamp(sentryDespawnSeconds, 5, Integer.MAX_VALUE);
-        pylonTribulationGolemBonusPerTier = Math.clamp(pylonTribulationGolemBonusPerTier, 0, Integer.MAX_VALUE);
-        pylonTribulationRadiusBonusPerTier = Math.clamp(pylonTribulationRadiusBonusPerTier, 0, Integer.MAX_VALUE);
+        pickupXpCost = clampInt("pickupXpCost", pickupXpCost, 0, Integer.MAX_VALUE);
+        tradeCycleEmeraldCost = clampInt("tradeCycleEmeraldCost", tradeCycleEmeraldCost, 0, Integer.MAX_VALUE);
+        reputationTradeGain = clampInt("reputationTradeGain", reputationTradeGain, 0, Integer.MAX_VALUE);
+        reputationCureGain = clampInt("reputationCureGain", reputationCureGain, 0, Integer.MAX_VALUE);
+        reputationAttackLoss = clampInt("reputationAttackLoss", reputationAttackLoss, 0, Integer.MAX_VALUE);
+        reputationKillLoss = clampInt("reputationKillLoss", reputationKillLoss, 0, Integer.MAX_VALUE);
+        reputationCycleGain = clampInt("reputationCycleGain", reputationCycleGain, 0, Integer.MAX_VALUE);
+        reputationRaidWinGain = clampInt("reputationRaidWinGain", reputationRaidWinGain, 0, Integer.MAX_VALUE);
+        reputationDailyCap = clampInt("reputationDailyCap", reputationDailyCap, 1, 50);
+        reputationTradesPerGain = clampInt("reputationTradesPerGain", reputationTradesPerGain, 1, 20);
+        reputationDailyMaxTradeRep = clampInt("reputationDailyMaxTradeRep", reputationDailyMaxTradeRep, 1, 10);
+        reputationDailyMaxCycleRep = clampInt("reputationDailyMaxCycleRep", reputationDailyMaxCycleRep, 1, 10);
+        reputationGiftGain = clampInt("reputationGiftGain", reputationGiftGain, 0, Integer.MAX_VALUE);
+        reputationDailyMaxGiftRep = clampInt("reputationDailyMaxGiftRep", reputationDailyMaxGiftRep, 1, 10);
+        reputationNegativeDecayPerDay = clampInt("reputationNegativeDecayPerDay", reputationNegativeDecayPerDay, 0, Integer.MAX_VALUE);
+        gratitudeGiftsPerDay = clampInt("gratitudeGiftsPerDay", gratitudeGiftsPerDay, 0, 10);
+        maxFollowingVillagers = clampInt("maxFollowingVillagers", maxFollowingVillagers, 1, Integer.MAX_VALUE);
+        healingMultiplier = clampFloat("healingMultiplier", healingMultiplier, 1.0f, 10.0f);
+        babyFeedPercentPerFeed = clampInt("babyFeedPercentPerFeed", babyFeedPercentPerFeed, 1, 100);
+        babyFeedMaxReductionPercent = clampInt("babyFeedMaxReductionPercent", babyFeedMaxReductionPercent, 0, 100);
+        pylonDetectionRadius = clampInt("pylonDetectionRadius", pylonDetectionRadius, 4, 128);
+        pylonMaxFuel = clampInt("pylonMaxFuel", pylonMaxFuel, 1, Integer.MAX_VALUE);
+        pylonMaxGolems = clampInt("pylonMaxGolems", pylonMaxGolems, 1, Integer.MAX_VALUE);
+        sentryDespawnSeconds = clampInt("sentryDespawnSeconds", sentryDespawnSeconds, 5, Integer.MAX_VALUE);
+        pylonTribulationGolemBonusPerTier = clampInt("pylonTribulationGolemBonusPerTier", pylonTribulationGolemBonusPerTier, 0, Integer.MAX_VALUE);
+        pylonTribulationRadiusBonusPerTier = clampInt("pylonTribulationRadiusBonusPerTier", pylonTribulationRadiusBonusPerTier, 0, Integer.MAX_VALUE);
         // The Tribulation cap can never sit below the un-integrated golem cap it extends.
-        pylonTribulationMaxGolems = Math.max(pylonTribulationMaxGolems, pylonMaxGolems);
-        moodPriceModifierPercent = Math.clamp(moodPriceModifierPercent, 0, 50);
-        moodRestockSpeedPercent = Math.clamp(moodRestockSpeedPercent, 0, 80);
-        moodRecalcIntervalTicks = Math.clamp(moodRecalcIntervalTicks, 20, 24_000);
-        marketDayIntervalDays = Math.clamp(marketDayIntervalDays, 1, 1_000);
-        marketDayDiscountPercent = Math.clamp(marketDayDiscountPercent, 0, 100);
-        nitwitRehabEmeraldCost = Math.clamp(nitwitRehabEmeraldCost, 0, Integer.MAX_VALUE);
-        workOrderEmeraldCost = Math.clamp(workOrderEmeraldCost, 0, Integer.MAX_VALUE);
-        fearKillThreshold = Math.clamp(fearKillThreshold, 1, 20);
-        fearKillWindowMinutes = Math.clamp(fearKillWindowMinutes, 1, 120);
-        fearMarkupPercent = Math.clamp(fearMarkupPercent, 0, 200);
-        fearMarkupDurationDays = Math.clamp(fearMarkupDurationDays, 1, 30);
+        if (pylonTribulationMaxGolems < pylonMaxGolems) {
+            Mercantile.LOGGER.warn("Config 'pylonTribulationMaxGolems' value {} is below pylonMaxGolems {}; raised to {}",
+                    pylonTribulationMaxGolems, pylonMaxGolems, pylonMaxGolems);
+            pylonTribulationMaxGolems = pylonMaxGolems;
+        }
+        moodPriceModifierPercent = clampInt("moodPriceModifierPercent", moodPriceModifierPercent, 0, 50);
+        moodRestockSpeedPercent = clampInt("moodRestockSpeedPercent", moodRestockSpeedPercent, 0, 80);
+        moodRecalcIntervalTicks = clampInt("moodRecalcIntervalTicks", moodRecalcIntervalTicks, 20, 24_000);
+        marketDayIntervalDays = clampInt("marketDayIntervalDays", marketDayIntervalDays, 1, 1_000);
+        marketDayDiscountPercent = clampInt("marketDayDiscountPercent", marketDayDiscountPercent, 0, 100);
+        nitwitRehabEmeraldCost = clampInt("nitwitRehabEmeraldCost", nitwitRehabEmeraldCost, 0, Integer.MAX_VALUE);
+        workOrderEmeraldCost = clampInt("workOrderEmeraldCost", workOrderEmeraldCost, 0, Integer.MAX_VALUE);
+        fearKillThreshold = clampInt("fearKillThreshold", fearKillThreshold, 1, 20);
+        fearKillWindowMinutes = clampInt("fearKillWindowMinutes", fearKillWindowMinutes, 1, 120);
+        fearMarkupPercent = clampInt("fearMarkupPercent", fearMarkupPercent, 0, 200);
+        fearMarkupDurationDays = clampInt("fearMarkupDurationDays", fearMarkupDurationDays, 1, 30);
         // Upper bound matches PlayerData.MAX_PINNED_TRADES so the configurable cap can never
         // exceed the persisted hard bound.
-        maxPinnedTradesPerPlayer = Math.clamp(maxPinnedTradesPerPlayer, 1, 64);
-        pinRestockNotifyRange = Math.clamp(pinRestockNotifyRange, 8, 256);
-        contractOfferChance = Math.clamp(contractOfferChance, 0, 100);
-        contractPaymentScale = Math.clamp(contractPaymentScale, 0, 1_000);
-        contractRepGain = Math.clamp(contractRepGain, 0, Integer.MAX_VALUE);
-        contractRepPerDay = Math.clamp(contractRepPerDay, 0, 50);
-        contractDeadlineDays = Math.clamp(contractDeadlineDays, 1, 30);
-        villagerSoundVolume = Math.clamp(villagerSoundVolume, 0.0f, 1.0f);
+        maxPinnedTradesPerPlayer = clampInt("maxPinnedTradesPerPlayer", maxPinnedTradesPerPlayer, 1, 64);
+        pinRestockNotifyRange = clampInt("pinRestockNotifyRange", pinRestockNotifyRange, 8, 256);
+        contractOfferChance = clampInt("contractOfferChance", contractOfferChance, 0, 100);
+        contractPaymentScale = clampInt("contractPaymentScale", contractPaymentScale, 0, 1_000);
+        contractRepGain = clampInt("contractRepGain", contractRepGain, 0, Integer.MAX_VALUE);
+        contractRepPerDay = clampInt("contractRepPerDay", contractRepPerDay, 0, 50);
+        contractDeadlineDays = clampInt("contractDeadlineDays", contractDeadlineDays, 1, 30);
+        villagerSoundVolume = clampFloat("villagerSoundVolume", villagerSoundVolume, 0.0f, 1.0f);
         // Gson leaves enum fields null on unknown/missing values.
         if (hudAnchor == null) hudAnchor = Anchor.TOP_LEFT;
-        hudOffsetX = Math.clamp(hudOffsetX, 0, 10_000);
-        hudOffsetY = Math.clamp(hudOffsetY, 0, 10_000);
+        hudOffsetX = clampInt("hudOffsetX", hudOffsetX, 0, 10_000);
+        hudOffsetY = clampInt("hudOffsetY", hudOffsetY, 0, 10_000);
+    }
+
+    /**
+     * Clamp {@code value} into {@code [min, max]}, logging a warning when the
+     * hand-edited value was actually out of range (warn-and-clamp — a player
+     * can see exactly which field their edit overrode).
+     */
+    private static int clampInt(String name, int value, int min, int max) {
+        int clamped = Math.clamp(value, min, max);
+        if (clamped != value) {
+            Mercantile.LOGGER.warn("Config '{}' value {} out of range [{}, {}]; clamped to {}",
+                    name, value, min, max, clamped);
+        }
+        return clamped;
+    }
+
+    /** Float counterpart of {@link #clampInt}. */
+    private static float clampFloat(String name, float value, float min, float max) {
+        float clamped = Math.clamp(value, min, max);
+        if (clamped != value) {
+            Mercantile.LOGGER.warn("Config '{}' value {} out of range [{}, {}]; clamped to {}",
+                    name, value, min, max, clamped);
+        }
+        return clamped;
     }
 
     public String toJson() {
