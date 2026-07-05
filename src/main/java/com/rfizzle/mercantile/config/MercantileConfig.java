@@ -126,6 +126,17 @@ public class MercantileConfig {
     public boolean enableNitwitRehab = true;
     public int nitwitRehabEmeraldCost = 16;
 
+    // Memorials & Mourning
+    public boolean enableMemorials = true;
+    public boolean enableMourning = true;
+
+    // Fear Markup
+    public boolean enableFearMarkup = true;
+    public int fearKillThreshold = 3;
+    public int fearKillWindowMinutes = 10;
+    public int fearMarkupPercent = 25;
+    public int fearMarkupDurationDays = 3;
+
     // --- Client Config ---
 
     public float villagerSoundVolume = 1.0f;
@@ -178,6 +189,10 @@ public class MercantileConfig {
         marketDayIntervalDays = Math.clamp(marketDayIntervalDays, 1, 1_000);
         marketDayDiscountPercent = Math.clamp(marketDayDiscountPercent, 0, 100);
         nitwitRehabEmeraldCost = Math.clamp(nitwitRehabEmeraldCost, 0, Integer.MAX_VALUE);
+        fearKillThreshold = Math.clamp(fearKillThreshold, 1, 20);
+        fearKillWindowMinutes = Math.clamp(fearKillWindowMinutes, 1, 120);
+        fearMarkupPercent = Math.clamp(fearMarkupPercent, 0, 200);
+        fearMarkupDurationDays = Math.clamp(fearMarkupDurationDays, 1, 30);
         villagerSoundVolume = Math.clamp(villagerSoundVolume, 0.0f, 1.0f);
         // Gson leaves enum fields null on unknown/missing values.
         if (hudAnchor == null) hudAnchor = Anchor.TOP_LEFT;

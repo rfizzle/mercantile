@@ -1,0 +1,20 @@
+# mercantile — grief tear (8×8 particle sprite)
+# A single pale-blue teardrop shed by mourning villagers. Soft-edged — no ink
+# outline — because the particle renders on the translucent sheet and fades out.
+size: 8
+
+legend:
+  . transparent
+  h #eaf7ff   # glassy highlight
+  m #9fd8f2   # pale blue body
+  d #58a8d8   # deep edge
+
+frame:
+  ...m....
+  ...mm...
+  ..mhmd..
+  .mhhmmd.
+  .mhhmmd.
+  .mmmmdd.
+  ..mmdd..
+  ...dd...

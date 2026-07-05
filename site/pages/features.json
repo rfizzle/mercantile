@@ -84,6 +84,16 @@
               "note": "Config: <code class='text-bone'>enableMood</code>, <code class='text-bone'>moodPriceModifierPercent</code> (default 5), <code class='text-bone'>moodRestockSpeedPercent</code> (default 20), <code class='text-bone'>moodAmbientParticles</code>"
             },
             {
+              "id": "memorials",
+              "title": "Memorials, Mourning &amp; Fear",
+              "html": [
+                "Villager deaths carry weight. When a <strong class='text-bone'>named</strong> villager dies, it drops a memorial keepsake — a custom skull glyph whose tooltip records the villager's name, profession, level, and how they died. A keepsake, not a resurrection token; unnamed villagers drop nothing.",
+                "Nearby villagers <strong class='text-bone'>mourn</strong>: for a few seconds they stop what they're doing, turn toward where their neighbor fell, and shed pale-blue grief tears. Purely cosmetic — no AI or schedule changes.",
+                "And villages remember who did it. Killing several villagers in the same village within a short window (default 3 kills in 10 minutes) makes that village's survivors <strong class='text-bone'>afraid of you</strong>: a price markup (default 25% of base price) applies to the killer only, in that village only — keyed to the village bell — and fades linearly over a few in-game days. It shows as its own red \"Fear\" line in the price breakdown, on top of the reputation penalty."
+              ],
+              "note": "Config: <code class='text-bone'>enableMemorials</code>, <code class='text-bone'>enableMourning</code>, <code class='text-bone'>enableFearMarkup</code>, <code class='text-bone'>fearKillThreshold</code>, <code class='text-bone'>fearKillWindowMinutes</code>, <code class='text-bone'>fearMarkupPercent</code>, <code class='text-bone'>fearMarkupDurationDays</code>"
+            },
+            {
               "id": "pathfinding",
               "title": "Smarter Pathfinding",
               "html": [
@@ -134,7 +144,7 @@
               "id": "demand-transparency",
               "title": "Demand Transparency",
               "html": [
-                "Hover over a trade price to see a breakdown: base price, demand adjustment, reputation modifier, mood modifier, gossip modifier, market-day discount, final price. Discounts appear in green, markups in red."
+                "Hover over a trade price to see a breakdown: base price, demand adjustment, reputation modifier, mood modifier, gossip modifier, market-day discount, fear markup, final price. Discounts appear in green, markups in red."
               ],
               "note": "Config: <code class='text-bone'>enableDemandTransparency</code>"
             },

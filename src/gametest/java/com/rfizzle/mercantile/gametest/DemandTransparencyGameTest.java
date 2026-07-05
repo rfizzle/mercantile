@@ -35,8 +35,8 @@ public class DemandTransparencyGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void payloadRoundTripsCorrectFields(GameTestHelper helper) {
         DemandPriceS2CPayload original = new DemandPriceS2CPayload(42,
-                List.of(new DemandPriceS2CPayload.PriceComponent(3, 2, -1, 0, 0, 0, 0, 4),
-                        new DemandPriceS2CPayload.PriceComponent(10, 0, 0, 0, -2, 0, 0, 8)));
+                List.of(new DemandPriceS2CPayload.PriceComponent(3, 2, -1, 0, 0, 0, 0, 0, 4),
+                        new DemandPriceS2CPayload.PriceComponent(10, 0, 0, 0, -2, 0, 5, 0, 8)));
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         try {
             DemandPriceS2CPayload.CODEC.encode(buf, original);
@@ -50,6 +50,8 @@ public class DemandTransparencyGameTest implements FabricGameTest {
                             && first.reputationModifier() == -1 && first.gossipModifier() == 0
                             && first.otherAdjust() == 0 && first.finalPrice() == 4,
                     "first component fields should round-trip");
+            helper.assertTrue(decoded.components().get(1).fearModifier() == 5,
+                    "fearModifier should round-trip");
         } finally {
             buf.release();
         }

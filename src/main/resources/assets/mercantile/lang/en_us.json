@@ -2,6 +2,7 @@
     "itemGroup.mercantile": "Mercantile",
     "block.mercantile.sentry_pylon": "Sentry Pylon",
     "item.mercantile.villager": "Villager",
+    "item.mercantile.memorial": "Villager Memorial",
     "command.mercantile.reload": "Mercantile config reloaded",
     "command.mercantile.reputation.self": "Your reputation: %1$s (%2$s) — %3$s/%4$s today",
     "command.mercantile.reputation.other": "%1$s's reputation: %2$s (%3$s) — %4$s/%5$s today",
@@ -187,6 +188,10 @@
     "mercantile.rehab.denied.reputation": "You must be %s with villagers to rehabilitate a nitwit",
     "mercantile.rehab.denied.cost": "Rehabilitating a nitwit costs %s emeralds",
 
+    "mercantile.memorial.name": "Memorial of %s",
+    "mercantile.memorial.lore.profession_level": "%1$s — %2$s",
+    "mercantile.memorial.lore.keepsake": "Their memory lives on",
+
     "mercantile.tier.honored":    "Honored",
     "mercantile.tier.trusted":    "Trusted",
     "mercantile.tier.liked":      "Liked",
@@ -253,6 +258,7 @@
     "gui.mercantile.price.mood": "Mood: %s",
     "gui.mercantile.price.gossip": "Gossip: %s",
     "gui.mercantile.price.marketday": "Market Day: %s",
+    "gui.mercantile.price.fear": "Fear: %s",
     "gui.mercantile.price.other": "Other: %s",
     "gui.mercantile.price.final": "Final: %s",
 
@@ -305,6 +311,22 @@
     "mercantile.config.moodAmbientParticles.tooltip": "Happy villagers occasionally emit happy particles; Miserable ones emit angry particles",
 
     "mercantile.message.market_day": "Market day! Trades are discounted and villagers restock more.",
+
+    "mercantile.config.category.memorial": "Memorials & Fear",
+    "mercantile.config.enableMemorials": "Enable Memorials",
+    "mercantile.config.enableMemorials.tooltip": "A named villager's death drops a memorial keepsake recording their name, profession, level, and cause of death",
+    "mercantile.config.enableMourning": "Enable Mourning",
+    "mercantile.config.enableMourning.tooltip": "Villagers near a villager death briefly stop, face the spot, and shed grief tears (cosmetic only)",
+    "mercantile.config.enableFearMarkup": "Enable Fear Markup",
+    "mercantile.config.enableFearMarkup.tooltip": "Killing several villagers in one village quickly makes that village's survivors mark up prices for the killer, decaying over a few in-game days",
+    "mercantile.config.fearKillThreshold": "Fear Kill Threshold",
+    "mercantile.config.fearKillThreshold.tooltip": "Villager kills in the same village within the kill window needed to trigger the fear markup",
+    "mercantile.config.fearKillWindowMinutes": "Fear Kill Window",
+    "mercantile.config.fearKillWindowMinutes.tooltip": "Minutes (real time) in which the threshold kills must land to count as a spree",
+    "mercantile.config.fearMarkupPercent": "Fear Markup Percent",
+    "mercantile.config.fearMarkupPercent.tooltip": "Price markup when fear is fresh, as a percent of base price; it decays linearly to zero over the duration (0 disables the price effect)",
+    "mercantile.config.fearMarkupDurationDays": "Fear Duration Days",
+    "mercantile.config.fearMarkupDurationDays.tooltip": "In-game days for a village's fear of the killer to fade completely",
 
     "mercantile.config.category.market": "Market Day",
     "mercantile.config.enableMarketDay": "Enable Market Day",

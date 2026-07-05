@@ -15,7 +15,7 @@ import com.rfizzle.mercantile.Mercantile;
  */
 final class ConfigMigrator {
 
-    static final int CURRENT_VERSION = 6;
+    static final int CURRENT_VERSION = 7;
 
     @FunctionalInterface
     interface Migration {
@@ -61,6 +61,17 @@ final class ConfigMigrator {
             MercantileConfig defaults = new MercantileConfig();
             addIfAbsent(json, "enableNitwitRehab", defaults.enableNitwitRehab);
             addIfAbsent(json, "nitwitRehabEmeraldCost", defaults.nitwitRehabEmeraldCost);
+        },
+        // v6 -> v7: memorial, mourning, and fear markup fields, seeded at their defaults.
+        json -> {
+            MercantileConfig defaults = new MercantileConfig();
+            addIfAbsent(json, "enableMemorials", defaults.enableMemorials);
+            addIfAbsent(json, "enableMourning", defaults.enableMourning);
+            addIfAbsent(json, "enableFearMarkup", defaults.enableFearMarkup);
+            addIfAbsent(json, "fearKillThreshold", defaults.fearKillThreshold);
+            addIfAbsent(json, "fearKillWindowMinutes", defaults.fearKillWindowMinutes);
+            addIfAbsent(json, "fearMarkupPercent", defaults.fearMarkupPercent);
+            addIfAbsent(json, "fearMarkupDurationDays", defaults.fearMarkupDurationDays);
         },
     };
 

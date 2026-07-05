@@ -39,6 +39,9 @@ public final class MercantileRegistry {
 
     public static BlockEntityType<SentryPylonBlockEntity> SENTRY_PYLON_BE;
 
+    // Keepsake dropped when a named villager dies; identity lives in its data components.
+    public static final Item MEMORIAL = new Item(new Item.Properties());
+
     private static boolean registered = false;
 
     private MercantileRegistry() {
@@ -49,6 +52,7 @@ public final class MercantileRegistry {
         registered = true;
 
         registerBlock("sentry_pylon", SENTRY_PYLON, new Item.Properties());
+        registerItem("memorial", MEMORIAL);
 
         SENTRY_PYLON_BE = BlockEntityType.Builder
                 .of(SentryPylonBlockEntity::new, SENTRY_PYLON)
@@ -64,6 +68,12 @@ public final class MercantileRegistry {
         BLOCKS.put(id, block);
         Registry.register(BuiltInRegistries.ITEM, id, new BlockItem(block, itemProps));
         return block;
+    }
+
+    private static <T extends Item> T registerItem(String name, T item) {
+        Registry.register(BuiltInRegistries.ITEM, Mercantile.id(name), item);
+        STANDALONE_ITEMS.add(item);
+        return item;
     }
 
     private static <T extends BlockEntity> BlockEntityType<T> registerBlockEntityType(String name,

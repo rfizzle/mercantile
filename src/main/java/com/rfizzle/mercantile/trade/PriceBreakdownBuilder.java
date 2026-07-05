@@ -4,6 +4,8 @@ import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
 import com.rfizzle.mercantile.market.MarketDayManager;
+import com.rfizzle.mercantile.memorial.FearManager;
+import com.rfizzle.mercantile.memorial.FearMath;
 import com.rfizzle.mercantile.mixin.MerchantOfferDemandAccessor;
 import com.rfizzle.mercantile.mood.MoodManager;
 import com.rfizzle.mercantile.network.DemandPriceS2CPayload;
@@ -29,6 +31,7 @@ public final class PriceBreakdownBuilder {
 
         List<MerchantOffer> offers = villager.getOffers();
         List<DemandPriceS2CPayload.PriceComponent> components = new ArrayList<>(offers.size());
+        double fearFraction = FearManager.fearFraction(villager, player, config);
         for (MerchantOffer offer : offers) {
             int basePrice = offer.getBaseCostA().getCount();
             int demand = ((MerchantOfferDemandAccessor) offer).mercantile$getDemand();
@@ -50,13 +53,20 @@ public final class PriceBreakdownBuilder {
                     ? 0
                     : -Mth.floor(gossipReputation * priceMultiplier);
 
+            // Same headroom cap as the mixin: fear past the vanilla max-stack clamp is
+            // never charged, so it must not be reported either.
+            int rawFear = FearManager.priceModifier(basePrice, fearFraction, config);
+            int fearModifier = FearMath.capToHeadroom(rawFear, offer.getBaseCostA().getMaxStackSize(),
+                    basePrice, demandAdjust,
+                    reputationModifier + gossipModifier + moodModifier + marketDayModifier);
+
             int finalPrice = offer.getCostA().getCount();
             int otherAdjust = finalPrice - basePrice - demandAdjust - reputationModifier - moodModifier
-                    - gossipModifier - marketDayModifier;
+                    - gossipModifier - marketDayModifier - fearModifier;
 
             components.add(new DemandPriceS2CPayload.PriceComponent(
                     basePrice, demandAdjust, reputationModifier, moodModifier, gossipModifier,
-                    marketDayModifier, otherAdjust, finalPrice));
+                    marketDayModifier, fearModifier, otherAdjust, finalPrice));
         }
         return components;
     }

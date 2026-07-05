@@ -176,6 +176,48 @@ class ConfigMigratorTest {
     }
 
     @Test
+    void v6FileGainsMemorialFearFieldsAtDefaults() {
+        JsonObject raw = parse("""
+                {
+                  "configVersion": 6,
+                  "enableNitwitRehab": false
+                }
+                """);
+
+        boolean migrated = ConfigMigrator.migrate(raw);
+        MercantileConfig defaults = new MercantileConfig();
+
+        assertTrue(migrated, "a v6 file must migrate to v7");
+        assertEquals(ConfigMigrator.CURRENT_VERSION, raw.get("configVersion").getAsInt());
+        assertEquals(defaults.enableMemorials, raw.get("enableMemorials").getAsBoolean());
+        assertEquals(defaults.enableMourning, raw.get("enableMourning").getAsBoolean());
+        assertEquals(defaults.enableFearMarkup, raw.get("enableFearMarkup").getAsBoolean());
+        assertEquals(defaults.fearKillThreshold, raw.get("fearKillThreshold").getAsInt());
+        assertEquals(defaults.fearKillWindowMinutes, raw.get("fearKillWindowMinutes").getAsInt());
+        assertEquals(defaults.fearMarkupPercent, raw.get("fearMarkupPercent").getAsInt());
+        assertEquals(defaults.fearMarkupDurationDays, raw.get("fearMarkupDurationDays").getAsInt());
+        // Existing fields are carried forward untouched.
+        assertFalse(raw.get("enableNitwitRehab").getAsBoolean());
+    }
+
+    @Test
+    void memorialFearMigrationPreservesExplicitValues() {
+        JsonObject raw = parse("""
+                {
+                  "configVersion": 6,
+                  "enableMemorials": false,
+                  "fearMarkupPercent": 60
+                }
+                """);
+
+        ConfigMigrator.migrate(raw);
+
+        assertFalse(raw.get("enableMemorials").getAsBoolean(),
+                "an explicitly set enableMemorials must not be overwritten by the migration");
+        assertEquals(60, raw.get("fearMarkupPercent").getAsInt());
+    }
+
+    @Test
     void nitwitRehabMigrationPreservesExplicitValues() {
         JsonObject raw = parse("""
                 {

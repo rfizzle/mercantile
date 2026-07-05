@@ -21,6 +21,8 @@ public final class MercantileParticles {
     // Workstation status markers (bell-held overlay): green check / white question mark.
     public static final SimpleParticleType WORKSTATION_CLAIMED = FabricParticleTypes.simple();
     public static final SimpleParticleType WORKSTATION_UNCLAIMED = FabricParticleTypes.simple();
+    // Teardrop shed by villagers mourning a nearby death.
+    public static final SimpleParticleType GRIEF_TEAR = FabricParticleTypes.simple();
 
     public static void init() {
         Registry.register(BuiltInRegistries.PARTICLE_TYPE, Mercantile.id("cycle_glint"), CYCLE_GLINT);
@@ -32,6 +34,7 @@ public final class MercantileParticles {
         Registry.register(BuiltInRegistries.PARTICLE_TYPE, Mercantile.id("link_mote"), LINK_MOTE);
         Registry.register(BuiltInRegistries.PARTICLE_TYPE, Mercantile.id("workstation_claimed"), WORKSTATION_CLAIMED);
         Registry.register(BuiltInRegistries.PARTICLE_TYPE, Mercantile.id("workstation_unclaimed"), WORKSTATION_UNCLAIMED);
+        Registry.register(BuiltInRegistries.PARTICLE_TYPE, Mercantile.id("grief_tear"), GRIEF_TEAR);
     }
 
     private MercantileParticles() {

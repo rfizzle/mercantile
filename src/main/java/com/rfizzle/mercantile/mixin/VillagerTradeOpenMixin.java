@@ -4,6 +4,8 @@ import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
 import com.rfizzle.mercantile.market.MarketDayManager;
+import com.rfizzle.mercantile.memorial.FearManager;
+import com.rfizzle.mercantile.memorial.FearMath;
 import com.rfizzle.mercantile.mood.MoodManager;
 import com.rfizzle.mercantile.mood.MoodMath;
 import com.rfizzle.mercantile.network.DemandPriceS2CPayload;
@@ -19,6 +21,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
@@ -62,7 +65,8 @@ public abstract class VillagerTradeOpenMixin {
                     target = "Lnet/minecraft/world/entity/npc/Villager;openTradingScreen(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/network/chat/Component;I)V"))
     private void mercantile$applyReputationEffects(Player player, CallbackInfo ci) {
         MercantileConfig config = MercantileConfig.get();
-        if (!config.enableReputation && !config.enableMood && !config.enableMarketDay) return;
+        if (!config.enableReputation && !config.enableMood && !config.enableMarketDay
+                && !config.enableFearMarkup) return;
         if (!(player instanceof ServerPlayer serverPlayer)) return;
         if (serverPlayer.connection == null) return;
 
@@ -74,20 +78,34 @@ public abstract class VillagerTradeOpenMixin {
             score = data.getScore();
         }
 
+        double fearFraction = FearManager.fearFraction(self, serverPlayer, config);
         for (MerchantOffer offer : self.getOffers()) {
             int basePrice = offer.getBaseCostA().getCount();
             int reputationModifier = score != 0 ? ReputationManager.getPriceModifier(score, basePrice) : 0;
             int moodModifier = MoodManager.priceModifier(self, basePrice, config);
             int marketDayModifier = MarketDayManager.priceModifier(self, basePrice, config);
+            int rawFear = FearManager.priceModifier(basePrice, fearFraction, config);
+            // Vanilla clamps the charged cost at the item's max stack size; cap fear at the
+            // remaining headroom so the breakdown never reports fear that isn't charged.
+            int demandAdjust = Math.max(0, Mth.floor(basePrice
+                    * ((MerchantOfferDemandAccessor) offer).mercantile$getDemand()
+                    * offer.getPriceMultiplier()));
             if (reputationModifier != 0) {
                 // Intentional absolute set: mod fully owns reputation pricing, superseding
-                // vanilla's gossip and Hero-of-the-Village discounts. Mood and the market-day
-                // discount stack on top.
-                offer.setSpecialPriceDiff(reputationModifier + moodModifier + marketDayModifier);
-            } else if (moodModifier != 0 || marketDayModifier != 0) {
-                // No reputation modifier: mood and market day stack on the vanilla gossip/HotV
-                // special price.
-                offer.setSpecialPriceDiff(offer.getSpecialPriceDiff() + moodModifier + marketDayModifier);
+                // vanilla's gossip and Hero-of-the-Village discounts. Mood, the market-day
+                // discount, and the fear markup stack on top.
+                int fearModifier = FearMath.capToHeadroom(rawFear, offer.getBaseCostA().getMaxStackSize(),
+                        basePrice, demandAdjust, reputationModifier + moodModifier + marketDayModifier);
+                offer.setSpecialPriceDiff(reputationModifier + moodModifier + marketDayModifier + fearModifier);
+            } else {
+                // No reputation modifier: mood, market day, and fear stack on the vanilla
+                // gossip/HotV special price.
+                int vanillaDiff = offer.getSpecialPriceDiff();
+                int fearModifier = FearMath.capToHeadroom(rawFear, offer.getBaseCostA().getMaxStackSize(),
+                        basePrice, demandAdjust, vanillaDiff + moodModifier + marketDayModifier);
+                if (moodModifier != 0 || marketDayModifier != 0 || fearModifier != 0) {
+                    offer.setSpecialPriceDiff(vanillaDiff + moodModifier + marketDayModifier + fearModifier);
+                }
             }
         }
 

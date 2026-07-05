@@ -107,8 +107,8 @@ class PayloadCodecTest {
     @Test
     void demandPriceS2CWithComponents() {
         var components = List.of(
-                new DemandPriceS2CPayload.PriceComponent(10, 2, -1, 0, -3, 0, 0, 8),
-                new DemandPriceS2CPayload.PriceComponent(32, 0, -5, 0, 0, 0, 0, 27)
+                new DemandPriceS2CPayload.PriceComponent(10, 2, -1, 0, -3, 0, 0, 0, 8),
+                new DemandPriceS2CPayload.PriceComponent(32, 0, -5, 0, 0, 0, 0, 0, 27)
         );
         var original = new DemandPriceS2CPayload(42, components);
         assertEquals(original, roundTrip(DemandPriceS2CPayload.CODEC, original));
@@ -122,23 +122,29 @@ class PayloadCodecTest {
 
     @Test
     void priceComponentDirect() {
-        var original = new DemandPriceS2CPayload.PriceComponent(64, 5, -10, 0, -2, 0, 0, 57);
+        var original = new DemandPriceS2CPayload.PriceComponent(64, 5, -10, 0, -2, 0, 0, 0, 57);
         assertEquals(original, roundTrip(DemandPriceS2CPayload.PriceComponent.STREAM_CODEC, original));
     }
 
     @Test
     void priceComponentWithMoodModifier() {
-        var discount = new DemandPriceS2CPayload.PriceComponent(20, 0, 0, -1, 0, 0, 0, 19);
+        var discount = new DemandPriceS2CPayload.PriceComponent(20, 0, 0, -1, 0, 0, 0, 0, 19);
         assertEquals(discount, roundTrip(DemandPriceS2CPayload.PriceComponent.STREAM_CODEC, discount));
-        var markup = new DemandPriceS2CPayload.PriceComponent(20, 0, 0, 1, 0, 0, 0, 21);
+        var markup = new DemandPriceS2CPayload.PriceComponent(20, 0, 0, 1, 0, 0, 0, 0, 21);
         assertEquals(markup, roundTrip(DemandPriceS2CPayload.PriceComponent.STREAM_CODEC, markup));
     }
 
     @Test
     void priceComponentWithOtherAdjust() {
         // Simulates Hero of the Village discount: finalPrice < basePrice with no other modifiers.
-        var original = new DemandPriceS2CPayload.PriceComponent(10, 0, 0, 0, 0, 0, -3, 7);
+        var original = new DemandPriceS2CPayload.PriceComponent(10, 0, 0, 0, 0, 0, 0, -3, 7);
         assertEquals(original, roundTrip(DemandPriceS2CPayload.PriceComponent.STREAM_CODEC, original));
+    }
+
+    @Test
+    void priceComponentWithFearModifier() {
+        var feared = new DemandPriceS2CPayload.PriceComponent(20, 0, 0, 0, 0, 0, 5, 0, 25);
+        assertEquals(feared, roundTrip(DemandPriceS2CPayload.PriceComponent.STREAM_CODEC, feared));
     }
 
     @Test
