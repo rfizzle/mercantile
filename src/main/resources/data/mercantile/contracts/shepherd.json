@@ -1,0 +1,8 @@
+{
+    "requests": [
+        { "item": "minecraft:white_wool", "count": [12, 24], "payment": [2, 3], "weight": 3 },
+        { "item": "minecraft:black_wool", "count": [8, 16], "payment": [1, 2], "weight": 1 },
+        { "item": "minecraft:brown_wool", "count": [8, 16], "payment": [1, 2], "weight": 1 },
+        { "item": "minecraft:wheat", "count": [16, 30], "payment": [2, 3], "weight": 2 }
+    ]
+}

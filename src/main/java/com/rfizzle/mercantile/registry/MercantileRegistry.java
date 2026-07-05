@@ -4,6 +4,7 @@ import com.rfizzle.mercantile.Mercantile;
 import com.rfizzle.mercantile.block.SentryPylonBlock;
 import com.rfizzle.mercantile.block.SentryPylonBlockEntity;
 import com.rfizzle.mercantile.config.MercantileConfig;
+import com.rfizzle.mercantile.contract.DeliveryContractItem;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
@@ -42,6 +43,9 @@ public final class MercantileRegistry {
     // Keepsake dropped when a named villager dies; identity lives in its data components.
     public static final Item MEMORIAL = new Item(new Item.Properties());
 
+    // Written delivery contract (issue #86); terms live in its data components.
+    public static final Item DELIVERY_CONTRACT = new DeliveryContractItem(new Item.Properties().stacksTo(1));
+
     private static boolean registered = false;
 
     private MercantileRegistry() {
@@ -53,6 +57,7 @@ public final class MercantileRegistry {
 
         registerBlock("sentry_pylon", SENTRY_PYLON, new Item.Properties());
         registerItem("memorial", MEMORIAL);
+        registerItem("delivery_contract", DELIVERY_CONTRACT);
 
         SENTRY_PYLON_BE = BlockEntityType.Builder
                 .of(SentryPylonBlockEntity::new, SENTRY_PYLON)

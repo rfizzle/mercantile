@@ -1,0 +1,8 @@
+{
+    "requests": [
+        { "item": "minecraft:coal", "count": [15, 28], "payment": [2, 3], "weight": 3 },
+        { "item": "minecraft:iron_ingot", "count": [4, 9], "payment": [2, 3], "weight": 2 },
+        { "item": "minecraft:flint", "count": [12, 24], "payment": [1, 2], "weight": 1 },
+        { "item": "minecraft:diamond", "count": [1, 2], "payment": [2, 4], "weight": 1 }
+    ]
+}

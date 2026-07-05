@@ -267,6 +267,16 @@
               "note": "Config: <code class='text-bone'>enableNitwitRehab</code>, <code class='text-bone'>nitwitRehabEmeraldCost</code> (default 16)"
             },
             {
+              "id": "delivery-contracts",
+              "title": "Delivery Contracts",
+              "html": [
+                "Villagers finally ask something of <em>you</em>. An employed villager occasionally rolls a delivery request — a speech-bubble cue floats over its head — and <strong class='text-bone'>sneak + using paper</strong> on it signs the contract (a plain paper click still trades as vanilla): one paper becomes a unique contract item recording a profession-appropriate request (32 wheat for a farmer, coal for an armorer), the emerald payment, the villager's name and last-known spot, and a deadline (default 2 in-game days). Right-click the contract in the air any time to print the full terms and live time remaining to chat.",
+                "While the contract is in your hand its villager <strong class='text-bone'>glows</strong> — an outline only you see, visible through walls, matched by contract id so it survives save/reload and even the pickup/place cycle. Deliver by right-clicking the payee with the contract in hand and the goods anywhere in your inventory: the items and contract are consumed, the emeralds are paid, and you earn a reputation bonus that — like curing and raid defense — bypasses the daily cap, bounded instead by its own per-day award count (default 3; later deliveries still pay emeralds). The wrong villager politely refuses, a short stock refuses without taking anything, and an expired contract simply crumbles away, no penalty.",
+                "Request pools are data-driven per profession via <code class='text-bone text-xs'>data/mercantile/contracts/&lt;profession&gt;.json</code> with the same replace/append semantics as the mod's other loaders — packs can retune requests, counts, payments, and weights, or give modded professions their own pools."
+              ],
+              "note": "Config: <code class='text-bone'>enableContracts</code>, <code class='text-bone'>contractOfferChance</code> (default 50), <code class='text-bone'>contractPaymentScale</code> (default 100), <code class='text-bone'>contractRepGain</code> (default 3), <code class='text-bone'>contractRepPerDay</code> (default 3), <code class='text-bone'>contractDeadlineDays</code> (default 2)"
+            },
+            {
               "id": "reputation-raid-trader",
               "title": "Raid Defense &amp; Traders",
               "html": [

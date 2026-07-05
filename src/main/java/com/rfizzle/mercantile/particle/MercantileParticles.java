@@ -23,6 +23,8 @@ public final class MercantileParticles {
     public static final SimpleParticleType WORKSTATION_UNCLAIMED = FabricParticleTypes.simple();
     // Teardrop shed by villagers mourning a nearby death.
     public static final SimpleParticleType GRIEF_TEAR = FabricParticleTypes.simple();
+    // Speech-bubble cue above a villager with a delivery-contract offer waiting (issue #86).
+    public static final SimpleParticleType CONTRACT_AVAILABLE = FabricParticleTypes.simple();
 
     public static void init() {
         Registry.register(BuiltInRegistries.PARTICLE_TYPE, Mercantile.id("cycle_glint"), CYCLE_GLINT);
@@ -35,6 +37,7 @@ public final class MercantileParticles {
         Registry.register(BuiltInRegistries.PARTICLE_TYPE, Mercantile.id("workstation_claimed"), WORKSTATION_CLAIMED);
         Registry.register(BuiltInRegistries.PARTICLE_TYPE, Mercantile.id("workstation_unclaimed"), WORKSTATION_UNCLAIMED);
         Registry.register(BuiltInRegistries.PARTICLE_TYPE, Mercantile.id("grief_tear"), GRIEF_TEAR);
+        Registry.register(BuiltInRegistries.PARTICLE_TYPE, Mercantile.id("contract_available"), CONTRACT_AVAILABLE);
     }
 
     private MercantileParticles() {

@@ -21,6 +21,7 @@
         "ThrownPotionSplashMixin",
         "VillagerAccessor",
         "VillagerBabyFeedMixin",
+        "VillagerContractMixin",
         "VillagerDoorMixin",
         "VillagerFollowMixin",
         "VillagerFollowPushMixin",

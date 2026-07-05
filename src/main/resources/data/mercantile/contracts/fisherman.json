@@ -1,0 +1,9 @@
+{
+    "requests": [
+        { "item": "minecraft:string", "count": [12, 20], "payment": [2, 3], "weight": 3 },
+        { "item": "minecraft:coal", "count": [10, 16], "payment": [1, 2], "weight": 2 },
+        { "item": "minecraft:salmon", "count": [8, 13], "payment": [1, 2], "weight": 1 },
+        { "item": "minecraft:cod", "count": [10, 15], "payment": [1, 2], "weight": 1 },
+        { "item": "minecraft:oak_boat", "count": 1, "payment": [1, 2], "weight": 1 }
+    ]
+}

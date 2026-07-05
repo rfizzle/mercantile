@@ -34,10 +34,11 @@ import java.util.Optional;
  * in creative). The item identifies the job and is never consumed. The item-hand guards across
  * the mobInteract mixins are mutually exclusive: {@link VillagerPickupMixin} requires an empty
  * hand, {@link VillagerFollowMixin} requires an emerald, {@link VillagerBabyFeedMixin} requires a
- * villager breeding food, {@link VillagerNitwitRehabMixin} requires a golden apple, and this
+ * villager breeding food, {@link VillagerNitwitRehabMixin} requires a golden apple,
+ * {@link VillagerContractMixin} requires paper or the delivery-contract item, and this
  * mixin requires a workstation block item (an acquirable job-site POI block — never empty, an
- * emerald, food, or a golden apple). Future authors must preserve this invariant so no two
- * mobInteract injections can fire for the same interaction.
+ * emerald, food, a golden apple, paper, or a contract). Future authors must preserve this
+ * invariant so no two mobInteract injections can fire for the same interaction.
  */
 @Mixin(Villager.class)
 public abstract class VillagerWorkOrderMixin extends AbstractVillager {

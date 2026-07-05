@@ -1,0 +1,9 @@
+{
+    "requests": [
+        { "item": "minecraft:paper", "count": [24, 48], "payment": [2, 3], "weight": 3 },
+        { "item": "minecraft:book", "count": [4, 8], "payment": [2, 3], "weight": 2 },
+        { "item": "minecraft:ink_sac", "count": [5, 10], "payment": [2, 3], "weight": 1 },
+        { "item": "minecraft:glass", "count": [8, 16], "payment": [1, 2], "weight": 1 },
+        { "item": "minecraft:writable_book", "count": [1, 2], "payment": [2, 3], "weight": 1 }
+    ]
+}

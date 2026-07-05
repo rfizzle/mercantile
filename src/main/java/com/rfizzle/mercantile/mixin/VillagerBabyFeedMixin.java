@@ -28,8 +28,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * guards across the mobInteract mixins are mutually exclusive: {@link VillagerPickupMixin}
  * requires an empty hand, {@link VillagerFollowMixin} requires an emerald,
  * {@link VillagerNitwitRehabMixin} requires a golden apple on a nitwit (never a villager food),
- * {@link VillagerWorkOrderMixin} requires a workstation block item, and this mixin requires a
- * baby villager and a villager food item in the main hand. Future
+ * {@link VillagerWorkOrderMixin} requires a workstation block item, {@link VillagerContractMixin}
+ * requires paper or the delivery-contract item (and never fires on a baby), and this mixin
+ * requires a baby villager and a villager food item in the main hand. Future
  * authors must preserve this invariant so no two mobInteract injections can fire for the same
  * interaction.
  */

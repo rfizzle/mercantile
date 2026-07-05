@@ -15,7 +15,7 @@ import com.rfizzle.mercantile.Mercantile;
  */
 final class ConfigMigrator {
 
-    static final int CURRENT_VERSION = 9;
+    static final int CURRENT_VERSION = 10;
 
     @FunctionalInterface
     interface Migration {
@@ -85,6 +85,16 @@ final class ConfigMigrator {
             MercantileConfig defaults = new MercantileConfig();
             addIfAbsent(json, "enableWorkOrders", defaults.enableWorkOrders);
             addIfAbsent(json, "workOrderEmeraldCost", defaults.workOrderEmeraldCost);
+        },
+        // v9 -> v10: delivery contract fields, seeded at their defaults.
+        json -> {
+            MercantileConfig defaults = new MercantileConfig();
+            addIfAbsent(json, "enableContracts", defaults.enableContracts);
+            addIfAbsent(json, "contractOfferChance", defaults.contractOfferChance);
+            addIfAbsent(json, "contractPaymentScale", defaults.contractPaymentScale);
+            addIfAbsent(json, "contractRepGain", defaults.contractRepGain);
+            addIfAbsent(json, "contractRepPerDay", defaults.contractRepPerDay);
+            addIfAbsent(json, "contractDeadlineDays", defaults.contractDeadlineDays);
         },
     };
 

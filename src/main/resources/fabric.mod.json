@@ -67,7 +67,8 @@
             "com.rfizzle.mercantile.gametest.MemorialGameTest",
             "com.rfizzle.mercantile.gametest.FearMarkupGameTest",
             "com.rfizzle.mercantile.gametest.TradePinGameTest",
-            "com.rfizzle.mercantile.gametest.WorkOrderGameTest"
+            "com.rfizzle.mercantile.gametest.WorkOrderGameTest",
+            "com.rfizzle.mercantile.gametest.ContractGameTest"
         ]
     },
     "custom": {

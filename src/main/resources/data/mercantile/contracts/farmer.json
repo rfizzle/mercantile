@@ -1,0 +1,11 @@
+{
+    "requests": [
+        { "item": "minecraft:wheat", "count": [24, 48], "payment": [3, 4], "weight": 3 },
+        { "item": "minecraft:carrot", "count": [24, 44], "payment": [2, 3], "weight": 2 },
+        { "item": "minecraft:potato", "count": [24, 44], "payment": [2, 3], "weight": 2 },
+        { "item": "minecraft:beetroot", "count": [16, 30], "payment": [2, 3], "weight": 1 },
+        { "item": "minecraft:pumpkin", "count": [6, 12], "payment": [2, 3], "weight": 1 },
+        { "item": "minecraft:melon", "count": [4, 10], "payment": [3, 4], "weight": 1 },
+        { "item": "minecraft:bone_meal", "count": [16, 32], "payment": [2, 3], "weight": 1 }
+    ]
+}

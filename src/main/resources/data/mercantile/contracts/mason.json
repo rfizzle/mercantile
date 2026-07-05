@@ -1,0 +1,10 @@
+{
+    "requests": [
+        { "item": "minecraft:clay_ball", "count": [16, 32], "payment": [3, 4], "weight": 3 },
+        { "item": "minecraft:stone", "count": [32, 64], "payment": [2, 4], "weight": 2 },
+        { "item": "minecraft:granite", "count": [16, 32], "payment": [2, 3], "weight": 1 },
+        { "item": "minecraft:diorite", "count": [16, 32], "payment": [2, 3], "weight": 1 },
+        { "item": "minecraft:andesite", "count": [16, 32], "payment": [2, 3], "weight": 1 },
+        { "item": "minecraft:quartz", "count": [8, 14], "payment": [1, 2], "weight": 1 }
+    ]
+}
