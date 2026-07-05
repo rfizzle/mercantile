@@ -62,7 +62,8 @@
             "com.rfizzle.mercantile.gametest.SentryPylonBellGameTest",
             "com.rfizzle.mercantile.gametest.SentryPylonTribulationGameTest",
             "com.rfizzle.mercantile.gametest.WanderingTraderReputationGameTest",
-            "com.rfizzle.mercantile.gametest.BabyFeedingGameTest"
+            "com.rfizzle.mercantile.gametest.BabyFeedingGameTest",
+            "com.rfizzle.mercantile.gametest.NitwitRehabGameTest"
         ]
     },
     "custom": {

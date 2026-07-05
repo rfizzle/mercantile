@@ -26,9 +26,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * food item in the main hand is consumed and removes a food-value-weighted percentage of the
  * remaining growth time, up to a per-baby cumulative cap (see {@link BabyFeeding}). The item-hand
  * guards across the mobInteract mixins are mutually exclusive: {@link VillagerPickupMixin}
- * requires an empty hand, {@link VillagerFollowMixin} requires an emerald, and this mixin
- * requires a baby villager and a villager food item in the main hand. Future authors must
- * preserve this invariant so no two mobInteract injections can fire for the same interaction.
+ * requires an empty hand, {@link VillagerFollowMixin} requires an emerald,
+ * {@link VillagerNitwitRehabMixin} requires a golden apple on a nitwit (never a villager food),
+ * and this mixin requires a baby villager and a villager food item in the main hand. Future
+ * authors must preserve this invariant so no two mobInteract injections can fire for the same
+ * interaction.
  */
 @Mixin(Villager.class)
 public abstract class VillagerBabyFeedMixin extends AbstractVillager {

@@ -4,6 +4,7 @@ import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.VillagerPickupHelper;
 import com.rfizzle.mercantile.follow.FollowManager;
 import com.rfizzle.mercantile.particle.MercantileParticles;
+import com.rfizzle.mercantile.rehab.NitwitRehabManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -26,8 +27,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * villager pickup via shift+right-click with an empty hand. Runs before
  * {@link VillagerFollowMixin} (priority 1100) because pickup discards the entity and its
  * early-exit guards (raid check, trading-player check) should evaluate first. The item-hand
- * guards are mutually exclusive: this mixin requires an empty hand; VillagerFollowMixin
- * requires an emerald. Future authors must preserve this invariant to avoid double-cancel.
+ * guards are mutually exclusive: this mixin requires an empty hand; {@link VillagerFollowMixin}
+ * requires an emerald, {@link VillagerBabyFeedMixin} a villager breeding food on a baby, and
+ * {@link VillagerNitwitRehabMixin} a golden apple on a nitwit. Future authors must preserve this
+ * invariant to avoid double-cancel.
  */
 @Mixin(Villager.class)
 public abstract class VillagerPickupMixin {
@@ -63,6 +66,16 @@ public abstract class VillagerPickupMixin {
         if (self.getTradingPlayer() != null && self.getTradingPlayer() != player) {
             serverPlayer.displayClientMessage(
                     Component.translatable("mercantile.pickup.denied.trading")
+                            .withStyle(ChatFormatting.RED), true);
+            cir.setReturnValue(InteractionResult.FAIL);
+            return;
+        }
+
+        // A paid rehab is mid-delay: discarding the entity now would forfeit the payment, since
+        // pickup strips the UUID the pending conversion is keyed on.
+        if (NitwitRehabManager.isPending(self.getUUID())) {
+            serverPlayer.displayClientMessage(
+                    Component.translatable("mercantile.pickup.denied.rehab")
                             .withStyle(ChatFormatting.RED), true);
             cir.setReturnValue(InteractionResult.FAIL);
             return;

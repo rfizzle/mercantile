@@ -14,6 +14,7 @@ import com.rfizzle.mercantile.mood.MoodManager;
 import com.rfizzle.mercantile.network.MercantileNetworking;
 import com.rfizzle.mercantile.particle.MercantileParticles;
 import com.rfizzle.mercantile.registry.MercantileRegistry;
+import com.rfizzle.mercantile.rehab.NitwitRehabManager;
 import com.rfizzle.mercantile.reputation.ExclusiveTradesManager;
 import com.rfizzle.mercantile.reputation.ReputationManager;
 import com.rfizzle.mercantile.trade.index.TradeIndexDataSource;
@@ -42,6 +43,7 @@ public class Mercantile implements ModInitializer {
         VillagerHeadTextures.init();
         VillagerNameManager.init();
         FollowManager.init();
+        NitwitRehabManager.init();
         MercantileParticles.init();
         MercantileNetworking.init();
         MercantileCommands.init();

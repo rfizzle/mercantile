@@ -122,6 +122,10 @@ public class MercantileConfig {
     public int marketDayIntervalDays = 7;
     public int marketDayDiscountPercent = 5;
 
+    // Nitwit Rehabilitation
+    public boolean enableNitwitRehab = true;
+    public int nitwitRehabEmeraldCost = 16;
+
     // --- Client Config ---
 
     public float villagerSoundVolume = 1.0f;
@@ -173,6 +177,7 @@ public class MercantileConfig {
         moodRecalcIntervalTicks = Math.clamp(moodRecalcIntervalTicks, 20, 24_000);
         marketDayIntervalDays = Math.clamp(marketDayIntervalDays, 1, 1_000);
         marketDayDiscountPercent = Math.clamp(marketDayDiscountPercent, 0, 100);
+        nitwitRehabEmeraldCost = Math.clamp(nitwitRehabEmeraldCost, 0, Integer.MAX_VALUE);
         villagerSoundVolume = Math.clamp(villagerSoundVolume, 0.0f, 1.0f);
         // Gson leaves enum fields null on unknown/missing values.
         if (hudAnchor == null) hudAnchor = Anchor.TOP_LEFT;
