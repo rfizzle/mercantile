@@ -89,6 +89,17 @@ public final class ReputationHudOverlay {
     }
 
     private static boolean shouldRender(Minecraft mc) {
+        if (!hudGateVisible(mc)) return false;
+        return villagerNearby(mc.level, mc.player);
+    }
+
+    /**
+     * The shared HUD-STANDARD §5 visibility gate plus both reputation toggles,
+     * excluding the badge's villager-proximity requirement. The hold-to-peek
+     * detail panel ({@link ReputationDetailPanelRenderer}) reuses this so the
+     * badge and its panel can't drift out of sync — a change here governs both.
+     */
+    static boolean hudGateVisible(Minecraft mc) {
         if (mc == null) return false;
         LocalPlayer player = mc.player;
         ClientLevel level = mc.level;
@@ -101,8 +112,7 @@ public final class ReputationHudOverlay {
         if (player.isDeadOrDying()) return false;
         if (!MercantileConfig.get().enableReputationHud) return false;
         MercantileConfig synced = ClientMercantileData.getServerConfig();
-        if (synced != null && !synced.enableReputation) return false;
-        return villagerNearby(level, player);
+        return synced == null || synced.enableReputation;
     }
 
     private static boolean villagerNearby(ClientLevel level, LocalPlayer player) {
