@@ -40,9 +40,9 @@ import java.util.Set;
  * emerald-toggle follow mode. Runs after {@link VillagerPickupMixin} (priority 900). The
  * item-hand guards are mutually exclusive: this mixin requires an emerald in the main hand;
  * {@link VillagerPickupMixin} requires an empty hand, {@link VillagerBabyFeedMixin} a villager
- * breeding food on a baby, and {@link VillagerNitwitRehabMixin} a golden apple on a nitwit.
- * Future authors must preserve this invariant so no two injections can fire for the same
- * interaction.
+ * breeding food on a baby, {@link VillagerNitwitRehabMixin} a golden apple on a nitwit, and
+ * {@link VillagerWorkOrderMixin} a workstation block item. Future authors must preserve this
+ * invariant so no two injections can fire for the same interaction.
  */
 @Mixin(Villager.class)
 public abstract class VillagerFollowMixin extends AbstractVillager implements FollowableVillager {

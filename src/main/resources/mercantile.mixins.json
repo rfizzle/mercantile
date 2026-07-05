@@ -37,6 +37,7 @@
         "VillagerRestockMoodMixin",
         "VillagerRestockNotifyMixin",
         "VillagerTradeOpenMixin",
+        "VillagerWorkOrderMixin",
         "WanderingTraderPickupMixin",
         "WanderingTraderTradeOpenMixin",
         "ZombieVillagerCureMixin",

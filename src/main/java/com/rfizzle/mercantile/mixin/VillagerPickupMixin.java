@@ -28,9 +28,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * {@link VillagerFollowMixin} (priority 1100) because pickup discards the entity and its
  * early-exit guards (raid check, trading-player check) should evaluate first. The item-hand
  * guards are mutually exclusive: this mixin requires an empty hand; {@link VillagerFollowMixin}
- * requires an emerald, {@link VillagerBabyFeedMixin} a villager breeding food on a baby, and
- * {@link VillagerNitwitRehabMixin} a golden apple on a nitwit. Future authors must preserve this
- * invariant to avoid double-cancel.
+ * requires an emerald, {@link VillagerBabyFeedMixin} a villager breeding food on a baby,
+ * {@link VillagerNitwitRehabMixin} a golden apple on a nitwit, and {@link VillagerWorkOrderMixin}
+ * a workstation block item. Future authors must preserve this invariant to avoid double-cancel.
  */
 @Mixin(Villager.class)
 public abstract class VillagerPickupMixin {

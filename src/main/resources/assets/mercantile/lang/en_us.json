@@ -115,6 +115,10 @@
     "mercantile.config.enableBulkTrading.tooltip": "Shift-click to execute a trade multiple times",
     "mercantile.config.enableProfessionLock": "Enable Profession Lock",
     "mercantile.config.enableProfessionLock.tooltip": "Lock villager professions after trading",
+    "mercantile.config.enableWorkOrders": "Enable Work Orders",
+    "mercantile.config.enableWorkOrders.tooltip": "Sneak + right-click an unemployed villager with a workstation item to send it to claim the nearest unclaimed workstation of that type",
+    "mercantile.config.workOrderEmeraldCost": "Work Order Emerald Cost",
+    "mercantile.config.workOrderEmeraldCost.tooltip": "Emeralds drawn from the player's inventory per accepted work order (0 makes orders free; creative always waived)",
     "mercantile.config.enableHealing": "Enable Villager Healing",
     "mercantile.config.enableHealing.tooltip": "Apply healing/regen multiplier to villagers hit by splash or lingering potions",
     "mercantile.config.healingMultiplier": "Healing Multiplier",
@@ -205,6 +209,10 @@
     "mercantile.rehab.denied.baby": "Baby nitwits must grow up before they can be rehabilitated",
     "mercantile.rehab.denied.reputation": "You must be %s with villagers to rehabilitate a nitwit",
     "mercantile.rehab.denied.cost": "Rehabilitating a nitwit costs %s emeralds",
+
+    "mercantile.workorder.accepted": "Work order accepted — the villager heads for the %s",
+    "mercantile.workorder.denied.no_workstation": "No unclaimed %s within range",
+    "mercantile.workorder.denied.cost": "A work order costs %s emeralds",
 
     "mercantile.memorial.name": "Memorial of %s",
     "mercantile.memorial.lore.profession_level": "%1$s — %2$s",
