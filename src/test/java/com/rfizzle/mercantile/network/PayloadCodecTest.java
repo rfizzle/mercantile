@@ -44,6 +44,36 @@ class PayloadCodecTest {
         assertEquals(original, roundTrip(RequestWorkstationMapC2SPayload.CODEC, original));
     }
 
+    @Test
+    void pinTradeC2S() {
+        var original = new PinTradeC2SPayload(42, 3);
+        assertEquals(original, roundTrip(PinTradeC2SPayload.CODEC, original));
+    }
+
+    @Test
+    void tradePinsS2C() {
+        var original = new TradePinsS2CPayload(42, List.of(true, false, true, false, false));
+        assertEquals(original, roundTrip(TradePinsS2CPayload.CODEC, original));
+    }
+
+    @Test
+    void tradePinsS2CEmpty() {
+        var original = new TradePinsS2CPayload(42, List.of());
+        assertEquals(original, roundTrip(TradePinsS2CPayload.CODEC, original));
+    }
+
+    @Test
+    void tradePinsS2CRejectsOversizedList() {
+        List<Boolean> oversized = new ArrayList<>();
+        for (int i = 0; i < TradePinsS2CPayload.MAX_OFFERS + 1; i++) {
+            oversized.add(true);
+        }
+        var original = new TradePinsS2CPayload(42, oversized);
+        FriendlyByteBuf buf = buf();
+        assertThrows(EncoderException.class, () -> TradePinsS2CPayload.CODEC.encode(buf, original),
+                "lists beyond MAX_OFFERS must be rejected at encode time");
+    }
+
     // --- S2C payloads ---
 
     @Test

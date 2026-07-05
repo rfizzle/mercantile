@@ -65,7 +65,8 @@
             "com.rfizzle.mercantile.gametest.BabyFeedingGameTest",
             "com.rfizzle.mercantile.gametest.NitwitRehabGameTest",
             "com.rfizzle.mercantile.gametest.MemorialGameTest",
-            "com.rfizzle.mercantile.gametest.FearMarkupGameTest"
+            "com.rfizzle.mercantile.gametest.FearMarkupGameTest",
+            "com.rfizzle.mercantile.gametest.TradePinGameTest"
         ]
     },
     "custom": {

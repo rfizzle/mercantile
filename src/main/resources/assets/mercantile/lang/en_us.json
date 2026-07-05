@@ -9,9 +9,21 @@
     "command.mercantile.reputation.set": "Set %s's reputation to %s (%s)",
     "command.mercantile.reputation.add": "Added %s reputation to %s, now %s (%s)",
     "command.mercantile.reputation.not_player": "This command must be run by a player",
+    "command.mercantile.pins.disabled": "Trade pinning is disabled on this server",
+    "command.mercantile.pins.empty": "You have no pinned trades",
+    "command.mercantile.pins.header": "Pinned trades (%1$s/%2$s):",
+    "command.mercantile.pins.entry": "%1$s. %2$s: %3$s [%4$s]",
+    "command.mercantile.pins.removed": "Unpinned %1$s: %2$s",
+    "command.mercantile.pins.bad_index": "No pin with that number — you have %s pin(s)",
+    "command.mercantile.pins.status.in_stock": "in stock",
+    "command.mercantile.pins.status.out_of_stock": "out of stock",
+    "command.mercantile.pins.status.unknown": "unknown",
+    "command.mercantile.pins.cleared": "Cleared %s pinned trade(s)",
     "gui.mercantile.reroll_trades": "Re-roll Trades",
     "gui.mercantile.reroll_trades.tooltip": "Re-roll unlocked trades (%s emeralds)",
     "gui.mercantile.reputation": "Reputation: %s",
+    "gui.mercantile.pin.tooltip.pinned": "Unpin this trade",
+    "gui.mercantile.pin.tooltip.unpinned": "Pin this trade to be notified when it restocks",
 
     "mercantile.config.title": "Mercantile Settings",
 
@@ -111,6 +123,12 @@
     "mercantile.config.enableRestockIndicator.tooltip": "Show restock timer in the trade GUI",
     "mercantile.config.enableDemandTransparency": "Enable Demand Transparency",
     "mercantile.config.enableDemandTransparency.tooltip": "Show price breakdown tooltip in the trade GUI",
+    "mercantile.config.enableTradePinning": "Enable Trade Pinning",
+    "mercantile.config.enableTradePinning.tooltip": "Pin trades in the trade GUI and get an action-bar notice when they restock nearby",
+    "mercantile.config.maxPinnedTradesPerPlayer": "Max Pins Per Player",
+    "mercantile.config.maxPinnedTradesPerPlayer.tooltip": "Cap on pinned trades each player may hold (1-64)",
+    "mercantile.config.pinRestockNotifyRange": "Pin Notify Range",
+    "mercantile.config.pinRestockNotifyRange.tooltip": "Max distance in blocks between player and villager for a restock notification (8-256)",
 
     "mercantile.config.enableSentryPylon": "Enable Sentry Pylon",
     "mercantile.config.enableSentryPylon.tooltip": "Enable the sentry pylon block and crafting recipe",
@@ -311,6 +329,8 @@
     "mercantile.config.moodAmbientParticles.tooltip": "Happy villagers occasionally emit happy particles; Miserable ones emit angry particles",
 
     "mercantile.message.market_day": "Market day! Trades are discounted and villagers restock more.",
+    "mercantile.message.trade_restocked": "%1$s restocked: %2$s",
+    "mercantile.message.pin_cap": "Pin limit reached (%s) — unpin a trade first",
 
     "mercantile.config.category.memorial": "Memorials & Fear",
     "mercantile.config.enableMemorials": "Enable Memorials",

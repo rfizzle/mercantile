@@ -137,6 +137,11 @@ public class MercantileConfig {
     public int fearMarkupPercent = 25;
     public int fearMarkupDurationDays = 3;
 
+    // Trade Pinning
+    public boolean enableTradePinning = true;
+    public int maxPinnedTradesPerPlayer = 10;
+    public int pinRestockNotifyRange = 128;
+
     // --- Client Config ---
 
     public float villagerSoundVolume = 1.0f;
@@ -193,6 +198,10 @@ public class MercantileConfig {
         fearKillWindowMinutes = Math.clamp(fearKillWindowMinutes, 1, 120);
         fearMarkupPercent = Math.clamp(fearMarkupPercent, 0, 200);
         fearMarkupDurationDays = Math.clamp(fearMarkupDurationDays, 1, 30);
+        // Upper bound matches PlayerData.MAX_PINNED_TRADES so the configurable cap can never
+        // exceed the persisted hard bound.
+        maxPinnedTradesPerPlayer = Math.clamp(maxPinnedTradesPerPlayer, 1, 64);
+        pinRestockNotifyRange = Math.clamp(pinRestockNotifyRange, 8, 256);
         villagerSoundVolume = Math.clamp(villagerSoundVolume, 0.0f, 1.0f);
         // Gson leaves enum fields null on unknown/missing values.
         if (hudAnchor == null) hudAnchor = Anchor.TOP_LEFT;

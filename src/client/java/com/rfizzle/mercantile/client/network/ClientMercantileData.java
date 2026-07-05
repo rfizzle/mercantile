@@ -19,6 +19,7 @@ public class ClientMercantileData {
     private static @Nullable RestockTimerS2CPayload restockTimer;
     private static @Nullable DemandPriceS2CPayload demandPrice;
     private static @Nullable VillagerInfoPanelS2CPayload villagerInfo;
+    private static @Nullable TradePinsS2CPayload tradePins;
 
     private static @Nullable WorkstationMapS2CPayload workstationMap;
     private static final Map<Integer, Boolean> followStates = new HashMap<>();
@@ -104,6 +105,23 @@ public class ClientMercantileData {
         demandPrice = payload;
     }
 
+    public static @Nullable TradePinsS2CPayload getTradePins() {
+        return tradePins;
+    }
+
+    /**
+     * Protocol invariant: same villager-switch rule as {@link #setRestockTimer} —
+     * a pin payload for a villager other than the currently stored {@link #villagerInfo}
+     * is dropped; if info has not yet arrived it is accepted and reconciled on arrival.
+     */
+    public static void setTradePins(@Nullable TradePinsS2CPayload payload) {
+        if (payload != null && villagerInfo != null
+                && villagerInfo.villagerEntityId() != payload.villagerEntityId()) {
+            return;
+        }
+        tradePins = payload;
+    }
+
     public static @Nullable VillagerInfoPanelS2CPayload getVillagerInfo() {
         return villagerInfo;
     }
@@ -116,6 +134,9 @@ public class ClientMercantileData {
             if (demandPrice != null && demandPrice.villagerEntityId() != payload.villagerEntityId()) {
                 demandPrice = null;
             }
+            if (tradePins != null && tradePins.villagerEntityId() != payload.villagerEntityId()) {
+                tradePins = null;
+            }
         }
         villagerInfo = payload;
     }
@@ -124,6 +145,7 @@ public class ClientMercantileData {
         restockTimer = null;
         demandPrice = null;
         villagerInfo = null;
+        tradePins = null;
     }
 
     // --- Visualization ---
@@ -184,6 +206,7 @@ public class ClientMercantileData {
         restockTimer = null;
         demandPrice = null;
         villagerInfo = null;
+        tradePins = null;
         workstationMap = null;
         followStates.clear();
         followCount = 0;

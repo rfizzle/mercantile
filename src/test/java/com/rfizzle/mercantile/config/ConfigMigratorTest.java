@@ -201,6 +201,46 @@ class ConfigMigratorTest {
     }
 
     @Test
+    void v7FileGainsTradePinningFieldsAtDefaults() {
+        JsonObject raw = parse("""
+                {
+                  "configVersion": 7,
+                  "enableMemorials": false
+                }
+                """);
+
+        boolean migrated = ConfigMigrator.migrate(raw);
+        MercantileConfig defaults = new MercantileConfig();
+
+        assertTrue(migrated, "a v7 file must migrate to v8");
+        assertEquals(ConfigMigrator.CURRENT_VERSION, raw.get("configVersion").getAsInt());
+        assertEquals(defaults.enableTradePinning, raw.get("enableTradePinning").getAsBoolean());
+        assertEquals(defaults.maxPinnedTradesPerPlayer, raw.get("maxPinnedTradesPerPlayer").getAsInt());
+        assertEquals(defaults.pinRestockNotifyRange, raw.get("pinRestockNotifyRange").getAsInt());
+        // Existing fields are carried forward untouched.
+        assertFalse(raw.get("enableMemorials").getAsBoolean());
+    }
+
+    @Test
+    void tradePinningMigrationPreservesExplicitValues() {
+        JsonObject raw = parse("""
+                {
+                  "configVersion": 7,
+                  "enableTradePinning": false,
+                  "maxPinnedTradesPerPlayer": 5
+                }
+                """);
+
+        ConfigMigrator.migrate(raw);
+
+        assertFalse(raw.get("enableTradePinning").getAsBoolean(),
+                "an explicitly set enableTradePinning must not be overwritten by the migration");
+        assertEquals(5, raw.get("maxPinnedTradesPerPlayer").getAsInt());
+        assertEquals(new MercantileConfig().pinRestockNotifyRange, raw.get("pinRestockNotifyRange").getAsInt(),
+                "the absent field must still be seeded at its default alongside preserved keys");
+    }
+
+    @Test
     void memorialFearMigrationPreservesExplicitValues() {
         JsonObject raw = parse("""
                 {

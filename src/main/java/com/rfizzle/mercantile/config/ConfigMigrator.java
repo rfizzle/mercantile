@@ -15,7 +15,7 @@ import com.rfizzle.mercantile.Mercantile;
  */
 final class ConfigMigrator {
 
-    static final int CURRENT_VERSION = 7;
+    static final int CURRENT_VERSION = 8;
 
     @FunctionalInterface
     interface Migration {
@@ -72,6 +72,13 @@ final class ConfigMigrator {
             addIfAbsent(json, "fearKillWindowMinutes", defaults.fearKillWindowMinutes);
             addIfAbsent(json, "fearMarkupPercent", defaults.fearMarkupPercent);
             addIfAbsent(json, "fearMarkupDurationDays", defaults.fearMarkupDurationDays);
+        },
+        // v7 -> v8: trade pinning fields, seeded at their defaults.
+        json -> {
+            MercantileConfig defaults = new MercantileConfig();
+            addIfAbsent(json, "enableTradePinning", defaults.enableTradePinning);
+            addIfAbsent(json, "maxPinnedTradesPerPlayer", defaults.maxPinnedTradesPerPlayer);
+            addIfAbsent(json, "pinRestockNotifyRange", defaults.pinRestockNotifyRange);
         },
     };
 

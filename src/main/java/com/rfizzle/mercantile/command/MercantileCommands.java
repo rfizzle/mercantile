@@ -5,9 +5,11 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.rfizzle.mercantile.api.ReputationTier;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
+import com.rfizzle.mercantile.data.PinnedTrade;
 import com.rfizzle.mercantile.data.PlayerData;
 import com.rfizzle.mercantile.network.ConfigSyncS2CPayload;
 import com.rfizzle.mercantile.reputation.ReputationManager;
+import com.rfizzle.mercantile.trade.OfferIdentityHash;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.commands.CommandSourceStack;
@@ -15,6 +17,10 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.item.trading.MerchantOffer;
+
+import java.util.List;
 
 public final class MercantileCommands {
 
@@ -55,9 +61,110 @@ public final class MercantileCommands {
                                 .requires(src -> src.hasPermission(2))
                                 .executes(ctx -> showPlayerReputation(ctx.getSource(),
                                         EntityArgument.getPlayer(ctx, "player")))))
+                .then(Commands.literal("pins")
+                        .executes(ctx -> listPins(ctx.getSource()))
+                        .then(Commands.literal("remove")
+                                .then(Commands.argument("index",
+                                                IntegerArgumentType.integer(1, PlayerData.MAX_PINNED_TRADES))
+                                        .executes(ctx -> removePin(ctx.getSource(),
+                                                IntegerArgumentType.getInteger(ctx, "index")))))
+                        .then(Commands.literal("clear")
+                                .executes(ctx -> clearPins(ctx.getSource()))))
                 .then(Commands.literal("reload")
                         .requires(src -> src.hasPermission(2))
                         .executes(ctx -> reloadConfig(ctx.getSource()))));
+    }
+
+    private static int listPins(CommandSourceStack source) {
+        ServerPlayer player = source.getPlayer();
+        if (player == null) {
+            source.sendFailure(Component.translatable("command.mercantile.reputation.not_player"));
+            return 0;
+        }
+        if (!MercantileConfig.get().enableTradePinning) {
+            source.sendFailure(Component.translatable("command.mercantile.pins.disabled"));
+            return 0;
+        }
+
+        PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
+
+        // Lazy prune: a pin whose villager is loaded here but no longer sells the offer is dead.
+        for (PinnedTrade pin : List.copyOf(data.getPinnedTrades())) {
+            if (findOffer(player, pin) == PinTarget.OFFER_GONE) {
+                data.removePinnedTrade(pin.villagerUuid(), pin.offerHash());
+            }
+        }
+
+        List<PinnedTrade> pins = data.getPinnedTrades();
+        if (pins.isEmpty()) {
+            source.sendSuccess(() -> Component.translatable("command.mercantile.pins.empty"), false);
+            return 0;
+        }
+
+        int cap = MercantileConfig.get().maxPinnedTradesPerPlayer;
+        source.sendSuccess(() -> Component.translatable("command.mercantile.pins.header",
+                pins.size(), cap), false);
+        for (int i = 0; i < pins.size(); i++) {
+            PinnedTrade pin = pins.get(i);
+            PinTarget target = findOffer(player, pin);
+            Component status = Component.translatable(switch (target) {
+                case IN_STOCK -> "command.mercantile.pins.status.in_stock";
+                case OUT_OF_STOCK -> "command.mercantile.pins.status.out_of_stock";
+                default -> "command.mercantile.pins.status.unknown";
+            });
+            int index = i + 1;
+            source.sendSuccess(() -> Component.translatable("command.mercantile.pins.entry",
+                    index, pin.villagerName(), pin.tradeSummary(), status), false);
+        }
+        return pins.size();
+    }
+
+    // Not gated on enableTradePinning: remove/clear stay available as an escape hatch so
+    // pins (which occupy cap slots) can always be shed, even while the feature is off.
+    private static int removePin(CommandSourceStack source, int index) {
+        ServerPlayer player = source.getPlayer();
+        if (player == null) {
+            source.sendFailure(Component.translatable("command.mercantile.reputation.not_player"));
+            return 0;
+        }
+        PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
+        List<PinnedTrade> pins = data.getPinnedTrades();
+        if (index > pins.size()) {
+            source.sendFailure(Component.translatable("command.mercantile.pins.bad_index", pins.size()));
+            return 0;
+        }
+        PinnedTrade pin = pins.get(index - 1);
+        data.removePinnedTrade(pin.villagerUuid(), pin.offerHash());
+        source.sendSuccess(() -> Component.translatable("command.mercantile.pins.removed",
+                pin.villagerName(), pin.tradeSummary()), false);
+        return 1;
+    }
+
+    private static int clearPins(CommandSourceStack source) {
+        ServerPlayer player = source.getPlayer();
+        if (player == null) {
+            source.sendFailure(Component.translatable("command.mercantile.reputation.not_player"));
+            return 0;
+        }
+        PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
+        int cleared = data.clearPinnedTrades();
+        source.sendSuccess(() -> Component.translatable("command.mercantile.pins.cleared", cleared), false);
+        return cleared;
+    }
+
+    private enum PinTarget { IN_STOCK, OUT_OF_STOCK, OFFER_GONE, UNRESOLVED }
+
+    /** Resolves a pin against the player's current dimension; unloaded villagers stay UNRESOLVED. */
+    private static PinTarget findOffer(ServerPlayer player, PinnedTrade pin) {
+        if (!(player.serverLevel().getEntity(pin.villagerUuid()) instanceof Villager villager)) {
+            return PinTarget.UNRESOLVED;
+        }
+        for (MerchantOffer offer : villager.getOffers()) {
+            if (OfferIdentityHash.compute(offer).equals(pin.offerHash())) {
+                return offer.isOutOfStock() ? PinTarget.OUT_OF_STOCK : PinTarget.IN_STOCK;
+            }
+        }
+        return PinTarget.OFFER_GONE;
     }
 
     private static int showOwnReputation(CommandSourceStack source) {
