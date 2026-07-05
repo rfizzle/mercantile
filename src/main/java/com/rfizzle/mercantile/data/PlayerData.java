@@ -14,7 +14,11 @@ public class PlayerData {
     public static final int MAX_CURED_VILLAGERS = 1024;
     /** Max tracked trade-stat entries per player; bounded to keep serialized footprint predictable. */
     public static final int MAX_TRADE_STATS = 1024;
+    /** Max tracked fear-markup villages per player; bounded to keep serialized footprint predictable. */
+    public static final int MAX_FEAR_VILLAGES = 64;
 
+    // NOTE: RecordCodecBuilder.group is at its hard 16-field ceiling. The next field must
+    // first move a cohesive cluster (e.g. the daily counters) into a sub-record codec.
     public static final Codec<PlayerData> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
                     Codec.INT.optionalFieldOf("score", 0).forGetter(PlayerData::getScore),
@@ -36,7 +40,10 @@ public class PlayerData {
                     Codec.INT.optionalFieldOf("tradesSinceLastRepGain", 0).forGetter(PlayerData::getTradesSinceLastRepGain),
                     Codec.BOOL.optionalFieldOf("reputationMigrated", false).forGetter(PlayerData::isReputationMigrated),
                     Codec.BOOL.optionalFieldOf("dailyCapNotified", false).forGetter(PlayerData::isDailyCapNotified),
-                    Codec.INT.optionalFieldOf("dailyGratitudeGifts", 0).forGetter(PlayerData::getDailyGratitudeGifts)
+                    Codec.INT.optionalFieldOf("dailyGratitudeGifts", 0).forGetter(PlayerData::getDailyGratitudeGifts),
+                    Codec.unboundedMap(Codec.STRING, FearEntry.CODEC)
+                            .optionalFieldOf("fearByVillage", Map.of())
+                            .forGetter(PlayerData::getFearByVillage)
             ).apply(instance, PlayerData::new)
     );
 
@@ -55,15 +62,16 @@ public class PlayerData {
     private boolean reputationMigrated;
     private boolean dailyCapNotified;
     private int dailyGratitudeGifts;
+    private final LinkedHashMap<String, FearEntry> fearByVillage;
 
     public PlayerData() {
-        this(0, 0, -1L, Set.of(), Map.of(), 0, -1L, 0, 0, 0, -1L, 0, false, false, 0);
+        this(0, 0, -1L, Set.of(), Map.of(), 0, -1L, 0, 0, 0, -1L, 0, false, false, 0, Map.of());
     }
 
     public PlayerData(int score, int proximityTicks, long lastProximityDay, Set<UUID> curedVillagers, Map<UUID, Integer> tradeStats,
                       int dailyReputationEarned, long lastCapResetDay, int dailyTradeRep, int dailyCycleRep, int dailyGiftRep,
                       long lastDecayDay, int tradesSinceLastRepGain, boolean reputationMigrated, boolean dailyCapNotified,
-                      int dailyGratitudeGifts) {
+                      int dailyGratitudeGifts, Map<String, FearEntry> fearByVillage) {
         this.score = Math.clamp(score, MIN_SCORE, MAX_SCORE);
         this.proximityTicks = proximityTicks;
         this.lastProximityDay = lastProximityDay;
@@ -91,6 +99,29 @@ public class PlayerData {
         this.reputationMigrated = reputationMigrated;
         this.dailyCapNotified = dailyCapNotified;
         this.dailyGratitudeGifts = Math.max(0, dailyGratitudeGifts);
+        LinkedHashMap<String, FearEntry> fear = new LinkedHashMap<>(fearByVillage);
+        while (fear.size() > MAX_FEAR_VILLAGES) {
+            evictLeastRecentlyActiveFearEntry(fear);
+        }
+        this.fearByVillage = fear;
+    }
+
+    // Eviction goes by entry activity, not map order: Codec.unboundedMap round-trips through
+    // a hash-ordered map, so insertion order does not survive a reload — and evicting the
+    // least-recently-active entry keeps a live markup from being pushed out by fresh blanks.
+    private static void evictLeastRecentlyActiveFearEntry(LinkedHashMap<String, FearEntry> map) {
+        String victim = null;
+        long oldest = Long.MAX_VALUE;
+        for (Map.Entry<String, FearEntry> entry : map.entrySet()) {
+            long activity = entry.getValue().lastActivityGameTime();
+            if (activity < oldest) {
+                oldest = activity;
+                victim = entry.getKey();
+            }
+        }
+        if (victim != null) {
+            map.remove(victim);
+        }
     }
 
     public int getScore() {
@@ -157,6 +188,33 @@ public class PlayerData {
         }
         int newVal = (existing == null ? 0 : existing) + 1;
         tradeStats.put(villagerUuid, newVal);
+    }
+
+    public Map<String, FearEntry> getFearByVillage() {
+        return Collections.unmodifiableMap(fearByVillage);
+    }
+
+    public boolean hasFearEntries() {
+        return !fearByVillage.isEmpty();
+    }
+
+    public FearEntry getFearEntry(String villageKey) {
+        return fearByVillage.get(villageKey);
+    }
+
+    public FearEntry getOrCreateFearEntry(String villageKey) {
+        FearEntry existing = fearByVillage.get(villageKey);
+        if (existing != null) return existing;
+        if (fearByVillage.size() >= MAX_FEAR_VILLAGES) {
+            evictLeastRecentlyActiveFearEntry(fearByVillage);
+        }
+        FearEntry created = new FearEntry();
+        fearByVillage.put(villageKey, created);
+        return created;
+    }
+
+    public void removeFearEntry(String villageKey) {
+        fearByVillage.remove(villageKey);
     }
 
     public int getDailyReputationEarned() {
@@ -283,6 +341,7 @@ public class PlayerData {
         private boolean reputationMigrated = false;
         private boolean dailyCapNotified = false;
         private int dailyGratitudeGifts = 0;
+        private Map<String, FearEntry> fearByVillage = Map.of();
 
         private Builder() {
         }
@@ -302,11 +361,13 @@ public class PlayerData {
         public Builder reputationMigrated(boolean v) { this.reputationMigrated = v; return this; }
         public Builder dailyCapNotified(boolean v) { this.dailyCapNotified = v; return this; }
         public Builder dailyGratitudeGifts(int v) { this.dailyGratitudeGifts = v; return this; }
+        public Builder fearByVillage(Map<String, FearEntry> v) { this.fearByVillage = v; return this; }
 
         public PlayerData build() {
             return new PlayerData(score, proximityTicks, lastProximityDay, curedVillagers, tradeStats,
                     dailyReputationEarned, lastCapResetDay, dailyTradeRep, dailyCycleRep, dailyGiftRep,
-                    lastDecayDay, tradesSinceLastRepGain, reputationMigrated, dailyCapNotified, dailyGratitudeGifts);
+                    lastDecayDay, tradesSinceLastRepGain, reputationMigrated, dailyCapNotified, dailyGratitudeGifts,
+                    fearByVillage);
         }
     }
 }

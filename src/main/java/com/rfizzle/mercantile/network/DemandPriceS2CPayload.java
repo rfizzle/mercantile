@@ -23,10 +23,11 @@ public record DemandPriceS2CPayload(
             int moodModifier,
             int gossipModifier,
             int marketDayModifier,
+            int fearModifier,
             int otherAdjust,
             int finalPrice
     ) {
-        // StreamCodec.composite tops out at 6 fields; this record has 8.
+        // StreamCodec.composite tops out at 6 fields; this record has 9.
         public static final StreamCodec<ByteBuf, PriceComponent> STREAM_CODEC =
                 StreamCodec.of(PriceComponent::encode, PriceComponent::decode);
 
@@ -37,12 +38,14 @@ public record DemandPriceS2CPayload(
             ByteBufCodecs.VAR_INT.encode(buf, c.moodModifier);
             ByteBufCodecs.VAR_INT.encode(buf, c.gossipModifier);
             ByteBufCodecs.VAR_INT.encode(buf, c.marketDayModifier);
+            ByteBufCodecs.VAR_INT.encode(buf, c.fearModifier);
             ByteBufCodecs.VAR_INT.encode(buf, c.otherAdjust);
             ByteBufCodecs.VAR_INT.encode(buf, c.finalPrice);
         }
 
         private static PriceComponent decode(ByteBuf buf) {
             return new PriceComponent(
+                    ByteBufCodecs.VAR_INT.decode(buf),
                     ByteBufCodecs.VAR_INT.decode(buf),
                     ByteBufCodecs.VAR_INT.decode(buf),
                     ByteBufCodecs.VAR_INT.decode(buf),

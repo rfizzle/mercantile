@@ -345,6 +345,48 @@ public class ModMenuIntegration implements ModMenuApi {
                     .setSaveConsumer(v -> config.marketDayDiscountPercent = v)
                     .build());
 
+            // --- Memorials & Fear ---
+            ConfigCategory memorial = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.memorial"));
+            memorial.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableMemorials"), config.enableMemorials)
+                    .setDefaultValue(defaults.enableMemorials)
+                    .setTooltip(Component.translatable("mercantile.config.enableMemorials.tooltip"))
+                    .setSaveConsumer(v -> config.enableMemorials = v)
+                    .build());
+            memorial.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableMourning"), config.enableMourning)
+                    .setDefaultValue(defaults.enableMourning)
+                    .setTooltip(Component.translatable("mercantile.config.enableMourning.tooltip"))
+                    .setSaveConsumer(v -> config.enableMourning = v)
+                    .build());
+            memorial.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableFearMarkup"), config.enableFearMarkup)
+                    .setDefaultValue(defaults.enableFearMarkup)
+                    .setTooltip(Component.translatable("mercantile.config.enableFearMarkup.tooltip"))
+                    .setSaveConsumer(v -> config.enableFearMarkup = v)
+                    .build());
+            memorial.addEntry(entry.startIntField(Component.translatable("mercantile.config.fearKillThreshold"), config.fearKillThreshold)
+                    .setDefaultValue(defaults.fearKillThreshold)
+                    .setMin(1).setMax(20)
+                    .setTooltip(Component.translatable("mercantile.config.fearKillThreshold.tooltip"))
+                    .setSaveConsumer(v -> config.fearKillThreshold = v)
+                    .build());
+            memorial.addEntry(entry.startIntField(Component.translatable("mercantile.config.fearKillWindowMinutes"), config.fearKillWindowMinutes)
+                    .setDefaultValue(defaults.fearKillWindowMinutes)
+                    .setMin(1).setMax(120)
+                    .setTooltip(Component.translatable("mercantile.config.fearKillWindowMinutes.tooltip"))
+                    .setSaveConsumer(v -> config.fearKillWindowMinutes = v)
+                    .build());
+            memorial.addEntry(entry.startIntField(Component.translatable("mercantile.config.fearMarkupPercent"), config.fearMarkupPercent)
+                    .setDefaultValue(defaults.fearMarkupPercent)
+                    .setMin(0).setMax(200)
+                    .setTooltip(Component.translatable("mercantile.config.fearMarkupPercent.tooltip"))
+                    .setSaveConsumer(v -> config.fearMarkupPercent = v)
+                    .build());
+            memorial.addEntry(entry.startIntField(Component.translatable("mercantile.config.fearMarkupDurationDays"), config.fearMarkupDurationDays)
+                    .setDefaultValue(defaults.fearMarkupDurationDays)
+                    .setMin(1).setMax(30)
+                    .setTooltip(Component.translatable("mercantile.config.fearMarkupDurationDays.tooltip"))
+                    .setSaveConsumer(v -> config.fearMarkupDurationDays = v)
+                    .build());
+
             // --- Sentry Pylon ---
             ConfigCategory pylon = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.pylon"));
             pylon.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableSentryPylon"), config.enableSentryPylon)

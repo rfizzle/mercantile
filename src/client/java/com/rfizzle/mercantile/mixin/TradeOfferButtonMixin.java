@@ -116,6 +116,12 @@ public abstract class TradeOfferButtonMixin {
             lines.add(Component.translatable("gui.mercantile.price.marketday", value)
                     .withStyle(color));
         }
+        if (c.fearModifier() != 0) {
+            ChatFormatting color = c.fearModifier() < 0 ? ChatFormatting.GREEN : ChatFormatting.RED;
+            String value = (c.fearModifier() > 0 ? "+" : "") + c.fearModifier();
+            lines.add(Component.translatable("gui.mercantile.price.fear", value)
+                    .withStyle(color));
+        }
         if (c.otherAdjust() != 0) {
             ChatFormatting color = c.otherAdjust() < 0 ? ChatFormatting.GREEN : ChatFormatting.RED;
             String value = (c.otherAdjust() > 0 ? "+" : "") + c.otherAdjust();

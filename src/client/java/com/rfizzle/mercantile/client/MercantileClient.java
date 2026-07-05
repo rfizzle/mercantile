@@ -8,6 +8,7 @@ import com.rfizzle.mercantile.client.network.ClientNetworkHandler;
 import com.rfizzle.mercantile.client.particle.CycleGlintParticle;
 import com.rfizzle.mercantile.client.particle.FollowTrailParticle;
 import com.rfizzle.mercantile.client.particle.GolemShardParticle;
+import com.rfizzle.mercantile.client.particle.GriefTearParticle;
 import com.rfizzle.mercantile.client.particle.LinkMoteParticle;
 import com.rfizzle.mercantile.client.particle.PickupSparkleParticle;
 import com.rfizzle.mercantile.client.particle.PylonMoteParticle;
@@ -66,6 +67,7 @@ public class MercantileClient implements ClientModInitializer {
         ParticleFactoryRegistry.getInstance().register(MercantileParticles.LINK_MOTE, LinkMoteParticle.Provider::new);
         ParticleFactoryRegistry.getInstance().register(MercantileParticles.WORKSTATION_CLAIMED, WorkstationMarkerParticle.Provider::new);
         ParticleFactoryRegistry.getInstance().register(MercantileParticles.WORKSTATION_UNCLAIMED, WorkstationMarkerParticle.Provider::new);
+        ParticleFactoryRegistry.getInstance().register(MercantileParticles.GRIEF_TEAR, GriefTearParticle.Provider::new);
         ClientTickEvents.END_CLIENT_TICK.register(WorkstationLinkRenderer::tick);
         ClientTickEvents.END_CLIENT_TICK.register(BellRadiusRenderer::tick);
     }

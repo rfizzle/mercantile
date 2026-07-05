@@ -10,6 +10,8 @@ import com.rfizzle.mercantile.data.VillagerNameManager;
 import com.rfizzle.mercantile.data.VillagerPlacementHandler;
 import com.rfizzle.mercantile.follow.FollowManager;
 import com.rfizzle.mercantile.market.MarketDayManager;
+import com.rfizzle.mercantile.memorial.MemorialManager;
+import com.rfizzle.mercantile.memorial.MourningManager;
 import com.rfizzle.mercantile.mood.MoodManager;
 import com.rfizzle.mercantile.network.MercantileNetworking;
 import com.rfizzle.mercantile.particle.MercantileParticles;
@@ -44,6 +46,8 @@ public class Mercantile implements ModInitializer {
         VillagerNameManager.init();
         FollowManager.init();
         NitwitRehabManager.init();
+        MemorialManager.init();
+        MourningManager.init();
         MercantileParticles.init();
         MercantileNetworking.init();
         MercantileCommands.init();

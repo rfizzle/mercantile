@@ -384,6 +384,69 @@ class PlayerDataCodecTest {
     }
 
     @Test
+    void fearByVillageRoundTrips() {
+        PlayerData original = new PlayerData();
+        FearEntry entry = original.getOrCreateFearEntry("minecraft:overworld@1,64,2");
+        entry.setRecentKillTimes(List.of(100L, 200L, 300L));
+        entry.setFearStartGameTime(300L);
+        original.getOrCreateFearEntry("minecraft:overworld@9,70,9");
+
+        JsonElement encoded = PlayerData.CODEC.encodeStart(JsonOps.INSTANCE, original).getOrThrow();
+        PlayerData decoded = PlayerData.CODEC.parse(JsonOps.INSTANCE, encoded).getOrThrow();
+
+        assertEquals(2, decoded.getFearByVillage().size());
+        FearEntry decodedEntry = decoded.getFearEntry("minecraft:overworld@1,64,2");
+        assertNotNull(decodedEntry);
+        assertEquals(List.of(100L, 200L, 300L), decodedEntry.getRecentKillTimes());
+        assertEquals(300L, decodedEntry.getFearStartGameTime());
+
+        FearEntry blank = decoded.getFearEntry("minecraft:overworld@9,70,9");
+        assertNotNull(blank);
+        assertTrue(blank.getRecentKillTimes().isEmpty());
+        assertEquals(-1L, blank.getFearStartGameTime(),
+                "the never-activated sentinel must survive a round-trip");
+    }
+
+    @Test
+    void legacySaveWithoutFearFieldDecodesEmpty() {
+        JsonObject legacy = new JsonObject();
+        legacy.addProperty("score", 80);
+
+        PlayerData decoded = PlayerData.CODEC.parse(JsonOps.INSTANCE, legacy).getOrThrow();
+        assertFalse(decoded.hasFearEntries());
+    }
+
+    @Test
+    void fearByVillageCappedAtMax() {
+        PlayerData data = new PlayerData();
+        for (int i = 0; i < PlayerData.MAX_FEAR_VILLAGES + 20; i++) {
+            data.getOrCreateFearEntry("village-" + i);
+        }
+        assertEquals(PlayerData.MAX_FEAR_VILLAGES, data.getFearByVillage().size(),
+                "fearByVillage must not exceed MAX_FEAR_VILLAGES");
+    }
+
+    @Test
+    void fearEvictionSparesActiveEntries() {
+        // An active markup must not be laundered out of the map by touching many other
+        // villages: eviction picks the least-recently-active entry, not insertion order.
+        PlayerData data = new PlayerData();
+        FearEntry active = data.getOrCreateFearEntry("feared-village");
+        active.setRecentKillTimes(List.of(9_000L, 9_100L, 9_200L));
+        active.setFearStartGameTime(9_200L);
+
+        for (int i = 0; i < PlayerData.MAX_FEAR_VILLAGES + 10; i++) {
+            FearEntry blank = data.getOrCreateFearEntry("decoy-" + i);
+            blank.setRecentKillTimes(List.of((long) i));
+        }
+
+        assertEquals(PlayerData.MAX_FEAR_VILLAGES, data.getFearByVillage().size());
+        assertNotNull(data.getFearEntry("feared-village"),
+                "the entry with the most recent activity must survive eviction");
+        assertEquals(9_200L, data.getFearEntry("feared-village").getFearStartGameTime());
+    }
+
+    @Test
     void incrementTradesMovesEntryToEndForLruEviction() {
         // Fill to cap, then increment the first-inserted entry — it should move to end
         // so the *second*-inserted entry becomes the eviction candidate on overflow.
