@@ -29,6 +29,7 @@
         "VillagerGolemSpawnCountMixin",
         "VillagerHealingMixin",
         "VillagerHurtMixin",
+        "VillagerNitwitRehabMixin",
         "VillagerPickupMixin",
         "VillagerProfessionLockMixin",
         "VillagerRestockAccessor",

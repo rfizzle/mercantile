@@ -156,6 +156,43 @@ class ConfigMigratorTest {
     }
 
     @Test
+    void v5FileGainsNitwitRehabFieldsAtDefaults() {
+        JsonObject raw = parse("""
+                {
+                  "configVersion": 5,
+                  "enableGratitudeGifts": false
+                }
+                """);
+
+        boolean migrated = ConfigMigrator.migrate(raw);
+        MercantileConfig defaults = new MercantileConfig();
+
+        assertTrue(migrated, "a v5 file must migrate to v6");
+        assertEquals(ConfigMigrator.CURRENT_VERSION, raw.get("configVersion").getAsInt());
+        assertEquals(defaults.enableNitwitRehab, raw.get("enableNitwitRehab").getAsBoolean());
+        assertEquals(defaults.nitwitRehabEmeraldCost, raw.get("nitwitRehabEmeraldCost").getAsInt());
+        // Existing fields are carried forward untouched.
+        assertFalse(raw.get("enableGratitudeGifts").getAsBoolean());
+    }
+
+    @Test
+    void nitwitRehabMigrationPreservesExplicitValues() {
+        JsonObject raw = parse("""
+                {
+                  "configVersion": 5,
+                  "enableNitwitRehab": false,
+                  "nitwitRehabEmeraldCost": 32
+                }
+                """);
+
+        ConfigMigrator.migrate(raw);
+
+        assertFalse(raw.get("enableNitwitRehab").getAsBoolean(),
+                "an explicitly set enableNitwitRehab must not be overwritten by the migration");
+        assertEquals(32, raw.get("nitwitRehabEmeraldCost").getAsInt());
+    }
+
+    @Test
     void gratitudeGiftMigrationPreservesExplicitValues() {
         JsonObject raw = parse("""
                 {

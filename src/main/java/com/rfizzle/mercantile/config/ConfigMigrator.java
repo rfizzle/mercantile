@@ -15,7 +15,7 @@ import com.rfizzle.mercantile.Mercantile;
  */
 final class ConfigMigrator {
 
-    static final int CURRENT_VERSION = 5;
+    static final int CURRENT_VERSION = 6;
 
     @FunctionalInterface
     interface Migration {
@@ -55,6 +55,12 @@ final class ConfigMigrator {
             MercantileConfig defaults = new MercantileConfig();
             addIfAbsent(json, "enableGratitudeGifts", defaults.enableGratitudeGifts);
             addIfAbsent(json, "gratitudeGiftsPerDay", defaults.gratitudeGiftsPerDay);
+        },
+        // v5 -> v6: nitwit rehabilitation fields, seeded at their defaults.
+        json -> {
+            MercantileConfig defaults = new MercantileConfig();
+            addIfAbsent(json, "enableNitwitRehab", defaults.enableNitwitRehab);
+            addIfAbsent(json, "nitwitRehabEmeraldCost", defaults.nitwitRehabEmeraldCost);
         },
     };
 

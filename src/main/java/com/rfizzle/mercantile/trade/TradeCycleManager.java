@@ -13,8 +13,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerTrades;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.trading.MerchantOffers;
 
@@ -50,7 +48,7 @@ public final class TradeCycleManager {
         if (!hasUnlocked) return false;
 
         if (!player.getAbilities().instabuild) {
-            return countEmeralds(player) >= config.tradeCycleEmeraldCost;
+            return EmeraldPayment.count(player) >= config.tradeCycleEmeraldCost;
         }
         return true;
     }
@@ -85,12 +83,12 @@ public final class TradeCycleManager {
 
         if (!player.getAbilities().instabuild) {
             int cost = config.tradeCycleEmeraldCost;
-            if (countEmeralds(player) < cost) {
+            if (EmeraldPayment.count(player) < cost) {
                 ExclusiveTradesManager.injectOffers(villager, playerScore);
                 syncOffers(player, villager);
                 return false;
             }
-            removeEmeralds(player, cost);
+            EmeraldPayment.remove(player, cost);
         }
 
         int originalSize = offers.size();
@@ -166,38 +164,4 @@ public final class TradeCycleManager {
         ));
     }
 
-    private static int countEmeralds(ServerPlayer player) {
-        int count = 0;
-        for (ItemStack stack : player.getInventory().items) {
-            if (stack.is(Items.EMERALD)) {
-                count += stack.getCount();
-            }
-        }
-        for (ItemStack stack : player.getInventory().offhand) {
-            if (stack.is(Items.EMERALD)) {
-                count += stack.getCount();
-            }
-        }
-        return count;
-    }
-
-    private static void removeEmeralds(ServerPlayer player, int amount) {
-        int remaining = amount;
-        for (ItemStack stack : player.getInventory().items) {
-            if (remaining <= 0) break;
-            if (stack.is(Items.EMERALD)) {
-                int take = Math.min(remaining, stack.getCount());
-                stack.shrink(take);
-                remaining -= take;
-            }
-        }
-        for (ItemStack stack : player.getInventory().offhand) {
-            if (remaining <= 0) break;
-            if (stack.is(Items.EMERALD)) {
-                int take = Math.min(remaining, stack.getCount());
-                stack.shrink(take);
-                remaining -= take;
-            }
-        }
-    }
 }

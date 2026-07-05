@@ -174,6 +174,17 @@ public class ModMenuIntegration implements ModMenuApi {
                     .setTooltip(Component.translatable("mercantile.config.gratitudeGiftsPerDay.tooltip"))
                     .setSaveConsumer(v -> config.gratitudeGiftsPerDay = v)
                     .build());
+            reputation.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableNitwitRehab"), config.enableNitwitRehab)
+                    .setDefaultValue(defaults.enableNitwitRehab)
+                    .setTooltip(Component.translatable("mercantile.config.enableNitwitRehab.tooltip"))
+                    .setSaveConsumer(v -> config.enableNitwitRehab = v)
+                    .build());
+            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.nitwitRehabEmeraldCost"), config.nitwitRehabEmeraldCost)
+                    .setDefaultValue(defaults.nitwitRehabEmeraldCost)
+                    .setMin(0)
+                    .setTooltip(Component.translatable("mercantile.config.nitwitRehabEmeraldCost.tooltip"))
+                    .setSaveConsumer(v -> config.nitwitRehabEmeraldCost = v)
+                    .build());
 
             // --- Follow Mode ---
             ConfigCategory follow = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.follow"));

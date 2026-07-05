@@ -230,6 +230,15 @@
               "note": "Config: <code class='text-bone'>enableGratitudeGifts</code>, <code class='text-bone'>gratitudeGiftsPerDay</code> (default 1)"
             },
             {
+              "id": "nitwit-rehab",
+              "title": "Nitwit Rehabilitation",
+              "html": [
+                "Nitwits stop being dead weight. At Trusted standing and above, use a <strong class='text-bone'>golden apple</strong> on an adult nitwit and pay an emerald fee (default 16, drawn from your inventory) — after a short pause it sheds the green robe and becomes an unemployed villager, ready to claim a workstation like any other. Happy particles and a villager \"yes\" mark the moment; name and gossip carry over.",
+                "The conversion is one-way and checked at use time: below Trusted you're told what standing it takes, baby nitwits must grow up first, and nothing is charged on a denied attempt. If the reputation system is disabled the tier gate is skipped and only the apple + emerald cost applies."
+              ],
+              "note": "Config: <code class='text-bone'>enableNitwitRehab</code>, <code class='text-bone'>nitwitRehabEmeraldCost</code> (default 16)"
+            },
+            {
               "id": "reputation-raid-trader",
               "title": "Raid Defense &amp; Traders",
               "html": [

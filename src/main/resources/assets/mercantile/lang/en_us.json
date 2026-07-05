@@ -75,6 +75,10 @@
     "mercantile.config.enableGratitudeGifts.tooltip": "Villagers occasionally toss a small profession-flavored gift to Honored players who spend time near them",
     "mercantile.config.gratitudeGiftsPerDay": "Gratitude Gifts Per Day",
     "mercantile.config.gratitudeGiftsPerDay.tooltip": "Maximum gratitude gifts a player can receive per in-game day (0 disables)",
+    "mercantile.config.enableNitwitRehab": "Enable Nitwit Rehabilitation",
+    "mercantile.config.enableNitwitRehab.tooltip": "Trusted+ players can convert an adult nitwit to an unemployed villager by using a golden apple on it and paying an emerald fee",
+    "mercantile.config.nitwitRehabEmeraldCost": "Nitwit Rehab Emerald Cost",
+    "mercantile.config.nitwitRehabEmeraldCost.tooltip": "Emeralds drawn from the player's inventory when rehabilitating a nitwit, on top of the golden apple (0 makes the apple the only cost)",
 
     "mercantile.config.enableFollowMode": "Enable Follow Mode",
     "mercantile.config.enableFollowMode.tooltip": "Allow villagers to follow the player",
@@ -160,6 +164,7 @@
     "mercantile.pickup.denied.trading": "Villager is trading with another player",
     "mercantile.pickup.denied.trader_trading": "Trader is trading with another player",
     "mercantile.pickup.denied.following": "Villager is following another player",
+    "mercantile.pickup.denied.rehab": "Villager is being rehabilitated",
     "mercantile.pickup.lore.instruction": "Right-click to place",
     "mercantile.pickup.lore.trades": "Trades:",
     "mercantile.pickup.lore.despawn_remaining": "Despawns in: %ss",
@@ -175,6 +180,12 @@
     "mercantile.follow.denied.baby": "Baby villagers cannot follow you",
     "mercantile.follow.denied.unavailable": "Cannot follow right now",
     "mercantile.follow.released": "Villager stopped following — too far away",
+
+    "mercantile.rehab.start": "The nitwit accepts your offering...",
+    "mercantile.rehab.success": "The villager is ready to work!",
+    "mercantile.rehab.denied.baby": "Baby nitwits must grow up before they can be rehabilitated",
+    "mercantile.rehab.denied.reputation": "You must be %s with villagers to rehabilitate a nitwit",
+    "mercantile.rehab.denied.cost": "Rehabilitating a nitwit costs %s emeralds",
 
     "mercantile.tier.honored":    "Honored",
     "mercantile.tier.trusted":    "Trusted",
