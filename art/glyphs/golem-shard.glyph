@@ -1,0 +1,21 @@
+# mercantile — golem-shard (faithful reproduction of the shipped 8x8 texture)
+size: 8
+
+legend:
+  . transparent
+  a #a6988860
+  b #a69888
+  c #c4b8a8
+  d #dbcdbd
+  e #887060
+  f #6b5545
+
+frame:
+  ..ab....
+  .accb...
+  .cddce..
+  bcddcef.
+  .bbeef..
+  ..affa..
+  ........
+  ........

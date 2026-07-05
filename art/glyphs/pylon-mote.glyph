@@ -1,0 +1,14 @@
+# mercantile — pylon-mote (faithful reproduction of the shipped 4x4 texture)
+size: 4
+
+legend:
+  . transparent
+  a #c0c0c060
+  b #c0c0c0
+  c #e8e8e8
+
+frame:
+  .ab.
+  acca
+  acba
+  .aa.

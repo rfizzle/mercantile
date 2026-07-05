@@ -1,0 +1,19 @@
+# mercantile — cycle-glint (faithful reproduction of the shipped 8x8 texture)
+size: 8
+
+legend:
+  . transparent
+  a gold
+  b #fffde0
+  c prosperity.gold-deep
+  d #b8860b
+
+frame:
+  ...aa...
+  ..abba..
+  .abcbca.
+  abcddcba
+  .acddca.
+  ..adda..
+  ...aa...
+  ........
