@@ -1,7 +1,7 @@
 package com.rfizzle.mercantile;
 
-import com.rfizzle.mercantile.compat.BreedingTooltipData;
-import com.rfizzle.mercantile.compat.BreedingTooltipFormatter;
+import com.rfizzle.mercantile.compat.shared.BreedingTooltipData;
+import com.rfizzle.mercantile.compat.shared.BreedingTooltipFormatter;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;

@@ -1,6 +1,6 @@
 package com.rfizzle.mercantile.compat.wthit;
 
-import com.rfizzle.mercantile.compat.MoodTooltipData;
+import com.rfizzle.mercantile.compat.shared.MoodTooltipData;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import mcp.mobius.waila.api.IDataProvider;
 import mcp.mobius.waila.api.IDataWriter;

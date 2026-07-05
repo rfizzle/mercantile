@@ -1,7 +1,7 @@
 package com.rfizzle.mercantile.compat.wthit;
 
-import com.rfizzle.mercantile.compat.MoodTooltipData;
-import com.rfizzle.mercantile.compat.MoodTooltipFormatter;
+import com.rfizzle.mercantile.compat.shared.MoodTooltipData;
+import com.rfizzle.mercantile.compat.shared.MoodTooltipFormatter;
 import mcp.mobius.waila.api.IEntityAccessor;
 import mcp.mobius.waila.api.IEntityComponentProvider;
 import mcp.mobius.waila.api.IPluginConfig;

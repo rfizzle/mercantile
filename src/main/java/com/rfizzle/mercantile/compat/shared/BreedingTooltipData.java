@@ -1,4 +1,4 @@
-package com.rfizzle.mercantile.compat;
+package com.rfizzle.mercantile.compat.shared;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;

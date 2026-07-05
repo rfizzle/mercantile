@@ -1,5 +1,7 @@
 package com.rfizzle.mercantile.compat;
 
+import com.rfizzle.mercantile.compat.shared.MoodTooltipData;
+import com.rfizzle.mercantile.compat.shared.MoodTooltipFormatter;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;

@@ -1,7 +1,7 @@
 package com.rfizzle.mercantile.client.gui.merchant;
 
 import com.rfizzle.mercantile.Mercantile;
-import com.rfizzle.mercantile.compat.MoodTooltipFormatter;
+import com.rfizzle.mercantile.compat.shared.MoodTooltipFormatter;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.network.RestockTimerS2CPayload;
 import com.rfizzle.mercantile.network.VillagerInfoPanelS2CPayload;

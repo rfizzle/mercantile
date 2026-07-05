@@ -1,7 +1,7 @@
 package com.rfizzle.mercantile.mixin;
 
 import com.rfizzle.mercantile.breeding.BabyFeeding;
-import com.rfizzle.mercantile.compat.BreedingTooltipData;
+import com.rfizzle.mercantile.compat.shared.BreedingTooltipData;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.MercantileVillagerData;

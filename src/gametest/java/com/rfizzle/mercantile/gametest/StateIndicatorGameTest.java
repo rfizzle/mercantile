@@ -1,6 +1,6 @@
 package com.rfizzle.mercantile.gametest;
 
-import com.rfizzle.mercantile.compat.StateIndicatorData;
+import com.rfizzle.mercantile.compat.shared.StateIndicatorData;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;

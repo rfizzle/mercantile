@@ -1,8 +1,8 @@
 package com.rfizzle.mercantile.compat.jade;
 
 import com.rfizzle.mercantile.Mercantile;
-import com.rfizzle.mercantile.compat.MoodTooltipData;
-import com.rfizzle.mercantile.compat.MoodTooltipFormatter;
+import com.rfizzle.mercantile.compat.shared.MoodTooltipData;
+import com.rfizzle.mercantile.compat.shared.MoodTooltipFormatter;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
