@@ -185,6 +185,41 @@ public class ModMenuIntegration implements ModMenuApi {
                     .setTooltip(Component.translatable("mercantile.config.nitwitRehabEmeraldCost.tooltip"))
                     .setSaveConsumer(v -> config.nitwitRehabEmeraldCost = v)
                     .build());
+            reputation.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableContracts"), config.enableContracts)
+                    .setDefaultValue(defaults.enableContracts)
+                    .setTooltip(Component.translatable("mercantile.config.enableContracts.tooltip"))
+                    .setSaveConsumer(v -> config.enableContracts = v)
+                    .build());
+            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.contractOfferChance"), config.contractOfferChance)
+                    .setDefaultValue(defaults.contractOfferChance)
+                    .setMin(0).setMax(100)
+                    .setTooltip(Component.translatable("mercantile.config.contractOfferChance.tooltip"))
+                    .setSaveConsumer(v -> config.contractOfferChance = v)
+                    .build());
+            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.contractPaymentScale"), config.contractPaymentScale)
+                    .setDefaultValue(defaults.contractPaymentScale)
+                    .setMin(0).setMax(1000)
+                    .setTooltip(Component.translatable("mercantile.config.contractPaymentScale.tooltip"))
+                    .setSaveConsumer(v -> config.contractPaymentScale = v)
+                    .build());
+            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.contractRepGain"), config.contractRepGain)
+                    .setDefaultValue(defaults.contractRepGain)
+                    .setMin(0)
+                    .setTooltip(Component.translatable("mercantile.config.contractRepGain.tooltip"))
+                    .setSaveConsumer(v -> config.contractRepGain = v)
+                    .build());
+            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.contractRepPerDay"), config.contractRepPerDay)
+                    .setDefaultValue(defaults.contractRepPerDay)
+                    .setMin(0).setMax(50)
+                    .setTooltip(Component.translatable("mercantile.config.contractRepPerDay.tooltip"))
+                    .setSaveConsumer(v -> config.contractRepPerDay = v)
+                    .build());
+            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.contractDeadlineDays"), config.contractDeadlineDays)
+                    .setDefaultValue(defaults.contractDeadlineDays)
+                    .setMin(1).setMax(30)
+                    .setTooltip(Component.translatable("mercantile.config.contractDeadlineDays.tooltip"))
+                    .setSaveConsumer(v -> config.contractDeadlineDays = v)
+                    .build());
 
             // --- Follow Mode ---
             ConfigCategory follow = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.follow"));

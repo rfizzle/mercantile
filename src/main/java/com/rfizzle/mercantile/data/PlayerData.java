@@ -261,6 +261,14 @@ public class PlayerData {
         dailyCounters.incrementGratitudeGifts();
     }
 
+    public int getDailyContractRepAwards() {
+        return dailyCounters.getContractRepAwards();
+    }
+
+    public void incrementDailyContractRepAwards() {
+        dailyCounters.incrementContractRepAwards();
+    }
+
     public void addDailyTradeRep(int amount) {
         dailyCounters.addTradeRep(amount);
     }
@@ -371,6 +379,7 @@ public class PlayerData {
         private boolean reputationMigrated = false;
         private boolean dailyCapNotified = false;
         private int dailyGratitudeGifts = 0;
+        private int dailyContractRepAwards = 0;
         private Map<String, FearEntry> fearByVillage = Map.of();
         private List<PinnedTrade> pinnedTrades = List.of();
 
@@ -392,12 +401,14 @@ public class PlayerData {
         public Builder reputationMigrated(boolean v) { this.reputationMigrated = v; return this; }
         public Builder dailyCapNotified(boolean v) { this.dailyCapNotified = v; return this; }
         public Builder dailyGratitudeGifts(int v) { this.dailyGratitudeGifts = v; return this; }
+        public Builder dailyContractRepAwards(int v) { this.dailyContractRepAwards = v; return this; }
         public Builder fearByVillage(Map<String, FearEntry> v) { this.fearByVillage = v; return this; }
         public Builder pinnedTrades(List<PinnedTrade> v) { this.pinnedTrades = v; return this; }
 
         public PlayerData build() {
             DailyCounters daily = new DailyCounters(dailyReputationEarned, lastCapResetDay, dailyTradeRep,
-                    dailyCycleRep, dailyGiftRep, tradesSinceLastRepGain, dailyCapNotified, dailyGratitudeGifts);
+                    dailyCycleRep, dailyGiftRep, tradesSinceLastRepGain, dailyCapNotified, dailyGratitudeGifts,
+                    dailyContractRepAwards);
             return new PlayerData(score, proximityTicks, lastProximityDay, curedVillagers, tradeStats,
                     daily, lastDecayDay, reputationMigrated, fearByVillage, pinnedTrades);
         }

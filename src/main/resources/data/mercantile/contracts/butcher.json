@@ -1,0 +1,10 @@
+{
+    "requests": [
+        { "item": "minecraft:chicken", "count": [10, 18], "payment": [1, 2], "weight": 2 },
+        { "item": "minecraft:porkchop", "count": [5, 10], "payment": [1, 2], "weight": 2 },
+        { "item": "minecraft:beef", "count": [6, 12], "payment": [1, 2], "weight": 2 },
+        { "item": "minecraft:rabbit", "count": [3, 6], "payment": [1, 2], "weight": 1 },
+        { "item": "minecraft:coal", "count": [10, 18], "payment": [1, 2], "weight": 1 },
+        { "item": "minecraft:sweet_berries", "count": [10, 16], "payment": [2, 3], "weight": 1 }
+    ]
+}

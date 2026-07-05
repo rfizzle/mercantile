@@ -20,7 +20,8 @@ public class DailyCounters {
                     Codec.INT.optionalFieldOf("giftRep", 0).forGetter(DailyCounters::getGiftRep),
                     Codec.INT.optionalFieldOf("tradesSinceLastRepGain", 0).forGetter(DailyCounters::getTradesSinceLastRepGain),
                     Codec.BOOL.optionalFieldOf("capNotified", false).forGetter(DailyCounters::isCapNotified),
-                    Codec.INT.optionalFieldOf("gratitudeGifts", 0).forGetter(DailyCounters::getGratitudeGifts)
+                    Codec.INT.optionalFieldOf("gratitudeGifts", 0).forGetter(DailyCounters::getGratitudeGifts),
+                    Codec.INT.optionalFieldOf("contractRepAwards", 0).forGetter(DailyCounters::getContractRepAwards)
             ).apply(instance, DailyCounters::new)
     );
 
@@ -32,13 +33,15 @@ public class DailyCounters {
     private int tradesSinceLastRepGain;
     private boolean capNotified;
     private int gratitudeGifts;
+    private int contractRepAwards;
 
     public DailyCounters() {
-        this(0, -1L, 0, 0, 0, 0, false, 0);
+        this(0, -1L, 0, 0, 0, 0, false, 0, 0);
     }
 
     public DailyCounters(int reputationEarned, long lastCapResetDay, int tradeRep, int cycleRep, int giftRep,
-                         int tradesSinceLastRepGain, boolean capNotified, int gratitudeGifts) {
+                         int tradesSinceLastRepGain, boolean capNotified, int gratitudeGifts,
+                         int contractRepAwards) {
         this.reputationEarned = Math.max(0, reputationEarned);
         this.lastCapResetDay = lastCapResetDay;
         this.tradeRep = Math.max(0, tradeRep);
@@ -47,11 +50,12 @@ public class DailyCounters {
         this.tradesSinceLastRepGain = Math.max(0, tradesSinceLastRepGain);
         this.capNotified = capNotified;
         this.gratitudeGifts = Math.max(0, gratitudeGifts);
+        this.contractRepAwards = Math.max(0, contractRepAwards);
     }
 
     public DailyCounters copy() {
         return new DailyCounters(reputationEarned, lastCapResetDay, tradeRep, cycleRep, giftRep,
-                tradesSinceLastRepGain, capNotified, gratitudeGifts);
+                tradesSinceLastRepGain, capNotified, gratitudeGifts, contractRepAwards);
     }
 
     public void reset(long newDay) {
@@ -63,6 +67,7 @@ public class DailyCounters {
         this.tradesSinceLastRepGain = 0;
         this.capNotified = false;
         this.gratitudeGifts = 0;
+        this.contractRepAwards = 0;
     }
 
     public int getReputationEarned() {
@@ -103,6 +108,15 @@ public class DailyCounters {
 
     public void incrementGratitudeGifts() {
         this.gratitudeGifts++;
+    }
+
+    /** Deliveries rewarded with reputation today; a count cap, deliberately outside the rep caps. */
+    public int getContractRepAwards() {
+        return contractRepAwards;
+    }
+
+    public void incrementContractRepAwards() {
+        this.contractRepAwards++;
     }
 
     public void addTradeRep(int amount) {

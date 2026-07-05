@@ -242,6 +242,49 @@ class ConfigMigratorTest {
     }
 
     @Test
+    void v9FileGainsContractFieldsAtDefaults() {
+        JsonObject raw = parse("""
+                {
+                  "configVersion": 9,
+                  "enableWorkOrders": false
+                }
+                """);
+
+        boolean migrated = ConfigMigrator.migrate(raw);
+        MercantileConfig defaults = new MercantileConfig();
+
+        assertTrue(migrated, "a v9 file must migrate to v10");
+        assertEquals(ConfigMigrator.CURRENT_VERSION, raw.get("configVersion").getAsInt());
+        assertEquals(defaults.enableContracts, raw.get("enableContracts").getAsBoolean());
+        assertEquals(defaults.contractOfferChance, raw.get("contractOfferChance").getAsInt());
+        assertEquals(defaults.contractPaymentScale, raw.get("contractPaymentScale").getAsInt());
+        assertEquals(defaults.contractRepGain, raw.get("contractRepGain").getAsInt());
+        assertEquals(defaults.contractRepPerDay, raw.get("contractRepPerDay").getAsInt());
+        assertEquals(defaults.contractDeadlineDays, raw.get("contractDeadlineDays").getAsInt());
+        // Existing fields are carried forward untouched.
+        assertFalse(raw.get("enableWorkOrders").getAsBoolean());
+    }
+
+    @Test
+    void contractMigrationPreservesExplicitValues() {
+        JsonObject raw = parse("""
+                {
+                  "configVersion": 9,
+                  "enableContracts": false,
+                  "contractRepGain": 7
+                }
+                """);
+
+        ConfigMigrator.migrate(raw);
+
+        assertFalse(raw.get("enableContracts").getAsBoolean(),
+                "an explicitly set enableContracts must not be overwritten by the migration");
+        assertEquals(7, raw.get("contractRepGain").getAsInt());
+        assertEquals(new MercantileConfig().contractOfferChance, raw.get("contractOfferChance").getAsInt(),
+                "the absent field must still be seeded at its default alongside preserved keys");
+    }
+
+    @Test
     void workOrderMigrationPreservesExplicitValues() {
         JsonObject raw = parse("""
                 {

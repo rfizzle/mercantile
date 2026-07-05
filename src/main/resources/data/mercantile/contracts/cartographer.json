@@ -1,0 +1,7 @@
+{
+    "requests": [
+        { "item": "minecraft:paper", "count": [24, 48], "payment": [2, 3], "weight": 3 },
+        { "item": "minecraft:glass_pane", "count": [8, 14], "payment": [1, 2], "weight": 2 },
+        { "item": "minecraft:string", "count": [8, 14], "payment": [1, 2], "weight": 1 }
+    ]
+}

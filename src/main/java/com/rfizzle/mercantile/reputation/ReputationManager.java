@@ -329,6 +329,25 @@ public final class ReputationManager {
         syncToClient(player, data);
     }
 
+    // Contract rep is an intentional bypass like cure/raid rep: it skips both the daily total
+    // cap and the per-source sub-caps, and does NOT contribute to dailyReputationEarned. Unlike
+    // cure/raid, contract supply scales with villager count (a bred villager hall would mint
+    // uncapped rep), so the bypass is bounded by its own per-day award count instead — the
+    // gratitude-gift pattern: the first contractRepPerDay deliveries a day earn rep, later
+    // ones still pay emeralds (issue #86).
+    public static void gainContractRep(ServerPlayer player) {
+        MercantileConfig config = MercantileConfig.get();
+        if (!config.enableReputation || !config.enableContracts) return;
+        PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
+        migrateIfNeeded(data);
+        long currentDay = player.serverLevel().getGameTime() / 24_000L;
+        rolloverIfNewDay(player, data, currentDay);
+        if (data.getDailyContractRepAwards() >= config.contractRepPerDay) return;
+        data.incrementDailyContractRepAwards();
+        changeScore(player, data, data.getScore() + config.contractRepGain);
+        syncToClient(player, data);
+    }
+
     private static void sendDailyCapMessage(ServerPlayer player, PlayerData data) {
         if (player.connection == null) return;
         // Dedup: with reputationTradesPerGain=5 and active trading, an undeduped message would

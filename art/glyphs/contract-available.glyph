@@ -1,0 +1,33 @@
+# mercantile — contract-available cue (16×16 particle)
+# A bone speech bubble floating above a villager with a delivery offer,
+# sibling to the workstation status markers. Ink silhouette so it reads
+# against sky and shade, one ash step along the lower-right inner edge for
+# volume, and three emerald ellipsis dots (bright top row, base bottom) —
+# the villager has something to ask.
+size: 16
+
+legend:
+  . transparent
+  K ink                        # silhouette outline
+  b bone                       # bubble body
+  a ash                        # lower-right inner shade
+  e mercantile.emerald         # ellipsis dots
+  E mercantile.emerald-bright  # dot highlight row
+
+frame:
+  ................
+  ...KKKKKKKKKK...
+  ..KbbbbbbbbbbK..
+  .KbbbbbbbbbbbbK.
+  .KbbEebEebEebbK.
+  .KbbeebeebeebbK.
+  .KbbbbbbbbbbbaK.
+  ..KbbbbbbbbbaK..
+  ...KKbbKKKKKK...
+  ....KbaK........
+  .....KaK........
+  ......K.........
+  ................
+  ................
+  ................
+  ................

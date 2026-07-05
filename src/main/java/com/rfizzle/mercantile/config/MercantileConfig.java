@@ -146,6 +146,14 @@ public class MercantileConfig {
     public int maxPinnedTradesPerPlayer = 10;
     public int pinRestockNotifyRange = 128;
 
+    // Delivery Contracts (gated behind enableReputation)
+    public boolean enableContracts = true;
+    public int contractOfferChance = 50;
+    public int contractPaymentScale = 100;
+    public int contractRepGain = 3;
+    public int contractRepPerDay = 3;
+    public int contractDeadlineDays = 2;
+
     // --- Client Config ---
 
     public float villagerSoundVolume = 1.0f;
@@ -207,6 +215,11 @@ public class MercantileConfig {
         // exceed the persisted hard bound.
         maxPinnedTradesPerPlayer = Math.clamp(maxPinnedTradesPerPlayer, 1, 64);
         pinRestockNotifyRange = Math.clamp(pinRestockNotifyRange, 8, 256);
+        contractOfferChance = Math.clamp(contractOfferChance, 0, 100);
+        contractPaymentScale = Math.clamp(contractPaymentScale, 0, 1_000);
+        contractRepGain = Math.clamp(contractRepGain, 0, Integer.MAX_VALUE);
+        contractRepPerDay = Math.clamp(contractRepPerDay, 0, 50);
+        contractDeadlineDays = Math.clamp(contractDeadlineDays, 1, 30);
         villagerSoundVolume = Math.clamp(villagerSoundVolume, 0.0f, 1.0f);
         // Gson leaves enum fields null on unknown/missing values.
         if (hudAnchor == null) hudAnchor = Anchor.TOP_LEFT;

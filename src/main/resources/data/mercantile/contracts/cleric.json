@@ -1,0 +1,9 @@
+{
+    "requests": [
+        { "item": "minecraft:rotten_flesh", "count": [32, 64], "payment": [2, 3], "weight": 3 },
+        { "item": "minecraft:gold_ingot", "count": [3, 6], "payment": [2, 3], "weight": 2 },
+        { "item": "minecraft:rabbit_foot", "count": [2, 4], "payment": [2, 3], "weight": 1 },
+        { "item": "minecraft:glass_bottle", "count": [9, 15], "payment": [2, 3], "weight": 1 },
+        { "item": "minecraft:nether_wart", "count": [12, 22], "payment": [1, 2], "weight": 1 }
+    ]
+}

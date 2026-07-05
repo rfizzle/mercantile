@@ -1,0 +1,9 @@
+{
+    "requests": [
+        { "item": "minecraft:stick", "count": [32, 64], "payment": [2, 3], "weight": 3 },
+        { "item": "minecraft:flint", "count": [12, 26], "payment": [1, 2], "weight": 2 },
+        { "item": "minecraft:feather", "count": [12, 24], "payment": [1, 2], "weight": 2 },
+        { "item": "minecraft:string", "count": [10, 14], "payment": [1, 2], "weight": 1 },
+        { "item": "minecraft:tripwire_hook", "count": [4, 8], "payment": [2, 3], "weight": 1 }
+    ]
+}

@@ -2,8 +2,10 @@ package com.rfizzle.mercantile.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.rfizzle.mercantile.contract.DeliveryContract;
 import com.rfizzle.mercantile.mood.MoodMath;
 import net.minecraft.nbt.CompoundTag;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -30,9 +32,14 @@ public class MercantileVillagerData {
                     Codec.LONG.optionalFieldOf("lastHurtGameTime", -1L)
                             .forGetter(MercantileVillagerData::getLastHurtGameTime),
                     Codec.LONG.optionalFieldOf("lastWitnessedDeathGameTime", -1L)
-                            .forGetter(MercantileVillagerData::getLastWitnessedDeathGameTime)
+                            .forGetter(MercantileVillagerData::getLastWitnessedDeathGameTime),
+                    // Lenient: a malformed contract blob (hand-edited NBT) degrades to "no
+                    // contract" instead of failing the whole villager-data decode, which would
+                    // wipe locked trades, mood, and the rest of the attachment.
+                    DeliveryContract.CODEC.lenientOptionalFieldOf("contract")
+                            .forGetter(data -> Optional.ofNullable(data.contract))
             ).apply(instance, (professionLocked, lockedTrades, nameAssigned, wanderingTraderOfferTag, fedGrowthTicks,
-                               mood, lastMoodUpdateTime, lastHurtGameTime, lastWitnessedDeathGameTime) -> {
+                               mood, lastMoodUpdateTime, lastHurtGameTime, lastWitnessedDeathGameTime, contract) -> {
                     MercantileVillagerData data = new MercantileVillagerData(
                             professionLocked, lockedTrades, nameAssigned, wanderingTraderOfferTag.orElse(null));
                     data.setFedGrowthTicks(fedGrowthTicks);
@@ -40,6 +47,7 @@ public class MercantileVillagerData {
                     data.setLastMoodUpdateTime(lastMoodUpdateTime);
                     data.setLastHurtGameTime(lastHurtGameTime);
                     data.setLastWitnessedDeathGameTime(lastWitnessedDeathGameTime);
+                    data.setContract(contract.orElse(null));
                     return data;
             })
     );
@@ -53,6 +61,8 @@ public class MercantileVillagerData {
     private long lastMoodUpdateTime = -1L;
     private long lastHurtGameTime = -1L;
     private long lastWitnessedDeathGameTime = -1L;
+    @Nullable
+    private DeliveryContract contract;
 
     public MercantileVillagerData() {
         this(false, Set.of(), false, null);
@@ -152,5 +162,20 @@ public class MercantileVillagerData {
 
     public void setLastWitnessedDeathGameTime(long gameTime) {
         this.lastWitnessedDeathGameTime = gameTime;
+    }
+
+    /**
+     * This villager's delivery contract (issue #86): an offer while un-accepted, an obligation
+     * once accepted; {@code null} when it has none. At most one contract rides a villager at a
+     * time. Riding the persistent attachment means it survives save/reload and the pickup/place
+     * cycle for free.
+     */
+    @Nullable
+    public DeliveryContract getContract() {
+        return contract;
+    }
+
+    public void setContract(@Nullable DeliveryContract contract) {
+        this.contract = contract;
     }
 }

@@ -2,6 +2,7 @@ package com.rfizzle.mercantile.client.network;
 
 import com.rfizzle.mercantile.client.visualization.BellGlowTracker;
 import com.rfizzle.mercantile.client.visualization.BellRadiusRenderer;
+import com.rfizzle.mercantile.client.visualization.ContractGlowTracker;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.network.*;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -59,6 +60,13 @@ public class ClientNetworkHandler {
         ClientPlayNetworking.registerGlobalReceiver(TradeIndexS2CPayload.TYPE, (payload, context) -> {
             context.client().execute(() ->
                     ClientMercantileData.setTradeIndex(payload.entries()));
+        });
+
+        ClientPlayNetworking.registerGlobalReceiver(ContractTargetS2CPayload.TYPE, (payload, context) -> {
+            context.client().execute(() -> {
+                long now = context.client().level == null ? 0L : context.client().level.getGameTime();
+                ContractGlowTracker.setTarget(payload.villagerEntityId(), now);
+            });
         });
 
         ClientPlayNetworking.registerGlobalReceiver(BellRingS2CPayload.TYPE, (payload, context) -> {

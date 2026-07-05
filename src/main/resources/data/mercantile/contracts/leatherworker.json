@@ -1,0 +1,8 @@
+{
+    "requests": [
+        { "item": "minecraft:leather", "count": [8, 16], "payment": [3, 4], "weight": 3 },
+        { "item": "minecraft:rabbit_hide", "count": [6, 12], "payment": [1, 2], "weight": 1 },
+        { "item": "minecraft:flint", "count": [16, 26], "payment": [1, 2], "weight": 1 },
+        { "item": "minecraft:turtle_scute", "count": [2, 4], "payment": [2, 3], "weight": 1 }
+    ]
+}
