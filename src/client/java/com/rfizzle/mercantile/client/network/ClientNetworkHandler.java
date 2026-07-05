@@ -51,6 +51,11 @@ public class ClientNetworkHandler {
                     ClientMercantileData.setServerConfig(MercantileConfig.fromJson(payload.configJson())));
         });
 
+        ClientPlayNetworking.registerGlobalReceiver(TradePinsS2CPayload.TYPE, (payload, context) -> {
+            context.client().execute(() ->
+                    ClientMercantileData.setTradePins(payload));
+        });
+
         ClientPlayNetworking.registerGlobalReceiver(TradeIndexS2CPayload.TYPE, (payload, context) -> {
             context.client().execute(() ->
                     ClientMercantileData.setTradeIndex(payload.entries()));

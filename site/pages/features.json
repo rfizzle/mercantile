@@ -141,6 +141,15 @@
               "note": "Config: <code class='text-bone'>enableRestockIndicator</code>"
             },
             {
+              "id": "trade-pinning",
+              "title": "Trade Pinning",
+              "html": [
+                "Pin the trades you're waiting on. Each row in the merchant screen carries a small pin toggle (hover the row to reveal it); pinned trades are remembered per player and survive relogging. When a villager restocks a pinned trade that was sold out and you're within range (default 128 blocks, same dimension), an action-bar note names the villager and the trade — <em>\"Aldric restocked: Emerald x3 → Mending I\"</em>.",
+                "<code class='text-bone'>/mercantile pins</code> lists your pins numbered with each trade's current stock status; <code class='text-bone'>/mercantile pins remove &lt;n&gt;</code> drops one and <code class='text-bone'>/mercantile pins clear</code> empties the list. Pins are capped per player (default 10), and pins pointing at villagers that died or re-rolled away the trade are pruned silently."
+              ],
+              "note": "Config: <code class='text-bone'>enableTradePinning</code>, <code class='text-bone'>maxPinnedTradesPerPlayer</code> (default 10), <code class='text-bone'>pinRestockNotifyRange</code> (default 128)"
+            },
+            {
               "id": "demand-transparency",
               "title": "Demand Transparency",
               "html": [

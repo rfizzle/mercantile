@@ -14,6 +14,7 @@ import com.rfizzle.mercantile.network.VillagerInfoPanelSync;
 import com.rfizzle.mercantile.reputation.ExclusiveTradesManager;
 import com.rfizzle.mercantile.reputation.ReputationManager;
 import com.rfizzle.mercantile.trade.PriceBreakdownBuilder;
+import com.rfizzle.mercantile.trade.TradePinManager;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
@@ -129,6 +130,15 @@ public abstract class VillagerTradeOpenMixin {
         Villager self = (Villager) (Object) this;
         ServerPlayNetworking.send(serverPlayer, new DemandPriceS2CPayload(
                 self.getId(), PriceBreakdownBuilder.buildFor(self, serverPlayer)));
+    }
+
+    @Inject(method = "startTrading", at = @At("TAIL"))
+    private void mercantile$sendTradePinsOnTradeOpen(Player player, CallbackInfo ci) {
+        if (!MercantileConfig.get().enableTradePinning) return;
+        if (!(player instanceof ServerPlayer serverPlayer)) return;
+        if (serverPlayer.connection == null) return;
+
+        TradePinManager.sendPinsTo(serverPlayer, (Villager) (Object) this);
     }
 
     @Inject(method = "startTrading", at = @At("TAIL"))

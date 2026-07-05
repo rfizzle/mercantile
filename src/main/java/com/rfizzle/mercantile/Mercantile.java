@@ -19,6 +19,7 @@ import com.rfizzle.mercantile.registry.MercantileRegistry;
 import com.rfizzle.mercantile.rehab.NitwitRehabManager;
 import com.rfizzle.mercantile.reputation.ExclusiveTradesManager;
 import com.rfizzle.mercantile.reputation.ReputationManager;
+import com.rfizzle.mercantile.trade.TradePinManager;
 import com.rfizzle.mercantile.trade.index.TradeIndexDataSource;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.ResourceLocation;
@@ -48,6 +49,7 @@ public class Mercantile implements ModInitializer {
         NitwitRehabManager.init();
         MemorialManager.init();
         MourningManager.init();
+        TradePinManager.init();
         MercantileParticles.init();
         MercantileNetworking.init();
         MercantileCommands.init();

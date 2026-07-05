@@ -1,0 +1,23 @@
+# Mercantile — merchant-screen "trade pinned" glyph (11x11), emerald-styled to
+# match the lock/info/close button family. Filled map-pin: round head tapering
+# to a point, sheen on the upper-left of the head.
+size: 11
+
+legend:
+  . transparent
+  K ink                          # #0a0a0a outline
+  E mercantile.emerald           # #50c878 head
+  e mercantile.emerald-bright    # #6ddb94 sheen
+
+grid:
+  ...........
+  ...KKKKK...
+  ..KeeEEEK..
+  ..KeEEEEK..
+  ..KEEEEEK..
+  ..KEEEEEK..
+  ...KEEEK...
+  ....KEK....
+  .....K.....
+  ...........
+  ...........

@@ -4,6 +4,8 @@
     { "type": "minecraft:single", "resource": "mercantile:close_button" },
     { "type": "minecraft:single", "resource": "mercantile:reputation_badge" },
     { "type": "minecraft:single", "resource": "mercantile:locked_button" },
-    { "type": "minecraft:single", "resource": "mercantile:unlocked_button" }
+    { "type": "minecraft:single", "resource": "mercantile:unlocked_button" },
+    { "type": "minecraft:single", "resource": "mercantile:pin_button" },
+    { "type": "minecraft:single", "resource": "mercantile:pin_button_off" }
   ]
 }

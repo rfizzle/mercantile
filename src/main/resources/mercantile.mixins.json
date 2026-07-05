@@ -35,6 +35,7 @@
         "VillagerRestockAccessor",
         "VillagerRestockMarketDayMixin",
         "VillagerRestockMoodMixin",
+        "VillagerRestockNotifyMixin",
         "VillagerTradeOpenMixin",
         "WanderingTraderPickupMixin",
         "WanderingTraderTradeOpenMixin",

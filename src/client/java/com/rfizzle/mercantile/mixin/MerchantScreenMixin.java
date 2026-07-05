@@ -5,6 +5,7 @@ import com.rfizzle.mercantile.client.network.ClientMercantileData;
 import com.rfizzle.mercantile.compat.MoodTooltipFormatter;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.network.CycleTradesC2SPayload;
+import com.rfizzle.mercantile.network.PinTradeC2SPayload;
 import com.rfizzle.mercantile.network.RestockTimerS2CPayload;
 import com.rfizzle.mercantile.network.VillagerInfoPanelS2CPayload;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -22,6 +23,7 @@ import net.minecraft.world.item.trading.MerchantOffer;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -46,6 +48,24 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
 
     @Unique
     private static final int CYCLE_BUTTON_HEIGHT = 20;
+
+    @Unique
+    private static final ResourceLocation PIN_SPRITE = Mercantile.id("pin_button");
+    @Unique
+    private static final ResourceLocation PIN_OFF_SPRITE = Mercantile.id("pin_button_off");
+    // Trade rows sit at leftPos+5, topPos+18, 88x20 each, 7 visible (vanilla init()).
+    // The pin column lives just right of the scrollbar track (leftPos+94..100), in the
+    // blank band before the trade-slot area that starts at leftPos+136.
+    @Unique
+    private static final int PIN_ICON_X = 101;
+    @Unique
+    private static final int TRADE_ROW_X = 5;
+    @Unique
+    private static final int TRADE_ROW_Y = 18;
+    @Unique
+    private static final int TRADE_ROW_HEIGHT = 20;
+    @Unique
+    private static final int VISIBLE_TRADE_ROWS = 7;
 
     @Unique
     private static final int INFO_PANEL_WIDTH = 110;
@@ -88,6 +108,9 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     private static final int INFO_ICON_BORDER_COLOR = 0xFF888888;
     @Unique
     private static final int CLOSE_BUTTON_HOVER_BG_COLOR = 0xC0A03030;
+
+    @Shadow
+    private int scrollOff;
 
     @Unique
     private Button mercantile$cycleButton;
@@ -286,8 +309,81 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
 
     @Inject(method = "render", at = @At("TAIL"))
     private void mercantile$renderInfoPanelInject(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
+        mercantile$renderTradePins(guiGraphics, mouseX, mouseY);
         mercantile$renderInfoPanel(guiGraphics);
         mercantile$renderOverlay(guiGraphics, mouseX, mouseY, partialTick);
+    }
+
+    // ---- Trade pins ----
+
+    // Deliberately independent of the info-panel payload: TradePinsS2CPayload carries its
+    // own villagerEntityId, so pinning keeps working when enableInfoPanel is off.
+    @Unique
+    private boolean mercantile$pinsActive() {
+        MercantileConfig config = ClientMercantileData.getServerConfig();
+        if (config == null) config = MercantileConfig.get();
+        return config.enableTradePinning
+                && !mercantile$overlayOpen
+                && ClientMercantileData.getTradePins() != null;
+    }
+
+    @Unique
+    private void mercantile$renderTradePins(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        if (!mercantile$pinsActive()) return;
+        var pins = ClientMercantileData.getTradePins();
+        var offers = this.menu.getOffers();
+        if (offers == null || offers.isEmpty()) return;
+
+        int iconX = this.leftPos + PIN_ICON_X;
+        int rows = Math.min(VISIBLE_TRADE_ROWS, offers.size() - scrollOff);
+        for (int row = 0; row < rows; row++) {
+            int offerIndex = row + scrollOff;
+            if (offerIndex >= pins.pinnedByIndex().size()) break;
+            boolean pinned = pins.pinnedByIndex().get(offerIndex);
+            int rowY = this.topPos + TRADE_ROW_Y + row * TRADE_ROW_HEIGHT;
+            int iconY = rowY + (TRADE_ROW_HEIGHT - ICON_SIZE) / 2;
+
+            // The unpinned affordance only appears while the pointer is on the row (or the
+            // pin column beside it), so seven hollow pins don't clutter an untouched screen.
+            boolean rowHovered = mouseX >= this.leftPos + TRADE_ROW_X
+                    && mouseX < iconX + ICON_SIZE
+                    && mouseY >= rowY && mouseY < rowY + TRADE_ROW_HEIGHT;
+            if (pinned) {
+                guiGraphics.blitSprite(PIN_SPRITE, iconX, iconY, ICON_SIZE, ICON_SIZE);
+            } else if (rowHovered) {
+                guiGraphics.blitSprite(PIN_OFF_SPRITE, iconX, iconY, ICON_SIZE, ICON_SIZE);
+            }
+
+            if (mouseX >= iconX && mouseX < iconX + ICON_SIZE
+                    && mouseY >= iconY && mouseY < iconY + ICON_SIZE) {
+                String key = pinned
+                        ? "gui.mercantile.pin.tooltip.pinned"
+                        : "gui.mercantile.pin.tooltip.unpinned";
+                guiGraphics.renderTooltip(this.font, Component.translatable(key), mouseX, mouseY);
+            }
+        }
+    }
+
+    /** Returns the absolute offer index of the pin icon under the cursor, or -1. */
+    @Unique
+    private int mercantile$pinIndexAt(double mouseX, double mouseY) {
+        if (!mercantile$pinsActive()) return -1;
+        var pins = ClientMercantileData.getTradePins();
+        var offers = this.menu.getOffers();
+        if (offers == null || offers.isEmpty()) return -1;
+
+        int iconX = this.leftPos + PIN_ICON_X;
+        if (mouseX < iconX || mouseX >= iconX + ICON_SIZE) return -1;
+        int rows = Math.min(VISIBLE_TRADE_ROWS, offers.size() - scrollOff);
+        for (int row = 0; row < rows; row++) {
+            int rowY = this.topPos + TRADE_ROW_Y + row * TRADE_ROW_HEIGHT;
+            int iconY = rowY + (TRADE_ROW_HEIGHT - ICON_SIZE) / 2;
+            if (mouseY >= iconY && mouseY < iconY + ICON_SIZE) {
+                int offerIndex = row + scrollOff;
+                return offerIndex < pins.pinnedByIndex().size() ? offerIndex : -1;
+            }
+        }
+        return -1;
     }
 
     @Unique
@@ -615,6 +711,18 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         if (button == 0 && mercantile$infoIconVisible() && mercantile$isPointInInfoIcon(mouseX, mouseY)) {
             mercantile$overlayOpen = true;
             cir.setReturnValue(true);
+            return;
+        }
+
+        if (button == 0) {
+            int pinIndex = mercantile$pinIndexAt(mouseX, mouseY);
+            if (pinIndex >= 0) {
+                var pins = ClientMercantileData.getTradePins();
+                if (pins != null) {
+                    ClientPlayNetworking.send(new PinTradeC2SPayload(pins.villagerEntityId(), pinIndex));
+                }
+                cir.setReturnValue(true);
+            }
         }
     }
 

@@ -266,6 +266,23 @@ public class ModMenuIntegration implements ModMenuApi {
                     .setTooltip(Component.translatable("mercantile.config.enableDemandTransparency.tooltip"))
                     .setSaveConsumer(v -> config.enableDemandTransparency = v)
                     .build());
+            trading.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableTradePinning"), config.enableTradePinning)
+                    .setDefaultValue(defaults.enableTradePinning)
+                    .setTooltip(Component.translatable("mercantile.config.enableTradePinning.tooltip"))
+                    .setSaveConsumer(v -> config.enableTradePinning = v)
+                    .build());
+            trading.addEntry(entry.startIntField(Component.translatable("mercantile.config.maxPinnedTradesPerPlayer"), config.maxPinnedTradesPerPlayer)
+                    .setDefaultValue(defaults.maxPinnedTradesPerPlayer)
+                    .setMin(1).setMax(64)
+                    .setTooltip(Component.translatable("mercantile.config.maxPinnedTradesPerPlayer.tooltip"))
+                    .setSaveConsumer(v -> config.maxPinnedTradesPerPlayer = v)
+                    .build());
+            trading.addEntry(entry.startIntField(Component.translatable("mercantile.config.pinRestockNotifyRange"), config.pinRestockNotifyRange)
+                    .setDefaultValue(defaults.pinRestockNotifyRange)
+                    .setMin(8).setMax(256)
+                    .setTooltip(Component.translatable("mercantile.config.pinRestockNotifyRange.tooltip"))
+                    .setSaveConsumer(v -> config.pinRestockNotifyRange = v)
+                    .build());
             trading.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableBreedingTooltip"), config.enableBreedingTooltip)
                     .setDefaultValue(defaults.enableBreedingTooltip)
                     .setTooltip(Component.translatable("mercantile.config.enableBreedingTooltip.tooltip"))

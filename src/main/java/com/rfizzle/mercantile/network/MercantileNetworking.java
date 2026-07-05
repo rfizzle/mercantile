@@ -5,6 +5,7 @@ import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.follow.FollowManager;
 import com.rfizzle.mercantile.reputation.ReputationManager;
 import com.rfizzle.mercantile.trade.TradeCycleManager;
+import com.rfizzle.mercantile.trade.TradePinManager;
 import com.rfizzle.mercantile.trade.index.TradeIndexDataSource;
 import com.rfizzle.mercantile.trade.index.TradeIndexEntry;
 import com.rfizzle.mercantile.visualization.WorkstationMapService;
@@ -34,9 +35,11 @@ public class MercantileNetworking {
     // expensive POI queries or trade-pool regeneration.
     private static final Map<UUID, Long> LAST_CYCLE_TRADES_MS = new ConcurrentHashMap<>();
     private static final Map<UUID, Long> LAST_WORKSTATION_MAP_MS = new ConcurrentHashMap<>();
+    private static final Map<UUID, Long> LAST_PIN_TRADE_MS = new ConcurrentHashMap<>();
 
     private static final long CYCLE_TRADES_COOLDOWN_MS = 500;
     private static final long REQUEST_QUERY_COOLDOWN_MS = 2000;
+    private static final long PIN_TRADE_COOLDOWN_MS = 200;
 
     // Tracks whether the trade index payload size has been logged at least once per session.
     private static final AtomicBoolean tradeIndexSizeLogged = new AtomicBoolean(false);
@@ -52,6 +55,7 @@ public class MercantileNetworking {
     private static void registerPayloadTypes() {
         PayloadTypeRegistry.playC2S().register(CycleTradesC2SPayload.TYPE, CycleTradesC2SPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(RequestWorkstationMapC2SPayload.TYPE, RequestWorkstationMapC2SPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(PinTradeC2SPayload.TYPE, PinTradeC2SPayload.CODEC);
 
         PayloadTypeRegistry.playS2C().register(SyncReputationS2CPayload.TYPE, SyncReputationS2CPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(FollowStateS2CPayload.TYPE, FollowStateS2CPayload.CODEC);
@@ -63,6 +67,7 @@ public class MercantileNetworking {
         PayloadTypeRegistry.playS2C().register(BellRingS2CPayload.TYPE, BellRingS2CPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(ConfigSyncS2CPayload.TYPE, ConfigSyncS2CPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(TradeIndexS2CPayload.TYPE, TradeIndexS2CPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(TradePinsS2CPayload.TYPE, TradePinsS2CPayload.CODEC);
     }
 
     private static void registerServerHandlers() {
@@ -76,6 +81,12 @@ public class MercantileNetworking {
             ServerPlayer player = context.player();
             if (!checkCooldown(LAST_WORKSTATION_MAP_MS, player.getUUID(), REQUEST_QUERY_COOLDOWN_MS)) return;
             player.server.execute(() -> handleRequestWorkstationMap(player));
+        });
+
+        ServerPlayNetworking.registerGlobalReceiver(PinTradeC2SPayload.TYPE, (payload, context) -> {
+            ServerPlayer player = context.player();
+            if (!checkCooldown(LAST_PIN_TRADE_MS, player.getUUID(), PIN_TRADE_COOLDOWN_MS)) return;
+            player.server.execute(() -> handlePinTrade(player, payload));
         });
     }
 
@@ -128,6 +139,7 @@ public class MercantileNetworking {
             UUID id = handler.getPlayer().getUUID();
             LAST_CYCLE_TRADES_MS.remove(id);
             LAST_WORKSTATION_MAP_MS.remove(id);
+            LAST_PIN_TRADE_MS.remove(id);
         });
     }
 
@@ -149,6 +161,20 @@ public class MercantileNetworking {
         }
 
         TradeCycleManager.cycle(player, villager);
+    }
+
+    private static void handlePinTrade(ServerPlayer player, PinTradeC2SPayload payload) {
+        if (!MercantileConfig.get().enableTradePinning) return;
+
+        Villager villager = resolveVillager(player, payload.villagerEntityId());
+        if (villager == null) return;
+
+        if (villager.getTradingPlayer() != player) {
+            Mercantile.LOGGER.warn("Player {} tried to pin a trade of a villager they aren't trading with", player.getName().getString());
+            return;
+        }
+
+        TradePinManager.togglePin(player, villager, payload.offerIndex());
     }
 
     private static void handleRequestWorkstationMap(ServerPlayer player) {

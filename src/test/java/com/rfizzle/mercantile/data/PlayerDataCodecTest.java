@@ -447,6 +447,132 @@ class PlayerDataCodecTest {
     }
 
     @Test
+    void dailyCountersNestUnderSingleKey() {
+        PlayerData original = new PlayerData();
+        original.addDailyTradeRep(2);
+
+        JsonObject encoded = PlayerData.CODEC.encodeStart(JsonOps.INSTANCE, original).getOrThrow().getAsJsonObject();
+        assertTrue(encoded.has("dailyCounters"), "daily counters must serialize as a nested sub-record");
+        assertFalse(encoded.has("dailyTradeRep"), "legacy flat daily keys must no longer be written");
+    }
+
+    @Test
+    void preDailyCountersSaveDecodesWithFreshDay() {
+        // A save from before the DailyCounters extraction carries flat daily keys; they are
+        // intentionally dropped (at most one in-progress day of cap tracking resets).
+        JsonObject legacy = new JsonObject();
+        legacy.addProperty("score", 90);
+        legacy.addProperty("dailyTradeRep", 7);
+        legacy.addProperty("lastCapResetDay", 11L);
+
+        PlayerData decoded = PlayerData.CODEC.parse(JsonOps.INSTANCE, legacy).getOrThrow();
+        assertEquals(90, decoded.getScore(), "non-daily fields must survive");
+        assertEquals(0, decoded.getDailyTradeRep());
+        assertEquals(-1L, decoded.getLastCapResetDay(),
+                "stale flat daily keys decode to defaults so the next day rollover starts fresh");
+    }
+
+    @Test
+    void decodedInstancesDoNotShareDailyCounters() {
+        // The codec's optionalFieldOf default is a single shared DailyCounters instance;
+        // the PlayerData constructor must copy it or every legacy-save player aliases
+        // the same counters. This pins that load-bearing copy.
+        PlayerData first = PlayerData.CODEC.parse(JsonOps.INSTANCE, new JsonObject()).getOrThrow();
+        PlayerData second = PlayerData.CODEC.parse(JsonOps.INSTANCE, new JsonObject()).getOrThrow();
+
+        first.addDailyTradeRep(3);
+
+        assertEquals(3, first.getDailyTradeRep());
+        assertEquals(0, second.getDailyTradeRep(),
+                "mutating one decoded PlayerData must not leak into another");
+    }
+
+    @Test
+    void pinnedTradesRoundTrip() {
+        UUID villager = UUID.fromString("22222222-2222-2222-2222-222222222222");
+        PlayerData original = new PlayerData();
+        assertTrue(original.addPinnedTrade(new PinnedTrade(villager, "hash-a", "Aldric", "1 Emerald -> Mending I")));
+        assertTrue(original.addPinnedTrade(new PinnedTrade(villager, "hash-b", "Aldric", "32 Stick -> 1 Emerald")));
+
+        JsonElement encoded = PlayerData.CODEC.encodeStart(JsonOps.INSTANCE, original).getOrThrow();
+        PlayerData decoded = PlayerData.CODEC.parse(JsonOps.INSTANCE, encoded).getOrThrow();
+
+        assertEquals(2, decoded.getPinnedTrades().size());
+        assertTrue(decoded.isTradePinned(villager, "hash-a"));
+        assertTrue(decoded.isTradePinned(villager, "hash-b"));
+        PinnedTrade first = decoded.getPinnedTrades().get(0);
+        assertEquals("Aldric", first.villagerName());
+        assertEquals("1 Emerald -> Mending I", first.tradeSummary());
+    }
+
+    @Test
+    void legacySaveWithoutPinnedTradesDecodesEmpty() {
+        JsonObject legacy = new JsonObject();
+        legacy.addProperty("score", 80);
+
+        PlayerData decoded = PlayerData.CODEC.parse(JsonOps.INSTANCE, legacy).getOrThrow();
+        assertTrue(decoded.getPinnedTrades().isEmpty());
+    }
+
+    @Test
+    void pinnedTradesDeduplicateAndRemove() {
+        UUID villager = UUID.randomUUID();
+        PlayerData data = new PlayerData();
+        assertTrue(data.addPinnedTrade(new PinnedTrade(villager, "hash-a", "Aldric", "x")));
+        assertFalse(data.addPinnedTrade(new PinnedTrade(villager, "hash-a", "Aldric", "x")),
+                "duplicate (villager, offer) pins must be rejected");
+        assertEquals(1, data.getPinnedTrades().size());
+
+        assertTrue(data.removePinnedTrade(villager, "hash-a"));
+        assertFalse(data.removePinnedTrade(villager, "hash-a"));
+        assertTrue(data.getPinnedTrades().isEmpty());
+    }
+
+    @Test
+    void pinnedTradesPruneByVillagerAndClear() {
+        UUID dead = UUID.randomUUID();
+        UUID alive = UUID.randomUUID();
+        PlayerData data = new PlayerData();
+        data.addPinnedTrade(new PinnedTrade(dead, "hash-a", "A", ""));
+        data.addPinnedTrade(new PinnedTrade(dead, "hash-b", "A", ""));
+        data.addPinnedTrade(new PinnedTrade(alive, "hash-c", "B", ""));
+
+        assertEquals(2, data.removePinnedTradesFor(dead));
+        assertEquals(1, data.getPinnedTrades().size());
+        assertTrue(data.isTradePinned(alive, "hash-c"));
+
+        assertEquals(1, data.clearPinnedTrades());
+        assertTrue(data.getPinnedTrades().isEmpty());
+    }
+
+    @Test
+    void pinnedTradesHardBoundClampsOnConstructAndAdd() {
+        List<PinnedTrade> oversized = new ArrayList<>();
+        for (int i = 0; i < PlayerData.MAX_PINNED_TRADES + 10; i++) {
+            oversized.add(new PinnedTrade(new UUID(0L, i), "hash-" + i, "V" + i, ""));
+        }
+
+        PlayerData data = PlayerData.builder().pinnedTrades(oversized).build();
+        assertEquals(PlayerData.MAX_PINNED_TRADES, data.getPinnedTrades().size(),
+                "constructor must clamp oversized pin lists to MAX_PINNED_TRADES");
+        assertFalse(data.isTradePinned(new UUID(0L, 0L), "hash-0"),
+                "oldest pins must evict first");
+        assertFalse(data.addPinnedTrade(new PinnedTrade(UUID.randomUUID(), "hash-x", "", "")),
+                "adds at the hard bound must be rejected");
+    }
+
+    @Test
+    void pinnedTradeSnapshotsClampLength() {
+        String longHash = "h".repeat(PinnedTrade.MAX_HASH_LENGTH + 50);
+        String longName = "n".repeat(PinnedTrade.MAX_NAME_LENGTH + 50);
+        String longSummary = "s".repeat(PinnedTrade.MAX_SUMMARY_LENGTH + 50);
+        PinnedTrade pin = new PinnedTrade(UUID.randomUUID(), longHash, longName, longSummary);
+        assertEquals(PinnedTrade.MAX_HASH_LENGTH, pin.offerHash().length());
+        assertEquals(PinnedTrade.MAX_NAME_LENGTH, pin.villagerName().length());
+        assertEquals(PinnedTrade.MAX_SUMMARY_LENGTH, pin.tradeSummary().length());
+    }
+
+    @Test
     void incrementTradesMovesEntryToEndForLruEviction() {
         // Fill to cap, then increment the first-inserted entry — it should move to end
         // so the *second*-inserted entry becomes the eviction candidate on overflow.

@@ -162,6 +162,11 @@ public final class TradeCycleManager {
                 villager.showProgressBar(),
                 villager.canRestock()
         ));
+        // A re-roll reorders/replaces the offer list, so the client's index-aligned pin
+        // overlay must be rebuilt (and cycled-away pins pruned) in the same breath.
+        if (MercantileConfig.get().enableTradePinning) {
+            TradePinManager.sendPinsTo(player, villager);
+        }
     }
 
 }

@@ -16,9 +16,15 @@ public class PlayerData {
     public static final int MAX_TRADE_STATS = 1024;
     /** Max tracked fear-markup villages per player; bounded to keep serialized footprint predictable. */
     public static final int MAX_FEAR_VILLAGES = 64;
+    /**
+     * Hard bound on persisted pins per player (the player-facing cap is the smaller, configurable
+     * {@code maxPinnedTradesPerPlayer}); ~16 KB serialized footprint at this limit.
+     */
+    public static final int MAX_PINNED_TRADES = 64;
 
-    // NOTE: RecordCodecBuilder.group is at its hard 16-field ceiling. The next field must
-    // first move a cohesive cluster (e.g. the daily counters) into a sub-record codec.
+    // NOTE: pre-2026-07 saves stored the daily counters as flat fields; they now live in the
+    // DailyCounters sub-record ("dailyCounters"), so upgrading resets at most one in-progress
+    // day of cap tracking. RecordCodecBuilder.group ceiling is 16 fields; currently at 10.
     public static final Codec<PlayerData> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
                     Codec.INT.optionalFieldOf("score", 0).forGetter(PlayerData::getScore),
@@ -31,19 +37,16 @@ public class PlayerData {
                     Codec.unboundedMap(UUIDUtil.STRING_CODEC, Codec.INT)
                             .optionalFieldOf("tradeStats", Map.of())
                             .forGetter(PlayerData::getTradeStats),
-                    Codec.INT.optionalFieldOf("dailyReputationEarned", 0).forGetter(PlayerData::getDailyReputationEarned),
-                    Codec.LONG.optionalFieldOf("lastCapResetDay", -1L).forGetter(PlayerData::getLastCapResetDay),
-                    Codec.INT.optionalFieldOf("dailyTradeRep", 0).forGetter(PlayerData::getDailyTradeRep),
-                    Codec.INT.optionalFieldOf("dailyCycleRep", 0).forGetter(PlayerData::getDailyCycleRep),
-                    Codec.INT.optionalFieldOf("dailyGiftRep", 0).forGetter(PlayerData::getDailyGiftRep),
+                    DailyCounters.CODEC.optionalFieldOf("dailyCounters", new DailyCounters())
+                            .forGetter(PlayerData::getDailyCounters),
                     Codec.LONG.optionalFieldOf("lastDecayDay", -1L).forGetter(PlayerData::getLastDecayDay),
-                    Codec.INT.optionalFieldOf("tradesSinceLastRepGain", 0).forGetter(PlayerData::getTradesSinceLastRepGain),
                     Codec.BOOL.optionalFieldOf("reputationMigrated", false).forGetter(PlayerData::isReputationMigrated),
-                    Codec.BOOL.optionalFieldOf("dailyCapNotified", false).forGetter(PlayerData::isDailyCapNotified),
-                    Codec.INT.optionalFieldOf("dailyGratitudeGifts", 0).forGetter(PlayerData::getDailyGratitudeGifts),
                     Codec.unboundedMap(Codec.STRING, FearEntry.CODEC)
                             .optionalFieldOf("fearByVillage", Map.of())
-                            .forGetter(PlayerData::getFearByVillage)
+                            .forGetter(PlayerData::getFearByVillage),
+                    PinnedTrade.CODEC.listOf()
+                            .optionalFieldOf("pinnedTrades", List.of())
+                            .forGetter(PlayerData::getPinnedTrades)
             ).apply(instance, PlayerData::new)
     );
 
@@ -52,26 +55,19 @@ public class PlayerData {
     private long lastProximityDay;
     private final LinkedHashSet<UUID> curedVillagers;
     private final LinkedHashMap<UUID, Integer> tradeStats;
-    private int dailyReputationEarned;
-    private long lastCapResetDay;
-    private int dailyTradeRep;
-    private int dailyCycleRep;
-    private int dailyGiftRep;
+    private final DailyCounters dailyCounters;
     private long lastDecayDay;
-    private int tradesSinceLastRepGain;
     private boolean reputationMigrated;
-    private boolean dailyCapNotified;
-    private int dailyGratitudeGifts;
     private final LinkedHashMap<String, FearEntry> fearByVillage;
+    private final List<PinnedTrade> pinnedTrades;
 
     public PlayerData() {
-        this(0, 0, -1L, Set.of(), Map.of(), 0, -1L, 0, 0, 0, -1L, 0, false, false, 0, Map.of());
+        this(0, 0, -1L, Set.of(), Map.of(), new DailyCounters(), -1L, false, Map.of(), List.of());
     }
 
     public PlayerData(int score, int proximityTicks, long lastProximityDay, Set<UUID> curedVillagers, Map<UUID, Integer> tradeStats,
-                      int dailyReputationEarned, long lastCapResetDay, int dailyTradeRep, int dailyCycleRep, int dailyGiftRep,
-                      long lastDecayDay, int tradesSinceLastRepGain, boolean reputationMigrated, boolean dailyCapNotified,
-                      int dailyGratitudeGifts, Map<String, FearEntry> fearByVillage) {
+                      DailyCounters dailyCounters, long lastDecayDay, boolean reputationMigrated,
+                      Map<String, FearEntry> fearByVillage, List<PinnedTrade> pinnedTrades) {
         this.score = Math.clamp(score, MIN_SCORE, MAX_SCORE);
         this.proximityTicks = proximityTicks;
         this.lastProximityDay = lastProximityDay;
@@ -89,21 +85,21 @@ public class PlayerData {
             tsIt.remove();
         }
         this.tradeStats = ts;
-        this.dailyReputationEarned = Math.max(0, dailyReputationEarned);
-        this.lastCapResetDay = lastCapResetDay;
-        this.dailyTradeRep = Math.max(0, dailyTradeRep);
-        this.dailyCycleRep = Math.max(0, dailyCycleRep);
-        this.dailyGiftRep = Math.max(0, dailyGiftRep);
+        // Copy: the codec's optionalFieldOf default is a single shared instance.
+        this.dailyCounters = dailyCounters.copy();
         this.lastDecayDay = lastDecayDay;
-        this.tradesSinceLastRepGain = Math.max(0, tradesSinceLastRepGain);
         this.reputationMigrated = reputationMigrated;
-        this.dailyCapNotified = dailyCapNotified;
-        this.dailyGratitudeGifts = Math.max(0, dailyGratitudeGifts);
         LinkedHashMap<String, FearEntry> fear = new LinkedHashMap<>(fearByVillage);
         while (fear.size() > MAX_FEAR_VILLAGES) {
             evictLeastRecentlyActiveFearEntry(fear);
         }
         this.fearByVillage = fear;
+        ArrayList<PinnedTrade> pins = new ArrayList<>(pinnedTrades);
+        // Oldest pins evict first; list order is insertion order and survives the round-trip.
+        while (pins.size() > MAX_PINNED_TRADES) {
+            pins.removeFirst();
+        }
+        this.pinnedTrades = pins;
     }
 
     // Eviction goes by entry activity, not map order: Codec.unboundedMap round-trips through
@@ -217,24 +213,28 @@ public class PlayerData {
         fearByVillage.remove(villageKey);
     }
 
+    public DailyCounters getDailyCounters() {
+        return dailyCounters;
+    }
+
     public int getDailyReputationEarned() {
-        return dailyReputationEarned;
+        return dailyCounters.getReputationEarned();
     }
 
     public long getLastCapResetDay() {
-        return lastCapResetDay;
+        return dailyCounters.getLastCapResetDay();
     }
 
     public int getDailyTradeRep() {
-        return dailyTradeRep;
+        return dailyCounters.getTradeRep();
     }
 
     public int getDailyCycleRep() {
-        return dailyCycleRep;
+        return dailyCounters.getCycleRep();
     }
 
     public int getDailyGiftRep() {
-        return dailyGiftRep;
+        return dailyCounters.getGiftRep();
     }
 
     public long getLastDecayDay() {
@@ -246,49 +246,79 @@ public class PlayerData {
     }
 
     public int getTradesSinceLastRepGain() {
-        return tradesSinceLastRepGain;
+        return dailyCounters.getTradesSinceLastRepGain();
     }
 
     public void resetDailyCounters(long newDay) {
-        this.lastCapResetDay = newDay;
-        this.dailyReputationEarned = 0;
-        this.dailyTradeRep = 0;
-        this.dailyCycleRep = 0;
-        this.dailyGiftRep = 0;
-        this.tradesSinceLastRepGain = 0;
-        this.dailyCapNotified = false;
-        this.dailyGratitudeGifts = 0;
+        dailyCounters.reset(newDay);
     }
 
     public int getDailyGratitudeGifts() {
-        return dailyGratitudeGifts;
+        return dailyCounters.getGratitudeGifts();
     }
 
     public void incrementDailyGratitudeGifts() {
-        this.dailyGratitudeGifts++;
+        dailyCounters.incrementGratitudeGifts();
     }
 
     public void addDailyTradeRep(int amount) {
-        this.dailyTradeRep += amount;
-        this.dailyReputationEarned += amount;
+        dailyCounters.addTradeRep(amount);
     }
 
     public void addDailyCycleRep(int amount) {
-        this.dailyCycleRep += amount;
-        this.dailyReputationEarned += amount;
+        dailyCounters.addCycleRep(amount);
     }
 
     public void addDailyGiftRep(int amount) {
-        this.dailyGiftRep += amount;
-        this.dailyReputationEarned += amount;
+        dailyCounters.addGiftRep(amount);
     }
 
     public void incrementTradesSinceLastRepGain() {
-        this.tradesSinceLastRepGain++;
+        dailyCounters.incrementTradesSinceLastRepGain();
     }
 
     public void resetTradesSinceLastRepGain() {
-        this.tradesSinceLastRepGain = 0;
+        dailyCounters.resetTradesSinceLastRepGain();
+    }
+
+    public List<PinnedTrade> getPinnedTrades() {
+        return Collections.unmodifiableList(pinnedTrades);
+    }
+
+    public boolean isTradePinned(UUID villagerUuid, String offerHash) {
+        for (PinnedTrade pin : pinnedTrades) {
+            if (pin.matches(villagerUuid, offerHash)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Adds a pin unless it already exists or the hard bound is reached. The configurable
+     * player-facing cap is enforced by the caller before this; the bound here only guards
+     * the serialized footprint.
+     */
+    public boolean addPinnedTrade(PinnedTrade pin) {
+        if (isTradePinned(pin.villagerUuid(), pin.offerHash())) return false;
+        if (pinnedTrades.size() >= MAX_PINNED_TRADES) return false;
+        pinnedTrades.add(pin);
+        return true;
+    }
+
+    public boolean removePinnedTrade(UUID villagerUuid, String offerHash) {
+        return pinnedTrades.removeIf(pin -> pin.matches(villagerUuid, offerHash));
+    }
+
+    /** Removes all pins targeting the given villager (death/pruning). Returns the removed count. */
+    public int removePinnedTradesFor(UUID villagerUuid) {
+        int before = pinnedTrades.size();
+        pinnedTrades.removeIf(pin -> pin.villagerUuid().equals(villagerUuid));
+        return before - pinnedTrades.size();
+    }
+
+    public int clearPinnedTrades() {
+        int cleared = pinnedTrades.size();
+        pinnedTrades.clear();
+        return cleared;
     }
 
     public boolean isReputationMigrated() {
@@ -307,15 +337,15 @@ public class PlayerData {
     }
 
     public boolean isDailyCapNotified() {
-        return dailyCapNotified;
+        return dailyCounters.isCapNotified();
     }
 
     public void setDailyCapNotified(boolean dailyCapNotified) {
-        this.dailyCapNotified = dailyCapNotified;
+        dailyCounters.setCapNotified(dailyCapNotified);
     }
 
     /**
-     * Test-only fluent builder. The 12-arg positional constructor stays as the codec's
+     * Test-only fluent builder. The positional constructor stays as the codec's
      * apply target, but tests should use this builder so an int swap (e.g. dailyTradeRep
      * vs dailyCycleRep) cannot pass the compiler silently.
      */
@@ -342,6 +372,7 @@ public class PlayerData {
         private boolean dailyCapNotified = false;
         private int dailyGratitudeGifts = 0;
         private Map<String, FearEntry> fearByVillage = Map.of();
+        private List<PinnedTrade> pinnedTrades = List.of();
 
         private Builder() {
         }
@@ -362,12 +393,13 @@ public class PlayerData {
         public Builder dailyCapNotified(boolean v) { this.dailyCapNotified = v; return this; }
         public Builder dailyGratitudeGifts(int v) { this.dailyGratitudeGifts = v; return this; }
         public Builder fearByVillage(Map<String, FearEntry> v) { this.fearByVillage = v; return this; }
+        public Builder pinnedTrades(List<PinnedTrade> v) { this.pinnedTrades = v; return this; }
 
         public PlayerData build() {
+            DailyCounters daily = new DailyCounters(dailyReputationEarned, lastCapResetDay, dailyTradeRep,
+                    dailyCycleRep, dailyGiftRep, tradesSinceLastRepGain, dailyCapNotified, dailyGratitudeGifts);
             return new PlayerData(score, proximityTicks, lastProximityDay, curedVillagers, tradeStats,
-                    dailyReputationEarned, lastCapResetDay, dailyTradeRep, dailyCycleRep, dailyGiftRep,
-                    lastDecayDay, tradesSinceLastRepGain, reputationMigrated, dailyCapNotified, dailyGratitudeGifts,
-                    fearByVillage);
+                    daily, lastDecayDay, reputationMigrated, fearByVillage, pinnedTrades);
         }
     }
 }
