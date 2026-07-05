@@ -1,7 +1,7 @@
 package com.rfizzle.mercantile.compat.wthit;
 
-import com.rfizzle.mercantile.compat.StateIndicatorData;
-import com.rfizzle.mercantile.compat.StateIndicatorFormatter;
+import com.rfizzle.mercantile.compat.shared.StateIndicatorData;
+import com.rfizzle.mercantile.compat.shared.StateIndicatorFormatter;
 import mcp.mobius.waila.api.IEntityAccessor;
 import mcp.mobius.waila.api.IEntityComponentProvider;
 import mcp.mobius.waila.api.IPluginConfig;

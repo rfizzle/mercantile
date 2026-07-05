@@ -28,15 +28,15 @@
 | Merchant unlock button | `art/glyphs/unlocked-button.glyph` | `assets/mercantile/textures/gui/sprites/unlocked_button.png` |
 | Workstation claimed marker | `art/glyphs/workstation-claimed.glyph` | `assets/mercantile/textures/particle/workstation_claimed.png` |
 | Workstation unclaimed marker | `art/glyphs/workstation-unclaimed.glyph` | `assets/mercantile/textures/particle/workstation_unclaimed.png` |
-| Info button | **MISSING** | `assets/mercantile/textures/gui/sprites/info_button.png` |
-| Close button | **MISSING** | `assets/mercantile/textures/gui/sprites/close_button.png` |
-| Sentry pylon block (top/side/bottom) | **MISSING** | `assets/mercantile/textures/block/sentry_pylon_{top,side,bottom}.png` |
-| Pickup sparkle (particle) | **MISSING** | `assets/mercantile/textures/particle/pickup_sparkle.png` |
-| Trade cycle glint (particle) | **MISSING** | `assets/mercantile/textures/particle/cycle_glint.png` |
-| Follow trail (particle) | **MISSING** | `assets/mercantile/textures/particle/follow_trail.png` |
-| Golem shard (particle) | **MISSING** | `assets/mercantile/textures/particle/golem_shard.png` |
-| Pylon mote (particle) | **MISSING** | `assets/mercantile/textures/particle/pylon_mote.png` |
-| Pylon spark (particle) | **MISSING** | `assets/mercantile/textures/particle/pylon_spark.png` |
+| Info button | `art/glyphs/info-button.glyph` | `assets/mercantile/textures/gui/sprites/info_button.png` |
+| Close button | `art/glyphs/close-button.glyph` | `assets/mercantile/textures/gui/sprites/close_button.png` |
+| Sentry pylon block (top/side/bottom) | `art/glyphs/sentry-pylon-{top,side,bottom}.glyph` | `assets/mercantile/textures/block/sentry_pylon_{top,side,bottom}.png` |
+| Pickup sparkle (particle) | `art/glyphs/pickup-sparkle.glyph` | `assets/mercantile/textures/particle/pickup_sparkle.png` |
+| Trade cycle glint (particle) | `art/glyphs/cycle-glint.glyph` | `assets/mercantile/textures/particle/cycle_glint.png` |
+| Follow trail (particle) | `art/glyphs/follow-trail.glyph` | `assets/mercantile/textures/particle/follow_trail.png` |
+| Golem shard (particle) | `art/glyphs/golem-shard.glyph` | `assets/mercantile/textures/particle/golem_shard.png` |
+| Pylon mote (particle) | `art/glyphs/pylon-mote.glyph` | `assets/mercantile/textures/particle/pylon_mote.png` |
+| Pylon spark (particle) | `art/glyphs/pylon-spark.glyph` | `assets/mercantile/textures/particle/pylon_spark.png` |
 
 ## Audio (`.sfx` — procedural synthesis)
 

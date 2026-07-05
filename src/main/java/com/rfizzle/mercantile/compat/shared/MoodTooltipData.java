@@ -1,4 +1,4 @@
-package com.rfizzle.mercantile.compat;
+package com.rfizzle.mercantile.compat.shared;
 
 import com.rfizzle.mercantile.mood.MoodManager;
 import net.minecraft.nbt.CompoundTag;

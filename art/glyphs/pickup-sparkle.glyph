@@ -1,0 +1,19 @@
+# mercantile — pickup-sparkle (faithful reproduction of the shipped 8x8 texture)
+size: 8
+
+legend:
+  . transparent
+  a #55c45560
+  b #55c455
+  c #a8e6a0
+  d #ffffff
+
+frame:
+  ...aba..
+  ...bcb..
+  ..abcba.
+  abcddcba
+  ..abcba.
+  ...bcb..
+  ...aba..
+  ........

@@ -1,4 +1,4 @@
-package com.rfizzle.mercantile.compat;
+package com.rfizzle.mercantile.compat.shared;
 
 import com.rfizzle.mercantile.block.SentryGolemTag;
 import com.rfizzle.mercantile.block.SentryPylonBlockEntity;

@@ -1,6 +1,6 @@
 package com.rfizzle.mercantile.compat.wthit;
 
-import com.rfizzle.mercantile.compat.SentryGolemTooltipData;
+import com.rfizzle.mercantile.compat.shared.SentryGolemTooltipData;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import mcp.mobius.waila.api.IDataProvider;
 import mcp.mobius.waila.api.IDataWriter;

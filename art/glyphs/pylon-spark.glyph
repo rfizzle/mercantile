@@ -1,0 +1,20 @@
+# mercantile — pylon-spark (faithful reproduction of the shipped 8x8 texture)
+size: 8
+
+legend:
+  . transparent
+  a #ff8c0060
+  b gold
+  c #ffffcc
+  d #ff8c00
+  e #cc4400
+
+frame:
+  .a..b...
+  ..abca..
+  ..bccb..
+  .bcccbd.
+  bccbd...
+  ..bda...
+  .aea.ae.
+  ........

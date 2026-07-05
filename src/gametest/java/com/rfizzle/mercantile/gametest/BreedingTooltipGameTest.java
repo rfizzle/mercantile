@@ -1,6 +1,6 @@
 package com.rfizzle.mercantile.gametest;
 
-import com.rfizzle.mercantile.compat.BreedingTooltipData;
+import com.rfizzle.mercantile.compat.shared.BreedingTooltipData;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;

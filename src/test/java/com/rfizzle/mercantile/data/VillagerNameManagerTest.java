@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceKey;
+import com.rfizzle.mercantile.Mercantile;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.resources.Resource;
@@ -138,8 +139,7 @@ class VillagerNameManagerTest {
     @Test
     void replaceFlagClearsPreviousPool() {
         Map<ResourceLocation, List<String>> resources = new LinkedHashMap<>();
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(
-                "mercantile", "villager_names/plains.json");
+        ResourceLocation id = poolId("plains");
         resources.put(id, List.of(
                 "{\"replace\": false, \"names\": [\"Alice\", \"Bob\"]}",
                 "{\"replace\": true, \"names\": [\"Zara\"]}"
@@ -154,8 +154,7 @@ class VillagerNameManagerTest {
     @Test
     void appendModeAddsToPreviousPool() {
         Map<ResourceLocation, List<String>> resources = new LinkedHashMap<>();
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(
-                "mercantile", "villager_names/plains.json");
+        ResourceLocation id = poolId("plains");
         resources.put(id, List.of(
                 "{\"replace\": false, \"names\": [\"Alice\", \"Bob\"]}",
                 "{\"replace\": false, \"names\": [\"Charlie\"]}"
@@ -170,8 +169,7 @@ class VillagerNameManagerTest {
     @Test
     void duplicateNamesAreIgnored() {
         Map<ResourceLocation, List<String>> resources = new LinkedHashMap<>();
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(
-                "mercantile", "villager_names/plains.json");
+        ResourceLocation id = poolId("plains");
         resources.put(id, List.of("{\"replace\": false, \"names\": [\"Alice\", \"Bob\", \"Alice\"]}"));
         fillEmptyPools(resources, "plains");
 
@@ -183,8 +181,7 @@ class VillagerNameManagerTest {
     @Test
     void duplicatesAcrossPacksAreIgnored() {
         Map<ResourceLocation, List<String>> resources = new LinkedHashMap<>();
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(
-                "mercantile", "villager_names/plains.json");
+        ResourceLocation id = poolId("plains");
         resources.put(id, List.of(
                 "{\"replace\": false, \"names\": [\"Alice\", \"Bob\"]}",
                 "{\"replace\": false, \"names\": [\"Bob\", \"Charlie\"]}"
@@ -323,7 +320,7 @@ class VillagerNameManagerTest {
     // --- helpers ---
 
     private static ResourceLocation poolId(String category) {
-        return ResourceLocation.fromNamespaceAndPath("mercantile", "villager_names/" + category + ".json");
+        return Mercantile.id("villager_names/" + category + ".json");
     }
 
     private void fillEmptyPools(Map<ResourceLocation, List<String>> resources, String... loaded) {

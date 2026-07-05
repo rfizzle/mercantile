@@ -1,6 +1,6 @@
 package com.rfizzle.mercantile.compat.wthit;
 
-import com.rfizzle.mercantile.compat.BreedingTooltipData;
+import com.rfizzle.mercantile.compat.shared.BreedingTooltipData;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import mcp.mobius.waila.api.IDataProvider;
 import mcp.mobius.waila.api.IDataWriter;

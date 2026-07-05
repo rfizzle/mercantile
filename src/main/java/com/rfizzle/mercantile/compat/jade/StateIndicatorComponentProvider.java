@@ -1,8 +1,8 @@
 package com.rfizzle.mercantile.compat.jade;
 
 import com.rfizzle.mercantile.Mercantile;
-import com.rfizzle.mercantile.compat.StateIndicatorData;
-import com.rfizzle.mercantile.compat.StateIndicatorFormatter;
+import com.rfizzle.mercantile.compat.shared.StateIndicatorData;
+import com.rfizzle.mercantile.compat.shared.StateIndicatorFormatter;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.npc.Villager;

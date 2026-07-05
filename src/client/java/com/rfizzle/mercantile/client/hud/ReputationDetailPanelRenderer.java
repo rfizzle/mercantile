@@ -333,18 +333,14 @@ public final class ReputationDetailPanelRenderer implements HudRenderCallback {
         graphics.setColor(1f, 1f, 1f, 1f);
     }
 
-    /** The HUD-STANDARD §5 visibility rules plus the server's reputation toggle. */
+    /**
+     * The badge's shared visibility gate — {@link ReputationHudOverlay#hudGateVisible}
+     * (HUD-STANDARD §5 rules, {@code enableReputationHud}, and the server's
+     * reputation toggle). Unlike the badge, the panel has no villager-proximity
+     * requirement: it shows a "no villagers nearby" state instead.
+     */
     private static boolean shouldRender() {
-        Minecraft mc = Minecraft.getInstance();
-        if (mc == null) return false;
-        LocalPlayer player = mc.player;
-        if (player == null || mc.level == null) return false;
-        if (mc.options.hideGui) return false;
-        if (mc.screen != null) return false;
-        if (player.isSpectator()) return false;
-        if (player.isDeadOrDying()) return false;
-        MercantileConfig synced = ClientMercantileData.getServerConfig();
-        return synced == null || synced.enableReputation;
+        return ReputationHudOverlay.hudGateVisible(Minecraft.getInstance());
     }
 
     /**

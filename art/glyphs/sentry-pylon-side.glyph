@@ -1,0 +1,29 @@
+# mercantile — sentry-pylon-side (faithful reproduction of the shipped 16x16 texture)
+size: 16
+
+legend:
+  . transparent
+  a #384048
+  b #b0c0d0
+  c #606870
+  d #a0a8b0
+  e #505860
+  f #8090a0
+
+frame:
+  aaaaaaaaaaaaaaaa
+  abbbbbbbbbbbbcca
+  abdddddddddddeca
+  abfffffffffffeca
+  abfdceecceedfeca
+  abfdeaaaaaadfeca
+  aefdeaaaaaadfcca
+  abfdceecceedfeca
+  abfffffffffffeca
+  abfdceeaeecdfeca
+  abfdeaaaaaadfeca
+  aefdeaaaaaadfcca
+  abfdceecceedfeca
+  abdddddddddddeca
+  acccccccccccccca
+  aaaaaaaaaaaaaaaa

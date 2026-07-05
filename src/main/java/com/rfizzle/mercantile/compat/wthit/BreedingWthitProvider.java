@@ -1,7 +1,7 @@
 package com.rfizzle.mercantile.compat.wthit;
 
-import com.rfizzle.mercantile.compat.BreedingTooltipData;
-import com.rfizzle.mercantile.compat.BreedingTooltipFormatter;
+import com.rfizzle.mercantile.compat.shared.BreedingTooltipData;
+import com.rfizzle.mercantile.compat.shared.BreedingTooltipFormatter;
 import mcp.mobius.waila.api.IEntityAccessor;
 import mcp.mobius.waila.api.IEntityComponentProvider;
 import mcp.mobius.waila.api.IPluginConfig;

@@ -1,4 +1,4 @@
-package com.rfizzle.mercantile.compat;
+package com.rfizzle.mercantile.compat.shared;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
