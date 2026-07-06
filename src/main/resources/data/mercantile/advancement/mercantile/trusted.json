@@ -1,0 +1,18 @@
+{
+    "parent": "mercantile:mercantile/root",
+    "display": {
+        "icon": { "id": "minecraft:emerald_block" },
+        "title": { "translate": "advancements.mercantile.trusted.title" },
+        "description": { "translate": "advancements.mercantile.trusted.description" },
+        "frame": "goal",
+        "show_toast": true,
+        "announce_to_chat": true,
+        "hidden": false
+    },
+    "criteria": {
+        "reached_trusted": {
+            "trigger": "mercantile:trusted_tier"
+        }
+    },
+    "sends_telemetry_event": false
+}

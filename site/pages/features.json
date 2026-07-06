@@ -350,6 +350,28 @@
       ]
     },
     {
+      "id": "advancements",
+      "title": "Advancements",
+      "blocks": [
+        {
+          "type": "cards",
+          "mdColumns": 2,
+          "items": [
+            {
+              "id": "tutorial-tree",
+              "title": "Tutorial Advancement Tree",
+              "html": [
+                "A dedicated <strong>Mercantile</strong> advancement tab teaches the mod's gestures as you play. Every advancement's description spells out the exact gesture that grants it, so Mercantile's hidden interactions are discoverable in-game without a wiki.",
+                "The tree branches from a root earned by trading with any villager: pick up a villager, make one follow you with an emerald, have one accept a tossed gift, accept a delivery contract, reach the Trusted reputation tier, fuel a Sentry Pylon, assign a work order, and start nitwit rehabilitation.",
+                "Each grant lives inside the feature it teaches, so an advancement whose feature is disabled in <a href='/config.html' class='text-accent hover:text-accent2 underline'>config</a> is simply never earned."
+              ],
+              "note": "No config — the advancement tab is always present and costs nothing to complete."
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "visualizations",
       "title": "Visualizations",
       "blocks": [

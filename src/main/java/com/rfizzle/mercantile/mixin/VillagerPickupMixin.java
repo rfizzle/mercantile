@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.mixin;
 
+import com.rfizzle.mercantile.advancement.MercantileCriteria;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.VillagerPickupHelper;
 import com.rfizzle.mercantile.follow.FollowManager;
@@ -124,6 +125,7 @@ public abstract class VillagerPickupMixin {
 
         self.discard();
 
+        MercantileCriteria.PICKUP_VILLAGER.trigger(serverPlayer);
         cir.setReturnValue(InteractionResult.SUCCESS);
     }
 }

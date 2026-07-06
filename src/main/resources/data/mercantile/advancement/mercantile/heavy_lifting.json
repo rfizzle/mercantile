@@ -1,0 +1,18 @@
+{
+    "parent": "mercantile:mercantile/root",
+    "display": {
+        "icon": { "id": "minecraft:villager_spawn_egg" },
+        "title": { "translate": "advancements.mercantile.heavy_lifting.title" },
+        "description": { "translate": "advancements.mercantile.heavy_lifting.description" },
+        "frame": "task",
+        "show_toast": true,
+        "announce_to_chat": false,
+        "hidden": false
+    },
+    "criteria": {
+        "picked_up_villager": {
+            "trigger": "mercantile:pickup_villager"
+        }
+    },
+    "sends_telemetry_event": false
+}

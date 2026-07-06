@@ -1,0 +1,18 @@
+{
+    "parent": "mercantile:mercantile/root",
+    "display": {
+        "icon": { "id": "minecraft:poppy" },
+        "title": { "translate": "advancements.mercantile.a_kind_gesture.title" },
+        "description": { "translate": "advancements.mercantile.a_kind_gesture.description" },
+        "frame": "task",
+        "show_toast": true,
+        "announce_to_chat": false,
+        "hidden": false
+    },
+    "criteria": {
+        "gift_accepted": {
+            "trigger": "mercantile:gift_accepted"
+        }
+    },
+    "sends_telemetry_event": false
+}

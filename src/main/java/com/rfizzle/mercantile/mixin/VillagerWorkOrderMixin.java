@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.mixin;
 
+import com.rfizzle.mercantile.advancement.MercantileCriteria;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.trade.EmeraldPayment;
 import com.rfizzle.mercantile.workorder.WorkOrder;
@@ -110,6 +111,7 @@ public abstract class VillagerWorkOrderMixin extends AbstractVillager {
                         player.getMainHandItem().getHoverName())
                         .withStyle(ChatFormatting.GREEN), true);
 
+        MercantileCriteria.WORK_ORDER_ASSIGNED.trigger(serverPlayer);
         cir.setReturnValue(InteractionResult.SUCCESS);
     }
 }

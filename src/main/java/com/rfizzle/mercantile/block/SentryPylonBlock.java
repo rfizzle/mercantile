@@ -1,11 +1,13 @@
 package com.rfizzle.mercantile.block;
 
 import com.mojang.serialization.MapCodec;
+import com.rfizzle.mercantile.advancement.MercantileCriteria;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.particle.MercantileParticles;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.sounds.SoundEvents;
@@ -115,6 +117,9 @@ public class SentryPylonBlock extends BaseEntityBlock {
                 stack.shrink(1);
             }
             level.playSound(null, pos, SoundEvents.IRON_TRAPDOOR_CLOSE, SoundSource.BLOCKS, 0.6f, 1.4f);
+            if (player instanceof ServerPlayer serverPlayer) {
+                MercantileCriteria.PYLON_FUELED.trigger(serverPlayer);
+            }
         }
         return ItemInteractionResult.sidedSuccess(level.isClientSide);
     }

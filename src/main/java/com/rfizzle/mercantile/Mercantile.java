@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile;
 
+import com.rfizzle.mercantile.advancement.MercantileCriteria;
 import com.rfizzle.mercantile.command.MercantileCommands;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.contract.ContractManager;
@@ -36,6 +37,7 @@ public class Mercantile implements ModInitializer {
     public void onInitialize() {
         MercantileConfig.get();
         MercantileRegistry.register();
+        MercantileCriteria.init();
         MercantileRegistry.registerApiLookups();
         MercantileAttachments.init();
         ReputationManager.init();

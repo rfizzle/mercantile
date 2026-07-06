@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.mixin;
 
+import com.rfizzle.mercantile.advancement.MercantileCriteria;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.follow.FollowManager;
 import com.rfizzle.mercantile.follow.FollowPlayerGoal;
@@ -206,6 +207,7 @@ public abstract class VillagerFollowMixin extends AbstractVillager implements Fo
                 Component.translatable("mercantile.follow.start")
                         .withStyle(ChatFormatting.GREEN), true);
 
+        MercantileCriteria.FOLLOW_VILLAGER.trigger(serverPlayer);
         cir.setReturnValue(InteractionResult.SUCCESS);
     }
 }

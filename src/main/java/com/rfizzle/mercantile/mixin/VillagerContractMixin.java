@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.mixin;
 
+import com.rfizzle.mercantile.advancement.MercantileCriteria;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.contract.ContractService;
 import com.rfizzle.mercantile.contract.DeliveryContract;
@@ -167,6 +168,7 @@ public abstract class VillagerContractMixin extends AbstractVillager {
                                 contract.count(), ContractService.requestedItemName(contract),
                                 self.getDisplayName())
                         .withStyle(ChatFormatting.GREEN), true);
+        MercantileCriteria.CONTRACT_ACCEPTED.trigger(serverPlayer);
         cir.setReturnValue(InteractionResult.SUCCESS);
     }
 
