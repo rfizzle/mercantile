@@ -1,6 +1,6 @@
 package com.rfizzle.mercantile.compat.jei;
 
-import com.rfizzle.mercantile.Mercantile;
+import com.rfizzle.mercantile.compat.tradeindex.TradeIndexCategoryKey;
 import com.rfizzle.mercantile.compat.tradeindex.TradeIndexIcon;
 import com.rfizzle.mercantile.compat.tradeindex.TradeIndexLabels;
 import com.rfizzle.mercantile.trade.index.TradeIndexEntry;
@@ -19,28 +19,34 @@ import net.minecraft.network.chat.Component;
 
 public class VillagerTradeJeiCategory implements IRecipeCategory<TradeIndexEntry> {
 
-    public static final RecipeType<TradeIndexEntry> TYPE = new RecipeType<>(
-            Mercantile.id("villager_trades"), TradeIndexEntry.class);
-
     private static final int WIDTH = 160;
     private static final int HEIGHT = 60;
 
+    private final TradeIndexCategoryKey key;
+    private final RecipeType<TradeIndexEntry> type;
     private final IDrawable background;
     private final IDrawable icon;
 
-    public VillagerTradeJeiCategory(IGuiHelper guiHelper) {
+    public VillagerTradeJeiCategory(IGuiHelper guiHelper, TradeIndexCategoryKey key) {
+        this.key = key;
+        this.type = recipeType(key);
         this.background = guiHelper.createBlankDrawable(WIDTH, HEIGHT);
         this.icon = guiHelper.createDrawableItemStack(TradeIndexIcon.categoryIcon());
     }
 
+    /** The JEI recipe type for a shared category key. {@code RecipeType} has value equality. */
+    public static RecipeType<TradeIndexEntry> recipeType(TradeIndexCategoryKey key) {
+        return new RecipeType<>(key.id(), TradeIndexEntry.class);
+    }
+
     @Override
     public RecipeType<TradeIndexEntry> getRecipeType() {
-        return TYPE;
+        return type;
     }
 
     @Override
     public Component getTitle() {
-        return Component.translatable("category.mercantile.villager_trades");
+        return key.title();
     }
 
     @Override

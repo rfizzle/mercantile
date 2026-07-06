@@ -22,14 +22,18 @@ public class VillagerTradeEmiRecipe implements EmiRecipe {
     private static final int WIDTH = 158;
     private static final int HEIGHT = 50;
 
+    private final EmiRecipeCategory category;
     private final TradeIndexEntry entry;
     private final ResourceLocation id;
     private final List<EmiIngredient> inputs;
     private final List<EmiStack> outputs;
 
-    public VillagerTradeEmiRecipe(TradeIndexEntry entry, int suffix) {
+    public VillagerTradeEmiRecipe(EmiRecipeCategory category, TradeIndexEntry entry, int suffix) {
+        this.category = category;
         this.entry = entry;
-        this.id = Mercantile.id("trade/" + signature(entry, suffix));
+        // The same trade is registered under several categories; scope the id by category
+        // path so EMI sees a distinct recipe in each and never collides.
+        this.id = Mercantile.id("trade/" + category.getId().getPath() + "/" + signature(entry, suffix));
 
         List<EmiIngredient> ins = new ArrayList<>(2);
         ins.add(EmiStack.of(entry.inputA()));
@@ -42,7 +46,7 @@ public class VillagerTradeEmiRecipe implements EmiRecipe {
 
     @Override
     public EmiRecipeCategory getCategory() {
-        return MercantileEmiCategories.VILLAGER_TRADES;
+        return category;
     }
 
     @Override

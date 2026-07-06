@@ -138,6 +138,24 @@
             { "type": "code", "label": "For a precise score, run:", "tone": "accent2", "code": "/mercantile reputation", "bottomGap": true },
             { "type": "prose", "html": ["See the <a href='/commands.html' class='text-accent hover:text-accent2 underline'>commands reference</a> for op-restricted set/add variants, and <a href='/features.html#reputation' class='text-accent hover:text-accent2 underline'>features → Reputation</a> for the full details."] }
           ]
+        },
+        {
+          "type": "sub",
+          "title": "Browsing trades by reputation",
+          "blocks": [
+            { "type": "prose", "html": [
+              "If you run a recipe viewer (<strong class='text-bone'>EMI</strong>, <strong class='text-bone'>REI</strong>, or <strong class='text-bone'>JEI</strong>), Mercantile's trade index splits into filtered tabs alongside the full <strong class='text-bone'>Villager Trades</strong> listing:"
+            ] },
+            {
+              "type": "list",
+              "spacing": 1,
+              "items": [
+                "<strong class='text-bone'>Available Trades</strong> — only the trades you can use at your current reputation, so exclusive trades you haven't earned yet stay hidden.",
+                "<strong class='text-bone'>&lt;Tier&gt; Trades</strong> — one tab per tier that gates a trade (e.g. <strong class='text-bone'>Trusted Trades</strong>), showing exactly what reaching that standing unlocks."
+              ]
+            },
+            { "type": "prose", "html": ["The tabs read straight from your synced reputation, so they stay in step as your standing changes."] }
+          ]
         }
       ]
     },

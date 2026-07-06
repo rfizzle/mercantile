@@ -1,6 +1,6 @@
 package com.rfizzle.mercantile.compat.rei;
 
-import com.rfizzle.mercantile.Mercantile;
+import com.rfizzle.mercantile.compat.tradeindex.TradeIndexCategoryKey;
 import com.rfizzle.mercantile.trade.index.TradeIndexEntry;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.basic.BasicDisplay;
@@ -13,23 +13,33 @@ import java.util.Optional;
 
 public class VillagerTradeDisplay extends BasicDisplay {
 
-    public static final CategoryIdentifier<VillagerTradeDisplay> IDENTIFIER =
-            CategoryIdentifier.of(Mercantile.id("villager_trades"));
-
     private final TradeIndexEntry entry;
+    private final TradeIndexCategoryKey categoryKey;
+    private final CategoryIdentifier<VillagerTradeDisplay> categoryId;
 
-    public VillagerTradeDisplay(TradeIndexEntry entry) {
+    public VillagerTradeDisplay(TradeIndexCategoryKey categoryKey, TradeIndexEntry entry) {
         super(buildInputs(entry), buildOutputs(entry), Optional.empty());
+        this.categoryKey = categoryKey;
         this.entry = entry;
+        this.categoryId = categoryIdentifier(categoryKey);
+    }
+
+    /** The REI category identifier for a shared category key. */
+    public static CategoryIdentifier<VillagerTradeDisplay> categoryIdentifier(TradeIndexCategoryKey key) {
+        return CategoryIdentifier.of(key.id());
     }
 
     public TradeIndexEntry entry() {
         return entry;
     }
 
+    public TradeIndexCategoryKey categoryKey() {
+        return categoryKey;
+    }
+
     @Override
     public CategoryIdentifier<?> getCategoryIdentifier() {
-        return IDENTIFIER;
+        return categoryId;
     }
 
     private static List<EntryIngredient> buildInputs(TradeIndexEntry entry) {
