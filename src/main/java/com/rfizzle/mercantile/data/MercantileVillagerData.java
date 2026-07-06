@@ -37,9 +37,16 @@ public class MercantileVillagerData {
                     // contract" instead of failing the whole villager-data decode, which would
                     // wipe locked trades, mood, and the rest of the attachment.
                     DeliveryContract.CODEC.lenientOptionalFieldOf("contract")
-                            .forGetter(data -> Optional.ofNullable(data.contract))
+                            .forGetter(data -> Optional.ofNullable(data.contract)),
+                    // Rolled generative exclusive offers (issue #63), keyed by a stable per-trade
+                    // template key so a librarian's random enchant-book draw stays fixed across
+                    // trade-screen re-opens instead of re-rolling — keeping buy-locks, pins, and
+                    // lock eviction stable for these offers.
+                    Codec.unboundedMap(Codec.STRING, CompoundTag.CODEC).optionalFieldOf("generativeOffers", Map.of())
+                            .forGetter(MercantileVillagerData::getGenerativeOffers)
             ).apply(instance, (professionLocked, lockedTrades, nameAssigned, wanderingTraderOfferTag, fedGrowthTicks,
-                               mood, lastMoodUpdateTime, lastHurtGameTime, lastWitnessedDeathGameTime, contract) -> {
+                               mood, lastMoodUpdateTime, lastHurtGameTime, lastWitnessedDeathGameTime, contract,
+                               generativeOffers) -> {
                     MercantileVillagerData data = new MercantileVillagerData(
                             professionLocked, lockedTrades, nameAssigned, wanderingTraderOfferTag.orElse(null));
                     data.setFedGrowthTicks(fedGrowthTicks);
@@ -48,6 +55,7 @@ public class MercantileVillagerData {
                     data.setLastHurtGameTime(lastHurtGameTime);
                     data.setLastWitnessedDeathGameTime(lastWitnessedDeathGameTime);
                     data.setContract(contract.orElse(null));
+                    generativeOffers.forEach(data::putGenerativeOffer);
                     return data;
             })
     );
@@ -63,6 +71,7 @@ public class MercantileVillagerData {
     private long lastWitnessedDeathGameTime = -1L;
     @Nullable
     private DeliveryContract contract;
+    private final Map<String, CompoundTag> generativeOffers = new HashMap<>();
 
     public MercantileVillagerData() {
         this(false, Set.of(), false, null);
@@ -177,5 +186,22 @@ public class MercantileVillagerData {
 
     public void setContract(@Nullable DeliveryContract contract) {
         this.contract = contract;
+    }
+
+    /**
+     * The persisted rolled offers for generative exclusive trades (issue #63), keyed by a stable
+     * per-trade template key. Serialized as-is; mutate via {@link #putGenerativeOffer}.
+     */
+    public Map<String, CompoundTag> getGenerativeOffers() {
+        return Collections.unmodifiableMap(generativeOffers);
+    }
+
+    @Nullable
+    public CompoundTag getGenerativeOffer(String key) {
+        return generativeOffers.get(key);
+    }
+
+    public void putGenerativeOffer(String key, CompoundTag offerTag) {
+        generativeOffers.put(key, offerTag);
     }
 }

@@ -76,7 +76,7 @@ public final class TradeCycleManager {
         }
 
         if (locked.size() == offers.size()) {
-            ExclusiveTradesManager.injectOffers(villager, playerScore);
+            ExclusiveTradesManager.injectOffers(villager, player, playerScore);
             syncOffers(player, villager);
             return false;
         }
@@ -84,7 +84,7 @@ public final class TradeCycleManager {
         if (!player.getAbilities().instabuild) {
             int cost = config.tradeCycleEmeraldCost;
             if (EmeraldPayment.count(player) < cost) {
-                ExclusiveTradesManager.injectOffers(villager, playerScore);
+                ExclusiveTradesManager.injectOffers(villager, player, playerScore);
                 syncOffers(player, villager);
                 return false;
             }
@@ -139,7 +139,7 @@ public final class TradeCycleManager {
                     15, 0.4, 0.6, 0.4, 0.02);
         }
 
-        ExclusiveTradesManager.injectOffers(villager, playerScore);
+        ExclusiveTradesManager.injectOffers(villager, player, playerScore);
         syncOffers(player, villager);
 
         return true;

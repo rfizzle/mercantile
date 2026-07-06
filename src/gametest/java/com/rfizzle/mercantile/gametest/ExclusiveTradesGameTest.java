@@ -3,14 +3,20 @@ package com.rfizzle.mercantile.gametest;
 import com.rfizzle.mercantile.Mercantile;
 import com.rfizzle.mercantile.api.ReputationTier;
 import com.rfizzle.mercantile.reputation.ExclusiveTradesManager;
+import com.rfizzle.mercantile.reputation.ExclusiveTradesManager.EnchantRandomlySpec;
 import com.rfizzle.mercantile.reputation.ExclusiveTradesManager.EnchantmentSpec;
 import com.rfizzle.mercantile.reputation.ExclusiveTradesManager.ExclusiveTrade;
+import com.rfizzle.mercantile.reputation.ExclusiveTradesManager.LevelPolicy;
 import com.rfizzle.mercantile.trade.OfferIdentityHash;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.EnchantmentTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.util.RandomSource;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
@@ -33,6 +39,7 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class ExclusiveTradesGameTest implements FabricGameTest {
 
@@ -219,6 +226,147 @@ public class ExclusiveTradesGameTest implements FabricGameTest {
                 "Component-free offer must hash identically with or without registry resolution");
 
         helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void generativeBookResolvesEnchantment(GameTestHelper helper) {
+        // A generative enchant_randomly output rolls one enchantment from the tag onto the book at the
+        // policy level. IN_ENCHANTING_TABLE is a populated vanilla tag, so the draw always resolves.
+        RegistryAccess registries = helper.getLevel().registryAccess();
+        RandomSource random = helper.getLevel().getRandom();
+
+        ExclusiveTrade book = new ExclusiveTrade(
+                new ItemCost(Items.EMERALD, 30), null, new ItemStack(Items.ENCHANTED_BOOK),
+                3, 5, 0.05f, ReputationTier.NEUTRAL.minScore(),
+                List.of(), List.of(), Optional.empty(),
+                new EnchantRandomlySpec(EnchantmentTags.IN_ENCHANTING_TABLE, LevelPolicy.MAX));
+
+        MerchantOffer offer = book.createOffer(registries, random);
+        ItemStack result = offer.getResult();
+        helper.assertTrue(result.is(Items.ENCHANTED_BOOK), "Expected an enchanted book result");
+
+        ItemEnchantments stored = result.get(DataComponents.STORED_ENCHANTMENTS);
+        helper.assertTrue(stored != null && stored.size() == 1,
+                "Expected exactly one rolled stored enchantment");
+        helper.assertTrue(result.get(DataComponents.ENCHANTMENTS) == null
+                        || result.get(DataComponents.ENCHANTMENTS).isEmpty(),
+                "A rolled book must not populate the gear ENCHANTMENTS component");
+
+        // The rolled enchantment belongs to the tag and sits at MAX level per the policy.
+        var lookup = registries.lookupOrThrow(Registries.ENCHANTMENT);
+        HolderSet.Named<Enchantment> pool = lookup.getOrThrow(EnchantmentTags.IN_ENCHANTING_TABLE);
+        Holder<Enchantment> rolled = stored.keySet().iterator().next();
+        helper.assertTrue(pool.contains(rolled), "Rolled enchantment must come from the declared tag");
+        helper.assertTrue(stored.getLevel(rolled) == rolled.value().getMaxLevel(),
+                "MAX policy must store the enchantment at its maximum level");
+
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void generativeBookEmptyTagYieldsPlainBook(GameTestHelper helper) {
+        // An unresolved/empty enchantment tag warns and leaves a plain book rather than failing the offer.
+        RegistryAccess registries = helper.getLevel().registryAccess();
+        RandomSource random = helper.getLevel().getRandom();
+
+        TagKey<Enchantment> missing = TagKey.create(Registries.ENCHANTMENT,
+                Mercantile.id("nonexistent_test_tag"));
+        ExclusiveTrade book = new ExclusiveTrade(
+                new ItemCost(Items.EMERALD, 30), null, new ItemStack(Items.ENCHANTED_BOOK),
+                3, 5, 0.05f, ReputationTier.NEUTRAL.minScore(),
+                List.of(), List.of(), Optional.empty(),
+                new EnchantRandomlySpec(missing, LevelPolicy.MID));
+
+        MerchantOffer offer = book.createOffer(registries, random);
+        ItemStack result = offer.getResult();
+        helper.assertTrue(result.is(Items.ENCHANTED_BOOK), "Expected a plain enchanted book");
+        ItemEnchantments stored = result.get(DataComponents.STORED_ENCHANTMENTS);
+        helper.assertTrue(stored == null || stored.isEmpty(),
+                "An empty tag must leave the book without stored enchantments");
+
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void generativeBookRollIsStableAcrossReopens(GameTestHelper helper) {
+        // The rolled book is persisted on the villager, so re-injecting (as happens on every trade-screen
+        // open) restores the same enchantment and the same identity hash rather than re-rolling.
+        ExclusiveTrade book = new ExclusiveTrade(
+                new ItemCost(Items.EMERALD, 30), null, new ItemStack(Items.ENCHANTED_BOOK),
+                3, 5, 0.05f, ReputationTier.NEUTRAL.minScore(),
+                List.of(), List.of(), Optional.empty(),
+                new EnchantRandomlySpec(EnchantmentTags.IN_ENCHANTING_TABLE, LevelPolicy.MID));
+
+        ExclusiveTradesManager.setSnapshotsForTesting(
+                Map.of("librarian", List.of(book)), List.of());
+
+        boolean savedEnableReputation = com.rfizzle.mercantile.config.MercantileConfig.get().enableReputation;
+        com.rfizzle.mercantile.config.MercantileConfig.get().enableReputation = true;
+        try {
+            Villager librarian = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
+            librarian.setVillagerData(new VillagerData(VillagerType.PLAINS, VillagerProfession.LIBRARIAN, 1));
+
+            ExclusiveTradesManager.injectOffers(librarian, ReputationTier.HONORED.minScore());
+            MerchantOffer first = librarian.getOffers().get(librarian.getOffers().size() - 1);
+            ItemEnchantments firstStored = first.getResult().get(DataComponents.STORED_ENCHANTMENTS);
+            helper.assertTrue(firstStored != null && !firstStored.isEmpty(), "Expected a rolled enchantment");
+            String firstHash = OfferIdentityHash.compute(first);
+
+            // Simulate a second trade-screen open: strip then re-inject.
+            ExclusiveTradesManager.stripInjectedOffers(librarian);
+            ExclusiveTradesManager.injectOffers(librarian, ReputationTier.HONORED.minScore());
+            MerchantOffer second = librarian.getOffers().get(librarian.getOffers().size() - 1);
+            String secondHash = OfferIdentityHash.compute(second);
+
+            helper.assertTrue(firstHash.equals(secondHash),
+                    "Persisted generative roll must yield a stable identity hash across re-opens (got "
+                            + firstHash + " then " + secondHash + ")");
+
+            helper.succeed();
+        } finally {
+            ExclusiveTradesManager.setSnapshotsForTesting(Map.of(), List.of());
+            com.rfizzle.mercantile.config.MercantileConfig.get().enableReputation = savedEnableReputation;
+        }
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void advancementGatedTradeHiddenWithoutPlayer(GameTestHelper helper) {
+        // The player-less injectOffers overload cannot verify a requires_advancement gate, so an
+        // advancement-gated trade is withheld while an ungated sibling is still injected.
+        ExclusiveTrade gated = new ExclusiveTrade(
+                new ItemCost(Items.EMERALD, 20), null, new ItemStack(Items.DRAGON_BREATH),
+                4, 1, 0.05f, ReputationTier.TRUSTED.minScore(),
+                List.of(), List.of(),
+                Optional.of(net.minecraft.resources.ResourceLocation.parse("minecraft:end/kill_dragon")),
+                null);
+        ExclusiveTrade ungated = new ExclusiveTrade(
+                new ItemCost(Items.EMERALD, 24), null, new ItemStack(Items.PAPER),
+                4, 1, 0.05f, ReputationTier.TRUSTED.minScore());
+
+        ExclusiveTradesManager.setSnapshotsForTesting(
+                Map.of("librarian", List.of(gated, ungated)), List.of());
+
+        boolean savedEnableReputation = com.rfizzle.mercantile.config.MercantileConfig.get().enableReputation;
+        com.rfizzle.mercantile.config.MercantileConfig.get().enableReputation = true;
+        try {
+            Villager librarian = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
+            librarian.setVillagerData(new VillagerData(VillagerType.PLAINS, VillagerProfession.LIBRARIAN, 1));
+
+            ExclusiveTradesManager.injectOffers(librarian, ReputationTier.HONORED.minScore());
+
+            boolean hasDragonBreath = librarian.getOffers().stream()
+                    .anyMatch(o -> o.getResult().is(Items.DRAGON_BREATH));
+            boolean hasPaper = librarian.getOffers().stream()
+                    .anyMatch(o -> o.getResult().is(Items.PAPER));
+            helper.assertFalse(hasDragonBreath,
+                    "Advancement-gated trade must be withheld when no player context is available");
+            helper.assertTrue(hasPaper, "Ungated sibling trade must still be injected");
+
+            helper.succeed();
+        } finally {
+            ExclusiveTradesManager.setSnapshotsForTesting(Map.of(), List.of());
+            com.rfizzle.mercantile.config.MercantileConfig.get().enableReputation = savedEnableReputation;
+        }
     }
 
     // ---- Fabric resource-condition gating (data/mercantile/exclusive_trades) ----

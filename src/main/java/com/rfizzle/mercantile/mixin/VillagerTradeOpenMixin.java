@@ -114,7 +114,7 @@ public abstract class VillagerTradeOpenMixin {
         }
 
         if (config.enableReputation) {
-            ExclusiveTradesManager.injectOffers(self, score);
+            ExclusiveTradesManager.injectOffers(self, serverPlayer, score);
         }
     }
 

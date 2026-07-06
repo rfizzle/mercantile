@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
 import com.rfizzle.mercantile.mood.MoodMath;
+import net.minecraft.nbt.CompoundTag;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
@@ -217,6 +218,28 @@ class MercantileVillagerDataCodecTest {
 
         assertTrue(decoded.isProfessionLocked());
         assertTrue(decoded.isNameAssigned());
+    }
+
+    @Test
+    void generativeOffersRoundTrip() {
+        MercantileVillagerData original = new MercantileVillagerData();
+        CompoundTag offer = new CompoundTag();
+        offer.putString("id", "minecraft:enchanted_book");
+        original.putGenerativeOffer("gen|template-key", offer);
+
+        JsonElement encoded = MercantileVillagerData.CODEC.encodeStart(JsonOps.INSTANCE, original).getOrThrow();
+        MercantileVillagerData decoded = MercantileVillagerData.CODEC.parse(JsonOps.INSTANCE, encoded).getOrThrow();
+
+        CompoundTag restored = decoded.getGenerativeOffer("gen|template-key");
+        assertNotNull(restored);
+        assertEquals("minecraft:enchanted_book", restored.getString("id"));
+    }
+
+    @Test
+    void generativeOffersDefaultEmpty() {
+        MercantileVillagerData decoded = MercantileVillagerData.CODEC.parse(JsonOps.INSTANCE, new JsonObject()).getOrThrow();
+        assertTrue(decoded.getGenerativeOffers().isEmpty());
+        assertNull(decoded.getGenerativeOffer("anything"));
     }
 
     @Test
