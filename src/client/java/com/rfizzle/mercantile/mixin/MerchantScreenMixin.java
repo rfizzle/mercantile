@@ -108,12 +108,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
 
         boolean panelVisible = config.enableInfoPanel && info != null && mercantile$panelFits();
         boolean overlayVisible = mercantile$overlayOpen && config.enableInfoPanel && info != null;
-        // Sprint S-049 / B-091: hide the re-roll button while the profession is locked.
-        // Re-rolling is technically independent of profession-lock (it re-rolls within the
-        // current profession), but the UX intent is that a "locked" villager looks frozen
-        // to the player — exposing a re-roll affordance would muddle that signal.
-        boolean lockedHidden = config.enableProfessionLock && info != null && info.professionLocked();
-        boolean visible = config.enableTradeCycling && !lockedHidden && (panelVisible || overlayVisible);
+        boolean visible = config.enableTradeCycling && (panelVisible || overlayVisible);
         mercantile$cycleButton.visible = visible;
         if (!visible) return;
 
@@ -136,8 +131,11 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
             mercantile$cycleButton.setWidth(buttonW);
         }
 
-        boolean enabled = true;
-        if (!this.minecraft.player.isCreative()) {
+        // Re-rolling is independent of profession-lock (it re-rolls within the current
+        // profession), but a locked villager should read as frozen — so disable rather
+        // than hide, and explain the lock in the tooltip (mercantile$cycleTooltip).
+        boolean enabled = !mercantile$cycleLocked();
+        if (enabled && !this.minecraft.player.isCreative()) {
             int emeraldCount = 0;
             for (var stack : this.minecraft.player.getInventory().items) {
                 if (stack.is(Items.EMERALD)) emeraldCount += stack.getCount();
@@ -148,6 +146,24 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         }
 
         mercantile$cycleButton.active = enabled;
+    }
+
+    /** True when the re-roll button is disabled specifically because the profession is locked. */
+    @Unique
+    private boolean mercantile$cycleLocked() {
+        MercantileConfig config = mercantile$config();
+        VillagerInfoPanelS2CPayload info = mercantile$validInfo();
+        return config.enableProfessionLock && info != null && info.professionLocked();
+    }
+
+    /** The tooltip for the re-roll button: the lock reason when locked, else the cost hint. */
+    @Unique
+    private Component mercantile$cycleTooltip() {
+        if (mercantile$cycleLocked()) {
+            return Component.translatable("gui.mercantile.reroll_trades.locked");
+        }
+        return Component.translatable("gui.mercantile.reroll_trades.tooltip",
+                mercantile$config().tradeCycleEmeraldCost);
     }
 
     @Inject(method = "renderLabels", at = @At("TAIL"))
@@ -299,9 +315,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
                         mouseX, mouseY);
             } else if (mercantile$cycleButton != null && mercantile$cycleButton.visible
                     && mercantile$cycleButton.isHovered()) {
-                guiGraphics.renderTooltip(this.font,
-                        Component.translatable("gui.mercantile.reroll_trades.tooltip", config.tradeCycleEmeraldCost),
-                        mouseX, mouseY);
+                guiGraphics.renderTooltip(this.font, mercantile$cycleTooltip(), mouseX, mouseY);
             }
             return;
         }
@@ -325,9 +339,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         }
 
         if (mercantile$cycleButton != null && mercantile$cycleButton.visible && mercantile$cycleButton.isHovered()) {
-            guiGraphics.renderTooltip(this.font,
-                    Component.translatable("gui.mercantile.reroll_trades.tooltip", config.tradeCycleEmeraldCost),
-                    mouseX, mouseY);
+            guiGraphics.renderTooltip(this.font, mercantile$cycleTooltip(), mouseX, mouseY);
         }
     }
 

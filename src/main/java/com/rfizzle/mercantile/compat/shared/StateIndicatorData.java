@@ -32,6 +32,7 @@ public final class StateIndicatorData {
     public static final String STATE_NEEDS_WORKSTATION = "needs_workstation";
     public static final String STATE_UNEMPLOYED = "unemployed";
     public static final String STATE_HAS_CONTRACT_OFFER = "has_contract_offer";
+    public static final String STATE_PROFESSION_LOCKED = "profession_locked";
 
     private static final Map<String, Block> PROFESSION_WORKSTATIONS = Map.ofEntries(
             Map.entry("armorer", Blocks.BLAST_FURNACE),
@@ -94,6 +95,12 @@ public final class StateIndicatorData {
             states.add(STATE_HAS_CONTRACT_OFFER);
         }
 
+        // Profession lock — surfaced here so the overlay players read villager state from
+        // reflects it, not just the trade GUI's title-bar glyph.
+        if (config.enableProfessionLock && isProfessionLocked(villager)) {
+            states.add(STATE_PROFESSION_LOCKED);
+        }
+
         ListTag list = new ListTag();
         for (String state : states) {
             list.add(StringTag.valueOf(state));
@@ -114,6 +121,11 @@ public final class StateIndicatorData {
         DeliveryContract contract = data.getContract();
         if (contract == null || contract.accepted()) return false;
         return !contract.isExpired(villager.level().getGameTime());
+    }
+
+    private static boolean isProfessionLocked(Villager villager) {
+        MercantileVillagerData data = villager.getAttached(MercantileAttachments.VILLAGER_DATA);
+        return data != null && data.isProfessionLocked();
     }
 
     private static boolean needsWorkstation(VillagerProfession profession, Villager villager) {

@@ -128,7 +128,7 @@
               "title": "Trade Cycling",
               "html": [
                 "Pay 6 emeralds (configurable) to re-roll a villager's unlocked trades from the profession pool — no more breaking and replacing workstations. Trades become locked once purchased; locked trades are preserved across cycles.",
-                "The <strong class='text-bone'>\"Re-roll Trades\"</strong> button sits in the villager info panel. It's grayed out when all trades are locked or you have no emeralds, and hidden entirely when the villager's profession is locked (so a locked villager reads as fully frozen). Cycling also grants a small reputation gain."
+                "The <strong class='text-bone'>\"Re-roll Trades\"</strong> button sits in the villager info panel. It stays visible but grays out when you have no emeralds, or when the villager's profession is locked — hovering the disabled button explains which. Cycling also grants a small reputation gain."
               ],
               "note": "Config: <code class='text-bone'>enableTradeCycling</code>, <code class='text-bone'>tradeCycleEmeraldCost</code> (default 6), <code class='text-bone'>reputationCycleGain</code> (default +1)"
             },
@@ -153,7 +153,7 @@
               "id": "trade-pinning",
               "title": "Trade Pinning",
               "html": [
-                "Pin the trades you're waiting on. Each row in the merchant screen carries a small pin toggle (hover the row to reveal it); pinned trades are remembered per player and survive relogging. When a villager restocks a pinned trade that was sold out and you're within range (default 128 blocks, same dimension), an action-bar note names the villager and the trade — <em>\"Aldric restocked: Emerald x3 → Mending I\"</em>.",
+                "Pin the trades you're waiting on. Each row in the merchant screen carries a small pin toggle — dimmed until you hover the row, filled once pinned; pinned trades are remembered per player and survive relogging. When a villager restocks a pinned trade that was sold out and you're within range (default 128 blocks, same dimension), an action-bar note names the villager and the trade — <em>\"Aldric restocked: Emerald x3 → Mending I\"</em>.",
                 "<code class='text-bone'>/mercantile pins</code> lists your pins numbered with each trade's current stock status; <code class='text-bone'>/mercantile pins remove &lt;n&gt;</code> drops one and <code class='text-bone'>/mercantile pins clear</code> empties the list. Pins are capped per player (default 10), and pins pointing at villagers that died or re-rolled away the trade are pruned silently."
               ],
               "note": "Config: <code class='text-bone'>enableTradePinning</code>, <code class='text-bone'>maxPinnedTradesPerPlayer</code> (default 10), <code class='text-bone'>pinRestockNotifyRange</code> (default 128)"
@@ -399,7 +399,7 @@
               "id": "jade-wthit",
               "title": "Jade / WTHIT Tooltips",
               "html": [
-                "Look at a villager with Jade or WTHIT installed to see a single color-coded breeding line — Ready, Hungry (with food progress), Needs bed, or Cooldown; babies show a Growing countdown on WTHIT, while on Jade its native growing-time line is used instead — plus a color-coded mood tier line and contextual state icons: \"Needs workstation\", \"Panicking\", \"Trading with &lt;player&gt;\". Sentry golems show their parent pylon coordinates, despawn countdown, and a \"No Drops\" indicator. Both plugins work simultaneously without conflict."
+                "Look at a villager with Jade or WTHIT installed to see a single color-coded breeding line — Ready, Hungry (with food progress), Needs bed, or Cooldown; babies show a Growing countdown on WTHIT, while on Jade its native growing-time line is used instead — plus a color-coded mood tier line and contextual state icons: \"Needs workstation\", \"Panicking\", \"Trading with &lt;player&gt;\", \"Profession: Locked\". Sentry golems show their parent pylon coordinates, despawn countdown, and a \"No Drops\" indicator. Both plugins work simultaneously without conflict."
               ],
               "note": "Config: <code class='text-bone'>enableBreedingTooltip</code>, <code class='text-bone'>enableStateIndicators</code>, <code class='text-bone'>enableMood</code>"
             }

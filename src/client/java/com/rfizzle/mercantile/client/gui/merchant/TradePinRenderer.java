@@ -29,6 +29,10 @@ public final class TradePinRenderer {
 
     private static final int ICON_SIZE = MerchantScreenLayout.ICON_SIZE;
 
+    // Alpha for the hollow pin on an un-hovered, unpinned row: present but understated,
+    // so the whole column is discoverable without seven full-opacity pins competing.
+    private static final float UNPINNED_DIM_ALPHA = 0.35f;
+
     public static void render(GuiGraphics guiGraphics, Font font, TradePinsS2CPayload pins,
                               List<MerchantOffer> offers, int leftPos, int topPos, int scrollOff,
                               int mouseX, int mouseY) {
@@ -43,8 +47,9 @@ public final class TradePinRenderer {
             int rowY = topPos + MerchantScreenLayout.TRADE_ROW_Y + row * MerchantScreenLayout.TRADE_ROW_HEIGHT;
             int iconY = rowY + (MerchantScreenLayout.TRADE_ROW_HEIGHT - ICON_SIZE) / 2;
 
-            // The unpinned affordance only appears while the pointer is on the row (or the
-            // pin column beside it), so seven hollow pins don't clutter an untouched screen.
+            // The pin column is always drawn so the affordance is discoverable. The hollow
+            // unpinned sprite renders dimmed on an untouched row and at full opacity while the
+            // pointer is on the row (or the pin column beside it), so it reads without cluttering.
             boolean rowHovered = mouseX >= leftPos + MerchantScreenLayout.TRADE_ROW_X
                     && mouseX < iconX + ICON_SIZE
                     && mouseY >= rowY && mouseY < rowY + MerchantScreenLayout.TRADE_ROW_HEIGHT;
@@ -52,6 +57,10 @@ public final class TradePinRenderer {
                 guiGraphics.blitSprite(PIN_SPRITE, iconX, iconY, ICON_SIZE, ICON_SIZE);
             } else if (rowHovered) {
                 guiGraphics.blitSprite(PIN_OFF_SPRITE, iconX, iconY, ICON_SIZE, ICON_SIZE);
+            } else {
+                guiGraphics.setColor(1.0f, 1.0f, 1.0f, UNPINNED_DIM_ALPHA);
+                guiGraphics.blitSprite(PIN_OFF_SPRITE, iconX, iconY, ICON_SIZE, ICON_SIZE);
+                guiGraphics.setColor(1.0f, 1.0f, 1.0f, 1.0f);
             }
 
             if (mouseX >= iconX && mouseX < iconX + ICON_SIZE
