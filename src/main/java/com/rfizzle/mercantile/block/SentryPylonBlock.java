@@ -3,7 +3,11 @@ package com.rfizzle.mercantile.block;
 import com.mojang.serialization.MapCodec;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.particle.MercantileParticles;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -27,6 +31,8 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class SentryPylonBlock extends BaseEntityBlock {
     public static final EnumProperty<PylonStateProperty> STATE =
@@ -148,5 +154,16 @@ public class SentryPylonBlock extends BaseEntityBlock {
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(STATE, POWERED);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip,
+                                TooltipFlag flag) {
+        tooltip.add(Component.translatable("tooltip.mercantile.sentry_pylon.fuel")
+                .withStyle(ChatFormatting.GRAY));
+        tooltip.add(Component.translatable("tooltip.mercantile.sentry_pylon.sentries")
+                .withStyle(ChatFormatting.GRAY));
+        tooltip.add(Component.translatable("tooltip.mercantile.sentry_pylon.bell")
+                .withStyle(ChatFormatting.GRAY));
     }
 }

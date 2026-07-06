@@ -1,5 +1,9 @@
 package com.rfizzle.mercantile.compat.shared;
 
+import com.rfizzle.mercantile.config.MercantileConfig;
+import com.rfizzle.mercantile.contract.DeliveryContract;
+import com.rfizzle.mercantile.data.MercantileAttachments;
+import com.rfizzle.mercantile.data.MercantileVillagerData;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -26,6 +30,8 @@ public final class StateIndicatorData {
     public static final String STATE_TRADING = "trading";
     public static final String STATE_PANICKING = "panicking";
     public static final String STATE_NEEDS_WORKSTATION = "needs_workstation";
+    public static final String STATE_UNEMPLOYED = "unemployed";
+    public static final String STATE_HAS_CONTRACT_OFFER = "has_contract_offer";
 
     private static final Map<String, Block> PROFESSION_WORKSTATIONS = Map.ofEntries(
             Map.entry("armorer", Blocks.BLAST_FURNACE),
@@ -65,6 +71,8 @@ public final class StateIndicatorData {
             states.add(STATE_PANICKING);
         }
 
+        MercantileConfig config = MercantileConfig.get();
+
         VillagerProfession profession = villager.getVillagerData().getProfession();
         if (needsWorkstation(profession, villager)) {
             states.add(STATE_NEEDS_WORKSTATION);
@@ -73,6 +81,17 @@ public final class StateIndicatorData {
                 ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(workstation.asItem());
                 tag.putString(KEY_WORKSTATION_ITEM, itemId.toString());
             }
+        }
+
+        // Unemployed adults (profession NONE, not NITWIT) can take a work order — the gesture
+        // sends them to claim a nearby workstation. Gated on the owning feature toggle.
+        if (config.enableWorkOrders && profession == VillagerProfession.NONE) {
+            states.add(STATE_UNEMPLOYED);
+        }
+
+        // A live, unaccepted delivery offer waiting to be signed with paper.
+        if (config.enableContracts && hasLiveContractOffer(villager)) {
+            states.add(STATE_HAS_CONTRACT_OFFER);
         }
 
         ListTag list = new ListTag();
@@ -87,6 +106,14 @@ public final class StateIndicatorData {
         return brain.hasMemoryValue(MemoryModuleType.HURT_BY)
                 || brain.hasMemoryValue(MemoryModuleType.NEAREST_HOSTILE)
                 || brain.isActive(net.minecraft.world.entity.schedule.Activity.PANIC);
+    }
+
+    private static boolean hasLiveContractOffer(Villager villager) {
+        MercantileVillagerData data = villager.getAttached(MercantileAttachments.VILLAGER_DATA);
+        if (data == null) return false;
+        DeliveryContract contract = data.getContract();
+        if (contract == null || contract.accepted()) return false;
+        return !contract.isExpired(villager.level().getGameTime());
     }
 
     private static boolean needsWorkstation(VillagerProfession profession, Villager villager) {

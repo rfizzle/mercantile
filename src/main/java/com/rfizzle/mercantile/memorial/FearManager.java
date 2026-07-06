@@ -5,7 +5,9 @@ import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.FearEntry;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.ai.village.poi.PoiManager;
@@ -46,13 +48,29 @@ public final class FearManager {
         PlayerData data = killer.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         long now = level.getGameTime();
         long windowTicks = config.fearKillWindowMinutes * FearMath.TICKS_PER_MINUTE;
+        long durationTicks = config.fearMarkupDurationDays * FearMath.TICKS_PER_DAY;
         for (BlockPos bell : bells) {
             FearEntry entry = data.getOrCreateFearEntry(villageKey(level, bell));
             List<Long> kills = FearMath.recordKill(entry.getRecentKillTimes(), now, windowTicks, MAX_TRACKED_KILLS);
-            entry.setRecentKillTimes(kills);
-            if (FearMath.thresholdReached(kills, config.fearKillThreshold)) {
-                // Every kill at or past the threshold restarts the decay clock.
-                entry.setFearStartGameTime(now);
+            applyKillToEntry(entry, kills, now, config.fearKillThreshold, durationTicks);
+        }
+    }
+
+    /**
+     * Applies one recorded kill to a village's fear entry: stores the trimmed kill list and, when
+     * the spree is at or past the threshold, restarts the decay clock. A spree that reactivates
+     * fear from an inactive state opens a fresh episode and re-arms the one-time "villagers fear
+     * you" notice; kills that merely refresh an already-active markup leave the notified flag
+     * untouched so the notice does not repeat mid-episode. Package-visible for unit testing.
+     */
+    static void applyKillToEntry(FearEntry entry, List<Long> updatedKills, long now,
+                                 int threshold, long durationTicks) {
+        boolean wasActive = FearMath.fraction(entry.getFearStartGameTime(), now, durationTicks) > 0.0;
+        entry.setRecentKillTimes(updatedKills);
+        if (FearMath.thresholdReached(updatedKills, threshold)) {
+            entry.setFearStartGameTime(now);
+            if (!wasActive) {
+                entry.setNotified(false);
             }
         }
     }
@@ -90,6 +108,37 @@ public final class FearManager {
     /** Fear price markup for one offer; 0 when no fear is active. */
     public static int priceModifier(int basePrice, double fearFraction, MercantileConfig config) {
         return FearMath.markup(basePrice, config.fearMarkupPercent, fearFraction);
+    }
+
+    /**
+     * On the first trade where fear markup is live for this player at this villager's village,
+     * send a one-time chat notice and mark the entry so it never repeats. Independent of the
+     * demand-transparency toggle, so a punished player always learns why prices rose. Call once
+     * per trade open, after {@link #fearFraction} has pruned any stale entry.
+     */
+    public static void notifyIfNewlyFeared(Villager villager, ServerPlayer player, MercantileConfig config) {
+        if (!config.enableFearMarkup) return;
+        if (player.connection == null) return;
+        if (!(villager.level() instanceof ServerLevel level)) return;
+
+        PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
+        if (!data.hasFearEntries()) return;
+
+        Optional<BlockPos> bell = SentryPylonScanner.findNearestBell(
+                level, villager.blockPosition(), VILLAGE_BELL_RADIUS);
+        if (bell.isEmpty()) return;
+
+        FearEntry entry = data.getFearEntry(villageKey(level, bell.get()));
+        if (entry == null || entry.isNotified()) return;
+
+        long durationTicks = config.fearMarkupDurationDays * FearMath.TICKS_PER_DAY;
+        double fraction = FearMath.fraction(entry.getFearStartGameTime(), level.getGameTime(), durationTicks);
+        if (fraction <= 0.0) return;
+
+        entry.setNotified(true);
+        player.displayClientMessage(
+                Component.translatable("mercantile.message.fear_markup")
+                        .withStyle(ChatFormatting.RED), false);
     }
 
     private static List<BlockPos> bellsInRange(ServerLevel level, BlockPos center, int radius) {

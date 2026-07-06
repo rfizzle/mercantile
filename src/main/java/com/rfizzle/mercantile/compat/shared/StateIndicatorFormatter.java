@@ -54,6 +54,14 @@ public final class StateIndicatorFormatter {
                         Component.translatable("tooltip.mercantile.state.needs_workstation")
                                 .withStyle(ChatFormatting.YELLOW));
             }
+            case StateIndicatorData.STATE_UNEMPLOYED -> new IndicatorLine(
+                    new ItemStack(Items.CRAFTING_TABLE),
+                    Component.translatable("tooltip.mercantile.state.unemployed")
+                            .withStyle(ChatFormatting.YELLOW));
+            case StateIndicatorData.STATE_HAS_CONTRACT_OFFER -> new IndicatorLine(
+                    new ItemStack(Items.PAPER),
+                    Component.translatable("tooltip.mercantile.state.has_contract_offer")
+                            .withStyle(ChatFormatting.AQUA));
             default -> null;
         };
     }
