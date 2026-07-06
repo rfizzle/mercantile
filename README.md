@@ -30,8 +30,8 @@ bar, vanilla assets where they already map cleanly; no balance-breaking shortcut
   (profession, trades, gossip, XP) is preserved on the held item.
 - **Villager Names** — biome-themed names are auto-assigned on spawn and stay
   visible above every villager.
-- **Trade Cycling** — refresh a villager's trade pool with emeralds and emerald
-  blocks instead of breaking and replacing their workstation.
+- **Trade Cycling** — refresh a villager's trade pool with emeralds instead of
+  breaking and replacing their workstation.
 - **Reputation** — a five-tier global standing with persistent gossip that
   travels with villagers across the world. Defend raids and gift villagers to
   climb the tiers (or let negative standing decay back from Reviled); high

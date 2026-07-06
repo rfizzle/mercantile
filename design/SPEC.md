@@ -750,11 +750,15 @@ All commands use the `mercantile` root. Requires **operator level 2** for admin 
 | `/mercantile reputation <player>` | Op level 2 | Shows another player's reputation |
 | `/mercantile reputation set <player> <value>` | Op level 2 | Sets a player's reputation to an exact value |
 | `/mercantile reputation add <player> <value>` | Op level 2 | Adds (or subtracts, if negative) reputation |
+| `/mercantile pins` | Any player | Lists your pinned trades (index, villager, summary, live stock status) |
+| `/mercantile pins remove <index>` | Any player | Removes the pin at the given 1-based index |
+| `/mercantile pins clear` | Any player | Removes all of your pinned trades |
 | `/mercantile reload` | Op level 2 | Reloads config from disk. Localization key: `command.mercantile.reload` |
 
 ### Implementation Notes
 - Register via Fabric's `CommandRegistrationCallback`.
 - `/mercantile reload` re-reads `config/mercantile.json` and pushes updated server config values to all connected clients.
+- `/mercantile pins` (the bare list) is gated on `enableTradePinning` and reports the feature as off when disabled; `pins remove` and `pins clear` are intentionally *not* gated, so pins occupying cap slots can always be shed while the feature is off. Listing also lazily prunes pins whose offer is no longer sold by a nearby loaded villager. See Section 30 for the pinning system.
 
 ---
 
@@ -915,6 +919,206 @@ Every feature that references professions must work in one of two modes:
 - `VillagerHeadTextures` is initialized during `ModInitializer.onInitialize()` with vanilla profession → Base64 texture mappings, then left open for other mods to call `register()`.
 - All profession ID comparisons use `ResourceLocation`, never string matching or ordinal comparison.
 - The exclusive trades loader scans all loaded datapacks for files matching the `data/mercantile/exclusive_trades/**/*.json` glob pattern — this naturally picks up files from any namespace.
+
+---
+
+## 24. Villager Mood
+
+Villagers carry an intrinsic mood that drifts toward how well their needs are met and feeds back into pricing, restock speed, and ambient particles. Mood is villager-global — identical for every player — and has no direct interaction.
+
+### Mood Value & Tiers
+- Score is `0–100` (`MIN_MOOD=0`, `MAX_MOOD=100`, `DEFAULT_MOOD=50`).
+- Tiers: **Miserable** (`<25`), **Unhappy** (`<50`), **Content** (`<80`), **Happy** (`≥80`). Only Happy and Miserable carry mechanical effects; Unhappy and Content are neutral.
+
+### Target & Drift
+- The target mood is the sum of satisfied condition weights: bed (`HOME` memory) = 20, workstation (`JOB_SITE` memory) = 20, slept recently (`LAST_SLEPT` within `24000` ticks) = 20, well-fed (food points `≥` the willing-to-breed threshold) = 20, not recently hurt (no damage within `2400` ticks / 2 min) = 10, no witnessed death (none within `24000` ticks / 1 day) = 10. All satisfied = 100.
+- Mood is recomputed lazily on read (trade open, tooltip, restock check, particle tick), never on a hot tick loop. The first evaluation seeds the drift clock at the stored value rather than snapping to target.
+- Each elapsed `moodRecalcIntervalTicks` window moves mood toward target by `DRIFT_PER_RECALC = 2` points, clamped so it never overshoots.
+
+### Effects
+- **Price:** magnitude = `max(1, basePrice * moodPriceModifierPercent / 100)`; Happy subtracts it, Miserable adds it, otherwise no change.
+- **Restock interval:** base `2400` ticks; Happy shortens to `max(1, base * (100 − moodRestockSpeedPercent) / 100)`, Miserable lengthens to `base * (100 + moodRestockSpeedPercent) / 100`.
+- **Ambient particles** (when `moodAmbientParticles`): every 200 ticks, each villager within 16 blocks of a player has a `0.25` chance to emit — Happy shows the vanilla happy-villager effect, Miserable the angry effect; Unhappy/Content emit nothing.
+
+### Souring Triggers
+- Any damage `>0` from any source stamps `lastHurtGameTime`.
+- On any villager death, every living villager within `DEATH_WITNESS_RANGE = 16` stamps `lastWitnessedDeathGameTime`.
+
+### Persistence
+- Stored on the villager attachment (`MercantileVillagerData`): `mood` (default 50), `lastMoodUpdateTime`, `lastHurtGameTime`, `lastWitnessedDeathGameTime`.
+
+### Config
+- `enableMood` (true), `moodPriceModifierPercent` (5, clamp 0–50), `moodRestockSpeedPercent` (20, clamp 0–80), `moodRecalcIntervalTicks` (100, clamp 20–24000), `moodAmbientParticles` (true).
+
+---
+
+## 25. Memorials, Mourning & Fear Pricing
+
+Three death-driven systems dispatched from a single `AFTER_DEATH` handler.
+
+### Memorials
+- **Trigger:** a *named* villager dies while `enableMemorials` is on and the `doMobLoot` gamerule is true.
+- Drops a **Memorial** item at the death position. Its custom-data blob (version 1) records the villager's name, profession, level, and cause of death (the damage source message id).
+- Lore lists the profession + level (skipped for babies, unemployed, and nitwits), the localized death message, and a keepsake line.
+
+### Mourning
+- Purely cosmetic and session-only (never persisted). When `enableMourning` is on, living villagers within `MOURNING_RANGE = 16` of a death briefly grieve for `MOURNING_DURATION_TICKS = 60` (3 s): they halt navigation, look toward the death position, and emit grief-tear particles every 10 ticks. No witnesses in range → no session is created.
+
+### Fear Pricing
+- **Trigger:** `enableFearMarkup` is on and the killer is a player.
+- **Village keying:** the kill is recorded against *every* bell POI within `VILLAGE_BELL_RADIUS = 48` of the death (anti-decoy — you cannot dodge fear by planting a distant bell). A death with no bell in range never causes fear.
+- **Threshold:** kills are tracked per village within a rolling `fearKillWindowMinutes` window (capped at `MAX_TRACKED_KILLS = 32`). When tracked kills reach `fearKillThreshold`, the village becomes feared and stamps `fearStartGameTime`.
+- **Decay:** the fear fraction falls linearly from 1 → 0 over `fearMarkupDurationDays` (evaluated lazily at trade open, no tick loop).
+- **Markup:** per offer, `max(1, round(basePrice * fearMarkupPercent / 100 * fraction))`, capped to the item's max-stack headroom.
+- A one-time red chat notice fires the first time a player trades with a newly feared village, independent of the demand-transparency toggle.
+
+### Persistence
+- Fear state is per-player: `fearByVillage` on `PlayerData` maps a bell-village key → recent kill timestamps, fear-start time, and the notified flag. Entries are LRU-evicted and pruned lazily on read.
+
+### Config
+- `enableMemorials` (true), `enableMourning` (true), `enableFearMarkup` (true), `fearKillThreshold` (3, clamp 1–20), `fearKillWindowMinutes` (10, clamp 1–120), `fearMarkupPercent` (25, clamp 0–200), `fearMarkupDurationDays` (3, clamp 1–30).
+
+---
+
+## 26. Baby Feeding (Growth Acceleration)
+
+Feeding a baby villager its breeding foods speeds up its growth toward adulthood, on top of the pickup and tooltip behavior covered elsewhere.
+
+### Interaction
+- Right-click a **baby** villager with a villager-breeding food in the main hand (bread, carrot, potato, beetroot — the same food set that grants breeding food points).
+
+### Mechanic
+- A newborn needs `FULL_GROWTH_TICKS = 24000` ticks to grow up. Each feed reduces the remaining time by `remainingTicks * babyFeedPercentPerFeed / 100`, weighted by the food's value relative to bread (`BREAD_FOOD_POINTS = 4`) — a 1-point beetroot delivers a quarter of the percentage. The reduction is clamped to `[1, remainingTicks]`.
+- A cumulative cap of `FULL_GROWTH_TICKS * babyFeedMaxReductionPercent / 100` limits total acceleration per baby; once reached, feeding fails with a red message and no item is consumed.
+- On success the age advances by the reduction (never past 0), the item is consumed (waived in creative), and the feed is banked in the villager's `fedGrowthTicks`.
+
+### Persistence
+- `fedGrowthTicks` (default 0) on the villager attachment tracks cumulative acceleration so the cap survives reload.
+
+### Config
+- `enableBabyFeeding` (true), `babyFeedPercentPerFeed` (10, clamp 1–100), `babyFeedMaxReductionPercent` (50, clamp 0–100).
+
+---
+
+## 27. Work Orders
+
+Assign an unemployed villager to a specific profession by handing it a workstation, without hauling and placing the block yourself.
+
+### Interaction
+- Sneak + right-click an **unemployed adult** villager (profession `NONE`; nitwits and employed villagers are excluded) while holding that profession's workstation block item. The item identifies the job and is never consumed.
+
+### Mechanic
+- The held block resolves to a job-site POI via the `ACQUIRABLE_JOB_SITE` tag (beds, bells, and beehives are excluded).
+- The mod searches within `SEARCH_RADIUS = 48` for up to `MAX_CANDIDATES = 5` free, reachable workstations of that type and, mirroring vanilla's acquire-POI flow, reserves the ticket up-front and sets the villager's `POTENTIAL_JOB_SITE` memory; the villager then walks over and vanilla assigns the profession on arrival.
+- No reachable free workstation → nothing is mutated and no fee is charged. Any prior potential-job-site ticket the villager held is released unless it is the same site.
+
+### Cost & Feedback
+- `workOrderEmeraldCost` is charged only after a successful placement (waived in creative). Success plays the villager "yes" sound, shows an action-bar confirmation, and grants the work-order advancement; denials play the "no" sound with a red reason (cost / no workstation).
+
+### Persistence
+- None of its own — it rides vanilla POI tickets and brain memory.
+
+### Config
+- `enableWorkOrders` (true), `workOrderEmeraldCost` (1, clamp 0+).
+
+---
+
+## 28. Nitwit Rehabilitation
+
+Convert a nitwit back into an unemployed villager so it can take a profession again.
+
+### Interaction
+- Use a **golden apple** on an adult nitwit. Requires **Trusted** reputation or higher (when reputation is enabled) plus an emerald fee.
+
+### Mechanic
+- Denials (red message + villager "no" sound): a conversion already pending, target is a baby, reputation below Trusted, or cannot afford the fee.
+- On payment: consumes 1 golden apple + `nitwitRehabEmeraldCost` emeralds (waived in creative), plays the eating sound, shows a start message, and grants the rehab-started advancement.
+- After `CONVERSION_DELAY_TICKS = 60` (3 s) the villager — if still alive and still a nitwit — has its profession-lock flag cleared, profession set to `NONE`, and brain refreshed, with a success sound and message.
+- Pending conversions are in-memory only (not persisted); a `GRACE_TICKS = 12000` window covers unloaded villagers before the pending entry is dropped. Pending state is cleared on server stop.
+
+### Config
+- `enableNitwitRehab` (true), `nitwitRehabEmeraldCost` (16, clamp 0+).
+
+---
+
+## 29. Market Day
+
+A recurring server-wide trading holiday derived purely from the overworld clock — no interaction, no per-player state.
+
+### Mechanic
+- Every `marketDayIntervalDays` calendar days, from dawn (`dayTime 0`) to dusk (`DUSK_DAY_TIME = 12000`), is a market day. Day 0 is excluded, so the first market day is day `marketDayIntervalDays`.
+- **Price:** a flat discount of `max(0, basePrice * marketDayDiscountPercent / 100)` — never a markup.
+- **Restock:** the daily restock cap rises by one cycle, from vanilla's 2 to 3.
+
+### Announcement
+- Once per market day at dawn: a gold action-bar message, a bell sound, and happy-villager particles on villagers within `CELEBRATION_RANGE = 48` of each player. The announcement is deferred on an empty server so the first player to log in that day still sees it.
+
+### Persistence
+- `MarketDayState` (a `SavedData` on the overworld, key `mercantile_market_day`) stores `lastAnnouncedDay` so a restart cannot double-announce.
+
+### Config
+- `enableMarketDay` (true), `marketDayIntervalDays` (7, clamp 1–1000), `marketDayDiscountPercent` (5, clamp 0–100).
+
+---
+
+## 30. Trade Pins
+
+Pin specific villager offers per player and get notified when they restock. Pins are surfaced in the reputation detail panel and managed with `/mercantile pins` (see Section 19).
+
+### Mechanic
+- A pin binds one player to one offer of one villager, identified by a content hash of the offer (two content-identical offers share a hash, so a re-rolled but identical trade stays pinned).
+- Toggling a pin is capped at `maxPinnedTradesPerPlayer` (hard upper bound `MAX_PINNED_TRADES = 64`); exceeding the cap shows a red action-bar notice.
+- **Restock notify:** when a villager restocks, online players in the same dimension within `pinRestockNotifyRange` whose pin matches a replenished offer get a green action-bar message; the detail-panel summary refreshes for all pin holders regardless of range.
+- **Pruning:** pins are removed when the villager dies (offline players' entries become "unknown") and lazily when the offer is no longer sold. Stock resolves to In-Stock, Out-of-Stock, Offer-Gone, or Unresolved.
+
+### Networking / HUD
+- Two S2C payloads: an index-aligned boolean array marking which of the open villager's offers are pinned, and a per-pin summary (name, trade summary, status) that drives the reputation detail panel. The summary payload is empty when the feature is disabled.
+
+### Persistence
+- `PlayerData.pinnedTrades` is a list of `PinnedTrade` records — villager UUID, offer hash, and server-locale display snapshots of the villager name and trade summary (string lengths clamped; the list is truncated to 64 on load).
+
+### Config
+- `enableTradePinning` (true), `maxPinnedTradesPerPlayer` (10, clamp 1–64), `pinRestockNotifyRange` (128, clamp 8–256).
+
+---
+
+## 31. Delivery Contracts
+
+Villagers occasionally offer a "bring me N of item X for Y emeralds and reputation" contract. Gated behind `enableReputation`.
+
+### Rolling
+- Eligible villagers are non-baby, alive, and neither unemployed nor nitwits.
+- A tick sweep (`SWEEP_INTERVAL_TICKS = 40`, `SWEEP_RANGE = 32`) rolls an offer with per-sweep probability `contractOfferChance/100 * 40/24000`. While an unaccepted offer is live, a speech-bubble cue floats above the villager.
+- Offers are drawn from data-driven, weighted pools at `data/mercantile/contracts/<profession>.json` (professions without a pool never roll; emeralds, emerald blocks, the contract item, and damageable items are excluded). A roll picks the item, a count in `[minCount, maxCount]`, and a payment in `[minPayment, maxPayment]` scaled by `contractPaymentScale` (bounds: count ≤ 1024, payment ≤ 4096).
+- An unaccepted offer is retracted after `OFFER_WINDOW_TICKS = 12000` (half a day).
+
+### Accept & Deliver
+- **Accept:** sneak + right-click the offering villager with **paper** (1 consumed, waived in creative) to receive a written **contract item** stamped with a deadline of `now + contractDeadlineDays`. The item carries its own contract UUID, item/count/payment, deadline, and the villager's name/position/dimension.
+- **Deliver:** right-click the *same* villager (matched by contract UUID, not villager UUID) with the contract item. Outcomes: Completed, Wrong-Villager, Expired, Missing-Items, Invalid. On completion the required items are consumed from main + off hand, the emerald payment is paid, and reputation is granted. Expired or now-invalid contracts are voided.
+- **Reputation:** completion grants a cap-bypassing `contractRepGain`, bounded to `contractRepPerDay` awards per day; deliveries beyond the daily cap still pay emeralds.
+
+### Persistence
+- The active contract is stored on the villager attachment; the daily contract-rep award count lives in the player's daily counters.
+
+### Config
+- `enableContracts` (true), `contractOfferChance` (50, clamp 0–100), `contractPaymentScale` (100, clamp 0–1000), `contractRepGain` (3), `contractRepPerDay` (3, clamp 0–50), `contractDeadlineDays` (2, clamp 1–30). Requires `enableReputation`.
+
+---
+
+## 32. Gratitude Gifts
+
+The inverse of gifting villagers: at the top reputation tier, nearby villagers occasionally throw *you* a gift. Requires `enableReputation`.
+
+### Mechanic
+- Piggybacks on the reputation proximity tick (roughly once per second) rather than scanning on its own. Each check, an **Honored**-tier player near at least one villager has a `1/180` chance (~3 min average) to receive a gift.
+- A daily cap of `gratitudeGiftsPerDay` applies; it is counted separately and does **not** consume the reputation daily total or sub-caps.
+- A random nearby villager tosses a profession-flavored item from a weighted, data-driven table (`data/mercantile/gratitude_gifts/<profession>.json`); professions without a table fall back to bread and wheat seeds. The dropped item entity is locked to the recipient so no one else can grab it, with a villager "yes" sound and happy effect.
+
+### Persistence
+- The daily gift count lives in the player's daily counters and rolls over per new day.
+
+### Config
+- `enableGratitudeGifts` (true), `gratitudeGiftsPerDay` (1, clamp 0–10). Requires `enableReputation`.
 
 ---
 
@@ -1183,5 +1387,5 @@ Visualization features (sections 11, 17) use client-side world rendering. These 
 ---
 
 ## Future Considerations (Out of Scope for v0.1)
-- Villager trading post block (centralized trade access)
-- Villager happiness / mood system
+- Villager trading post block (centralized trade access, #84)
+- Villager caravans (#88)
