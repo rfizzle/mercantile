@@ -9,6 +9,11 @@ import com.rfizzle.mercantile.Mercantile;
 import com.rfizzle.mercantile.api.ReputationTier;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.trade.OfferIdentityHash;
+import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.core.HolderSet;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.TagKey;
+import net.minecraft.util.RandomSource;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceCondition;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
@@ -37,6 +42,7 @@ import net.minecraft.world.item.trading.MerchantOffer;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.MercantileVillagerData;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import org.jetbrains.annotations.VisibleForTesting;
 
 import java.io.BufferedReader;
@@ -85,7 +91,16 @@ public final class ExclusiveTradesManager {
         }
     }
 
+    /**
+     * Injects exclusive offers without a player context. Advancement-gated trades
+     * ({@code requires_advancement}) cannot be verified here and are skipped. Prefer
+     * {@link #injectOffers(Villager, ServerPlayer, int)} whenever the opening player is known.
+     */
     public static void injectOffers(Villager villager, int playerScore) {
+        injectOffers(villager, null, playerScore);
+    }
+
+    public static void injectOffers(Villager villager, ServerPlayer player, int playerScore) {
         if (!MercantileConfig.get().enableReputation) return;
 
         Map<String, List<ExclusiveTrade>> profTrades = PROFESSION_TRADES;
@@ -96,19 +111,21 @@ public final class ExclusiveTradesManager {
 
         List<MerchantOffer> toInject = new ArrayList<>();
         RegistryAccess registries = villager.level().registryAccess();
+        RandomSource random = villager.getRandom();
+        MercantileVillagerData villagerData = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
 
         List<ExclusiveTrade> professionTrades = profTrades.get(profession);
         if (professionTrades != null) {
             for (ExclusiveTrade trade : professionTrades) {
-                if (playerScore >= trade.minScore()) {
-                    toInject.add(trade.createOffer(registries));
+                if (isAvailable(trade, player, playerScore)) {
+                    toInject.add(resolveOffer(trade, registries, random, villagerData));
                 }
             }
         }
 
         for (ExclusiveTrade trade : crossTrades) {
-            if (playerScore >= trade.minScore()) {
-                toInject.add(trade.createOffer(registries));
+            if (isAvailable(trade, player, playerScore)) {
+                toInject.add(resolveOffer(trade, registries, random, villagerData));
             }
         }
 
@@ -116,6 +133,52 @@ public final class ExclusiveTradesManager {
 
         villager.getOffers().addAll(toInject);
         INJECTED_OFFERS.put(villager, toInject);
+    }
+
+    /**
+     * Builds the offer for {@code trade}. Deterministic trades build fresh every time (their offer is a
+     * pure function of the trade definition). A generative {@code enchant_randomly} trade is rolled once
+     * and its result persisted on the villager under a stable per-template key, then restored verbatim on
+     * later opens — so the drawn enchantment stays fixed (no free re-roll) and its {@link OfferIdentityHash}
+     * is stable for the buy-lock, pin, and lock-eviction systems.
+     */
+    private static MerchantOffer resolveOffer(ExclusiveTrade trade, RegistryAccess registries,
+                                              RandomSource random, MercantileVillagerData villagerData) {
+        if (trade.enchantRandomly() == null) {
+            return trade.createOffer(registries);
+        }
+        String key = trade.generativeKey();
+        var ctx = registries.createSerializationContext(NbtOps.INSTANCE);
+        CompoundTag stored = villagerData.getGenerativeOffer(key);
+        if (stored != null) {
+            MerchantOffer parsed = MerchantOffer.CODEC.parse(ctx, stored)
+                    .resultOrPartial(Mercantile.LOGGER::error).orElse(null);
+            if (parsed != null) return parsed;
+        }
+        MerchantOffer rolled = trade.createOffer(registries, random);
+        CompoundTag encoded = (CompoundTag) MerchantOffer.CODEC.encodeStart(ctx, rolled)
+                .resultOrPartial(Mercantile.LOGGER::error).orElse(null);
+        if (encoded != null) villagerData.putGenerativeOffer(key, encoded);
+        return rolled;
+    }
+
+    /**
+     * Whether {@code trade} is offerable to a player at {@code playerScore}. Combines the reputation
+     * gate with the optional {@code requires_advancement} gate. When the trade names an advancement but
+     * no player is available (e.g. the wandering-trader path), the trade is treated as unavailable — it
+     * is never surfaced to a buyer whose progression cannot be checked.
+     */
+    private static boolean isAvailable(ExclusiveTrade trade, ServerPlayer player, int playerScore) {
+        if (playerScore < trade.minScore()) return false;
+        return advancementSatisfied(trade, player);
+    }
+
+    private static boolean advancementSatisfied(ExclusiveTrade trade, ServerPlayer player) {
+        if (trade.requiresAdvancement().isEmpty()) return true;
+        if (player == null) return false;
+        AdvancementHolder holder = player.server.getAdvancements().get(trade.requiresAdvancement().get());
+        if (holder == null) return false;
+        return player.getAdvancements().getOrStartProgress(holder).isDone();
     }
 
     public static void injectWanderingTraderOffer(WanderingTrader trader, int playerScore) {
@@ -170,23 +233,43 @@ public final class ExclusiveTradesManager {
 
         Set<String> inaccessible = new HashSet<>();
         RegistryAccess registries = villager.level().registryAccess();
+        MercantileVillagerData villagerData = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
 
         List<ExclusiveTrade> professionTrades = profTrades.get(profession);
         if (professionTrades != null) {
             for (ExclusiveTrade trade : professionTrades) {
                 if (playerScore < trade.minScore()) {
-                    inaccessible.add(OfferIdentityHash.compute(trade.createOffer(registries)));
+                    addInaccessibleHash(inaccessible, trade, registries, villagerData);
                 }
             }
         }
 
         for (ExclusiveTrade trade : crossTrades) {
             if (playerScore < trade.minScore()) {
-                inaccessible.add(OfferIdentityHash.compute(trade.createOffer(registries)));
+                addInaccessibleHash(inaccessible, trade, registries, villagerData);
             }
         }
 
         return inaccessible;
+    }
+
+    /**
+     * Adds {@code trade}'s identity hash to the eviction set. For a generative trade the hash must match
+     * the offer the player actually locked, so it uses the persisted rolled offer; a generative trade with
+     * no persisted roll (never offered to this player) has no lock to evict and is skipped.
+     */
+    private static void addInaccessibleHash(Set<String> inaccessible, ExclusiveTrade trade,
+                                            RegistryAccess registries, MercantileVillagerData villagerData) {
+        if (trade.enchantRandomly() != null) {
+            CompoundTag stored = villagerData.getGenerativeOffer(trade.generativeKey());
+            if (stored == null) return;
+            MerchantOffer offer = MerchantOffer.CODEC
+                    .parse(registries.createSerializationContext(NbtOps.INSTANCE), stored)
+                    .resultOrPartial(Mercantile.LOGGER::error).orElse(null);
+            if (offer != null) inaccessible.add(OfferIdentityHash.compute(offer));
+            return;
+        }
+        inaccessible.add(OfferIdentityHash.compute(trade.createOffer(registries)));
     }
 
     // @VisibleForTesting
@@ -307,6 +390,16 @@ public final class ExclusiveTradesManager {
             storedEnchantments = parseEnchantmentSpecs(components, "stored_enchantments");
         }
 
+        // Generative enchant-book output: draw one enchantment from a tag at a level policy, resolved at
+        // offer time. Mutually exclusive with fixed enchantment components — a trade that names both is
+        // malformed and skipped with a warning rather than silently favouring one.
+        EnchantRandomlySpec enchantRandomly = parseEnchantRandomly(outputJson);
+        if (enchantRandomly != null && (!enchantments.isEmpty() || !storedEnchantments.isEmpty())) {
+            Mercantile.LOGGER.warn("Exclusive trade output has both enchant_randomly and fixed enchantment "
+                    + "components; skipping the entry (they are mutually exclusive)");
+            return null;
+        }
+
         int maxUses = json.has("max_uses") ? json.get("max_uses").getAsInt() : 12;
         int xpGain = json.has("xp_gain") ? json.get("xp_gain").getAsInt() : 1;
         float priceMultiplier = json.has("price_multiplier") ? json.get("price_multiplier").getAsFloat() : 0.05f;
@@ -315,8 +408,40 @@ public final class ExclusiveTradesManager {
                 ? ReputationTier.fromName(json.get("min_tier_override").getAsString()).minScore()
                 : defaultMinScore;
 
+        Optional<ResourceLocation> requiresAdvancement = Optional.empty();
+        if (json.has("requires_advancement")) {
+            ResourceLocation advId = ResourceLocation.tryParse(json.get("requires_advancement").getAsString());
+            if (advId == null) {
+                Mercantile.LOGGER.warn("Invalid requires_advancement id in exclusive trade: {}",
+                        json.get("requires_advancement").getAsString());
+            } else {
+                requiresAdvancement = Optional.of(advId);
+            }
+        }
+
         return new ExclusiveTrade(input1, input2, output, maxUses, xpGain, priceMultiplier, minScore,
-                enchantments, storedEnchantments);
+                enchantments, storedEnchantments, requiresAdvancement, enchantRandomly);
+    }
+
+    /**
+     * Parses the generative {@code enchant_randomly} + {@code level} fields off a trade {@code output}.
+     * {@code enchant_randomly} is an enchantment tag id (a leading {@code #} is accepted and stripped);
+     * {@code level} is a {@link LevelPolicy} name defaulting to {@code mid}. Returns {@code null} when no
+     * generative output is declared or the tag id is unparseable (warned).
+     */
+    private static EnchantRandomlySpec parseEnchantRandomly(JsonObject outputJson) {
+        if (outputJson == null || !outputJson.has("enchant_randomly")) return null;
+        String raw = outputJson.get("enchant_randomly").getAsString();
+        String stripped = raw.startsWith("#") ? raw.substring(1) : raw;
+        ResourceLocation tagId = ResourceLocation.tryParse(stripped);
+        if (tagId == null) {
+            Mercantile.LOGGER.warn("Invalid enchant_randomly tag in exclusive trade: {}", raw);
+            return null;
+        }
+        LevelPolicy policy = outputJson.has("level")
+                ? LevelPolicy.fromName(outputJson.get("level").getAsString())
+                : LevelPolicy.MID;
+        return new EnchantRandomlySpec(TagKey.create(Registries.ENCHANTMENT, tagId), policy);
     }
 
     /**
@@ -385,12 +510,57 @@ public final class ExclusiveTradesManager {
     public record EnchantmentSpec(String id, int level) {
     }
 
+    /**
+     * Level chosen for a {@link EnchantRandomlySpec} draw, relative to the picked enchantment's own
+     * {@code [min, max]} level range. {@code MID} is the rounded-up midpoint floored at min; {@code MAX}
+     * is the enchantment's maximum level.
+     */
+    public enum LevelPolicy {
+        MID,
+        MAX;
+
+        public int computeLevel(int min, int max) {
+            return switch (this) {
+                case MID -> Math.max(min, (max + 1) / 2);
+                case MAX -> max;
+            };
+        }
+
+        /** Parses a policy name, defaulting to {@link #MID} for absent/unknown values (warned). */
+        public static LevelPolicy fromName(String name) {
+            if (name == null) return MID;
+            return switch (name.toLowerCase(Locale.ROOT)) {
+                case "max" -> MAX;
+                case "mid" -> MID;
+                default -> {
+                    Mercantile.LOGGER.warn("Unknown level policy '{}' in exclusive trade; defaulting to mid", name);
+                    yield MID;
+                }
+            };
+        }
+    }
+
+    /** A generative enchant-book output: pick one enchantment from {@code tag} at {@code policy} level. */
+    public record EnchantRandomlySpec(TagKey<Enchantment> tag, LevelPolicy policy) {
+    }
+
     public record ExclusiveTrade(ItemCost input1, ItemCost input2, ItemStack output,
                                  int maxUses, int xpGain, float priceMultiplier, int minScore,
-                                 List<EnchantmentSpec> enchantments, List<EnchantmentSpec> storedEnchantments) {
+                                 List<EnchantmentSpec> enchantments, List<EnchantmentSpec> storedEnchantments,
+                                 Optional<ResourceLocation> requiresAdvancement,
+                                 EnchantRandomlySpec enchantRandomly) {
         public ExclusiveTrade {
             enchantments = enchantments == null ? List.of() : List.copyOf(enchantments);
             storedEnchantments = storedEnchantments == null ? List.of() : List.copyOf(storedEnchantments);
+            requiresAdvancement = requiresAdvancement == null ? Optional.empty() : requiresAdvancement;
+        }
+
+        /** Enchantment-carrying trade with no advancement gate or generative output. */
+        public ExclusiveTrade(ItemCost input1, ItemCost input2, ItemStack output,
+                              int maxUses, int xpGain, float priceMultiplier, int minScore,
+                              List<EnchantmentSpec> enchantments, List<EnchantmentSpec> storedEnchantments) {
+            this(input1, input2, output, maxUses, xpGain, priceMultiplier, minScore,
+                    enchantments, storedEnchantments, Optional.empty(), null);
         }
 
         /** Component-free trade — convenience for callers and tests that ship no enchantments. */
@@ -405,6 +575,23 @@ public final class ExclusiveTradesManager {
         }
 
         /**
+         * A stable key identifying this generative trade's <em>template</em> — the inputs, output item,
+         * tier, stock, and the enchant tag/policy — but NOT the rolled enchantment. Used to persist and
+         * restore the drawn book per villager so it stays fixed across trade-screen re-opens. Only valid
+         * for generative trades ({@code enchantRandomly != null}).
+         */
+        public String generativeKey() {
+            return "gen|" + costKey(input1) + "|" + (input2 == null ? "-" : costKey(input2))
+                    + "|" + BuiltInRegistries.ITEM.getKey(output.getItem()) + "x" + output.getCount()
+                    + "|" + minScore + "|" + maxUses + "|" + xpGain + "|" + priceMultiplier
+                    + "|" + enchantRandomly.tag().location() + "|" + enchantRandomly.policy();
+        }
+
+        private static String costKey(ItemCost cost) {
+            return BuiltInRegistries.ITEM.getKey(cost.item().value()) + "x" + cost.count();
+        }
+
+        /**
          * Builds the offer without resolving enchantment components. Used where no {@link RegistryAccess}
          * is available (the recipe-viewer trade index, built on resource reload). Enchantments are dropped
          * from the displayed result; the live merchant offer carries them via {@link #createOffer(RegistryAccess)}.
@@ -413,10 +600,21 @@ public final class ExclusiveTradesManager {
             return buildOffer(output.copy());
         }
 
-        /** Builds the offer with enchantment components resolved against {@code registries}. */
+        /**
+         * Builds the offer with enchantment components resolved against {@code registries}. A generative
+         * {@code enchant_randomly} output is rolled with a throwaway {@link RandomSource}; prefer
+         * {@link #createOffer(RegistryAccess, RandomSource)} where a merchant's RNG is available so the
+         * roll participates in world randomness.
+         */
         public MerchantOffer createOffer(RegistryAccess registries) {
+            return createOffer(registries, RandomSource.create());
+        }
+
+        /** Builds the offer, resolving fixed enchantments and rolling any generative output with {@code random}. */
+        public MerchantOffer createOffer(RegistryAccess registries, RandomSource random) {
             ItemStack result = output.copy();
             applyEnchantments(result, registries);
+            applyGenerativeEnchant(result, registries, random);
             return buildOffer(result);
         }
 
@@ -438,6 +636,30 @@ public final class ExclusiveTradesManager {
                 ItemEnchantments resolved = resolve(storedEnchantments, lookup);
                 if (!resolved.isEmpty()) stack.set(DataComponents.STORED_ENCHANTMENTS, resolved);
             }
+        }
+
+        /**
+         * Rolls a generative {@code enchant_randomly} output onto {@code stack}. Resolves the tag against
+         * the live enchantment registry, picks one holder uniformly with {@code random}, and stores it at
+         * the policy level as a book enchantment. An unresolved or empty tag warns and leaves the stack a
+         * plain item rather than failing the offer.
+         */
+        private void applyGenerativeEnchant(ItemStack stack, RegistryAccess registries, RandomSource random) {
+            if (enchantRandomly == null) return;
+            HolderLookup.RegistryLookup<Enchantment> lookup = registries.lookupOrThrow(Registries.ENCHANTMENT);
+            Optional<HolderSet.Named<Enchantment>> holders = lookup.get(enchantRandomly.tag());
+            if (holders.isEmpty() || holders.get().size() == 0) {
+                Mercantile.LOGGER.warn("Empty or unknown enchantment tag in exclusive trade: {}",
+                        enchantRandomly.tag().location());
+                return;
+            }
+            HolderSet.Named<Enchantment> set = holders.get();
+            Holder<Enchantment> picked = set.get(random.nextInt(set.size()));
+            int level = enchantRandomly.policy().computeLevel(
+                    picked.value().getMinLevel(), picked.value().getMaxLevel());
+            ItemEnchantments.Mutable mutable = new ItemEnchantments.Mutable(ItemEnchantments.EMPTY);
+            mutable.set(picked, level);
+            stack.set(DataComponents.STORED_ENCHANTMENTS, mutable.toImmutable());
         }
 
         private static ItemEnchantments resolve(List<EnchantmentSpec> specs,

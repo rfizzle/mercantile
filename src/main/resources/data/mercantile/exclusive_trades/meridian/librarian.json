@@ -1,0 +1,64 @@
+{
+  "fabric:load_conditions": [
+    { "condition": "fabric:all_mods_loaded", "values": ["meridian"] }
+  ],
+  "replace": false,
+  "min_tier": "trusted",
+  "trades": [
+    {
+      "input_1": { "item": "minecraft:emerald", "count": 24 },
+      "output": { "item": "meridian:scrap_tome", "count": 1 },
+      "min_tier_override": "trusted",
+      "max_uses": 4
+    },
+    {
+      "input_1": { "item": "minecraft:emerald", "count": 18 },
+      "output": { "item": "meridian:prismatic_web", "count": 1 },
+      "min_tier_override": "trusted",
+      "max_uses": 3
+    },
+    {
+      "input_1": { "item": "minecraft:emerald", "count": 20 },
+      "output": { "item": "minecraft:dragon_breath", "count": 1 },
+      "min_tier_override": "trusted",
+      "max_uses": 4,
+      "requires_advancement": "minecraft:end/kill_dragon"
+    },
+    {
+      "input_1": { "item": "minecraft:emerald", "count": 30 },
+      "output": {
+        "item": "minecraft:enchanted_book",
+        "count": 1,
+        "enchant_randomly": "#meridian:rarity/common",
+        "level": "mid"
+      },
+      "min_tier_override": "neutral",
+      "max_uses": 3,
+      "xp_gain": 5
+    },
+    {
+      "input_1": { "item": "minecraft:emerald", "count": 36 },
+      "output": {
+        "item": "minecraft:enchanted_book",
+        "count": 1,
+        "enchant_randomly": "#meridian:rarity/uncommon",
+        "level": "mid"
+      },
+      "min_tier_override": "trusted",
+      "max_uses": 2,
+      "xp_gain": 5
+    },
+    {
+      "input_1": { "item": "minecraft:emerald", "count": 48 },
+      "output": {
+        "item": "minecraft:enchanted_book",
+        "count": 1,
+        "enchant_randomly": "#meridian:rarity/rare",
+        "level": "mid"
+      },
+      "min_tier_override": "honored",
+      "max_uses": 2,
+      "xp_gain": 8
+    }
+  ]
+}

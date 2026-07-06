@@ -438,6 +438,14 @@
               "note": "Optional — install any one of the three recipe viewers."
             },
             {
+              "title": "Meridian enchanting",
+              "html": [
+                "With <strong class='text-bone'>Meridian</strong> installed, librarians become an economic on-ramp into its enchanting endgame. High-standing librarians sell salvage tomes and shelf materials — including Dragon's Breath, which only appears once you've slain the Ender Dragon — and, the centerpiece, <strong class='text-bone'>rolled Meridian enchanted books</strong>: each purchase draws one enchantment at random from Meridian's rarity pools. The available pools widen with your reputation — common books need no standing, uncommon unlock at Trusted, and rare at Honored — while treasure and top-rarity enchants stay behind Meridian's own progression.",
+                "Pure data, gated on Meridian being present — nothing changes when it isn't installed."
+              ],
+              "note": "Optional integration: Meridian"
+            },
+            {
               "title": "Sound Volume Slider",
               "html": [
                 "A client-side volume slider (0%–100%) controls all villager sounds independently: ambient, hurt, death, trade, yes, and no. Set to 0% for full silence without affecting any other audio category."
