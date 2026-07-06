@@ -1,0 +1,18 @@
+{
+    "parent": "mercantile:mercantile/root",
+    "display": {
+        "icon": { "id": "minecraft:composter" },
+        "title": { "translate": "advancements.mercantile.job_placement.title" },
+        "description": { "translate": "advancements.mercantile.job_placement.description" },
+        "frame": "task",
+        "show_toast": true,
+        "announce_to_chat": false,
+        "hidden": false
+    },
+    "criteria": {
+        "work_order_assigned": {
+            "trigger": "mercantile:work_order_assigned"
+        }
+    },
+    "sends_telemetry_event": false
+}

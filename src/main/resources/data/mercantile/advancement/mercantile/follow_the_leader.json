@@ -1,0 +1,18 @@
+{
+    "parent": "mercantile:mercantile/root",
+    "display": {
+        "icon": { "id": "minecraft:lead" },
+        "title": { "translate": "advancements.mercantile.follow_the_leader.title" },
+        "description": { "translate": "advancements.mercantile.follow_the_leader.description" },
+        "frame": "task",
+        "show_toast": true,
+        "announce_to_chat": false,
+        "hidden": false
+    },
+    "criteria": {
+        "villager_followed": {
+            "trigger": "mercantile:follow_villager"
+        }
+    },
+    "sends_telemetry_event": false
+}

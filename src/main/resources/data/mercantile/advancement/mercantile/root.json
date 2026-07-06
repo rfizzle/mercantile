@@ -1,0 +1,18 @@
+{
+    "display": {
+        "icon": { "id": "minecraft:emerald" },
+        "title": { "translate": "advancements.mercantile.root.title" },
+        "description": { "translate": "advancements.mercantile.root.description" },
+        "frame": "task",
+        "background": "minecraft:textures/block/emerald_block.png",
+        "show_toast": true,
+        "announce_to_chat": true,
+        "hidden": false
+    },
+    "criteria": {
+        "traded_with_villager": {
+            "trigger": "minecraft:villager_trade"
+        }
+    },
+    "sends_telemetry_event": false
+}

@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.mixin;
 
+import com.rfizzle.mercantile.advancement.MercantileCriteria;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.GiftMappingManager;
 import com.rfizzle.mercantile.reputation.ReputationManager;
@@ -56,6 +57,8 @@ public abstract class VillagerGiftMixin {
                         player.displayClientMessage(Component.translatable(
                                 "mercantile.message.gift_accepted", self.getDisplayName()), true);
                     }
+                    // The villager accepted the gift regardless of the daily rep cap.
+                    MercantileCriteria.GIFT_ACCEPTED.trigger(player);
                 }
             }
             // Emit happy particles

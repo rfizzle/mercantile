@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.mixin;
 
+import com.rfizzle.mercantile.advancement.MercantileCriteria;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
@@ -120,6 +121,7 @@ public abstract class VillagerNitwitRehabMixin extends AbstractVillager {
                 Component.translatable("mercantile.rehab.start")
                         .withStyle(ChatFormatting.GREEN), true);
 
+        MercantileCriteria.NITWIT_REHAB_STARTED.trigger(serverPlayer);
         cir.setReturnValue(InteractionResult.SUCCESS);
     }
 }

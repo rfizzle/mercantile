@@ -427,5 +427,24 @@
     "mercantile.trade_index.level.5": "Master",
     "mercantile.trade_index.exclusive": "Mercantile",
     "mercantile.trade_index.exclusive_tooltip": "Requires %s reputation or higher",
-    "mercantile.trade_index.requires_reputation": "Requires %s"
+    "mercantile.trade_index.requires_reputation": "Requires %s",
+
+    "advancements.mercantile.root.title": "Mercantile",
+    "advancements.mercantile.root.description": "Complete a trade with a villager to begin your journey as a merchant",
+    "advancements.mercantile.heavy_lifting.title": "Heavy Lifting",
+    "advancements.mercantile.heavy_lifting.description": "Sneak + right-click a villager with an empty hand to pick it up",
+    "advancements.mercantile.follow_the_leader.title": "Follow the Leader",
+    "advancements.mercantile.follow_the_leader.description": "Right-click a villager while holding an emerald to make it follow you",
+    "advancements.mercantile.a_kind_gesture.title": "A Kind Gesture",
+    "advancements.mercantile.a_kind_gesture.description": "Drop an item a villager wants beside it and let the villager accept the gift",
+    "advancements.mercantile.signed_and_sealed.title": "Signed and Sealed",
+    "advancements.mercantile.signed_and_sealed.description": "Sneak + right-click a villager while holding paper to accept a delivery contract",
+    "advancements.mercantile.trusted.title": "Trusted",
+    "advancements.mercantile.trusted.description": "Earn a villager's confidence to reach the Trusted reputation tier (score 300 or higher)",
+    "advancements.mercantile.iron_sentinel.title": "Iron Sentinel",
+    "advancements.mercantile.iron_sentinel.description": "Right-click a Sentry Pylon with a block of iron to fuel it",
+    "advancements.mercantile.job_placement.title": "Job Placement",
+    "advancements.mercantile.job_placement.description": "Sneak + right-click an unemployed villager while holding a workstation block to assign a job",
+    "advancements.mercantile.second_chances.title": "Second Chances",
+    "advancements.mercantile.second_chances.description": "Right-click a nitwit with a golden apple to begin its rehabilitation"
 }
