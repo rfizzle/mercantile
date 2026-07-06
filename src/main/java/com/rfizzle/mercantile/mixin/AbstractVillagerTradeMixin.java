@@ -6,6 +6,7 @@ import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
 import com.rfizzle.mercantile.network.DemandPriceS2CPayload;
+import com.rfizzle.mercantile.network.RestockTimerSync;
 import com.rfizzle.mercantile.network.VillagerInfoPanelSync;
 import com.rfizzle.mercantile.reputation.ReputationManager;
 import com.rfizzle.mercantile.trade.BulkTradeContext;
@@ -75,7 +76,11 @@ public abstract class AbstractVillagerTradeMixin {
 
         if (!BulkTradeContext.isActive()
                 && villager.getTradingPlayer() instanceof ServerPlayer tradingPlayer) {
+            // Resend both panel payloads together so their shared hasWorkstation flag stays
+            // coherent — a job-site change between screen-open and this trade must not leave
+            // the restock payload reporting a stale binding against a fresh info payload.
             VillagerInfoPanelSync.sendTo(tradingPlayer, villager);
+            RestockTimerSync.sendTo(tradingPlayer, villager);
         }
     }
 }
