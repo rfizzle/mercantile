@@ -81,6 +81,7 @@ public class MercantileNetworking {
         PayloadTypeRegistry.playS2C().register(ConfigSyncS2CPayload.TYPE, ConfigSyncS2CPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(TradeIndexS2CPayload.TYPE, TradeIndexS2CPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(TradePinsS2CPayload.TYPE, TradePinsS2CPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(PinnedTradesSummaryS2CPayload.TYPE, PinnedTradesSummaryS2CPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(ContractTargetS2CPayload.TYPE, ContractTargetS2CPayload.CODEC);
     }
 
@@ -136,6 +137,7 @@ public class MercantileNetworking {
         // one-frame mismatch on the HUD at login.
         ServerPlayNetworking.send(player, new ConfigSyncS2CPayload(MercantileConfig.get().toJson()));
         ReputationManager.syncToClient(player);
+        TradePinManager.syncPinsSummary(player);
         ServerPlayNetworking.send(player, new FollowCountS2CPayload(FollowManager.getFollowerCount(player.getUUID())));
         List<TradeIndexEntry> snapshot = TradeIndexDataSource.snapshot();
         if (tradeIndexSizeLogged.compareAndSet(false, true) && Mercantile.LOGGER.isDebugEnabled()) {

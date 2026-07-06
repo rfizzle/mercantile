@@ -293,6 +293,11 @@
     "hud.mercantile.rep_detail.group": "%1$s ×%2$s",
     "hud.mercantile.rep_detail.status.unlocked": "Exclusive trades available",
     "hud.mercantile.rep_detail.status.locked": "Locked until Trusted",
+    "hud.mercantile.rep_detail.pins_heading": "Pinned trades",
+    "hud.mercantile.rep_detail.pin_detail": "%1$s — %2$s",
+    "hud.mercantile.rep_detail.pin_status.in_stock": "in stock",
+    "hud.mercantile.rep_detail.pin_status.out_of_stock": "out of stock",
+    "hud.mercantile.rep_detail.pin_status.unknown": "unknown",
 
     "mercantile.trade.denied.reviled": "This villager refuses to trade with you",
     "mercantile.message.reputation_daily_cap": "Daily reputation limit reached",
