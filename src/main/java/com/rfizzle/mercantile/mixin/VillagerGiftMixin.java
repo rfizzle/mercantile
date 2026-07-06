@@ -4,6 +4,7 @@ import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.GiftMappingManager;
 import com.rfizzle.mercantile.reputation.ReputationManager;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -48,7 +49,13 @@ public abstract class VillagerGiftMixin {
             if (((ItemEntityAccessor) itemEntity).getTarget() != null) {
                 ServerPlayer player = (ServerPlayer) self.level().getPlayerByUUID(((ItemEntityAccessor) itemEntity).getTarget());
                 if (player != null) {
-                    ReputationManager.tryGainGiftRep(player);
+                    ReputationManager.CapDecision decision = ReputationManager.tryGainGiftRep(player);
+                    // Confirm the gift landed only when rep was actually awarded; a cap hit already
+                    // sent its own daily-cap action-bar line, so a second message would compete.
+                    if (decision == ReputationManager.CapDecision.AWARDED && player.connection != null) {
+                        player.displayClientMessage(Component.translatable(
+                                "mercantile.message.gift_accepted", self.getDisplayName()), true);
+                    }
                 }
             }
             // Emit happy particles

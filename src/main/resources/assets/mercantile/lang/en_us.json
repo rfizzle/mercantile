@@ -288,6 +288,8 @@
 
     "mercantile.trade.denied.reviled": "This villager refuses to trade with you",
     "mercantile.message.reputation_daily_cap": "Daily reputation limit reached",
+    "mercantile.message.gift_accepted": "%s appreciated the gift!",
+    "mercantile.message.fear_markup": "The villagers here fear you — prices have risen",
 
     "gui.mercantile.bulk_trade.feedback": "Traded %sx %s",
 
@@ -399,6 +401,11 @@
     "tooltip.mercantile.state.needs_workstation": "Needs a workstation",
     "tooltip.mercantile.state.panicking": "Panicking",
     "tooltip.mercantile.state.trading": "Trading with %s",
+    "tooltip.mercantile.state.unemployed": "Unemployed — sneak + right-click with a workstation block to assign a job",
+    "tooltip.mercantile.state.has_contract_offer": "Has a delivery offer — sneak + right-click with paper",
+    "tooltip.mercantile.sentry_pylon.fuel": "Fuel it with iron blocks (1 block = 1 charge)",
+    "tooltip.mercantile.sentry_pylon.sentries": "Summons an iron golem sentry when hostiles approach (1 charge each)",
+    "tooltip.mercantile.sentry_pylon.bell": "Rings a nearby bell as an alarm",
 
     "mercantile.config.enableStateIndicators": "Enable State Indicators",
     "mercantile.config.enableStateIndicators.tooltip": "Show villager state icons (needs bed/workstation, breeding, panicking, trading) in Jade/WTHIT tooltips",

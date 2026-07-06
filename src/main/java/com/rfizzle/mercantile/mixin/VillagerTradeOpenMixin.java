@@ -80,6 +80,11 @@ public abstract class VillagerTradeOpenMixin {
         }
 
         double fearFraction = FearManager.fearFraction(self, serverPlayer, config);
+        // Only the feared case needs the one-time notice; skip its bell lookup on the common
+        // no-fear path (fearFraction already resolved that this village isn't feared).
+        if (fearFraction > 0.0) {
+            FearManager.notifyIfNewlyFeared(self, serverPlayer, config);
+        }
         for (MerchantOffer offer : self.getOffers()) {
             int basePrice = offer.getBaseCostA().getCount();
             int reputationModifier = score != 0 ? ReputationManager.getPriceModifier(score, basePrice) : 0;

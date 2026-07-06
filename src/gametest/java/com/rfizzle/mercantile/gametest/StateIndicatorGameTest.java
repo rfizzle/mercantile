@@ -1,7 +1,10 @@
 package com.rfizzle.mercantile.gametest;
 
 import com.rfizzle.mercantile.compat.shared.StateIndicatorData;
+import com.rfizzle.mercantile.contract.DeliveryContract;
+import com.rfizzle.mercantile.data.MercantileAttachments;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
@@ -9,6 +12,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.monster.Zombie;
@@ -19,6 +23,7 @@ import net.minecraft.world.level.GameType;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 public class StateIndicatorGameTest implements FabricGameTest {
 
@@ -114,6 +119,56 @@ public class StateIndicatorGameTest implements FabricGameTest {
                 "trading is first by priority");
 
         player.discard();
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void unemployedAdultHasUnemployedState(GameTestHelper helper) {
+        // Fresh villagers spawn with profession NONE; they can take a work order.
+        Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
+
+        CompoundTag tag = new CompoundTag();
+        StateIndicatorData.write(tag, villager);
+
+        Set<String> states = readStates(tag);
+        helper.assertTrue(states.contains(StateIndicatorData.STATE_UNEMPLOYED),
+                "profession-NONE adult should be unemployed");
+        helper.assertFalse(states.contains(StateIndicatorData.STATE_NEEDS_WORKSTATION),
+                "unemployed villager does not report needs_workstation");
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void liveContractOfferHasContractState(GameTestHelper helper) {
+        Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
+        DeliveryContract offer = new DeliveryContract(UUID.randomUUID(),
+                BuiltInRegistries.ITEM.getKey(Items.WHEAT),
+                8, 4, false, helper.getLevel().getGameTime() + 12_000L);
+        villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA).setContract(offer);
+
+        CompoundTag tag = new CompoundTag();
+        StateIndicatorData.write(tag, villager);
+
+        Set<String> states = readStates(tag);
+        helper.assertTrue(states.contains(StateIndicatorData.STATE_HAS_CONTRACT_OFFER),
+                "live unaccepted offer should surface the contract state");
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void acceptedContractHasNoOfferState(GameTestHelper helper) {
+        Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
+        DeliveryContract accepted = new DeliveryContract(UUID.randomUUID(),
+                BuiltInRegistries.ITEM.getKey(Items.WHEAT),
+                8, 4, true, helper.getLevel().getGameTime() + 12_000L);
+        villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA).setContract(accepted);
+
+        CompoundTag tag = new CompoundTag();
+        StateIndicatorData.write(tag, villager);
+
+        Set<String> states = readStates(tag);
+        helper.assertFalse(states.contains(StateIndicatorData.STATE_HAS_CONTRACT_OFFER),
+                "an accepted contract is no longer an open offer");
         helper.succeed();
     }
 

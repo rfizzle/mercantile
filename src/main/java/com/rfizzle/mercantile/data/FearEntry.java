@@ -20,20 +20,26 @@ public class FearEntry {
                     Codec.LONG.listOf().optionalFieldOf("recentKillTimes", List.of())
                             .forGetter(FearEntry::getRecentKillTimes),
                     Codec.LONG.optionalFieldOf("fearStartGameTime", -1L)
-                            .forGetter(FearEntry::getFearStartGameTime)
+                            .forGetter(FearEntry::getFearStartGameTime),
+                    Codec.BOOL.optionalFieldOf("notified", false)
+                            .forGetter(FearEntry::isNotified)
             ).apply(instance, FearEntry::new)
     );
 
     private List<Long> recentKillTimes;
     private long fearStartGameTime;
+    // Whether this player has already been told the village fears them, so the one-time
+    // "prices have risen" notice fires only on the first feared trade for this village.
+    private boolean notified;
 
     public FearEntry() {
-        this(List.of(), -1L);
+        this(List.of(), -1L, false);
     }
 
-    public FearEntry(List<Long> recentKillTimes, long fearStartGameTime) {
+    public FearEntry(List<Long> recentKillTimes, long fearStartGameTime, boolean notified) {
         this.recentKillTimes = new ArrayList<>(recentKillTimes);
         this.fearStartGameTime = fearStartGameTime;
+        this.notified = notified;
     }
 
     public List<Long> getRecentKillTimes() {
@@ -50,6 +56,14 @@ public class FearEntry {
 
     public void setFearStartGameTime(long fearStartGameTime) {
         this.fearStartGameTime = fearStartGameTime;
+    }
+
+    public boolean isNotified() {
+        return notified;
+    }
+
+    public void setNotified(boolean notified) {
+        this.notified = notified;
     }
 
     /**

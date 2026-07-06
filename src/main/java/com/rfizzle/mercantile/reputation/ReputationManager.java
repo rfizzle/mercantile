@@ -282,9 +282,15 @@ public final class ReputationManager {
         }
     }
 
-    public static void tryGainGiftRep(ServerPlayer player) {
+    /**
+     * Awards gift-source rep and returns the cap decision so the caller can tailor feedback.
+     * On a cap hit this already sends the daily-cap action-bar notice, so a caller that shows
+     * its own confirmation must only do so on {@link CapDecision#AWARDED} to avoid two competing
+     * action-bar lines for one gift. Returns {@code null} when rep or gifting is disabled.
+     */
+    public static CapDecision tryGainGiftRep(ServerPlayer player) {
         MercantileConfig config = MercantileConfig.get();
-        if (!config.enableReputation || !config.enableGifting) return;
+        if (!config.enableReputation || !config.enableGifting) return null;
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         migrateIfNeeded(data);
         long currentDay = player.serverLevel().getGameTime() / 24_000L;
@@ -298,6 +304,7 @@ public final class ReputationManager {
             case SUBCAP_HIT, TOTAL_CAP_HIT -> sendDailyCapMessage(player, data);
             case BELOW_TRADE_THRESHOLD -> { /* unreachable for gifts */ }
         }
+        return decision;
     }
 
     // Raid win rep is an intentional bypass similar to cure rep: it skips both the daily total
