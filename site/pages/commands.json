@@ -1,9 +1,9 @@
 {
   "nav": "Commands",
   "metaTitle": "Commands — Mercantile | Villager Overhaul for Minecraft",
-  "metaDescription": "The /mercantile command tree: reputation queries, op-restricted set/add, and config hot-reload.",
+  "metaDescription": "The /mercantile command tree: reputation queries, op-restricted set/add, pinned-trade management, and config hot-reload.",
   "ogTitle": "Commands — Mercantile",
-  "ogDescription": "The /mercantile command tree: reputation queries, op-restricted set/add, and config hot-reload.",
+  "ogDescription": "The /mercantile command tree: reputation queries, op-restricted set/add, pinned-trade management, and config hot-reload.",
   "title": "Commands",
   "lede": "The <code class='text-bone'>/mercantile</code> command tree. Op-restricted subcommands require <span class='text-bone'>permission level 2</span> (default <code class='text-bone'>op</code>). Self-query commands work for any player.",
   "width": "4xl",
@@ -48,6 +48,42 @@
                 { "type": "code", "code": "/mercantile reputation add <player> <value>" },
                 { "type": "prose", "html": "Op-restricted. Adds (or subtracts, with a negative value) to the current score, then clamps to <code class='text-bone'>[−200, 1500]</code>. The <code class='text-bone'>&lt;value&gt;</code> argument is bounded to <code class='text-bone'>[−1700, 1700]</code> — wide enough to traverse the full range in one call, narrow enough to reject parser overflow." },
                 { "type": "prose", "html": "<span class='text-smoke text-xs'><strong class='text-bone'>Example:</strong> <code>/mercantile reputation add Steve -50</code> → \"Added -50 to Steve's reputation: 50 (Neutral)\"</span>" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pins",
+      "title": "/mercantile pins",
+      "blocks": [
+        {
+          "type": "examples",
+          "items": [
+            {
+              "title": "List pinned trades",
+              "body": [
+                { "type": "code", "code": "/mercantile pins" },
+                { "type": "prose", "html": "No permission required. Lists the executing player's pinned trades — each entry shows a <code class='text-bone'>1</code>-based index, the villager's name, the trade summary, and a live stock status (<span class='text-bone'>In stock</span> / <span class='text-bone'>Out of stock</span> / <span class='text-bone'>Unknown</span>). The header reports how many pins are used against your cap (<code class='text-bone'>maxPinnedTradesPerPlayer</code>). Returns the pin count as the command result." },
+                { "type": "prose", "html": "Listing lazily prunes dead pins: any pin whose villager is loaded nearby but no longer sells the offer is dropped before the list is shown." },
+                { "type": "prose", "html": "<span class='text-smoke text-xs'>Requires <code class='text-bone'>enableTradePinning</code>. When the feature is disabled this subcommand reports that pinning is off.</span>" }
+              ]
+            },
+            {
+              "title": "Remove a pinned trade",
+              "body": [
+                { "type": "code", "code": "/mercantile pins remove <index>" },
+                { "type": "prose", "html": "No permission required. Removes the pin at the given <code class='text-bone'>1</code>-based <code class='text-bone'>&lt;index&gt;</code> as shown by <code>/mercantile pins</code>." },
+                { "type": "prose", "html": "<span class='text-smoke text-xs'>Works even when <code class='text-bone'>enableTradePinning</code> is off — an escape hatch so pins, which occupy cap slots, can always be shed while the feature is disabled.</span>" }
+              ]
+            },
+            {
+              "title": "Clear all pinned trades",
+              "body": [
+                { "type": "code", "code": "/mercantile pins clear" },
+                { "type": "prose", "html": "No permission required. Removes every pinned trade for the executing player." },
+                { "type": "prose", "html": "<span class='text-smoke text-xs'>Also works when <code class='text-bone'>enableTradePinning</code> is off, for the same escape-hatch reason as <code>remove</code>.</span>" }
               ]
             }
           ]
