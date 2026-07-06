@@ -9,7 +9,8 @@ import com.rfizzle.mercantile.data.PinnedTrade;
 import com.rfizzle.mercantile.data.PlayerData;
 import com.rfizzle.mercantile.network.ConfigSyncS2CPayload;
 import com.rfizzle.mercantile.reputation.ReputationManager;
-import com.rfizzle.mercantile.trade.OfferIdentityHash;
+import com.rfizzle.mercantile.trade.TradePinManager;
+import com.rfizzle.mercantile.trade.TradePinManager.PinStock;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.commands.CommandSourceStack;
@@ -17,8 +18,6 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.item.trading.MerchantOffer;
 
 import java.util.List;
 
@@ -89,10 +88,15 @@ public final class MercantileCommands {
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
 
         // Lazy prune: a pin whose villager is loaded here but no longer sells the offer is dead.
+        boolean pruned = false;
         for (PinnedTrade pin : List.copyOf(data.getPinnedTrades())) {
-            if (findOffer(player, pin) == PinTarget.OFFER_GONE) {
+            if (TradePinManager.resolveStock(player, pin) == PinStock.OFFER_GONE) {
                 data.removePinnedTrade(pin.villagerUuid(), pin.offerHash());
+                pruned = true;
             }
+        }
+        if (pruned) {
+            TradePinManager.syncPinsSummary(player);
         }
 
         List<PinnedTrade> pins = data.getPinnedTrades();
@@ -106,7 +110,7 @@ public final class MercantileCommands {
                 pins.size(), cap), false);
         for (int i = 0; i < pins.size(); i++) {
             PinnedTrade pin = pins.get(i);
-            PinTarget target = findOffer(player, pin);
+            PinStock target = TradePinManager.resolveStock(player, pin);
             Component status = Component.translatable(switch (target) {
                 case IN_STOCK -> "command.mercantile.pins.status.in_stock";
                 case OUT_OF_STOCK -> "command.mercantile.pins.status.out_of_stock";
@@ -135,6 +139,7 @@ public final class MercantileCommands {
         }
         PinnedTrade pin = pins.get(index - 1);
         data.removePinnedTrade(pin.villagerUuid(), pin.offerHash());
+        TradePinManager.syncPinsSummary(player);
         source.sendSuccess(() -> Component.translatable("command.mercantile.pins.removed",
                 pin.villagerName(), pin.tradeSummary()), false);
         return 1;
@@ -148,23 +153,9 @@ public final class MercantileCommands {
         }
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         int cleared = data.clearPinnedTrades();
+        TradePinManager.syncPinsSummary(player);
         source.sendSuccess(() -> Component.translatable("command.mercantile.pins.cleared", cleared), false);
         return cleared;
-    }
-
-    private enum PinTarget { IN_STOCK, OUT_OF_STOCK, OFFER_GONE, UNRESOLVED }
-
-    /** Resolves a pin against the player's current dimension; unloaded villagers stay UNRESOLVED. */
-    private static PinTarget findOffer(ServerPlayer player, PinnedTrade pin) {
-        if (!(player.serverLevel().getEntity(pin.villagerUuid()) instanceof Villager villager)) {
-            return PinTarget.UNRESOLVED;
-        }
-        for (MerchantOffer offer : villager.getOffers()) {
-            if (OfferIdentityHash.compute(offer).equals(pin.offerHash())) {
-                return offer.isOutOfStock() ? PinTarget.OUT_OF_STOCK : PinTarget.IN_STOCK;
-            }
-        }
-        return PinTarget.OFFER_GONE;
     }
 
     private static int showOwnReputation(CommandSourceStack source) {
@@ -224,6 +215,9 @@ public final class MercantileCommands {
         ConfigSyncS2CPayload payload = new ConfigSyncS2CPayload(configJson);
         for (ServerPlayer player : source.getServer().getPlayerList().getPlayers()) {
             ServerPlayNetworking.send(player, payload);
+            // Re-push the pins summary so a flipped enableTradePinning is reflected right away
+            // (an EMPTY clear when now off, fresh entries when now on) instead of at next sync.
+            TradePinManager.syncPinsSummary(player);
         }
         source.sendSuccess(() -> Component.translatable("command.mercantile.reload"), true);
         return 1;

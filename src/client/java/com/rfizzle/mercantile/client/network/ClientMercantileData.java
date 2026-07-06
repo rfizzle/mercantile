@@ -29,6 +29,10 @@ public class ClientMercantileData {
 
     private static @Nullable MercantileConfig serverConfig;
 
+    // The player's full pinned-trade list with stock status, player-scoped and persistent
+    // (unlike the screen-scoped tradePins above). Drives the reputation detail panel.
+    private static volatile List<PinnedTradesSummaryS2CPayload.Entry> pinnedTradesSummary = List.of();
+
     // --- Trade index ---
 
     private static volatile List<TradeIndexEntry> tradeIndex = List.of();
@@ -195,6 +199,16 @@ public class ClientMercantileData {
         }
     }
 
+    // --- Pinned trades summary (player-scoped, persistent) ---
+
+    public static List<PinnedTradesSummaryS2CPayload.Entry> getPinnedTradesSummary() {
+        return pinnedTradesSummary;
+    }
+
+    public static void setPinnedTradesSummary(List<PinnedTradesSummaryS2CPayload.Entry> pins) {
+        pinnedTradesSummary = List.copyOf(pins);
+    }
+
     // --- Server config ---
 
     public static @Nullable MercantileConfig getServerConfig() {
@@ -220,5 +234,6 @@ public class ClientMercantileData {
         followCount = 0;
         serverConfig = null;
         tradeIndex = List.of();
+        pinnedTradesSummary = List.of();
     }
 }

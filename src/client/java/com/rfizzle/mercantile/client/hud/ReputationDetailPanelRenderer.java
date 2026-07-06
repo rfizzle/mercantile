@@ -7,6 +7,7 @@ import com.rfizzle.mercantile.client.network.ClientMercantileData;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.VillagerHeadTextures;
 import com.rfizzle.mercantile.market.MarketDayMath;
+import com.rfizzle.mercantile.network.PinnedTradesSummaryS2CPayload;
 import com.rfizzle.mercantile.reputation.ReputationPerks;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.DeltaTracker;
@@ -65,6 +66,8 @@ public final class ReputationDetailPanelRenderer implements HudRenderCallback {
 
     /** A page of the nearby list is up to this many rows (also clamped by the screen-height budget). */
     private static final int PAGE_COMFORT_ROWS = 10;
+    /** A page of the pinned-trades list is up to this many rows (three 2-row pins). */
+    private static final int PINS_COMFORT_ROWS = 6;
     /** Time one page stays up, including its fade in/out (ms). */
     private static final long PAGE_HOLD_MS = 2600L;
     /** Cross-fade duration at each page boundary (ms). */
@@ -81,6 +84,11 @@ public final class ReputationDetailPanelRenderer implements HudRenderCallback {
     private static final int COLOR_ASH = 0xFFA89F93;
     private static final int COLOR_BAR_TRACK = 0xFF26241F;
     private static final int COLOR_DOT_OFF = 0xFF55504A;
+
+    // Stock tints for pinned trades — in-stock leaf green, out-of-stock rust, unknown ash.
+    private static final int COLOR_STOCK_IN = 0xFF89C07A;
+    private static final int COLOR_STOCK_OUT = 0xFFB5654A;
+    private static final int COLOR_STOCK_UNKNOWN = COLOR_ASH;
 
     private static final String BULLET = "› ";  // ›
 
@@ -168,6 +176,56 @@ public final class ReputationDetailPanelRenderer implements HudRenderCallback {
         // Rows + gap plus the section's own trailing divider.
         int statusH = statusRows == 0 ? 0 : statusRows * LINE_H + SECTION_GAP + 1 + SECTION_GAP;
 
+        // ---- Pinned trades (paged section above the nearby list) ----
+        // Player-scoped and persistent (synced separately from the merchant screen). Hidden
+        // entirely when pinning is off or the player has no pins.
+        List<PinnedTradesSummaryS2CPayload.Entry> pinEntries =
+                synced != null && synced.enableTradePinning
+                        ? ClientMercantileData.getPinnedTradesSummary()
+                        : List.of();
+        List<PinGroup> pinGroups = new ArrayList<>();
+        for (PinnedTradesSummaryS2CPayload.Entry entry : pinEntries) {
+            PinnedTradesSummaryS2CPayload.Status status =
+                    PinnedTradesSummaryS2CPayload.Status.fromOrdinal(entry.status());
+            Component statusText = Component.translatable(switch (status) {
+                case IN_STOCK -> "hud.mercantile.rep_detail.pin_status.in_stock";
+                case OUT_OF_STOCK -> "hud.mercantile.rep_detail.pin_status.out_of_stock";
+                case UNKNOWN -> "hud.mercantile.rep_detail.pin_status.unknown";
+            });
+            int stockColor = switch (status) {
+                case IN_STOCK -> COLOR_STOCK_IN;
+                case OUT_OF_STOCK -> COLOR_STOCK_OUT;
+                case UNKNOWN -> COLOR_STOCK_UNKNOWN;
+            };
+            Component summary = Component.literal(entry.tradeSummary());
+            Component detail = Component.translatable("hud.mercantile.rep_detail.pin_detail",
+                    entry.villagerName(), statusText);
+            pinGroups.add(new PinGroup(summary, detail, stockColor));
+        }
+        boolean hasPins = !pinGroups.isEmpty();
+        Component pinsHeading = Component.translatable("hud.mercantile.rep_detail.pins_heading");
+
+        List<List<PinGroup>> pinPages = List.of();
+        int pinsBodyRows = 0;
+        int pinsW = 0;
+        if (hasPins) {
+            int totalPinRows = pinGroups.size() * 2;
+            int pinsRowsPerPage = Math.max(2, Math.min(PINS_COMFORT_ROWS, totalPinRows));
+            pinPages = paginate(pinGroups, pinsRowsPerPage);
+            for (List<PinGroup> page : pinPages) {
+                pinsBodyRows = Math.max(pinsBodyRows, page.size() * 2);
+                for (PinGroup g : page) {
+                    pinsW = Math.max(pinsW, font.width(g.summary()));
+                    pinsW = Math.max(pinsW, ROW_INDENT + font.width(bullet(g.detail())));
+                }
+            }
+        }
+        int numPinPages = pinPages.size();
+        int pinsDotsW = numPinPages > 1 ? numPinPages * DOT_SIZE + (numPinPages - 1) * DOT_GAP : 0;
+        int pinsHeadingRowW = font.width(pinsHeading) + (pinsDotsW > 0 ? 12 + pinsDotsW : 0);
+        // Folded into chrome: heading + fixed body + trailing divider.
+        int pinsH = hasPins ? LINE_H + pinsBodyRows * LINE_H + SECTION_GAP + 1 + SECTION_GAP : 0;
+
         // Fixed-height "chrome": everything above the paged nearby list.
         int perksH = LINE_H + perks.size() * LINE_H + SECTION_GAP;  // heading + lines
         int chromeH = 2 * INSET
@@ -178,6 +236,7 @@ public final class ReputationDetailPanelRenderer implements HudRenderCallback {
                 + perksH                                                   // perks block
                 + 1 + SECTION_GAP                                          // divider
                 + statusH                                                  // market day + follow rows (if any)
+                + pinsH                                                     // pinned trades block (if any)
                 + LINE_H;                                                  // nearby heading
 
         // Paginate the nearby list to a comfortable, bounded height.
@@ -213,7 +272,8 @@ public final class ReputationDetailPanelRenderer implements HudRenderCallback {
         int statusW = 0;
         if (marketText != null) statusW = Math.max(statusW, font.width(marketText));
         if (followText != null) statusW = Math.max(statusW, font.width(followText));
-        int contentW = max(MIN_CONTENT_W, headerW, scoreRowW, figuresW, perksW, statusW, nearbyW, headingRowW);
+        int contentW = max(MIN_CONTENT_W, headerW, scoreRowW, figuresW, perksW, statusW,
+                pinsW, pinsHeadingRowW, nearbyW, headingRowW);
 
         int contentH = chromeH - 2 * INSET + bodyRows * LINE_H;
         int panelW = contentW + 2 * INSET;
@@ -293,6 +353,33 @@ public final class ReputationDetailPanelRenderer implements HudRenderCallback {
                 y += LINE_H;
             }
             y += SECTION_GAP;
+            y = divider(graphics, contentX, y, contentW, tierColor);
+        }
+
+        // ---- Pinned trades: static caption + dots, page cross-fading ----
+        if (hasPins) {
+            graphics.drawString(font, pinsHeading, contentX, y, COLOR_ASH, true);
+            int pinPage = 0;
+            float pinAlpha = 1f;
+            if (numPinPages > 1) {
+                long now = System.currentTimeMillis();
+                pinPage = (int) ((now / PAGE_HOLD_MS) % numPinPages);
+                pinAlpha = pageAlpha(now % PAGE_HOLD_MS);
+                drawDots(graphics, contentX + contentW - pinsDotsW, y + 2, numPinPages, pinPage, tierColor);
+            }
+            y += LINE_H;
+
+            int cy = y;
+            for (PinGroup g : pinPages.get(pinPage)) {
+                graphics.drawString(font, g.summary(), contentX, cy, fade(COLOR_BONE, pinAlpha), true);
+                cy += LINE_H;
+                graphics.drawString(font, bullet(g.detail()), contentX + ROW_INDENT, cy,
+                        fade(g.color(), pinAlpha), true);
+                cy += LINE_H;
+            }
+            // Advance by the fixed body height (not the current page's) so a short page
+            // never shifts the nearby section up and resizes the panel between pages.
+            y += pinsBodyRows * LINE_H + SECTION_GAP;
             y = divider(graphics, contentX, y, contentW, tierColor);
         }
 
@@ -384,11 +471,11 @@ public final class ReputationDetailPanelRenderer implements HudRenderCallback {
      * rows, never splitting a group. Always returns at least one (possibly
      * empty) page.
      */
-    private static List<List<Group>> paginate(List<Group> groups, int rowsPerPage) {
-        List<List<Group>> pages = new ArrayList<>();
-        List<Group> page = new ArrayList<>();
+    private static <T extends Paged> List<List<T>> paginate(List<T> groups, int rowsPerPage) {
+        List<List<T>> pages = new ArrayList<>();
+        List<T> page = new ArrayList<>();
         int rows = 0;
-        for (Group g : groups) {
+        for (T g : groups) {
             int gr = g.rowCount();
             if (rows > 0 && rows + gr > rowsPerPage) {
                 pages.add(page);
@@ -475,9 +562,23 @@ public final class ReputationDetailPanelRenderer implements HudRenderCallback {
         return m;
     }
 
+    /** A block that occupies a whole number of rows when paginated. */
+    private interface Paged {
+        int rowCount();
+    }
+
     /** A nearby profession group: a header line and a one-line exclusive-trade status. */
-    private record Group(Component header, Component status) {
-        int rowCount() {
+    private record Group(Component header, Component status) implements Paged {
+        @Override
+        public int rowCount() {
+            return 2;
+        }
+    }
+
+    /** A pinned trade: a trade-summary line and a villager + stock-status line, stock-tinted. */
+    private record PinGroup(Component summary, Component detail, int color) implements Paged {
+        @Override
+        public int rowCount() {
             return 2;
         }
     }

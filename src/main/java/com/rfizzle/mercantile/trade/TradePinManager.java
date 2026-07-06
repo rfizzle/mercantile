@@ -5,6 +5,7 @@ import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PinnedTrade;
 import com.rfizzle.mercantile.data.PlayerData;
 import com.rfizzle.mercantile.data.VillagerHeadTextures;
+import com.rfizzle.mercantile.network.PinnedTradesSummaryS2CPayload;
 import com.rfizzle.mercantile.network.TradePinsS2CPayload;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -49,7 +50,9 @@ public final class TradePinManager {
             if (villager.level().isClientSide()) return;
             for (ServerPlayer player : villager.getServer().getPlayerList().getPlayers()) {
                 PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
-                data.removePinnedTradesFor(villager.getUUID());
+                if (data.removePinnedTradesFor(villager.getUUID()) > 0) {
+                    syncPinsSummary(player);
+                }
             }
         });
     }
@@ -81,6 +84,62 @@ public final class TradePinManager {
                     describeVillager(villager).getString(), summarize(offer).getString()));
         }
         sendPinsTo(player, villager);
+        syncPinsSummary(player);
+    }
+
+    /** A pin's live stock status relative to the resolving player's current dimension. */
+    public enum PinStock { IN_STOCK, OUT_OF_STOCK, OFFER_GONE, UNRESOLVED }
+
+    /**
+     * Resolves a pin against the player's current dimension: {@code UNRESOLVED} when the
+     * villager isn't loaded, {@code OFFER_GONE} when it no longer sells the offer, otherwise
+     * the offer's in/out-of-stock state. Shared by {@code /mercantile pins} and the
+     * reputation panel summary so the two never disagree.
+     */
+    public static PinStock resolveStock(ServerPlayer player, PinnedTrade pin) {
+        if (!(player.serverLevel().getEntity(pin.villagerUuid()) instanceof Villager villager)) {
+            return PinStock.UNRESOLVED;
+        }
+        for (MerchantOffer offer : villager.getOffers()) {
+            if (OfferIdentityHash.compute(offer).equals(pin.offerHash())) {
+                return offer.isOutOfStock() ? PinStock.OUT_OF_STOCK : PinStock.IN_STOCK;
+            }
+        }
+        return PinStock.OFFER_GONE;
+    }
+
+    /**
+     * Rebuilds and sends the player's full pinned-trade summary for the reputation detail
+     * panel. Lazily prunes pins whose villager is loaded here but no longer sells the offer
+     * (the same prune {@code /mercantile pins} performs), then ships each remaining pin's
+     * snapshot plus stock status. When pinning is disabled an empty summary is sent so the
+     * client clears its list.
+     */
+    public static void syncPinsSummary(ServerPlayer player) {
+        if (player.connection == null) return;
+        if (!MercantileConfig.get().enableTradePinning) {
+            ServerPlayNetworking.send(player, PinnedTradesSummaryS2CPayload.EMPTY);
+            return;
+        }
+
+        PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
+        for (PinnedTrade pin : List.copyOf(data.getPinnedTrades())) {
+            if (resolveStock(player, pin) == PinStock.OFFER_GONE) {
+                data.removePinnedTrade(pin.villagerUuid(), pin.offerHash());
+            }
+        }
+
+        List<PinnedTradesSummaryS2CPayload.Entry> entries = new ArrayList<>();
+        for (PinnedTrade pin : data.getPinnedTrades()) {
+            PinnedTradesSummaryS2CPayload.Status status = switch (resolveStock(player, pin)) {
+                case IN_STOCK -> PinnedTradesSummaryS2CPayload.Status.IN_STOCK;
+                case OUT_OF_STOCK -> PinnedTradesSummaryS2CPayload.Status.OUT_OF_STOCK;
+                default -> PinnedTradesSummaryS2CPayload.Status.UNKNOWN;
+            };
+            entries.add(new PinnedTradesSummaryS2CPayload.Entry(
+                    pin.villagerName(), pin.tradeSummary(), status.ordinal()));
+        }
+        ServerPlayNetworking.send(player, new PinnedTradesSummaryS2CPayload(entries));
     }
 
     /**
@@ -107,13 +166,19 @@ public final class TradePinManager {
             }
         }
 
+        boolean pruned = false;
         for (PinnedTrade pin : List.copyOf(data.getPinnedTrades())) {
             if (pin.villagerUuid().equals(villager.getUUID()) && !currentHashes.contains(pin.offerHash())) {
                 data.removePinnedTrade(pin.villagerUuid(), pin.offerHash());
+                pruned = true;
             }
         }
 
         ServerPlayNetworking.send(player, new TradePinsS2CPayload(villager.getId(), pinnedByIndex));
+        // A prune here (trade cycling / screen reopen after a re-roll) drops a pin the reputation
+        // panel is still listing, so refresh the persistent summary. Callers that pin/unpin already
+        // resync unconditionally; this covers the pure-prune path they don't.
+        if (pruned) syncPinsSummary(player);
     }
 
     /**
@@ -153,6 +218,16 @@ public final class TradePinManager {
                                 describeVillager(villager), summarize(replenishedOffers.get(i)))
                         .withStyle(ChatFormatting.GREEN), true);
             }
+        }
+
+        // The in/out-of-stock flips for every pin holder, not only those in notify range, so
+        // refresh each online player who pins this villager — their panel now reads in-stock.
+        for (ServerPlayer player : villager.getServer().getPlayerList().getPlayers()) {
+            if (player.connection == null) continue;
+            PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
+            boolean holdsPin = data.getPinnedTrades().stream()
+                    .anyMatch(pin -> pin.villagerUuid().equals(villager.getUUID()));
+            if (holdsPin) syncPinsSummary(player);
         }
     }
 
