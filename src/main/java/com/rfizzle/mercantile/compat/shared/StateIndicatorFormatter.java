@@ -62,6 +62,10 @@ public final class StateIndicatorFormatter {
                     new ItemStack(Items.PAPER),
                     Component.translatable("tooltip.mercantile.state.has_contract_offer")
                             .withStyle(ChatFormatting.AQUA));
+            case StateIndicatorData.STATE_PROFESSION_LOCKED -> new IndicatorLine(
+                    new ItemStack(Items.IRON_INGOT),
+                    Component.translatable("tooltip.mercantile.state.profession_locked")
+                            .withStyle(ChatFormatting.GRAY));
             default -> null;
         };
     }

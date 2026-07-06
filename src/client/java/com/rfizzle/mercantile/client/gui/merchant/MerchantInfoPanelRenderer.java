@@ -154,18 +154,24 @@ public final class MerchantInfoPanelRenderer {
         guiGraphics.drawString(font, trades, contentX, y, INFO_PANEL_TEXT_COLOR, false);
         y += font.lineHeight + 4;
 
-        // Workstation status.
-        String wsKey = info.hasWorkstation()
-                ? "gui.mercantile.info.workstation.bound"
-                : "gui.mercantile.info.workstation.missing";
-        ChatFormatting wsColor = info.hasWorkstation() ? ChatFormatting.GREEN : ChatFormatting.RED;
-        Component workstation = Component.translatable(wsKey).withStyle(wsColor);
-        guiGraphics.drawString(font, workstation, contentX, y, INFO_PANEL_TEXT_COLOR, false);
-        y += font.lineHeight + 4;
+        // Workstation status appears exactly once in the panel. When the restock subsection
+        // renders it is the source of truth: it reads "No workstation" when the binding is
+        // absent, and when present shows a countdown, "Fully stocked", or (once the day's
+        // restocks are spent) the trailing count line — all of which imply the binding. The
+        // standalone status line is drawn only as a fallback, when that subsection won't
+        // render (restock indicator off or no timer yet), so no reader loses the information.
+        boolean restockSubsectionShown = timer != null && config.enableRestockIndicator;
+        if (!restockSubsectionShown) {
+            String wsKey = info.hasWorkstation()
+                    ? "gui.mercantile.info.workstation.bound"
+                    : "gui.mercantile.info.workstation.missing";
+            ChatFormatting wsColor = info.hasWorkstation() ? ChatFormatting.GREEN : ChatFormatting.RED;
+            Component workstation = Component.translatable(wsKey).withStyle(wsColor);
+            guiGraphics.drawString(font, workstation, contentX, y, INFO_PANEL_TEXT_COLOR, false);
+            return;
+        }
 
         // Restock subsection.
-        if (timer == null || !config.enableRestockIndicator) return;
-
         if (!timer.hasWorkstation()) {
             guiGraphics.drawString(font,
                     Component.translatable("gui.mercantile.restock.no_workstation")

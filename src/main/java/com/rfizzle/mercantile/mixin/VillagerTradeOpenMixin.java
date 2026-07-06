@@ -7,9 +7,8 @@ import com.rfizzle.mercantile.market.MarketDayManager;
 import com.rfizzle.mercantile.memorial.FearManager;
 import com.rfizzle.mercantile.memorial.FearMath;
 import com.rfizzle.mercantile.mood.MoodManager;
-import com.rfizzle.mercantile.mood.MoodMath;
 import com.rfizzle.mercantile.network.DemandPriceS2CPayload;
-import com.rfizzle.mercantile.network.RestockTimerS2CPayload;
+import com.rfizzle.mercantile.network.RestockTimerSync;
 import com.rfizzle.mercantile.network.VillagerInfoPanelSync;
 import com.rfizzle.mercantile.reputation.ExclusiveTradesManager;
 import com.rfizzle.mercantile.reputation.ReputationManager;
@@ -23,7 +22,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.trading.MerchantOffer;
@@ -148,22 +146,7 @@ public abstract class VillagerTradeOpenMixin {
 
     @Inject(method = "startTrading", at = @At("TAIL"))
     private void mercantile$sendRestockOnTradeOpen(Player player, CallbackInfo ci) {
-        if (!MercantileConfig.get().enableRestockIndicator) return;
         if (!(player instanceof ServerPlayer serverPlayer)) return;
-        if (serverPlayer.connection == null) return;
-
-        Villager self = (Villager) (Object) this;
-        VillagerRestockAccessor accessor = (VillagerRestockAccessor) self;
-        long lastRestockGameTime = accessor.mercantile$getLastRestockGameTime();
-        int restocksToday = accessor.mercantile$getNumberOfRestocksToday();
-        boolean hasWorkstation = self.getBrain()
-                .getMemory(MemoryModuleType.JOB_SITE).isPresent();
-
-        int restockIntervalTicks = (int) MoodManager.restockIntervalTicks(
-                self, MoodMath.BASE_RESTOCK_INTERVAL_TICKS);
-
-        ServerPlayNetworking.send(serverPlayer, new RestockTimerS2CPayload(
-                self.getId(), lastRestockGameTime, restocksToday, hasWorkstation, restockIntervalTicks,
-                MarketDayManager.maxRestocksToday(self)));
+        RestockTimerSync.sendTo(serverPlayer, (Villager) (Object) this);
     }
 }
