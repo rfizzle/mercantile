@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.compat.rei;
 
+import com.rfizzle.mercantile.compat.tradeindex.TradeIndexCategoryKey;
 import com.rfizzle.mercantile.compat.tradeindex.TradeIndexIcon;
 import com.rfizzle.mercantile.compat.tradeindex.TradeIndexLabels;
 import com.rfizzle.mercantile.trade.index.TradeIndexEntry;
@@ -19,14 +20,22 @@ import java.util.List;
 
 public class VillagerTradeDisplayCategory implements DisplayCategory<VillagerTradeDisplay> {
 
+    private final TradeIndexCategoryKey key;
+    private final CategoryIdentifier<VillagerTradeDisplay> identifier;
+
+    public VillagerTradeDisplayCategory(TradeIndexCategoryKey key) {
+        this.key = key;
+        this.identifier = VillagerTradeDisplay.categoryIdentifier(key);
+    }
+
     @Override
     public CategoryIdentifier<? extends VillagerTradeDisplay> getCategoryIdentifier() {
-        return VillagerTradeDisplay.IDENTIFIER;
+        return identifier;
     }
 
     @Override
     public Component getTitle() {
-        return Component.translatable("category.mercantile.villager_trades");
+        return key.title();
     }
 
     @Override

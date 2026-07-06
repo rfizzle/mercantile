@@ -404,7 +404,8 @@
     "mercantile.config.enableStateIndicators.tooltip": "Show villager state icons (needs bed/workstation, breeding, panicking, trading) in Jade/WTHIT tooltips",
 
     "category.mercantile.villager_trades": "Villager Trades",
-    "emi.category.mercantile.villager_trades": "Villager Trades",
+    "category.mercantile.villager_trades.available": "Available Trades",
+    "category.mercantile.villager_trades.tier": "%s Trades",
     "mercantile.trade_index.level.1": "Novice",
     "mercantile.trade_index.level.2": "Apprentice",
     "mercantile.trade_index.level.3": "Journeyman",
