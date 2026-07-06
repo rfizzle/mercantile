@@ -176,6 +176,8 @@
     "mercantile.config.enableInfoPanel.tooltip": "Show extended villager info panel in the trade GUI",
     "mercantile.config.enableReputationHud": "Reputation HUD",
     "mercantile.config.enableReputationHud.tooltip": "Show a compact reputation indicator on the HUD when villagers are nearby",
+    "mercantile.config.enableTierChangeMessages": "Tier Change Messages",
+    "mercantile.config.enableTierChangeMessages.tooltip": "Show a chat notice when your reputation tier changes",
     "mercantile.config.hudAnchor": "HUD Anchor",
     "mercantile.config.hudAnchor.tooltip": "Screen corner the reputation HUD is anchored to",
     "mercantile.config.hudAnchor.top_left": "Top Left",
@@ -256,6 +258,11 @@
     "mercantile.tier.neutral":    "Neutral",
     "mercantile.tier.distrusted": "Distrusted",
     "mercantile.tier.reviled":    "Reviled",
+
+    "mercantile.message.tier_up": "Villagers now consider you %s — new exclusive trades unlocked.",
+    "mercantile.message.tier_up.hint": "Villagers now consider you %s — new exclusive trades unlocked. Hold %s for details.",
+    "mercantile.message.tier_down": "Villagers now regard you as %s.",
+    "mercantile.message.tier_down.hint": "Villagers now regard you as %s. Hold %s for details.",
 
     "key.categories.mercantile": "Mercantile",
     "key.mercantile.reputation_detail": "Peek Reputation Detail",

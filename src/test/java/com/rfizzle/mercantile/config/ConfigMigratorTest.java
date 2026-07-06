@@ -266,6 +266,40 @@ class ConfigMigratorTest {
     }
 
     @Test
+    void v10FileGainsTierChangeMessageFieldAtDefault() {
+        JsonObject raw = parse("""
+                {
+                  "configVersion": 10,
+                  "enableReputationHud": false
+                }
+                """);
+
+        boolean migrated = ConfigMigrator.migrate(raw);
+        MercantileConfig defaults = new MercantileConfig();
+
+        assertTrue(migrated, "a v10 file must migrate to v11");
+        assertEquals(ConfigMigrator.CURRENT_VERSION, raw.get("configVersion").getAsInt());
+        assertEquals(defaults.enableTierChangeMessages, raw.get("enableTierChangeMessages").getAsBoolean());
+        // Existing fields are carried forward untouched.
+        assertFalse(raw.get("enableReputationHud").getAsBoolean());
+    }
+
+    @Test
+    void tierChangeMigrationPreservesExplicitValue() {
+        JsonObject raw = parse("""
+                {
+                  "configVersion": 10,
+                  "enableTierChangeMessages": false
+                }
+                """);
+
+        ConfigMigrator.migrate(raw);
+
+        assertFalse(raw.get("enableTierChangeMessages").getAsBoolean(),
+                "an explicitly set enableTierChangeMessages must not be overwritten by the migration");
+    }
+
+    @Test
     void contractMigrationPreservesExplicitValues() {
         JsonObject raw = parse("""
                 {

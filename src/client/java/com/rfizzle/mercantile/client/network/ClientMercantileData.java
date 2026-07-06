@@ -15,6 +15,9 @@ public class ClientMercantileData {
     private static String reputationTier = "mercantile.tier.neutral";
     private static int reputationDailyEarned = 0;
     private static int reputationDailyCap = 0;
+    // False until the first reputation sync of the session lands; gates the
+    // tier-change notice so joining a world never fires a spurious message.
+    private static boolean hasReputationBaseline = false;
 
     private static @Nullable RestockTimerS2CPayload restockTimer;
     private static @Nullable DemandPriceS2CPayload demandPrice;
@@ -57,10 +60,14 @@ public class ClientMercantileData {
     }
 
     public static void setReputation(int score, String tier, int dailyEarned, int dailyCap) {
+        int previousScore = reputationScore;
+        boolean hadBaseline = hasReputationBaseline;
         reputationScore = score;
         reputationTier = tier;
         reputationDailyEarned = dailyEarned;
         reputationDailyCap = dailyCap;
+        hasReputationBaseline = true;
+        ReputationTierNotifier.onScoreSynced(hadBaseline, previousScore, score);
     }
 
     // --- Merchant screen data ---
@@ -203,6 +210,7 @@ public class ClientMercantileData {
         reputationTier = "mercantile.tier.neutral";
         reputationDailyEarned = 0;
         reputationDailyCap = 0;
+        hasReputationBaseline = false;
         restockTimer = null;
         demandPrice = null;
         villagerInfo = null;
