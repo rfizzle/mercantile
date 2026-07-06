@@ -161,6 +161,8 @@ public class MercantileConfig {
     public boolean enableBellRadiusVis = true;
     public boolean enableInfoPanel = true;
     public boolean enableReputationHud = true;
+    // Client-side chat notice when the player's reputation tier changes.
+    public boolean enableTierChangeMessages = true;
     // Reputation HUD placement per Concord HUD-STANDARD §4: corner anchor plus
     // pixel offsets measured inward from the anchored edges.
     public Anchor hudAnchor = Anchor.TOP_LEFT;

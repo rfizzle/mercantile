@@ -32,9 +32,12 @@ import org.lwjgl.glfw.GLFW;
 
 public class MercantileClient implements ClientModInitializer {
     /**
-     * Hold-to-peek keybind for the reputation detail panel. Unbound by default
-     * ({@link GLFW#GLFW_KEY_UNKNOWN}) so it never collides with another mod's
-     * binding — the player assigns it under Controls → Mercantile.
+     * Hold-to-peek keybind for the reputation detail panel, bound to
+     * {@link GLFW#GLFW_KEY_V} by default. {@code V} is unused by vanilla
+     * 1.21.1 and this is the mod's only binding, so the default is
+     * conflict-free out of the box; discoverability of the detail panel
+     * outweighs the cross-mod collision risk, and players can rebind it
+     * under Controls → Mercantile.
      */
     public static KeyMapping KEY_REPUTATION_DETAIL;
 
@@ -43,7 +46,7 @@ public class MercantileClient implements ClientModInitializer {
         KEY_REPUTATION_DETAIL = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.mercantile.reputation_detail",
                 InputConstants.Type.KEYSYM,
-                GLFW.GLFW_KEY_UNKNOWN,
+                GLFW.GLFW_KEY_V,
                 "key.categories.mercantile"));
 
         ClientNetworkHandler.init();

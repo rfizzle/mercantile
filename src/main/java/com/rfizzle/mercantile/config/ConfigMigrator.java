@@ -15,7 +15,7 @@ import com.rfizzle.mercantile.Mercantile;
  */
 final class ConfigMigrator {
 
-    static final int CURRENT_VERSION = 10;
+    static final int CURRENT_VERSION = 11;
 
     @FunctionalInterface
     interface Migration {
@@ -95,6 +95,11 @@ final class ConfigMigrator {
             addIfAbsent(json, "contractRepGain", defaults.contractRepGain);
             addIfAbsent(json, "contractRepPerDay", defaults.contractRepPerDay);
             addIfAbsent(json, "contractDeadlineDays", defaults.contractDeadlineDays);
+        },
+        // v10 -> v11: reputation tier-change chat notice toggle, seeded at its default.
+        json -> {
+            MercantileConfig defaults = new MercantileConfig();
+            addIfAbsent(json, "enableTierChangeMessages", defaults.enableTierChangeMessages);
         },
     };
 

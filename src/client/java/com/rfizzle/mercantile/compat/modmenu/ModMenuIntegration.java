@@ -533,6 +533,11 @@ public class ModMenuIntegration implements ModMenuApi {
                     .setTooltip(Component.translatable("mercantile.config.enableReputationHud.tooltip"))
                     .setSaveConsumer(v -> config.enableReputationHud = v)
                     .build());
+            client.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableTierChangeMessages"), config.enableTierChangeMessages)
+                    .setDefaultValue(defaults.enableTierChangeMessages)
+                    .setTooltip(Component.translatable("mercantile.config.enableTierChangeMessages.tooltip"))
+                    .setSaveConsumer(v -> config.enableTierChangeMessages = v)
+                    .build());
             client.addEntry(entry.startEnumSelector(Component.translatable("mercantile.config.hudAnchor"),
                             MercantileConfig.Anchor.class, config.hudAnchor)
                     .setDefaultValue(defaults.hudAnchor)

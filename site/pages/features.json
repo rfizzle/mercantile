@@ -303,7 +303,16 @@
                 "Between the perks and the crowd sits a status strip: whether <span class='text-bone'>market day</span> is on right now — with the live discount, running until dusk — or how many days until the next one, plus a <span class='text-bone'>Following: N / max</span> line whenever villagers are trailing you. The market-day line is computed from the same schedule math the server discounts with, and the follow count is pushed straight from the server, so both read true even on a dedicated server.",
                 "Last, grouped by profession, it shows the villagers actually <em>around</em> you right now — a cached proximity scan throttled so it costs nothing per frame — and whether your standing has unlocked their exclusive trades yet. A crowd of professions pages through with a soft cross-fade and page dots, so the panel never overflows or scrolls. Framed in the mod's slate theme with emerald and standing-colored accents. Entirely client-side, hidden during F1, open screens, and spectator mode."
               ],
-              "note": "Controls → Mercantile → <span class='text-bone'>Peek Reputation Detail</span> — unbound by default"
+              "note": "Controls → Mercantile → <span class='text-bone'>Peek Reputation Detail</span> — bound to <code class='text-bone'>V</code> by default, rebindable"
+            },
+            {
+              "id": "reputation-tier-change",
+              "title": "Tier-Change Notices",
+              "html": [
+                "Cross into a new standing and a chat line tells you the moment it happens — <em>\"Villagers now consider you Trusted — new exclusive trades unlocked. Hold V for details.\"</em> — naming the standing you reached and pointing at the detail-panel keybind so the payoff is one keypress away. Slip backward and it warns you the moment your standing falls, so a slide toward higher prices never goes unnoticed.",
+                "The hint always names your live keybind, not a hardcoded key, and drops the hint cleanly if you've unbound the panel. No message fires on the first sync when you join a world, and standing changes are rare enough that the notice never spams."
+              ],
+              "note": "Client config: <code class='text-bone'>enableTierChangeMessages</code>"
             }
           ]
         }
