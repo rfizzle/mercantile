@@ -15,7 +15,7 @@
           "items": [
             {
               "q": "Is Mercantile vanilla-compatible?",
-              "a": "Yes. Mercantile follows a strict <strong class='text-bone'>vanilla-first asset policy</strong> — every sound, particle, and most icons reuse vanilla assets. Villager pickup items are player heads with pre-existing skin textures, not custom items. The only custom texture is the Sentry Pylon block. New trades and behaviors stack additively with vanilla gossip and pricing; your existing world is fully playable on installation."
+              "a": "Yes. Mercantile is <strong class='text-bone'>vanilla-coherent</strong> — all sounds reuse vanilla events, and villager pickup items are player heads with pre-existing skin textures rather than custom items. Where a vanilla sprite would be muddy or generic, it ships custom pixel-art in the suite palette instead: the Sentry Pylon block, the trade-GUI buttons, the reputation HUD glyph and badge, the delivery-contract and memorial items, and the mod's particle effects. New trades and behaviors stack additively with vanilla gossip and pricing; your existing world is fully playable on installation."
             },
             {
               "q": "Will this hurt my server's performance?",
@@ -27,7 +27,7 @@
             },
             {
               "q": "Can I disable individual features?",
-              "a": "Yes. Every feature has an <code class='text-bone'>enable*</code> flag in <code class='text-bone'>mercantile.json</code>. Don't like trade cycling? Set <code class='text-bone'>enableTradeCycling</code> to <code class='text-bone'>false</code>. Want the visualizations off? Toggle the four <code class='text-bone'>enable*Vis</code> client flags. See the <a href='/config.html' class='text-accent hover:text-accent2 underline'>full config reference</a>. Use <code class='text-bone'>/mercantile reload</code> to apply changes without restarting the server."
+              "a": "Yes. Every feature has an <code class='text-bone'>enable*</code> flag in <code class='text-bone'>mercantile.json</code>. Don't like trade cycling? Set <code class='text-bone'>enableTradeCycling</code> to <code class='text-bone'>false</code>. Want the visualizations off? Toggle the two <code class='text-bone'>enable*Vis</code> client flags. See the <a href='/config.html' class='text-accent hover:text-accent2 underline'>full config reference</a>. Use <code class='text-bone'>/mercantile reload</code> to apply changes without restarting the server."
             },
             {
               "q": "Can I customize Mercantile via datapack?",

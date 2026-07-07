@@ -82,7 +82,7 @@ its prices to your face until the fear fades.
 
 ### Reputation — every villager remembers
 - **What it is** — a single standing with villagerkind, from −200 to +1500 across
-  five tiers, that survives death and travels the world with you.
+  six tiers, that survives death and travels the world with you.
 - **How you use it** — trade fairly, cure zombie villagers, defend a village from a
   raid, or toss a villager a profession item it wants, and your standing climbs;
   attack or kill villagers and it falls. A badge in the corner shows your tier
