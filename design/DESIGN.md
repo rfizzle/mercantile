@@ -50,7 +50,7 @@ The logo matches the formula's bones (pixel art, stone frame, glowing central
 motif, pixel-type wordmark), rendered as a circular medallion on green brick with
 a market-stall motif. The market-stall / scales medallion is Mercantile's
 established identity — it is what siblings cite for Mercantile (Meridian
-`design/DESIGN.md` §7).
+`design/DESIGN.md` §5, Concord Context).
 
 ### Color Palette
 
@@ -73,7 +73,7 @@ hot-linked as `tokens.css`); the signature pair is Mercantile's per `VISION.md` 
 > while siblings layer a tinted dark pair (Meridian violet `#1a0a3e`/`#2a1a6e`,
 > Tribulation crimson, Prosperity bronze). `VISION.md` §3.1 recommends
 > Mercantile adopt deep emerald-blacks (suggested `#0a140d` / `#10241a`) to
-> match its siblings' depth. This pair is proposed but not chosen — see §9.
+> match its siblings' depth. This pair is proposed but not chosen — see §4.
 
 Accent-pairing rule (`VISION.md` §3.1): accents never leave Mercantile
 surfaces; no sibling may share *both* accents. Emerald-with-emerald is
@@ -98,52 +98,7 @@ lives in [`ASSETS.md`](ASSETS.md).
 
 ---
 
-## 3. Generation Prompts
-
-### HUD Glyph — shipped (balance scale)
-
-The HUD glyph is a standing merchant's balance scale — the same brand motif as
-the logo icon (§1), the most legible option at 16px and a direct tie to the
-trade economy. Authored as an ASCII glyph spec through Concord's glyph pipeline
-(`/glyph`, `mc-textures` skill), natively at 16px; master at
-`art/hud-icon-16.png`, source at `art/glyphs/hud-scales-16.glyph` (with a 32px
-variant at `art/glyphs/hud-scales-32.glyph`). It ships as the
-`mercantile:reputation_badge` sprite; the scale is a full-color sprite, so
-reputation tier reads in the bar color beneath it rather than in the glyph.
-To regenerate or revise:
-
-```
-Subject: standing merchant's balance scale, one centered motif, no text
-Size: 16x16
-Colors: Emerald (#50C878) body, Emerald Bright (#6DDB94) highlight, deeper
-        emerald (#2C8A57) facet shadow, deepest emerald (#1F6B41)
-        underside/base, ink (#0A0A0A) outline, gold (#FFD700) pivot; must read
-        on a 50–60% black HUD box
-Notes: Stays legible next to Tribulation's skull and Prosperity's chest in
-       the HUD stack. Edit art/glyphs/hud-scales-16.glyph, then re-render
-       with `/glyph` (or `python3 .ai/skills/mc-textures/scripts/glyph.py
-       art/glyphs/hud-scales-16.glyph`).
-```
-
-Logo regeneration prompts belong in `art/exploration/` alongside their outputs,
-per `REPO-LAYOUT.md`.
-
----
-
-## 4. Image References
-
-| Image | Reference Source | Notes |
-|-------|----------------|-------|
-| Market stall motif | `art/logo.png` | Awning, scales, coin pile, chest |
-| Emerald glow style | `art/logo.png` | Soft radial green glow on brick, floating particles |
-| Brickwork field | `art/logo.png` background | Green-tinted brick — Mercantile's established divergence from suite dark-stone (§1) |
-| Pixel type treatment | `art/logo.png` wordmark | Blocky pixel font, emerald fill |
-| Pixel art item style | `assets/mercantile/textures/gui/sprites/reputation_badge.png` | Reputation badge sprite — sets the in-game pixel density |
-| Sentry pylon | `assets/mercantile/textures/block/` | The mod's one custom block — top/side/bottom |
-
----
-
-## 5. HUD
+## 3. HUD
 
 Mercantile **holds slot 2** in the Concord HUD stack — the full visual and
 coordination spec is [`concord/HUD-STANDARD.md`](../../concord/HUD-STANDARD.md)
@@ -177,72 +132,7 @@ screen per the standard's visibility rules.
 
 ---
 
-## 6. In-Game Asset Philosophy
-
-Vanilla-first, per `AGENTS.md` and the `design/SPEC.md` preamble (SPEC is
-authoritative where they differ):
-
-- **Sounds:** existing vanilla sound events only — no custom audio.
-- **Villager pickup items:** player heads with pre-existing skin textures
-  (minecraft-heads.com sources, hosted on Mojang's CDN) — no custom item
-  textures.
-- **Particles:** custom particle *textures* for mod-identity effects (pickup,
-  trade cycling, follow mode, sentry pylon); vanilla `dust` for functional
-  overlays (workstation links, bell radius), which are
-  readouts, not theming.
-- **Blocks:** the sentry pylon is the only custom block texture in the mod.
-- **Text:** action-bar messages and tooltips are vanilla-toned — short, dry,
-  no exclamation points ("Villager will remember that" energy, `VISION.md` §2).
-
-Behavioral detail for every feature lives in [`SPEC.md`](SPEC.md) — this
-document never restates it.
-
----
-
-## 7. Website Specification
-
-- **Domain:** `mercantile.rfizzle.com` (CNAME in `docs/`)
-- **Hosting:** GitHub Pages from `docs/` — **legacy**. Per `REPO-LAYOUT.md`,
-  the canonical source is structured `site/` content rendered by the shared
-  Concord template; Mercantile's migration to it is pending and `docs/` serves
-  until the `site/` build is verified live.
-- **Pages:** Home (`index.html`), Features, Config, Commands, Changelog, FAQ,
-  Guide — matching the suite-standard page set (`VISION.md` §4), with no
-  dedicated API page. The `api` package exists (§5) but has no companion site
-  page.
-- **Theme:** Tailwind with the §1 tokens (`--color-emerald: #50C878`,
-  `--color-emerald-bright: #6DDB94` over the shared neutrals);
-  `emerald-pulse` heading animation; `.pixelated` rendering for pixel art.
-- **SEO:** title `Mercantile — Villager Overhaul for Minecraft`; absolute-URL
-  `og-image.png`; `twitter:card` `summary_large_image`. The descriptive title
-  is the SEO form; the tagline (§1) leads the human-facing hero copy.
-- **Cross-mod footer:** the "Part of **Concord**" strip (four glyphs + names +
-  taglines, current mod highlighted) per `VISION.md` §4 — lands with the
-  template migration.
-
----
-
-## 8. Distribution Listings
-
-Store copy lives in-repo at `site/listing-modrinth.md` and
-`site/listing-curseforge.md` (Mercantile originated this pattern,
-`REPO-LAYOUT.md` §1). Format follows the suite listing standard (`VISION.md`
-§4): 128×128 icon, full logo + screenshots in the gallery, tagline → feature
-bullets with real numbers → "Enhanced by" section naming siblings as strictly
-optional. Required deps: Fabric API only.
-
-The bare `mercantile` slug belongs to an unrelated mod on both stores, so
-Mercantile lists under the suite slug convention `<mod>-<domain>-overhaul`
-(`VISION.md` §4) — `mercantile-villager-overhaul`. The mod is published on
-Modrinth (project id `Bnp3Drhe`) and on CurseForge, both under the
-`mercantile-villager-overhaul` slug. Required deps: Fabric API only.
-
-README badges: MC 1.21.1 · Fabric · MIT · release · CI · Modrinth and
-CurseForge store download badges.
-
----
-
-## 9. Open Decisions
+## 4. Open Decisions
 
 Recorded so they read as *undecided*, not as omissions:
 
@@ -252,7 +142,7 @@ Recorded so they read as *undecided*, not as omissions:
 
 ---
 
-## 10. Concord Context
+## 5. Concord Context
 
 Mercantile is a member of **Concord** — *a modular collection of system
 overhauls. Install any, combine all.* (That sentence is the entire cross-promotion allowance per
