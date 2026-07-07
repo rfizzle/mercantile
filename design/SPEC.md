@@ -1327,8 +1327,8 @@ All user-facing text uses translation keys in `assets/mercantile/lang/en_us.json
 | `mercantile.tier.*` | `mercantile.tier.honored` | Reputation tier display names |
 | `mercantile.gui.*` | `mercantile.gui.restock_timer` | Trade GUI text (restock, demand, info panel) |
 | `mercantile.gui.cycle.*` | `mercantile.gui.cycle.button` | Trade cycling button/status |
-| `mercantile.config.*` | `mercantile.config.pickupXpCost` | Cloth Config screen labels |
-| `mercantile.config.*.tooltip` | `mercantile.config.pickupXpCost.tooltip` | Cloth Config field descriptions |
+| `config.mercantile.*` | `config.mercantile.pickupXpCost` | Cloth Config screen labels |
+| `config.mercantile.*.tooltip` | `config.mercantile.pickupXpCost.tooltip` | Cloth Config field descriptions |
 | `command.mercantile.*` | `command.mercantile.reload` | Command feedback messages |
 | `mercantile.jade.*` | `mercantile.jade.willing_to_breed` | Jade/WTHIT tooltip lines |
 | `mercantile.pylon.*` | `mercantile.pylon.fuel_level` | Sentry pylon status text |

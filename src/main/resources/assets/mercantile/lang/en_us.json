@@ -301,7 +301,7 @@
 
     "mercantile.trade.denied.reviled": "This villager refuses to trade with you",
     "message.mercantile.reputation_daily_cap": "Daily reputation limit reached",
-    "message.mercantile.gift_accepted": "%s appreciated the gift!",
+    "message.mercantile.gift_accepted": "%s appreciated the gift",
     "message.mercantile.fear_markup": "The villagers here fear you — prices have risen",
 
     "gui.mercantile.bulk_trade.feedback": "Traded %sx %s",
@@ -383,7 +383,7 @@
     "config.mercantile.moodAmbientParticles": "Mood Ambient Particles",
     "config.mercantile.moodAmbientParticles.tooltip": "Happy villagers occasionally emit happy particles; Miserable ones emit angry particles",
 
-    "message.mercantile.market_day": "Market day! Trades are discounted and villagers restock more.",
+    "message.mercantile.market_day": "Market day — trades are discounted and villagers restock more.",
     "message.mercantile.trade_restocked": "%1$s restocked: %2$s",
     "message.mercantile.pin_cap": "Pin limit reached (%s) — unpin a trade first",
 

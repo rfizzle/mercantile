@@ -86,7 +86,7 @@ its prices to your face until the fear fades.
 - **How you use it** — trade fairly, cure zombie villagers, defend a village from a
   raid, or toss a villager a profession item it wants, and your standing climbs;
   attack or kill villagers and it falls. A badge in the corner shows your tier
-  whenever a villager is within 32 blocks; hold the peek key (V by default) for
+  whenever a villager is within 32 blocks; hold the peek key (Left Alt by default) for
   the full breakdown — exact score, progress to the next tier, today's earnings,
   and which exclusive trades you've unlocked.
 - **What changes for you** — standing is both a discount curve and a gate. Liked
