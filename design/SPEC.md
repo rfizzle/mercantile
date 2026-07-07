@@ -18,7 +18,7 @@ Players can pick up villagers as items and place them back down.
 
 ### Scope
 - Works on adult and baby villagers.
-- Does **not** work on wandering traders (they are a separate entity type).
+- Works on **wandering traders** too. A captured trader carries its despawn countdown frozen in the item and resumes it on placement; each leashed trader llama drops its lead and stays put rather than trailing the vanished trader. Trader pickup is guarded only against another player already trading with it — the raid and follow guards below are villager-specific.
 
 ### Data Preservation
 - Full NBT is preserved: profession, profession level, XP, trade offers, gossip/reputation data, custom name, health, inventory, and any other entity data.
@@ -64,7 +64,7 @@ The item lore is built in order:
 
 Textures sourced from [minecraft-heads.com](https://minecraft-heads.com/custom-heads/search?searchterm=villager) — Plains biome variants for each profession. These are community-created skins permanently hosted on Mojang's texture CDN (`textures.minecraft.net`).
 
-**Texture mapping (16 heads):**
+**Texture mapping (16 profession heads):**
 
 | Profession | minecraft-heads.com UUID |
 |---|---|
@@ -88,6 +88,8 @@ Textures sourced from [minecraft-heads.com](https://minecraft-heads.com/custom-h
 The Base64-encoded texture values for each UUID are hardcoded in `VillagerHeadTextures`. At runtime, a `GameProfile` is constructed with the texture property and set via `DataComponents.PROFILE` on the player head item. The client fetches and caches the skin from Mojang's CDN automatically.
 
 **Modded profession fallback:** Uses the generic unemployed villager head for any profession not in the map.
+
+**Wandering trader head:** Trader pickup (see the Scope note above) uses a dedicated head keyed by `minecraft:wandering_trader` rather than a profession. Its skin is the community wandering-trader head from minecraft-heads.com — texture hash `da0f1519c597e289d4f2bf5ce9643b81d7185c6a5392a77b9ab817a132f3ddbc` on Mojang's CDN — hardcoded in `VillagerHeadTextures` alongside the profession heads. The modded-profession fallback does not apply to it; it is looked up by its own key.
 
 ### Implementation Notes
 - `VillagerHeadTextures` class maps `ResourceLocation` (profession ID) → Base64 texture value string. Vanilla professions hardcoded at init; modded professions fall back to the unemployed/generic head.
@@ -1207,6 +1209,63 @@ All features are independently toggleable via ModMenu / Cloth Config screen and 
 
 ---
 
+## Public API
+
+Mercantile exposes one stable, read-only public package, `com.rfizzle.mercantile.api`,
+conforming to the [Concord API Standard v1](https://github.com/rfizzle/concord/blob/master/API-STANDARD.md).
+Every type in it carries the mod's own `@Stable` marker (a local annotation, per
+the suite's no-shared-jar rule — there is no shared library mod). Signatures in
+this package survive minor and patch releases; a breaking change requires a major
+version bump and a changelog entry naming the broken signature. Everything outside
+the package — attachments, managers, mixins — is internal and may change without
+notice.
+
+### Consumption
+
+Soft dependency only: compile against Mercantile with `modCompileOnly` and guard
+every call site with `FabricLoader.getInstance().isModLoaded("mercantile")`, so the
+consuming mod loads cleanly whether or not Mercantile is present. All read
+accessors are authoritative **server-side only**.
+
+### `MercantileAPI` — read-only accessors
+
+A static facade over Mercantile's server-side state; it never mutates that state.
+
+| Method | Returns |
+|---|---|
+| `getReputation(ServerPlayer)` | The player's reputation score, clamped to `[-200, 1500]`; `0` (NEUTRAL) for a player with no reputation history. |
+| `getReputationTier(ServerPlayer)` | The player's `ReputationTier`, derived from the score. |
+| `isSentryGolem(Entity)` | `true` if the entity is a pylon-spawned, temporary sentry golem. |
+| `isProfessionLocked(Villager)` | `true` if the villager's profession is locked (locks permanently after its first trade). |
+| `isTradeLocked(Villager, MerchantOffer)` | `true` if that specific offer is locked (locked offers survive trade cycling); offers are matched by item/count identity, not object instance. |
+| `isHudVisible()` | HUD coordination accessor (HUD-STANDARD §6): whether the reputation HUD element is currently drawn. Reflection-backed; safe to call from common code. Sentinel `false` on a dedicated server or when the element is hidden. |
+| `getHudHeight()` | HUD coordination accessor: the element's height contribution in px for lower-priority slots to offset past — `0` when not visible, `22` (20px element + 2px gap) when visible. |
+
+### `ReputationTier`
+
+The six standings a player can hold, ordered best to worst: `HONORED`, `TRUSTED`,
+`LIKED`, `NEUTRAL`, `DISTRUSTED`, `REVILED`. Public methods: `fromScore(int)`,
+`minScore()`, `displayName()`, and `priceModifierForScore(int score, int basePrice)`.
+The constants, their ordering, and these methods are stable; the exact score
+thresholds are gameplay tuning and may shift in a minor release — consumers should
+compare tiers, not hardcode score numbers.
+
+### Events
+
+Both are Fabric array-backed events, fired **server-side only**, from the single
+internal choke point for their domain. A listener that throws is caught and logged;
+it cannot corrupt the underlying flow, but it may stop listeners registered after
+it from seeing that event.
+
+- `ReputationChangedCallback.EVENT` → `onReputationChanged(ServerPlayer, int oldScore, int newScore)`
+  — fires whenever a player's score actually changes. Not fired when a change is
+  fully absorbed by clamping, nor by the one-shot legacy save-format rescale.
+- `TradeExecutedCallback.EVENT` → `onTradeExecuted(ServerPlayer, AbstractVillager, MerchantOffer)`
+  — fires after a completed trade with a villager or a wandering trader. A bulk
+  (shift-click) trade fires once per executed trade.
+
+---
+
 ## Implementation Order
 
 Features are ordered by dependency and complexity. Infrastructure comes first, then standalone features, then features that build on earlier work. Each phase can be broken into individual stories.
@@ -1296,24 +1355,27 @@ Every cue here is **organic** — villager voices, bells, anvil, iron-golem fole
 
 ### Particle Mapping
 
-Mod-specific effects use custom particle textures under `assets/mercantile/textures/particle/`. Visualization overlays (workstation links, bell radius) use vanilla particles since they are functional, not themed.
+Which effect fires on which event. Mod-specific effects use custom particles;
+visualization overlays (workstation links, bell radius) use vanilla particles
+since they are functional, not themed. The custom particle **texture files and
+their pixel specs** are catalogued in [`design/ASSETS.md`](ASSETS.md).
 
-| Feature | Effect | Particle | Texture |
-|---|---|---|---|
-| Villager Pickup — pickup | Emerald star burst | `mercantile:pickup_sparkle` | `pickup_sparkle.png` (8x8, emerald green, 4-pointed star) |
-| Villager Pickup — placement | Block break | `minecraft:block` (stone variant) | Vanilla |
-| Trade Cycling — success | Gold coin flash | `mercantile:cycle_glint` | `cycle_glint.png` (8x8, gold, diamond facet) |
-| Reputation — refusal | Angry cloud above villager | `minecraft:angry_villager` | Vanilla |
-| Follow Mode — following indicator | Teal ground glow at feet | `mercantile:follow_trail` | `follow_trail.png` (8x8, teal/cyan, wide flat ellipse) |
-| Workstation Links — bound lines | Colored particle lines | `minecraft:dust` (profession-colored) | Vanilla |
-| Workstation Links — unbound villager | Angry pulsing | `minecraft:angry_villager` | Vanilla |
-| Workstation Links — unclaimed POI | Yellow orbit | `minecraft:dust` (yellow) | Vanilla |
-| Bell Radius — circle | Gold ring on ground | `minecraft:dust` (gold) | Vanilla |
-| Bell Radius — ring highlight | Villager glow | Vanilla entity glow flag | Vanilla (spectral arrow style) |
-| Sentry Pylon — idle | Drifting motes | `mercantile:pylon_mote` | `pylon_mote.png` (4x4, light gray, round dot) |
-| Sentry Pylon — active | Jagged energy sparks | `mercantile:pylon_spark` | `pylon_spark.png` (8x8, orange-gold, spiky) |
-| Sentry Pylon — out of fuel | Red pulse | `minecraft:dust` (red) | Vanilla |
-| Sentry Pylon — golem despawn | Iron shard crumbling | `mercantile:golem_shard` | `golem_shard.png` (8x8, iron/stone, angular chunk) |
+| Feature | Effect | Particle |
+|---|---|---|
+| Villager Pickup — pickup | Emerald star burst | `mercantile:pickup_sparkle` |
+| Villager Pickup — placement | Block break | `minecraft:block` (stone variant) |
+| Trade Cycling — success | Gold coin flash | `mercantile:cycle_glint` |
+| Reputation — refusal | Angry cloud above villager | `minecraft:angry_villager` |
+| Follow Mode — following indicator | Teal ground glow at feet | `mercantile:follow_trail` |
+| Workstation Links — bound lines | Colored particle lines | `minecraft:dust` (profession-colored) |
+| Workstation Links — unbound villager | Angry pulsing | `minecraft:angry_villager` |
+| Workstation Links — unclaimed POI | Yellow orbit | `minecraft:dust` (yellow) |
+| Bell Radius — circle | Gold ring on ground | `minecraft:dust` (gold) |
+| Bell Radius — ring highlight | Villager glow | Vanilla entity glow flag |
+| Sentry Pylon — idle | Drifting motes | `mercantile:pylon_mote` |
+| Sentry Pylon — active | Jagged energy sparks | `mercantile:pylon_spark` |
+| Sentry Pylon — out of fuel | Red pulse | `minecraft:dust` (red) |
+| Sentry Pylon — golem despawn | Iron shard crumbling | `mercantile:golem_shard` |
 
 ---
 

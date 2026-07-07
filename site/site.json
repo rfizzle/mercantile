@@ -17,6 +17,7 @@
     "commands",
     "guide",
     "faq",
+    "api",
     "changelog"
   ],
   "theme": {

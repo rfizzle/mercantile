@@ -1,0 +1,105 @@
+{
+  "nav": "API",
+  "metaTitle": "API — Mercantile | Villager & Reputation API for Mod Integration",
+  "metaDescription": "Mercantile's stable, read-only API for mod developers: reputation score and tier accessors, sentry-golem and trade-lock checks, HUD coordination, and two server-side Fabric events — all as a soft dependency.",
+  "ogTitle": "API — Mercantile",
+  "ogDescription": "Mercantile's read-only reputation API, villager-state checks, and server-side events for integrating with the villager economy.",
+  "title": "Developers",
+  "lede": "Mercantile exposes a stable, read-only API and two server-side events so other mods can read the villager economy — reputation, trade locks, sentry golems — without a hard dependency. Every read accessor is server-side authoritative.",
+  "width": "4xl",
+  "sections": [
+    {
+      "id": "soft-dependency",
+      "title": "Soft Dependency Setup",
+      "blocks": [
+        { "type": "prose", "html": ["The API lives in <code class='text-bone'>com.rfizzle.mercantile.api</code> — the only package another mod should reference. Everything outside it is internal and may change in any release. Every type in the package carries Mercantile's own <code class='text-bone'>@Stable</code> marker (a local annotation per the Concord API Standard v1 no-shared-jar rule, not a shared library type): its signature survives minor and patch releases."] },
+        { "type": "prose", "html": ["Compile against Mercantile with <code class='text-bone'>modCompileOnly</code> so it stays optional at runtime, then guard every call with a mod-loaded check."] },
+        { "type": "code", "label": "Gradle:", "bottomGap": true, "code": "dependencies {\n    modCompileOnly \"maven.modrinth:mercantile:<version>\"\n}" },
+        { "type": "prose", "html": ["Guard calls so your mod loads cleanly whether or not Mercantile is present:"] },
+        { "type": "code", "code": "if (FabricLoader.getInstance().isModLoaded(\"mercantile\")) {\n    // safe to touch the Mercantile API here\n}" }
+      ]
+    },
+    {
+      "id": "reputation-and-state",
+      "title": "Reading Reputation & Villager State",
+      "blocks": [
+        { "type": "prose", "html": ["<code class='text-bone'>MercantileAPI</code> is a static, read-only facade over Mercantile's server-side state. Nothing on it mutates that state, and every accessor is <strong class='text-bone'>authoritative on the server only</strong> — the backing entity and player data attachments are internal, so consume this facade rather than reaching for them."] },
+        {
+          "type": "list",
+          "items": [
+            "<code class='text-bone'>int getReputation(ServerPlayer player)</code> — the player's current reputation score, clamped to <code class='text-bone'>[-200, 1500]</code>. A player with no reputation history yet scores <code class='text-bone'>0</code> (<code class='text-bone'>NEUTRAL</code>).",
+            "<code class='text-bone'>ReputationTier getReputationTier(ServerPlayer player)</code> — the standing derived from that score.",
+            "<code class='text-bone'>boolean isSentryGolem(Entity entity)</code> — true for an iron golem spawned and maintained by a Sentry Pylon (temporary, pylon-bound, despawns when the pylon runs out of fuel).",
+            "<code class='text-bone'>boolean isProfessionLocked(Villager villager)</code> — the villager-level lock. Mercantile locks a villager's profession permanently after its first trade, so it can no longer lose its trades by losing its workstation.",
+            "<code class='text-bone'>boolean isTradeLocked(Villager villager, MerchantOffer offer)</code> — the per-offer lock. An offer locks the first time it is traded and stays locked when the villager's trade pool is cycled. Offers are matched by item/count identity, so an equivalent offer object matches the stored lock even if it is a different instance."
+          ]
+        },
+        {
+          "type": "code",
+          "code": "import com.rfizzle.mercantile.api.MercantileAPI;\nimport com.rfizzle.mercantile.api.ReputationTier;\n\nif (FabricLoader.getInstance().isModLoaded(\"mercantile\")) {\n    int score = MercantileAPI.getReputation(serverPlayer);\n    ReputationTier tier = MercantileAPI.getReputationTier(serverPlayer);\n\n    // gate perks by comparing tiers, not raw scores\n    if (tier.ordinal() <= ReputationTier.TRUSTED.ordinal()) {\n        // TRUSTED or better (HONORED) — grant a bonus\n    }\n\n    boolean sentry = MercantileAPI.isSentryGolem(entity);\n    boolean locked = MercantileAPI.isProfessionLocked(villager);\n}"
+        }
+      ]
+    },
+    {
+      "id": "reputation-tier",
+      "title": "The ReputationTier Enum",
+      "blocks": [
+        { "type": "prose", "html": ["<code class='text-bone'>ReputationTier</code> is the six standings a player can hold, declared best to worst: <code class='text-bone'>HONORED</code>, <code class='text-bone'>TRUSTED</code>, <code class='text-bone'>LIKED</code>, <code class='text-bone'>NEUTRAL</code>, <code class='text-bone'>DISTRUSTED</code>, <code class='text-bone'>REVILED</code>. The constants, their relative ordering, and the enum's public methods are stable across minor and patch releases."] },
+        {
+          "type": "list",
+          "items": [
+            "<code class='text-bone'>ReputationTier fromScore(int score)</code> — the tier a given score falls into (the same mapping <code class='text-bone'>getReputationTier</code> uses).",
+            "<code class='text-bone'>int minScore()</code> — the lowest score in the tier's range.",
+            "<code class='text-bone'>Component displayName()</code> — the localized standing name (<em>Honored</em>, <em>Trusted</em>, …) for display.",
+            "<code class='text-bone'>int priceModifierForScore(int score, int basePrice)</code> — the reputation price adjustment for a base price: negative for a discount at the friendly tiers, positive for the markup that ramps across <code class='text-bone'>DISTRUSTED</code>, zero at <code class='text-bone'>NEUTRAL</code>."
+          ]
+        },
+        { "type": "prose", "html": ["<strong class='text-bone'>Compare tiers, don't hardcode scores.</strong> Exact score thresholds are gameplay tuning and may shift in a minor release; the tier constants and their ordering will not. Gate your logic on the tier or on <code class='text-bone'>minScore()</code>, never on a literal like <code class='text-bone'>300</code>."] }
+      ]
+    },
+    {
+      "id": "events",
+      "title": "Events",
+      "blocks": [
+        { "type": "prose", "html": ["Two standard array-backed Fabric <code class='text-bone'>Event</code>s fire <strong class='text-bone'>server-side only</strong>. A listener that throws is caught and logged by Mercantile — it cannot corrupt the reputation or trade flow, but a thrown exception may stop listeners registered after it from seeing that event."] },
+        { "type": "prose", "html": ["<code class='text-bone'>ReputationChangedCallback.EVENT</code> → <code class='text-bone'>onReputationChanged(ServerPlayer player, int oldScore, int newScore)</code> fires whenever a player's score <em>actually</em> changes. It is not invoked when a change is fully absorbed by score clamping, and not by the one-shot legacy save-format migration."] },
+        { "type": "prose", "html": ["<code class='text-bone'>TradeExecutedCallback.EVENT</code> → <code class='text-bone'>onTradeExecuted(ServerPlayer player, AbstractVillager villager, MerchantOffer offer)</code> fires after a completed trade with a villager or a wandering trader — after the merchant's use count, XP, and Mercantile's own bookkeeping have been applied. A bulk trade (shift-click) fires the event once per executed trade."] },
+        {
+          "type": "code",
+          "code": "import com.rfizzle.mercantile.api.ReputationChangedCallback;\nimport com.rfizzle.mercantile.api.TradeExecutedCallback;\n\nif (FabricLoader.getInstance().isModLoaded(\"mercantile\")) {\n    ReputationChangedCallback.EVENT.register((player, oldScore, newScore) -> {\n        // react to the standing change (fires only on a real change)\n    });\n\n    TradeExecutedCallback.EVENT.register((player, villager, offer) -> {\n        // villager is a Villager or WanderingTrader;\n        // fires once per executed trade, bulk trades included\n    });\n}"
+        }
+      ]
+    },
+    {
+      "id": "hud-coordination",
+      "title": "HUD Coordination",
+      "blocks": [
+        { "type": "prose", "html": ["Two accessors implement the Concord HUD-STANDARD §6 stacking contract so a lower-priority HUD element from another mod can offset itself past Mercantile's reputation badge. They are reflection-backed into the client overlay, so they are safe to call unconditionally from common code on either physical side."] },
+        {
+          "type": "list",
+          "items": [
+            "<code class='text-bone'>boolean isHudVisible()</code> — whether Mercantile's reputation HUD element is currently being drawn. Sentinel: <code class='text-bone'>false</code> on a dedicated server, when the HUD is config-disabled, or when it is hidden (F1, an open screen, spectator, the death screen, no villager in range).",
+            "<code class='text-bone'>int getHudHeight()</code> — the element's current height contribution in pixels for a lower slot to clear. Sentinel: <code class='text-bone'>0</code> whenever <code class='text-bone'>isHudVisible()</code> is false; <code class='text-bone'>22</code> (a 20px standard element plus a 2px gap) when visible."
+          ]
+        },
+        { "type": "prose", "html": ["These are for rendering coordination only — the sentinels make them safe to read from anywhere, but never drive gameplay logic off them."] }
+      ]
+    },
+    {
+      "id": "notes",
+      "title": "Notes",
+      "blocks": [
+        {
+          "type": "list",
+          "items": [
+            "The API package is <code class='text-bone'>com.rfizzle.mercantile.api</code> — everything outside it (attachments, managers, mixins) is internal and may change without notice.",
+            "Every read accessor on <code class='text-bone'>MercantileAPI</code> is server-side authoritative; the reputation and trade-state reads are meaningless on a bare client.",
+            "<code class='text-bone'>ReputationChangedCallback</code> and <code class='text-bone'>TradeExecutedCallback</code> are standard Fabric <code class='text-bone'>Event</code>s, not a custom event bus.",
+            "A breaking change to any <code class='text-bone'>@Stable</code> signature requires a major version bump plus a changelog entry naming the broken signature."
+          ]
+        },
+        { "type": "prose", "html": ["Building an integration and something's missing? <a href='https://github.com/rfizzle/mercantile/issues' rel='noopener noreferrer' target='_blank' class='text-accent hover:text-accent2 underline'>Open an issue</a> — the API surface grows based on real integration needs."] }
+      ]
+    }
+  ]
+}

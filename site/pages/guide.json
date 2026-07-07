@@ -68,7 +68,7 @@
         { "type": "prose", "html": ["Mercantile tracks a persistent <strong class='text-bone'>global reputation score</strong> per player, from −200 to +1500. The score affects pricing across every villager in the world and survives death."] },
         {
           "type": "sub",
-          "title": "The five tiers",
+          "title": "The six tiers",
           "blocks": [
             {
               "type": "table",

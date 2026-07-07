@@ -10,19 +10,21 @@
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/github/license/rfizzle/mercantile"></a>
   <a href="https://github.com/rfizzle/mercantile/releases"><img alt="Latest release" src="https://img.shields.io/github/v/release/rfizzle/mercantile?include_prereleases"></a>
   <a href="https://github.com/rfizzle/mercantile/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/rfizzle/mercantile/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="https://modrinth.com/mod/mercantile-villager-overhaul"><img alt="Modrinth downloads" src="https://img.shields.io/modrinth/dt/Bnp3Drhe?logo=modrinth&label=Modrinth&color=00AF5C"></a>
+  <a href="https://www.curseforge.com/minecraft/mc-mods/mercantile-villager-overhaul"><img alt="CurseForge downloads" src="https://img.shields.io/curseforge/dt/1591251?logo=curseforge&label=CurseForge&color=F16436"></a>
 </p>
 
 A villager and trade overhaul for Minecraft 1.21.1 (Fabric). Mercantile turns
 villagers from disposable trade machines into mobile, named, persistent
-characters — with pickup, biome-themed names, a five-tier reputation system,
+characters — with pickup, biome-themed names, a six-tier reputation system,
 emerald-based trade cycling, and an iron-fueled sentry block that defends your
 village. Vanilla-coherent design: custom pixel-art textures where they raise the
 bar, vanilla assets where they already map cleanly; no balance-breaking shortcuts.
 
 ## Download
 
-| [GitHub Releases](https://github.com/rfizzle/mercantile/releases) | [Website](https://mercantile.rfizzle.com) | [Report an issue](https://github.com/rfizzle/mercantile/issues) |
-| --- | --- | --- |
+| [Modrinth](https://modrinth.com/mod/mercantile-villager-overhaul) | [CurseForge](https://www.curseforge.com/minecraft/mc-mods/mercantile-villager-overhaul) | [GitHub Releases](https://github.com/rfizzle/mercantile/releases) | [Website](https://mercantile.rfizzle.com) | [Report an issue](https://github.com/rfizzle/mercantile/issues) |
+| --- | --- | --- | --- | --- |
 
 ## Features
 
@@ -32,7 +34,7 @@ bar, vanilla assets where they already map cleanly; no balance-breaking shortcut
   visible above every villager.
 - **Trade Cycling** — refresh a villager's trade pool with emeralds instead of
   breaking and replacing their workstation.
-- **Reputation** — a five-tier global standing with persistent gossip that
+- **Reputation** — a six-tier global standing with persistent gossip that
   travels with villagers across the world. Defend raids and gift villagers to
   climb the tiers (or let negative standing decay back from Reviled); high
   standing even unlocks a wandering trader's exclusive offer.
@@ -71,10 +73,10 @@ feature; install it on the client for the readout to appear.
 
 | Control | Default | Description |
 |---------|---------|-------------|
-| **Peek Reputation Detail** | _Unbound_ | Hold to overlay a framed panel showing your reputation score, standing, progress to the next standing, the perks that standing grants, and the villager professions standing nearby. Release to dismiss. |
+| **Peek Reputation Detail** | `V` | Hold to overlay a framed panel showing your reputation score, standing, progress to the next standing, the perks that standing grants, and the villager professions standing nearby. Release to dismiss. |
 
-Bind it under **Options → Controls → Key Binds**, in the **Mercantile**
-category. It is unbound by default — assign a key to use it. The panel never
+Rebind it under **Options → Controls → Key Binds**, in the **Mercantile**
+category. It defaults to `V` (unused by vanilla 1.21.1). The panel never
 captures the mouse or pauses the game (like vanilla's hold-Tab player list) and
 hides automatically during F1, open screens, and spectator mode.
 

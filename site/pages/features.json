@@ -201,7 +201,7 @@
         {
           "type": "sub",
           "id": "reputation-system",
-          "title": "Five-Tier Reputation",
+          "title": "Six-Tier Reputation",
           "intro": "A persistent per-player score from −200 to +1500 that survives death and travels with you across the world. Score changes are configurable.",
           "blocks": [
             {

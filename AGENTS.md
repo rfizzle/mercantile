@@ -72,7 +72,7 @@ Fabric APIs must use gametests instead.
   is muddy or generic, ship a **custom pixel-art glyph in the Concord
   design-system palette** (DESIGN.md §1) rather than settle: the sentry pylon
   block, the custom GUI buttons, the bespoke particle textures, the merchant
-  lock/unlock glyphs, the reputation HUD emerald gem, the profession-tinted
+  lock/unlock glyphs, the reputation HUD balance-scale glyph, the profession-tinted
   workstation link mote, and the workstation status markers (claimed ✓ /
   unclaimed ?). Glyph masters live in `art/` (e.g. `art/hud-icon-16.png`) with
   their editable `.glyph` sources in `art/glyphs/`.
