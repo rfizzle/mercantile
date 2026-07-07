@@ -73,7 +73,7 @@ feature; install it on the client for the readout to appear.
 
 | Control | Default | Description |
 |---------|---------|-------------|
-| **Peek Reputation Detail** | `V` | Hold to overlay a framed panel showing your reputation score, standing, progress to the next standing, the perks that standing grants, and the villager professions standing nearby. Release to dismiss. |
+| **Peek Reputation Detail** | `Left Alt` | Hold to overlay a framed panel showing your reputation score, standing, progress to the next standing, the perks that standing grants, and the villager professions standing nearby. Release to dismiss. |
 
 Rebind it under **Options → Controls → Key Binds**, in the **Mercantile**
 category. It defaults to `V` (unused by vanilla 1.21.1). The panel never

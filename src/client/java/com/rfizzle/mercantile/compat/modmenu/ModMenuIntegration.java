@@ -19,7 +19,7 @@ public class ModMenuIntegration implements ModMenuApi {
 
             ConfigBuilder builder = ConfigBuilder.create()
                     .setParentScreen(parent)
-                    .setTitle(Component.translatable("mercantile.config.title"))
+                    .setTitle(Component.translatable("config.mercantile.title"))
                     .setSavingRunnable(() -> {
                         config.clamp();
                         config.save();
@@ -28,534 +28,534 @@ public class ModMenuIntegration implements ModMenuApi {
             ConfigEntryBuilder entry = builder.entryBuilder();
 
             // --- Villager Pickup ---
-            ConfigCategory pickup = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.pickup"));
-            pickup.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableVillagerPickup"), config.enableVillagerPickup)
+            ConfigCategory pickup = builder.getOrCreateCategory(Component.translatable("config.mercantile.category.pickup"));
+            pickup.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableVillagerPickup"), config.enableVillagerPickup)
                     .setDefaultValue(defaults.enableVillagerPickup)
-                    .setTooltip(Component.translatable("mercantile.config.enableVillagerPickup.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableVillagerPickup.tooltip"))
                     .setSaveConsumer(v -> config.enableVillagerPickup = v)
                     .build());
-            pickup.addEntry(entry.startIntField(Component.translatable("mercantile.config.pickupXpCost"), config.pickupXpCost)
+            pickup.addEntry(entry.startIntField(Component.translatable("config.mercantile.pickupXpCost"), config.pickupXpCost)
                     .setDefaultValue(defaults.pickupXpCost)
                     .setMin(0)
-                    .setTooltip(Component.translatable("mercantile.config.pickupXpCost.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.pickupXpCost.tooltip"))
                     .setSaveConsumer(v -> config.pickupXpCost = v)
                     .build());
 
             // --- Villager Names ---
-            ConfigCategory names = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.names"));
-            names.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableNames"), config.enableNames)
+            ConfigCategory names = builder.getOrCreateCategory(Component.translatable("config.mercantile.category.names"));
+            names.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableNames"), config.enableNames)
                     .setDefaultValue(defaults.enableNames)
-                    .setTooltip(Component.translatable("mercantile.config.enableNames.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableNames.tooltip"))
                     .setSaveConsumer(v -> config.enableNames = v)
                     .build());
 
             // --- Trade Cycling ---
-            ConfigCategory cycling = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.cycling"));
-            cycling.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableTradeCycling"), config.enableTradeCycling)
+            ConfigCategory cycling = builder.getOrCreateCategory(Component.translatable("config.mercantile.category.cycling"));
+            cycling.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableTradeCycling"), config.enableTradeCycling)
                     .setDefaultValue(defaults.enableTradeCycling)
-                    .setTooltip(Component.translatable("mercantile.config.enableTradeCycling.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableTradeCycling.tooltip"))
                     .setSaveConsumer(v -> config.enableTradeCycling = v)
                     .build());
-            cycling.addEntry(entry.startIntField(Component.translatable("mercantile.config.tradeCycleEmeraldCost"), config.tradeCycleEmeraldCost)
+            cycling.addEntry(entry.startIntField(Component.translatable("config.mercantile.tradeCycleEmeraldCost"), config.tradeCycleEmeraldCost)
                     .setDefaultValue(defaults.tradeCycleEmeraldCost)
                     .setMin(0)
-                    .setTooltip(Component.translatable("mercantile.config.tradeCycleEmeraldCost.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.tradeCycleEmeraldCost.tooltip"))
                     .setSaveConsumer(v -> config.tradeCycleEmeraldCost = v)
                     .build());
 
             // --- Reputation ---
-            ConfigCategory reputation = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.reputation"));
-            reputation.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableReputation"), config.enableReputation)
+            ConfigCategory reputation = builder.getOrCreateCategory(Component.translatable("config.mercantile.category.reputation"));
+            reputation.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableReputation"), config.enableReputation)
                     .setDefaultValue(defaults.enableReputation)
-                    .setTooltip(Component.translatable("mercantile.config.enableReputation.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableReputation.tooltip"))
                     .setSaveConsumer(v -> config.enableReputation = v)
                     .build());
-            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.reputationTradeGain"), config.reputationTradeGain)
+            reputation.addEntry(entry.startIntField(Component.translatable("config.mercantile.reputationTradeGain"), config.reputationTradeGain)
                     .setDefaultValue(defaults.reputationTradeGain)
                     .setMin(0)
-                    .setTooltip(Component.translatable("mercantile.config.reputationTradeGain.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.reputationTradeGain.tooltip"))
                     .setSaveConsumer(v -> config.reputationTradeGain = v)
                     .build());
-            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.reputationCureGain"), config.reputationCureGain)
+            reputation.addEntry(entry.startIntField(Component.translatable("config.mercantile.reputationCureGain"), config.reputationCureGain)
                     .setDefaultValue(defaults.reputationCureGain)
                     .setMin(0)
-                    .setTooltip(Component.translatable("mercantile.config.reputationCureGain.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.reputationCureGain.tooltip"))
                     .setSaveConsumer(v -> config.reputationCureGain = v)
                     .build());
-            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.reputationAttackLoss"), config.reputationAttackLoss)
+            reputation.addEntry(entry.startIntField(Component.translatable("config.mercantile.reputationAttackLoss"), config.reputationAttackLoss)
                     .setDefaultValue(defaults.reputationAttackLoss)
                     .setMin(0)
-                    .setTooltip(Component.translatable("mercantile.config.reputationAttackLoss.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.reputationAttackLoss.tooltip"))
                     .setSaveConsumer(v -> config.reputationAttackLoss = v)
                     .build());
-            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.reputationKillLoss"), config.reputationKillLoss)
+            reputation.addEntry(entry.startIntField(Component.translatable("config.mercantile.reputationKillLoss"), config.reputationKillLoss)
                     .setDefaultValue(defaults.reputationKillLoss)
                     .setMin(0)
-                    .setTooltip(Component.translatable("mercantile.config.reputationKillLoss.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.reputationKillLoss.tooltip"))
                     .setSaveConsumer(v -> config.reputationKillLoss = v)
                     .build());
-            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.reputationCycleGain"), config.reputationCycleGain)
+            reputation.addEntry(entry.startIntField(Component.translatable("config.mercantile.reputationCycleGain"), config.reputationCycleGain)
                     .setDefaultValue(defaults.reputationCycleGain)
                     .setMin(0)
-                    .setTooltip(Component.translatable("mercantile.config.reputationCycleGain.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.reputationCycleGain.tooltip"))
                     .setSaveConsumer(v -> config.reputationCycleGain = v)
                     .build());
-            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.reputationDailyCap"), config.reputationDailyCap)
+            reputation.addEntry(entry.startIntField(Component.translatable("config.mercantile.reputationDailyCap"), config.reputationDailyCap)
                     .setDefaultValue(defaults.reputationDailyCap)
                     .setMin(1).setMax(50)
-                    .setTooltip(Component.translatable("mercantile.config.reputationDailyCap.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.reputationDailyCap.tooltip"))
                     .setSaveConsumer(v -> config.reputationDailyCap = v)
                     .build());
-            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.reputationTradesPerGain"), config.reputationTradesPerGain)
+            reputation.addEntry(entry.startIntField(Component.translatable("config.mercantile.reputationTradesPerGain"), config.reputationTradesPerGain)
                     .setDefaultValue(defaults.reputationTradesPerGain)
                     .setMin(1).setMax(20)
-                    .setTooltip(Component.translatable("mercantile.config.reputationTradesPerGain.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.reputationTradesPerGain.tooltip"))
                     .setSaveConsumer(v -> config.reputationTradesPerGain = v)
                     .build());
-            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.reputationDailyMaxTradeRep"), config.reputationDailyMaxTradeRep)
+            reputation.addEntry(entry.startIntField(Component.translatable("config.mercantile.reputationDailyMaxTradeRep"), config.reputationDailyMaxTradeRep)
                     .setDefaultValue(defaults.reputationDailyMaxTradeRep)
                     .setMin(1).setMax(10)
-                    .setTooltip(Component.translatable("mercantile.config.reputationDailyMaxTradeRep.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.reputationDailyMaxTradeRep.tooltip"))
                     .setSaveConsumer(v -> config.reputationDailyMaxTradeRep = v)
                     .build());
-            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.reputationDailyMaxCycleRep"), config.reputationDailyMaxCycleRep)
+            reputation.addEntry(entry.startIntField(Component.translatable("config.mercantile.reputationDailyMaxCycleRep"), config.reputationDailyMaxCycleRep)
                     .setDefaultValue(defaults.reputationDailyMaxCycleRep)
                     .setMin(1).setMax(10)
-                    .setTooltip(Component.translatable("mercantile.config.reputationDailyMaxCycleRep.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.reputationDailyMaxCycleRep.tooltip"))
                     .setSaveConsumer(v -> config.reputationDailyMaxCycleRep = v)
                     .build());
-            reputation.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableRaidReputation"), config.enableRaidReputation)
+            reputation.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableRaidReputation"), config.enableRaidReputation)
                     .setDefaultValue(defaults.enableRaidReputation)
-                    .setTooltip(Component.translatable("mercantile.config.enableRaidReputation.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableRaidReputation.tooltip"))
                     .setSaveConsumer(v -> config.enableRaidReputation = v)
                     .build());
-            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.reputationRaidWinGain"), config.reputationRaidWinGain)
+            reputation.addEntry(entry.startIntField(Component.translatable("config.mercantile.reputationRaidWinGain"), config.reputationRaidWinGain)
                     .setDefaultValue(defaults.reputationRaidWinGain)
                     .setMin(0)
-                    .setTooltip(Component.translatable("mercantile.config.reputationRaidWinGain.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.reputationRaidWinGain.tooltip"))
                     .setSaveConsumer(v -> config.reputationRaidWinGain = v)
                     .build());
-            reputation.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableWanderingTraderRep"), config.enableWanderingTraderRep)
+            reputation.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableWanderingTraderRep"), config.enableWanderingTraderRep)
                     .setDefaultValue(defaults.enableWanderingTraderRep)
-                    .setTooltip(Component.translatable("mercantile.config.enableWanderingTraderRep.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableWanderingTraderRep.tooltip"))
                     .setSaveConsumer(v -> config.enableWanderingTraderRep = v)
                     .build());
-            reputation.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableGifting"), config.enableGifting)
+            reputation.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableGifting"), config.enableGifting)
                     .setDefaultValue(defaults.enableGifting)
-                    .setTooltip(Component.translatable("mercantile.config.enableGifting.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableGifting.tooltip"))
                     .setSaveConsumer(v -> config.enableGifting = v)
                     .build());
-            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.reputationGiftGain"), config.reputationGiftGain)
+            reputation.addEntry(entry.startIntField(Component.translatable("config.mercantile.reputationGiftGain"), config.reputationGiftGain)
                     .setDefaultValue(defaults.reputationGiftGain)
                     .setMin(0)
-                    .setTooltip(Component.translatable("mercantile.config.reputationGiftGain.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.reputationGiftGain.tooltip"))
                     .setSaveConsumer(v -> config.reputationGiftGain = v)
                     .build());
-            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.reputationDailyMaxGiftRep"), config.reputationDailyMaxGiftRep)
+            reputation.addEntry(entry.startIntField(Component.translatable("config.mercantile.reputationDailyMaxGiftRep"), config.reputationDailyMaxGiftRep)
                     .setDefaultValue(defaults.reputationDailyMaxGiftRep)
                     .setMin(1).setMax(10)
-                    .setTooltip(Component.translatable("mercantile.config.reputationDailyMaxGiftRep.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.reputationDailyMaxGiftRep.tooltip"))
                     .setSaveConsumer(v -> config.reputationDailyMaxGiftRep = v)
                     .build());
-            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.reputationNegativeDecayPerDay"), config.reputationNegativeDecayPerDay)
+            reputation.addEntry(entry.startIntField(Component.translatable("config.mercantile.reputationNegativeDecayPerDay"), config.reputationNegativeDecayPerDay)
                     .setDefaultValue(defaults.reputationNegativeDecayPerDay)
                     .setMin(0)
-                    .setTooltip(Component.translatable("mercantile.config.reputationNegativeDecayPerDay.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.reputationNegativeDecayPerDay.tooltip"))
                     .setSaveConsumer(v -> config.reputationNegativeDecayPerDay = v)
                     .build());
-            reputation.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableGratitudeGifts"), config.enableGratitudeGifts)
+            reputation.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableGratitudeGifts"), config.enableGratitudeGifts)
                     .setDefaultValue(defaults.enableGratitudeGifts)
-                    .setTooltip(Component.translatable("mercantile.config.enableGratitudeGifts.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableGratitudeGifts.tooltip"))
                     .setSaveConsumer(v -> config.enableGratitudeGifts = v)
                     .build());
-            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.gratitudeGiftsPerDay"), config.gratitudeGiftsPerDay)
+            reputation.addEntry(entry.startIntField(Component.translatable("config.mercantile.gratitudeGiftsPerDay"), config.gratitudeGiftsPerDay)
                     .setDefaultValue(defaults.gratitudeGiftsPerDay)
                     .setMin(0).setMax(10)
-                    .setTooltip(Component.translatable("mercantile.config.gratitudeGiftsPerDay.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.gratitudeGiftsPerDay.tooltip"))
                     .setSaveConsumer(v -> config.gratitudeGiftsPerDay = v)
                     .build());
-            reputation.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableNitwitRehab"), config.enableNitwitRehab)
+            reputation.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableNitwitRehab"), config.enableNitwitRehab)
                     .setDefaultValue(defaults.enableNitwitRehab)
-                    .setTooltip(Component.translatable("mercantile.config.enableNitwitRehab.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableNitwitRehab.tooltip"))
                     .setSaveConsumer(v -> config.enableNitwitRehab = v)
                     .build());
-            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.nitwitRehabEmeraldCost"), config.nitwitRehabEmeraldCost)
+            reputation.addEntry(entry.startIntField(Component.translatable("config.mercantile.nitwitRehabEmeraldCost"), config.nitwitRehabEmeraldCost)
                     .setDefaultValue(defaults.nitwitRehabEmeraldCost)
                     .setMin(0)
-                    .setTooltip(Component.translatable("mercantile.config.nitwitRehabEmeraldCost.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.nitwitRehabEmeraldCost.tooltip"))
                     .setSaveConsumer(v -> config.nitwitRehabEmeraldCost = v)
                     .build());
-            reputation.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableContracts"), config.enableContracts)
+            reputation.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableContracts"), config.enableContracts)
                     .setDefaultValue(defaults.enableContracts)
-                    .setTooltip(Component.translatable("mercantile.config.enableContracts.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableContracts.tooltip"))
                     .setSaveConsumer(v -> config.enableContracts = v)
                     .build());
-            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.contractOfferChance"), config.contractOfferChance)
+            reputation.addEntry(entry.startIntField(Component.translatable("config.mercantile.contractOfferChance"), config.contractOfferChance)
                     .setDefaultValue(defaults.contractOfferChance)
                     .setMin(0).setMax(100)
-                    .setTooltip(Component.translatable("mercantile.config.contractOfferChance.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.contractOfferChance.tooltip"))
                     .setSaveConsumer(v -> config.contractOfferChance = v)
                     .build());
-            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.contractPaymentScale"), config.contractPaymentScale)
+            reputation.addEntry(entry.startIntField(Component.translatable("config.mercantile.contractPaymentScale"), config.contractPaymentScale)
                     .setDefaultValue(defaults.contractPaymentScale)
                     .setMin(0).setMax(1000)
-                    .setTooltip(Component.translatable("mercantile.config.contractPaymentScale.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.contractPaymentScale.tooltip"))
                     .setSaveConsumer(v -> config.contractPaymentScale = v)
                     .build());
-            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.contractRepGain"), config.contractRepGain)
+            reputation.addEntry(entry.startIntField(Component.translatable("config.mercantile.contractRepGain"), config.contractRepGain)
                     .setDefaultValue(defaults.contractRepGain)
                     .setMin(0)
-                    .setTooltip(Component.translatable("mercantile.config.contractRepGain.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.contractRepGain.tooltip"))
                     .setSaveConsumer(v -> config.contractRepGain = v)
                     .build());
-            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.contractRepPerDay"), config.contractRepPerDay)
+            reputation.addEntry(entry.startIntField(Component.translatable("config.mercantile.contractRepPerDay"), config.contractRepPerDay)
                     .setDefaultValue(defaults.contractRepPerDay)
                     .setMin(0).setMax(50)
-                    .setTooltip(Component.translatable("mercantile.config.contractRepPerDay.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.contractRepPerDay.tooltip"))
                     .setSaveConsumer(v -> config.contractRepPerDay = v)
                     .build());
-            reputation.addEntry(entry.startIntField(Component.translatable("mercantile.config.contractDeadlineDays"), config.contractDeadlineDays)
+            reputation.addEntry(entry.startIntField(Component.translatable("config.mercantile.contractDeadlineDays"), config.contractDeadlineDays)
                     .setDefaultValue(defaults.contractDeadlineDays)
                     .setMin(1).setMax(30)
-                    .setTooltip(Component.translatable("mercantile.config.contractDeadlineDays.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.contractDeadlineDays.tooltip"))
                     .setSaveConsumer(v -> config.contractDeadlineDays = v)
                     .build());
 
             // --- Follow Mode ---
-            ConfigCategory follow = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.follow"));
-            follow.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableFollowMode"), config.enableFollowMode)
+            ConfigCategory follow = builder.getOrCreateCategory(Component.translatable("config.mercantile.category.follow"));
+            follow.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableFollowMode"), config.enableFollowMode)
                     .setDefaultValue(defaults.enableFollowMode)
-                    .setTooltip(Component.translatable("mercantile.config.enableFollowMode.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableFollowMode.tooltip"))
                     .setSaveConsumer(v -> config.enableFollowMode = v)
                     .build());
-            follow.addEntry(entry.startIntField(Component.translatable("mercantile.config.maxFollowingVillagers"), config.maxFollowingVillagers)
+            follow.addEntry(entry.startIntField(Component.translatable("config.mercantile.maxFollowingVillagers"), config.maxFollowingVillagers)
                     .setDefaultValue(defaults.maxFollowingVillagers)
                     .setMin(1)
-                    .setTooltip(Component.translatable("mercantile.config.maxFollowingVillagers.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.maxFollowingVillagers.tooltip"))
                     .setSaveConsumer(v -> config.maxFollowingVillagers = v)
                     .build());
-            follow.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableSendHome"), config.enableSendHome)
+            follow.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableSendHome"), config.enableSendHome)
                     .setDefaultValue(defaults.enableSendHome)
-                    .setTooltip(Component.translatable("mercantile.config.enableSendHome.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableSendHome.tooltip"))
                     .setSaveConsumer(v -> config.enableSendHome = v)
                     .build());
 
             // --- Pathfinding ---
-            ConfigCategory pathfinding = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.pathfinding"));
-            pathfinding.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enablePathfindingFixes"), config.enablePathfindingFixes)
+            ConfigCategory pathfinding = builder.getOrCreateCategory(Component.translatable("config.mercantile.category.pathfinding"));
+            pathfinding.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enablePathfindingFixes"), config.enablePathfindingFixes)
                     .setDefaultValue(defaults.enablePathfindingFixes)
-                    .setTooltip(Component.translatable("mercantile.config.enablePathfindingFixes.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enablePathfindingFixes.tooltip"))
                     .setSaveConsumer(v -> config.enablePathfindingFixes = v)
                     .build());
-            pathfinding.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enablePathfindingDoors"), config.enablePathfindingDoors)
+            pathfinding.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enablePathfindingDoors"), config.enablePathfindingDoors)
                     .setDefaultValue(defaults.enablePathfindingDoors)
-                    .setTooltip(Component.translatable("mercantile.config.enablePathfindingDoors.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enablePathfindingDoors.tooltip"))
                     .setSaveConsumer(v -> config.enablePathfindingDoors = v)
                     .build());
-            pathfinding.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enablePathfindingStairs"), config.enablePathfindingStairs)
+            pathfinding.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enablePathfindingStairs"), config.enablePathfindingStairs)
                     .setDefaultValue(defaults.enablePathfindingStairs)
-                    .setTooltip(Component.translatable("mercantile.config.enablePathfindingStairs.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enablePathfindingStairs.tooltip"))
                     .setSaveConsumer(v -> config.enablePathfindingStairs = v)
                     .build());
-            pathfinding.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enablePathfindingLadders"), config.enablePathfindingLadders)
+            pathfinding.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enablePathfindingLadders"), config.enablePathfindingLadders)
                     .setDefaultValue(defaults.enablePathfindingLadders)
-                    .setTooltip(Component.translatable("mercantile.config.enablePathfindingLadders.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enablePathfindingLadders.tooltip"))
                     .setSaveConsumer(v -> config.enablePathfindingLadders = v)
                     .build());
-            pathfinding.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enablePathfindingWater"), config.enablePathfindingWater)
+            pathfinding.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enablePathfindingWater"), config.enablePathfindingWater)
                     .setDefaultValue(defaults.enablePathfindingWater)
-                    .setTooltip(Component.translatable("mercantile.config.enablePathfindingWater.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enablePathfindingWater.tooltip"))
                     .setSaveConsumer(v -> config.enablePathfindingWater = v)
                     .build());
 
             // --- Trading ---
-            ConfigCategory trading = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.trading"));
-            trading.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableBulkTrading"), config.enableBulkTrading)
+            ConfigCategory trading = builder.getOrCreateCategory(Component.translatable("config.mercantile.category.trading"));
+            trading.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableBulkTrading"), config.enableBulkTrading)
                     .setDefaultValue(defaults.enableBulkTrading)
-                    .setTooltip(Component.translatable("mercantile.config.enableBulkTrading.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableBulkTrading.tooltip"))
                     .setSaveConsumer(v -> config.enableBulkTrading = v)
                     .build());
-            trading.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableProfessionLock"), config.enableProfessionLock)
+            trading.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableProfessionLock"), config.enableProfessionLock)
                     .setDefaultValue(defaults.enableProfessionLock)
-                    .setTooltip(Component.translatable("mercantile.config.enableProfessionLock.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableProfessionLock.tooltip"))
                     .setSaveConsumer(v -> config.enableProfessionLock = v)
                     .build());
-            trading.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableWorkOrders"), config.enableWorkOrders)
+            trading.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableWorkOrders"), config.enableWorkOrders)
                     .setDefaultValue(defaults.enableWorkOrders)
-                    .setTooltip(Component.translatable("mercantile.config.enableWorkOrders.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableWorkOrders.tooltip"))
                     .setSaveConsumer(v -> config.enableWorkOrders = v)
                     .build());
-            trading.addEntry(entry.startIntField(Component.translatable("mercantile.config.workOrderEmeraldCost"), config.workOrderEmeraldCost)
+            trading.addEntry(entry.startIntField(Component.translatable("config.mercantile.workOrderEmeraldCost"), config.workOrderEmeraldCost)
                     .setDefaultValue(defaults.workOrderEmeraldCost)
                     .setMin(0)
-                    .setTooltip(Component.translatable("mercantile.config.workOrderEmeraldCost.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.workOrderEmeraldCost.tooltip"))
                     .setSaveConsumer(v -> config.workOrderEmeraldCost = v)
                     .build());
-            trading.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableHealing"), config.enableHealing)
+            trading.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableHealing"), config.enableHealing)
                     .setDefaultValue(defaults.enableHealing)
-                    .setTooltip(Component.translatable("mercantile.config.enableHealing.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableHealing.tooltip"))
                     .setSaveConsumer(v -> config.enableHealing = v)
                     .build());
-            trading.addEntry(entry.startFloatField(Component.translatable("mercantile.config.healingMultiplier"), config.healingMultiplier)
+            trading.addEntry(entry.startFloatField(Component.translatable("config.mercantile.healingMultiplier"), config.healingMultiplier)
                     .setDefaultValue(defaults.healingMultiplier)
                     .setMin(1.0f).setMax(10.0f)
-                    .setTooltip(Component.translatable("mercantile.config.healingMultiplier.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.healingMultiplier.tooltip"))
                     .setSaveConsumer(v -> config.healingMultiplier = v)
                     .build());
-            trading.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableRestockIndicator"), config.enableRestockIndicator)
+            trading.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableRestockIndicator"), config.enableRestockIndicator)
                     .setDefaultValue(defaults.enableRestockIndicator)
-                    .setTooltip(Component.translatable("mercantile.config.enableRestockIndicator.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableRestockIndicator.tooltip"))
                     .setSaveConsumer(v -> config.enableRestockIndicator = v)
                     .build());
-            trading.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableDemandTransparency"), config.enableDemandTransparency)
+            trading.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableDemandTransparency"), config.enableDemandTransparency)
                     .setDefaultValue(defaults.enableDemandTransparency)
-                    .setTooltip(Component.translatable("mercantile.config.enableDemandTransparency.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableDemandTransparency.tooltip"))
                     .setSaveConsumer(v -> config.enableDemandTransparency = v)
                     .build());
-            trading.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableTradePinning"), config.enableTradePinning)
+            trading.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableTradePinning"), config.enableTradePinning)
                     .setDefaultValue(defaults.enableTradePinning)
-                    .setTooltip(Component.translatable("mercantile.config.enableTradePinning.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableTradePinning.tooltip"))
                     .setSaveConsumer(v -> config.enableTradePinning = v)
                     .build());
-            trading.addEntry(entry.startIntField(Component.translatable("mercantile.config.maxPinnedTradesPerPlayer"), config.maxPinnedTradesPerPlayer)
+            trading.addEntry(entry.startIntField(Component.translatable("config.mercantile.maxPinnedTradesPerPlayer"), config.maxPinnedTradesPerPlayer)
                     .setDefaultValue(defaults.maxPinnedTradesPerPlayer)
                     .setMin(1).setMax(64)
-                    .setTooltip(Component.translatable("mercantile.config.maxPinnedTradesPerPlayer.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.maxPinnedTradesPerPlayer.tooltip"))
                     .setSaveConsumer(v -> config.maxPinnedTradesPerPlayer = v)
                     .build());
-            trading.addEntry(entry.startIntField(Component.translatable("mercantile.config.pinRestockNotifyRange"), config.pinRestockNotifyRange)
+            trading.addEntry(entry.startIntField(Component.translatable("config.mercantile.pinRestockNotifyRange"), config.pinRestockNotifyRange)
                     .setDefaultValue(defaults.pinRestockNotifyRange)
                     .setMin(8).setMax(256)
-                    .setTooltip(Component.translatable("mercantile.config.pinRestockNotifyRange.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.pinRestockNotifyRange.tooltip"))
                     .setSaveConsumer(v -> config.pinRestockNotifyRange = v)
                     .build());
-            trading.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableBreedingTooltip"), config.enableBreedingTooltip)
+            trading.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableBreedingTooltip"), config.enableBreedingTooltip)
                     .setDefaultValue(defaults.enableBreedingTooltip)
-                    .setTooltip(Component.translatable("mercantile.config.enableBreedingTooltip.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableBreedingTooltip.tooltip"))
                     .setSaveConsumer(v -> config.enableBreedingTooltip = v)
                     .build());
-            trading.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableBabyFeeding"), config.enableBabyFeeding)
+            trading.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableBabyFeeding"), config.enableBabyFeeding)
                     .setDefaultValue(defaults.enableBabyFeeding)
-                    .setTooltip(Component.translatable("mercantile.config.enableBabyFeeding.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableBabyFeeding.tooltip"))
                     .setSaveConsumer(v -> config.enableBabyFeeding = v)
                     .build());
-            trading.addEntry(entry.startIntField(Component.translatable("mercantile.config.babyFeedPercentPerFeed"), config.babyFeedPercentPerFeed)
+            trading.addEntry(entry.startIntField(Component.translatable("config.mercantile.babyFeedPercentPerFeed"), config.babyFeedPercentPerFeed)
                     .setDefaultValue(defaults.babyFeedPercentPerFeed)
                     .setMin(1).setMax(100)
-                    .setTooltip(Component.translatable("mercantile.config.babyFeedPercentPerFeed.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.babyFeedPercentPerFeed.tooltip"))
                     .setSaveConsumer(v -> config.babyFeedPercentPerFeed = v)
                     .build());
-            trading.addEntry(entry.startIntField(Component.translatable("mercantile.config.babyFeedMaxReductionPercent"), config.babyFeedMaxReductionPercent)
+            trading.addEntry(entry.startIntField(Component.translatable("config.mercantile.babyFeedMaxReductionPercent"), config.babyFeedMaxReductionPercent)
                     .setDefaultValue(defaults.babyFeedMaxReductionPercent)
                     .setMin(0).setMax(100)
-                    .setTooltip(Component.translatable("mercantile.config.babyFeedMaxReductionPercent.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.babyFeedMaxReductionPercent.tooltip"))
                     .setSaveConsumer(v -> config.babyFeedMaxReductionPercent = v)
                     .build());
-            trading.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableStateIndicators"), config.enableStateIndicators)
+            trading.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableStateIndicators"), config.enableStateIndicators)
                     .setDefaultValue(defaults.enableStateIndicators)
-                    .setTooltip(Component.translatable("mercantile.config.enableStateIndicators.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableStateIndicators.tooltip"))
                     .setSaveConsumer(v -> config.enableStateIndicators = v)
                     .build());
 
             // --- Mood ---
-            ConfigCategory mood = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.mood"));
-            mood.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableMood"), config.enableMood)
+            ConfigCategory mood = builder.getOrCreateCategory(Component.translatable("config.mercantile.category.mood"));
+            mood.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableMood"), config.enableMood)
                     .setDefaultValue(defaults.enableMood)
-                    .setTooltip(Component.translatable("mercantile.config.enableMood.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableMood.tooltip"))
                     .setSaveConsumer(v -> config.enableMood = v)
                     .build());
-            mood.addEntry(entry.startIntField(Component.translatable("mercantile.config.moodPriceModifierPercent"), config.moodPriceModifierPercent)
+            mood.addEntry(entry.startIntField(Component.translatable("config.mercantile.moodPriceModifierPercent"), config.moodPriceModifierPercent)
                     .setDefaultValue(defaults.moodPriceModifierPercent)
                     .setMin(0).setMax(50)
-                    .setTooltip(Component.translatable("mercantile.config.moodPriceModifierPercent.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.moodPriceModifierPercent.tooltip"))
                     .setSaveConsumer(v -> config.moodPriceModifierPercent = v)
                     .build());
-            mood.addEntry(entry.startIntField(Component.translatable("mercantile.config.moodRestockSpeedPercent"), config.moodRestockSpeedPercent)
+            mood.addEntry(entry.startIntField(Component.translatable("config.mercantile.moodRestockSpeedPercent"), config.moodRestockSpeedPercent)
                     .setDefaultValue(defaults.moodRestockSpeedPercent)
                     .setMin(0).setMax(80)
-                    .setTooltip(Component.translatable("mercantile.config.moodRestockSpeedPercent.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.moodRestockSpeedPercent.tooltip"))
                     .setSaveConsumer(v -> config.moodRestockSpeedPercent = v)
                     .build());
-            mood.addEntry(entry.startIntField(Component.translatable("mercantile.config.moodRecalcIntervalTicks"), config.moodRecalcIntervalTicks)
+            mood.addEntry(entry.startIntField(Component.translatable("config.mercantile.moodRecalcIntervalTicks"), config.moodRecalcIntervalTicks)
                     .setDefaultValue(defaults.moodRecalcIntervalTicks)
                     .setMin(20).setMax(24_000)
-                    .setTooltip(Component.translatable("mercantile.config.moodRecalcIntervalTicks.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.moodRecalcIntervalTicks.tooltip"))
                     .setSaveConsumer(v -> config.moodRecalcIntervalTicks = v)
                     .build());
-            mood.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.moodAmbientParticles"), config.moodAmbientParticles)
+            mood.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.moodAmbientParticles"), config.moodAmbientParticles)
                     .setDefaultValue(defaults.moodAmbientParticles)
-                    .setTooltip(Component.translatable("mercantile.config.moodAmbientParticles.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.moodAmbientParticles.tooltip"))
                     .setSaveConsumer(v -> config.moodAmbientParticles = v)
                     .build());
 
             // --- Market Day ---
-            ConfigCategory market = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.market"));
-            market.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableMarketDay"), config.enableMarketDay)
+            ConfigCategory market = builder.getOrCreateCategory(Component.translatable("config.mercantile.category.market"));
+            market.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableMarketDay"), config.enableMarketDay)
                     .setDefaultValue(defaults.enableMarketDay)
-                    .setTooltip(Component.translatable("mercantile.config.enableMarketDay.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableMarketDay.tooltip"))
                     .setSaveConsumer(v -> config.enableMarketDay = v)
                     .build());
-            market.addEntry(entry.startIntField(Component.translatable("mercantile.config.marketDayIntervalDays"), config.marketDayIntervalDays)
+            market.addEntry(entry.startIntField(Component.translatable("config.mercantile.marketDayIntervalDays"), config.marketDayIntervalDays)
                     .setDefaultValue(defaults.marketDayIntervalDays)
                     .setMin(1).setMax(1_000)
-                    .setTooltip(Component.translatable("mercantile.config.marketDayIntervalDays.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.marketDayIntervalDays.tooltip"))
                     .setSaveConsumer(v -> config.marketDayIntervalDays = v)
                     .build());
-            market.addEntry(entry.startIntField(Component.translatable("mercantile.config.marketDayDiscountPercent"), config.marketDayDiscountPercent)
+            market.addEntry(entry.startIntField(Component.translatable("config.mercantile.marketDayDiscountPercent"), config.marketDayDiscountPercent)
                     .setDefaultValue(defaults.marketDayDiscountPercent)
                     .setMin(0).setMax(100)
-                    .setTooltip(Component.translatable("mercantile.config.marketDayDiscountPercent.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.marketDayDiscountPercent.tooltip"))
                     .setSaveConsumer(v -> config.marketDayDiscountPercent = v)
                     .build());
 
             // --- Memorials & Fear ---
-            ConfigCategory memorial = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.memorial"));
-            memorial.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableMemorials"), config.enableMemorials)
+            ConfigCategory memorial = builder.getOrCreateCategory(Component.translatable("config.mercantile.category.memorial"));
+            memorial.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableMemorials"), config.enableMemorials)
                     .setDefaultValue(defaults.enableMemorials)
-                    .setTooltip(Component.translatable("mercantile.config.enableMemorials.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableMemorials.tooltip"))
                     .setSaveConsumer(v -> config.enableMemorials = v)
                     .build());
-            memorial.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableMourning"), config.enableMourning)
+            memorial.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableMourning"), config.enableMourning)
                     .setDefaultValue(defaults.enableMourning)
-                    .setTooltip(Component.translatable("mercantile.config.enableMourning.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableMourning.tooltip"))
                     .setSaveConsumer(v -> config.enableMourning = v)
                     .build());
-            memorial.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableFearMarkup"), config.enableFearMarkup)
+            memorial.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableFearMarkup"), config.enableFearMarkup)
                     .setDefaultValue(defaults.enableFearMarkup)
-                    .setTooltip(Component.translatable("mercantile.config.enableFearMarkup.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableFearMarkup.tooltip"))
                     .setSaveConsumer(v -> config.enableFearMarkup = v)
                     .build());
-            memorial.addEntry(entry.startIntField(Component.translatable("mercantile.config.fearKillThreshold"), config.fearKillThreshold)
+            memorial.addEntry(entry.startIntField(Component.translatable("config.mercantile.fearKillThreshold"), config.fearKillThreshold)
                     .setDefaultValue(defaults.fearKillThreshold)
                     .setMin(1).setMax(20)
-                    .setTooltip(Component.translatable("mercantile.config.fearKillThreshold.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.fearKillThreshold.tooltip"))
                     .setSaveConsumer(v -> config.fearKillThreshold = v)
                     .build());
-            memorial.addEntry(entry.startIntField(Component.translatable("mercantile.config.fearKillWindowMinutes"), config.fearKillWindowMinutes)
+            memorial.addEntry(entry.startIntField(Component.translatable("config.mercantile.fearKillWindowMinutes"), config.fearKillWindowMinutes)
                     .setDefaultValue(defaults.fearKillWindowMinutes)
                     .setMin(1).setMax(120)
-                    .setTooltip(Component.translatable("mercantile.config.fearKillWindowMinutes.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.fearKillWindowMinutes.tooltip"))
                     .setSaveConsumer(v -> config.fearKillWindowMinutes = v)
                     .build());
-            memorial.addEntry(entry.startIntField(Component.translatable("mercantile.config.fearMarkupPercent"), config.fearMarkupPercent)
+            memorial.addEntry(entry.startIntField(Component.translatable("config.mercantile.fearMarkupPercent"), config.fearMarkupPercent)
                     .setDefaultValue(defaults.fearMarkupPercent)
                     .setMin(0).setMax(200)
-                    .setTooltip(Component.translatable("mercantile.config.fearMarkupPercent.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.fearMarkupPercent.tooltip"))
                     .setSaveConsumer(v -> config.fearMarkupPercent = v)
                     .build());
-            memorial.addEntry(entry.startIntField(Component.translatable("mercantile.config.fearMarkupDurationDays"), config.fearMarkupDurationDays)
+            memorial.addEntry(entry.startIntField(Component.translatable("config.mercantile.fearMarkupDurationDays"), config.fearMarkupDurationDays)
                     .setDefaultValue(defaults.fearMarkupDurationDays)
                     .setMin(1).setMax(30)
-                    .setTooltip(Component.translatable("mercantile.config.fearMarkupDurationDays.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.fearMarkupDurationDays.tooltip"))
                     .setSaveConsumer(v -> config.fearMarkupDurationDays = v)
                     .build());
 
             // --- Sentry Pylon ---
-            ConfigCategory pylon = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.pylon"));
-            pylon.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableSentryPylon"), config.enableSentryPylon)
+            ConfigCategory pylon = builder.getOrCreateCategory(Component.translatable("config.mercantile.category.pylon"));
+            pylon.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableSentryPylon"), config.enableSentryPylon)
                     .setDefaultValue(defaults.enableSentryPylon)
-                    .setTooltip(Component.translatable("mercantile.config.enableSentryPylon.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableSentryPylon.tooltip"))
                     .setSaveConsumer(v -> config.enableSentryPylon = v)
                     .build());
-            pylon.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enablePylonBellAlarm"), config.enablePylonBellAlarm)
+            pylon.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enablePylonBellAlarm"), config.enablePylonBellAlarm)
                     .setDefaultValue(defaults.enablePylonBellAlarm)
-                    .setTooltip(Component.translatable("mercantile.config.enablePylonBellAlarm.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enablePylonBellAlarm.tooltip"))
                     .setSaveConsumer(v -> config.enablePylonBellAlarm = v)
                     .build());
-            pylon.addEntry(entry.startIntField(Component.translatable("mercantile.config.pylonDetectionRadius"), config.pylonDetectionRadius)
+            pylon.addEntry(entry.startIntField(Component.translatable("config.mercantile.pylonDetectionRadius"), config.pylonDetectionRadius)
                     .setDefaultValue(defaults.pylonDetectionRadius)
                     .setMin(8).setMax(128)
-                    .setTooltip(Component.translatable("mercantile.config.pylonDetectionRadius.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.pylonDetectionRadius.tooltip"))
                     .setSaveConsumer(v -> config.pylonDetectionRadius = v)
                     .build());
-            pylon.addEntry(entry.startIntField(Component.translatable("mercantile.config.pylonMaxFuel"), config.pylonMaxFuel)
+            pylon.addEntry(entry.startIntField(Component.translatable("config.mercantile.pylonMaxFuel"), config.pylonMaxFuel)
                     .setDefaultValue(defaults.pylonMaxFuel)
                     .setMin(1)
-                    .setTooltip(Component.translatable("mercantile.config.pylonMaxFuel.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.pylonMaxFuel.tooltip"))
                     .setSaveConsumer(v -> config.pylonMaxFuel = v)
                     .build());
-            pylon.addEntry(entry.startIntField(Component.translatable("mercantile.config.pylonMaxGolems"), config.pylonMaxGolems)
+            pylon.addEntry(entry.startIntField(Component.translatable("config.mercantile.pylonMaxGolems"), config.pylonMaxGolems)
                     .setDefaultValue(defaults.pylonMaxGolems)
                     .setMin(1)
-                    .setTooltip(Component.translatable("mercantile.config.pylonMaxGolems.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.pylonMaxGolems.tooltip"))
                     .setSaveConsumer(v -> config.pylonMaxGolems = v)
                     .build());
-            pylon.addEntry(entry.startIntField(Component.translatable("mercantile.config.sentryDespawnSeconds"), config.sentryDespawnSeconds)
+            pylon.addEntry(entry.startIntField(Component.translatable("config.mercantile.sentryDespawnSeconds"), config.sentryDespawnSeconds)
                     .setDefaultValue(defaults.sentryDespawnSeconds)
                     .setMin(5)
-                    .setTooltip(Component.translatable("mercantile.config.sentryDespawnSeconds.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.sentryDespawnSeconds.tooltip"))
                     .setSaveConsumer(v -> config.sentryDespawnSeconds = v)
                     .build());
-            pylon.addEntry(entry.startIntField(Component.translatable("mercantile.config.pylonTribulationGolemBonusPerTier"), config.pylonTribulationGolemBonusPerTier)
+            pylon.addEntry(entry.startIntField(Component.translatable("config.mercantile.pylonTribulationGolemBonusPerTier"), config.pylonTribulationGolemBonusPerTier)
                     .setDefaultValue(defaults.pylonTribulationGolemBonusPerTier)
                     .setMin(0)
-                    .setTooltip(Component.translatable("mercantile.config.pylonTribulationGolemBonusPerTier.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.pylonTribulationGolemBonusPerTier.tooltip"))
                     .setSaveConsumer(v -> config.pylonTribulationGolemBonusPerTier = v)
                     .build());
-            pylon.addEntry(entry.startIntField(Component.translatable("mercantile.config.pylonTribulationRadiusBonusPerTier"), config.pylonTribulationRadiusBonusPerTier)
+            pylon.addEntry(entry.startIntField(Component.translatable("config.mercantile.pylonTribulationRadiusBonusPerTier"), config.pylonTribulationRadiusBonusPerTier)
                     .setDefaultValue(defaults.pylonTribulationRadiusBonusPerTier)
                     .setMin(0)
-                    .setTooltip(Component.translatable("mercantile.config.pylonTribulationRadiusBonusPerTier.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.pylonTribulationRadiusBonusPerTier.tooltip"))
                     .setSaveConsumer(v -> config.pylonTribulationRadiusBonusPerTier = v)
                     .build());
-            pylon.addEntry(entry.startIntField(Component.translatable("mercantile.config.pylonTribulationMaxGolems"), config.pylonTribulationMaxGolems)
+            pylon.addEntry(entry.startIntField(Component.translatable("config.mercantile.pylonTribulationMaxGolems"), config.pylonTribulationMaxGolems)
                     .setDefaultValue(defaults.pylonTribulationMaxGolems)
                     .setMin(1)
-                    .setTooltip(Component.translatable("mercantile.config.pylonTribulationMaxGolems.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.pylonTribulationMaxGolems.tooltip"))
                     .setSaveConsumer(v -> config.pylonTribulationMaxGolems = v)
                     .build());
 
             // --- Client ---
-            ConfigCategory client = builder.getOrCreateCategory(Component.translatable("mercantile.config.category.client"));
-            client.addEntry(entry.startFloatField(Component.translatable("mercantile.config.villagerSoundVolume"), config.villagerSoundVolume)
+            ConfigCategory client = builder.getOrCreateCategory(Component.translatable("config.mercantile.category.client"));
+            client.addEntry(entry.startFloatField(Component.translatable("config.mercantile.villagerSoundVolume"), config.villagerSoundVolume)
                     .setDefaultValue(defaults.villagerSoundVolume)
                     .setMin(0.0f).setMax(1.0f)
-                    .setTooltip(Component.translatable("mercantile.config.villagerSoundVolume.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.villagerSoundVolume.tooltip"))
                     .setSaveConsumer(v -> config.villagerSoundVolume = v)
                     .build());
-            client.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableWorkstationVis"), config.enableWorkstationVis)
+            client.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableWorkstationVis"), config.enableWorkstationVis)
                     .setDefaultValue(defaults.enableWorkstationVis)
-                    .setTooltip(Component.translatable("mercantile.config.enableWorkstationVis.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableWorkstationVis.tooltip"))
                     .setSaveConsumer(v -> config.enableWorkstationVis = v)
                     .build());
-            client.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableBellRadiusVis"), config.enableBellRadiusVis)
+            client.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableBellRadiusVis"), config.enableBellRadiusVis)
                     .setDefaultValue(defaults.enableBellRadiusVis)
-                    .setTooltip(Component.translatable("mercantile.config.enableBellRadiusVis.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableBellRadiusVis.tooltip"))
                     .setSaveConsumer(v -> config.enableBellRadiusVis = v)
                     .build());
-            client.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableInfoPanel"), config.enableInfoPanel)
+            client.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableInfoPanel"), config.enableInfoPanel)
                     .setDefaultValue(defaults.enableInfoPanel)
-                    .setTooltip(Component.translatable("mercantile.config.enableInfoPanel.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableInfoPanel.tooltip"))
                     .setSaveConsumer(v -> config.enableInfoPanel = v)
                     .build());
-            client.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableReputationHud"), config.enableReputationHud)
+            client.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableReputationHud"), config.enableReputationHud)
                     .setDefaultValue(defaults.enableReputationHud)
-                    .setTooltip(Component.translatable("mercantile.config.enableReputationHud.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableReputationHud.tooltip"))
                     .setSaveConsumer(v -> config.enableReputationHud = v)
                     .build());
-            client.addEntry(entry.startBooleanToggle(Component.translatable("mercantile.config.enableTierChangeMessages"), config.enableTierChangeMessages)
+            client.addEntry(entry.startBooleanToggle(Component.translatable("config.mercantile.enableTierChangeMessages"), config.enableTierChangeMessages)
                     .setDefaultValue(defaults.enableTierChangeMessages)
-                    .setTooltip(Component.translatable("mercantile.config.enableTierChangeMessages.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.enableTierChangeMessages.tooltip"))
                     .setSaveConsumer(v -> config.enableTierChangeMessages = v)
                     .build());
-            client.addEntry(entry.startEnumSelector(Component.translatable("mercantile.config.hudAnchor"),
+            client.addEntry(entry.startEnumSelector(Component.translatable("config.mercantile.hudAnchor"),
                             MercantileConfig.Anchor.class, config.hudAnchor)
                     .setDefaultValue(defaults.hudAnchor)
                     .setEnumNameProvider(v -> Component.translatable(
-                            "mercantile.config.hudAnchor." + v.name().toLowerCase(Locale.ROOT)))
-                    .setTooltip(Component.translatable("mercantile.config.hudAnchor.tooltip"))
+                            "config.mercantile.hudAnchor." + v.name().toLowerCase(Locale.ROOT)))
+                    .setTooltip(Component.translatable("config.mercantile.hudAnchor.tooltip"))
                     .setSaveConsumer(v -> config.hudAnchor = v)
                     .build());
-            client.addEntry(entry.startIntField(Component.translatable("mercantile.config.hudOffsetX"), config.hudOffsetX)
+            client.addEntry(entry.startIntField(Component.translatable("config.mercantile.hudOffsetX"), config.hudOffsetX)
                     .setDefaultValue(defaults.hudOffsetX)
                     .setMin(0).setMax(10_000)
-                    .setTooltip(Component.translatable("mercantile.config.hudOffsetX.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.hudOffsetX.tooltip"))
                     .setSaveConsumer(v -> config.hudOffsetX = v)
                     .build());
-            client.addEntry(entry.startIntField(Component.translatable("mercantile.config.hudOffsetY"), config.hudOffsetY)
+            client.addEntry(entry.startIntField(Component.translatable("config.mercantile.hudOffsetY"), config.hudOffsetY)
                     .setDefaultValue(defaults.hudOffsetY)
                     .setMin(0).setMax(10_000)
-                    .setTooltip(Component.translatable("mercantile.config.hudOffsetY.tooltip"))
+                    .setTooltip(Component.translatable("config.mercantile.hudOffsetY.tooltip"))
                     .setSaveConsumer(v -> config.hudOffsetY = v)
                     .build());
 

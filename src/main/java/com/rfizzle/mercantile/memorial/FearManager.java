@@ -137,7 +137,7 @@ public final class FearManager {
 
         entry.setNotified(true);
         player.displayClientMessage(
-                Component.translatable("mercantile.message.fear_markup")
+                Component.translatable("message.mercantile.fear_markup")
                         .withStyle(ChatFormatting.RED), false);
     }
 

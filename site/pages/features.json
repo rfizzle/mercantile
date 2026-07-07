@@ -304,13 +304,13 @@
                 "When you've pinned trades, a <span class='text-bone'>Pinned trades</span> block lists them across the whole village — each pin's trade summary above the villager who sells it, colored by live stock: green for in stock, rust for sold out, ash while the villager is out of range. It's the same source of truth as <code class='text-bone'>/mercantile pins</code>, synced per player rather than tied to an open screen, so it stays right after you pin or unpin and across relogs. A long list pages with the same cross-fade as the crowd below; the block hides entirely when trade pinning is off or you have no pins.",
                 "Last, grouped by profession, it shows the villagers actually <em>around</em> you right now — a cached proximity scan throttled so it costs nothing per frame — and whether your standing has unlocked their exclusive trades yet. A crowd of professions pages through with a soft cross-fade and page dots, so the panel never overflows or scrolls. Framed in the mod's slate theme with emerald and standing-colored accents. Entirely client-side, hidden during F1, open screens, and spectator mode."
               ],
-              "note": "Controls → Mercantile → <span class='text-bone'>Peek Reputation Detail</span> — bound to <code class='text-bone'>V</code> by default, rebindable"
+              "note": "Controls → Mercantile → <span class='text-bone'>Peek Reputation Detail</span> — bound to <code class='text-bone'>Left Alt</code> by default, rebindable"
             },
             {
               "id": "reputation-tier-change",
               "title": "Tier-Change Notices",
               "html": [
-                "Cross into a new standing and a chat line tells you the moment it happens — <em>\"Villagers now consider you Trusted — new exclusive trades unlocked. Hold V for details.\"</em> — naming the standing you reached and pointing at the detail-panel keybind so the payoff is one keypress away. Slip backward and it warns you the moment your standing falls, so a slide toward higher prices never goes unnoticed.",
+                "Cross into a new standing and a chat line tells you the moment it happens — <em>\"Villagers now consider you Trusted — new exclusive trades unlocked. Hold Left Alt for details.\"</em> — naming the standing you reached and pointing at the detail-panel keybind so the payoff is one keypress away. Slip backward and it warns you the moment your standing falls, so a slide toward higher prices never goes unnoticed.",
                 "The hint always names your live keybind, not a hardcoded key, and drops the hint cleanly if you've unbound the panel. No message fires on the first sync when you join a world, and standing changes are rare enough that the notice never spams."
               ],
               "note": "Client config: <code class='text-bone'>enableTierChangeMessages</code>"

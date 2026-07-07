@@ -76,7 +76,7 @@ public final class TradePinManager {
             if (data.getPinnedTrades().size() >= cap) {
                 if (player.connection != null) {
                     player.displayClientMessage(Component.translatable(
-                            "mercantile.message.pin_cap", cap).withStyle(ChatFormatting.RED), true);
+                            "message.mercantile.pin_cap", cap).withStyle(ChatFormatting.RED), true);
                 }
                 return;
             }
@@ -214,7 +214,7 @@ public final class TradePinManager {
             PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
             for (int i = 0; i < replenishedOffers.size(); i++) {
                 if (!data.isTradePinned(villager.getUUID(), replenishedOfferHashes.get(i))) continue;
-                player.displayClientMessage(Component.translatable("mercantile.message.trade_restocked",
+                player.displayClientMessage(Component.translatable("message.mercantile.trade_restocked",
                                 describeVillager(villager), summarize(replenishedOffers.get(i)))
                         .withStyle(ChatFormatting.GREEN), true);
             }
