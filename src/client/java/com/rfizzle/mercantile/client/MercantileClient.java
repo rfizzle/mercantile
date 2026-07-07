@@ -33,20 +33,19 @@ import org.lwjgl.glfw.GLFW;
 public class MercantileClient implements ClientModInitializer {
     /**
      * Hold-to-peek keybind for the reputation detail panel, bound to
-     * {@link GLFW#GLFW_KEY_V} by default. {@code V} is unused by vanilla
-     * 1.21.1 and this is the mod's only binding, so the default is
-     * conflict-free out of the box; discoverability of the detail panel
-     * outweighs the cross-mod collision risk, and players can rebind it
-     * under Controls → Mercantile.
+     * {@link GLFW#GLFW_KEY_LEFT_ALT} by default per the Concord HUD Standard
+     * §8. Left Alt is unused by vanilla 1.21.1 and ergonomic to hold, and a
+     * shared default keeps the peek gesture consistent across suite mods.
+     * Players can rebind it under Controls → Mercantile.
      */
     public static KeyMapping KEY_REPUTATION_DETAIL;
 
     @Override
     public void onInitializeClient() {
         KEY_REPUTATION_DETAIL = KeyBindingHelper.registerKeyBinding(new KeyMapping(
-                "key.mercantile.reputation_detail",
+                "key.mercantile.peek_detail",
                 InputConstants.Type.KEYSYM,
-                GLFW.GLFW_KEY_V,
+                GLFW.GLFW_KEY_LEFT_ALT,
                 "key.categories.mercantile"));
 
         ClientNetworkHandler.init();

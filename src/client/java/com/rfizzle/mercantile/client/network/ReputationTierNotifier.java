@@ -47,8 +47,8 @@ public final class ReputationTierNotifier {
 
     private static Component buildMessage(boolean promotion, ReputationTier newTier) {
         String baseKey = promotion
-                ? "mercantile.message.tier_up"
-                : "mercantile.message.tier_down";
+                ? "message.mercantile.tier_up"
+                : "message.mercantile.tier_down";
         KeyMapping key = MercantileClient.KEY_REPUTATION_DETAIL;
         if (key != null && !key.isUnbound()) {
             return Component.translatable(baseKey + ".hint",

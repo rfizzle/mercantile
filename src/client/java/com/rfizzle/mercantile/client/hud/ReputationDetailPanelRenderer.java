@@ -132,7 +132,7 @@ public final class ReputationDetailPanelRenderer implements HudRenderCallback {
         Component perksHeading = Component.translatable("hud.mercantile.rep_detail.perks_heading");
 
         // ---- Header / progress strings ----
-        Component title = Component.translatable("hud.mercantile.rep_detail.title");
+        Component title = Component.translatable("hud.mercantile.detail.title");
         Component standing = tier.displayName();
         Component scoreText = Component.translatable("hud.mercantile.rep_detail.score", score);
 

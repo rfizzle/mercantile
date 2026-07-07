@@ -361,7 +361,7 @@ public final class ReputationManager {
         // spam the action bar on every Nth trade after the cap. Reset on day rollover.
         if (data.isDailyCapNotified()) return;
         data.setDailyCapNotified(true);
-        player.displayClientMessage(Component.translatable("mercantile.message.reputation_daily_cap"), true);
+        player.displayClientMessage(Component.translatable("message.mercantile.reputation_daily_cap"), true);
     }
 
     public static void syncToClient(ServerPlayer player) {
