@@ -86,6 +86,10 @@ public final class ReputationHudOverlay {
         if (filledW > 0) {
             graphics.fill(x, barY, x + filledW, barY + BAR_HEIGHT, color);
         }
+
+        // Commit the batch before anything downstream can re-batch (ImmediatelyFast)
+        // or read the framebuffer (Blur+, post shaders) and drop our geometry.
+        graphics.flush();
     }
 
     private static boolean shouldRender(Minecraft mc) {

@@ -418,6 +418,10 @@ public final class ReputationDetailPanelRenderer implements HudRenderCallback {
             graphics.pose().popPose();
         }
         graphics.setColor(1f, 1f, 1f, 1f);
+
+        // Commit the batch before anything downstream can re-batch (ImmediatelyFast)
+        // or read the framebuffer (Blur+, post shaders) and drop our geometry.
+        graphics.flush();
     }
 
     /**
