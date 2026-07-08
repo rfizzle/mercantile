@@ -32,7 +32,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * requires paper or the delivery-contract item (and never fires on a baby), and this mixin
  * requires a baby villager and a villager food item in the main hand. Future
  * authors must preserve this invariant so no two mobInteract injections can fire for the same
- * interaction.
+ * interaction. Run order is irrelevant here — this mixin keeps Mixin's default priority (1000);
+ * only {@link VillagerPickupMixin} (900) and {@link VillagerFollowMixin} (1100) deviate.
  */
 @Mixin(Villager.class)
 public abstract class VillagerBabyFeedMixin extends AbstractVillager {

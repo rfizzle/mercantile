@@ -45,8 +45,12 @@ import java.util.Set;
  * {@link VillagerWorkOrderMixin} a workstation block item, and {@link VillagerContractMixin}
  * paper or the delivery-contract item. Future authors must preserve this
  * invariant so no two injections can fire for the same interaction.
+ * <p>The class-level priority also governs this mixin's {@code defineSynchedData}, {@code <init>},
+ * {@code customServerAiStep}, and {@code tick} injectors; no other mixin targets those methods on
+ * {@link Villager}, so it is inert for them — a future co-targeting mixin would inherit this
+ * apply-order relationship.
  */
-@Mixin(Villager.class)
+@Mixin(value = Villager.class, priority = 1100)
 public abstract class VillagerFollowMixin extends AbstractVillager implements FollowableVillager {
 
     @Unique

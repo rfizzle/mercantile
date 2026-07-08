@@ -39,7 +39,9 @@ import java.util.Optional;
  * {@link VillagerContractMixin} requires paper or the delivery-contract item, and this
  * mixin requires a workstation block item (an acquirable job-site POI block — never empty, an
  * emerald, food, a golden apple, paper, or a contract). Future authors must preserve this
- * invariant so no two mobInteract injections can fire for the same interaction.
+ * invariant so no two mobInteract injections can fire for the same interaction. Run order is
+ * irrelevant here — this mixin keeps Mixin's default priority (1000); only
+ * {@link VillagerPickupMixin} (900) and {@link VillagerFollowMixin} (1100) deviate.
  */
 @Mixin(Villager.class)
 public abstract class VillagerWorkOrderMixin extends AbstractVillager {
