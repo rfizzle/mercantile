@@ -110,7 +110,7 @@ public final class NitwitRehabManager {
         ServerPlayer player = level.getServer().getPlayerList().getPlayer(playerUuid);
         if (player != null && player.connection != null) {
             player.displayClientMessage(
-                    Component.translatable("mercantile.rehab.success")
+                    Component.translatable("notification.mercantile.rehab.success")
                             .withStyle(ChatFormatting.GREEN), true);
         }
     }

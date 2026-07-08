@@ -77,7 +77,7 @@ public abstract class VillagerNitwitRehabMixin extends AbstractVillager {
         if (self.isBaby()) {
             self.playSound(SoundEvents.VILLAGER_NO, 1.0f, self.getVoicePitch());
             serverPlayer.displayClientMessage(
-                    Component.translatable("mercantile.rehab.denied.baby")
+                    Component.translatable("notification.mercantile.rehab.denied.baby")
                             .withStyle(ChatFormatting.RED), true);
             cir.setReturnValue(InteractionResult.FAIL);
             return;
@@ -89,7 +89,7 @@ public abstract class VillagerNitwitRehabMixin extends AbstractVillager {
             if (!NitwitRehab.meetsReputationRequirement(true, data.getScore())) {
                 self.playSound(SoundEvents.VILLAGER_NO, 1.0f, self.getVoicePitch());
                 serverPlayer.displayClientMessage(
-                        Component.translatable("mercantile.rehab.denied.reputation",
+                        Component.translatable("notification.mercantile.rehab.denied.reputation",
                                 NitwitRehab.REQUIRED_TIER.displayName())
                                 .withStyle(ChatFormatting.RED), true);
                 cir.setReturnValue(InteractionResult.FAIL);
@@ -101,7 +101,7 @@ public abstract class VillagerNitwitRehabMixin extends AbstractVillager {
         if (!NitwitRehab.canAfford(creative, EmeraldPayment.count(serverPlayer), config.nitwitRehabEmeraldCost)) {
             self.playSound(SoundEvents.VILLAGER_NO, 1.0f, self.getVoicePitch());
             serverPlayer.displayClientMessage(
-                    Component.translatable("mercantile.rehab.denied.cost",
+                    Component.translatable("notification.mercantile.rehab.denied.cost",
                             config.nitwitRehabEmeraldCost)
                             .withStyle(ChatFormatting.RED), true);
             cir.setReturnValue(InteractionResult.FAIL);
@@ -118,7 +118,7 @@ public abstract class VillagerNitwitRehabMixin extends AbstractVillager {
         NitwitRehabManager.schedule(self, serverPlayer);
         self.playSound(eatingSound, 1.0f, self.getVoicePitch());
         serverPlayer.displayClientMessage(
-                Component.translatable("mercantile.rehab.start")
+                Component.translatable("notification.mercantile.rehab.start")
                         .withStyle(ChatFormatting.GREEN), true);
 
         MercantileCriteria.NITWIT_REHAB_STARTED.trigger(serverPlayer);

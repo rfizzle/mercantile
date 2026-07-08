@@ -78,22 +78,22 @@ class PayloadCodecTest {
 
     @Test
     void syncReputationS2C() {
-        var original = new SyncReputationS2CPayload(75, "mercantile.tier.trusted", 3, 5);
+        var original = new SyncReputationS2CPayload(75, "tooltip.mercantile.tier.trusted", 3, 5);
         assertEquals(original, roundTrip(SyncReputationS2CPayload.CODEC, original));
     }
 
     @Test
     void syncReputationS2CNegativeScore() {
-        var original = new SyncReputationS2CPayload(-80, "mercantile.tier.reviled", 0, 5);
+        var original = new SyncReputationS2CPayload(-80, "tooltip.mercantile.tier.reviled", 0, 5);
         assertEquals(original, roundTrip(SyncReputationS2CPayload.CODEC, original));
     }
 
     @Test
     void syncReputationS2CCarriesDailyFields() {
-        var original = new SyncReputationS2CPayload(305, "mercantile.tier.trusted", 4, 5);
+        var original = new SyncReputationS2CPayload(305, "tooltip.mercantile.tier.trusted", 4, 5);
         SyncReputationS2CPayload decoded = roundTrip(SyncReputationS2CPayload.CODEC, original);
         assertEquals(305, decoded.score());
-        assertEquals("mercantile.tier.trusted", decoded.tierKey());
+        assertEquals("tooltip.mercantile.tier.trusted", decoded.tierKey());
         assertEquals(4, decoded.dailyEarned());
         assertEquals(5, decoded.dailyCap());
     }
@@ -188,14 +188,14 @@ class PayloadCodecTest {
     @Test
     void villagerInfoPanelS2C() {
         var original = new VillagerInfoPanelS2CPayload(
-                42, "farmer", 3, 150, 250, 75, "mercantile.tier.trusted", 28, true, true, "mercantile.mood.content");
+                42, "farmer", 3, 150, 250, 75, "tooltip.mercantile.tier.trusted", 28, true, true, "tooltip.mercantile.mood.content");
         assertEquals(original, roundTrip(VillagerInfoPanelS2CPayload.CODEC, original));
     }
 
     @Test
     void villagerInfoPanelS2CDefaults() {
         var original = new VillagerInfoPanelS2CPayload(
-                1, "none", 1, 0, 10, 0, "mercantile.tier.neutral", 0, false, false, "");
+                1, "none", 1, 0, 10, 0, "tooltip.mercantile.tier.neutral", 0, false, false, "");
         assertEquals(original, roundTrip(VillagerInfoPanelS2CPayload.CODEC, original));
     }
 

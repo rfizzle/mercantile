@@ -5,10 +5,10 @@ package com.rfizzle.mercantile.mood;
  * mechanical effects (price nudge, restock speed); the middle tiers are neutral.
  */
 public enum MoodTier {
-    MISERABLE("mercantile.mood.miserable"),
-    UNHAPPY("mercantile.mood.unhappy"),
-    CONTENT("mercantile.mood.content"),
-    HAPPY("mercantile.mood.happy");
+    MISERABLE("tooltip.mercantile.mood.miserable"),
+    UNHAPPY("tooltip.mercantile.mood.unhappy"),
+    CONTENT("tooltip.mercantile.mood.content"),
+    HAPPY("tooltip.mercantile.mood.happy");
 
     private final String translationKey;
 

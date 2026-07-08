@@ -92,7 +92,7 @@ public abstract class VillagerContractMixin extends AbstractVillager {
                 // Entity event 14 = vanilla green "happy villager" particles.
                 ((ServerLevel) self.level()).broadcastEntityEvent(self, (byte) 14);
                 serverPlayer.displayClientMessage(
-                        Component.translatable("mercantile.contract.completed",
+                        Component.translatable("notification.mercantile.contract.completed",
                                         self.getDisplayName(), delivery.paid())
                                 .withStyle(ChatFormatting.GREEN), true);
                 cir.setReturnValue(InteractionResult.SUCCESS);
@@ -100,7 +100,7 @@ public abstract class VillagerContractMixin extends AbstractVillager {
             case MISSING_ITEMS -> {
                 self.playSound(SoundEvents.VILLAGER_NO, 1.0f, self.getVoicePitch());
                 serverPlayer.displayClientMessage(
-                        Component.translatable("mercantile.contract.denied.missing_items",
+                        Component.translatable("notification.mercantile.contract.denied.missing_items",
                                         delivery.stillMissing(), mercantile$requestedName(nbt))
                                 .withStyle(ChatFormatting.RED), true);
                 cir.setReturnValue(InteractionResult.FAIL);
@@ -108,7 +108,7 @@ public abstract class VillagerContractMixin extends AbstractVillager {
             case WRONG_VILLAGER -> {
                 self.playSound(SoundEvents.VILLAGER_NO, 1.0f, self.getVoicePitch());
                 serverPlayer.displayClientMessage(
-                        Component.translatable("mercantile.contract.denied.wrong_villager",
+                        Component.translatable("notification.mercantile.contract.denied.wrong_villager",
                                         mercantile$payeeName(nbt))
                                 .withStyle(ChatFormatting.RED), true);
                 cir.setReturnValue(InteractionResult.FAIL);
@@ -116,14 +116,14 @@ public abstract class VillagerContractMixin extends AbstractVillager {
             case EXPIRED -> {
                 self.playSound(SoundEvents.VILLAGER_NO, 1.0f, self.getVoicePitch());
                 serverPlayer.displayClientMessage(
-                        Component.translatable("mercantile.contract.denied.expired")
+                        Component.translatable("notification.mercantile.contract.denied.expired")
                                 .withStyle(ChatFormatting.RED), true);
                 cir.setReturnValue(InteractionResult.FAIL);
             }
             case INVALID -> {
                 self.playSound(SoundEvents.VILLAGER_NO, 1.0f, self.getVoicePitch());
                 serverPlayer.displayClientMessage(
-                        Component.translatable("mercantile.contract.denied.invalid")
+                        Component.translatable("notification.mercantile.contract.denied.invalid")
                                 .withStyle(ChatFormatting.RED), true);
                 cir.setReturnValue(InteractionResult.FAIL);
             }
@@ -164,7 +164,7 @@ public abstract class VillagerContractMixin extends AbstractVillager {
         self.playSound(SoundEvents.VILLAGER_YES, 1.0f, self.getVoicePitch());
         serverLevel.broadcastEntityEvent(self, (byte) 14);
         serverPlayer.displayClientMessage(
-                Component.translatable("mercantile.contract.accepted",
+                Component.translatable("notification.mercantile.contract.accepted",
                                 contract.count(), ContractService.requestedItemName(contract),
                                 self.getDisplayName())
                         .withStyle(ChatFormatting.GREEN), true);

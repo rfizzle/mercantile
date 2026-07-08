@@ -81,7 +81,7 @@ public final class MarketDayManager {
     private static void announce(MinecraftServer server) {
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             player.displayClientMessage(
-                    Component.translatable("message.mercantile.market_day")
+                    Component.translatable("notification.mercantile.market_day")
                             .withStyle(ChatFormatting.GOLD), true);
 
             ServerLevel level = player.serverLevel();

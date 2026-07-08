@@ -62,7 +62,7 @@ public abstract class WanderingTraderPickupMixin {
 
         if (wt.getTradingPlayer() != null && wt.getTradingPlayer() != player) {
             serverPlayer.displayClientMessage(
-                    Component.translatable("mercantile.pickup.denied.trader_trading")
+                    Component.translatable("notification.mercantile.pickup.denied.trader_trading")
                             .withStyle(ChatFormatting.RED), true);
             cir.setReturnValue(InteractionResult.FAIL);
             return;
@@ -70,7 +70,7 @@ public abstract class WanderingTraderPickupMixin {
 
         if (!player.getAbilities().instabuild && player.experienceLevel < config.pickupXpCost) {
             serverPlayer.displayClientMessage(
-                    Component.translatable("mercantile.pickup.not_enough_xp")
+                    Component.translatable("notification.mercantile.pickup.not_enough_xp")
                             .withStyle(ChatFormatting.RED), true);
             cir.setReturnValue(InteractionResult.FAIL);
             return;
@@ -93,7 +93,7 @@ public abstract class WanderingTraderPickupMixin {
                 x, midY, z, 18, 0.3, 0.5, 0.3, 0.03);
 
         serverPlayer.displayClientMessage(
-                Component.translatable("mercantile.pickup.success_trader")
+                Component.translatable("notification.mercantile.pickup.success_trader")
                         .withStyle(ChatFormatting.GREEN), true);
 
         // Order matters: detach llamas before discard so getLeashHolder() can

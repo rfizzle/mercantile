@@ -59,7 +59,7 @@ public abstract class VillagerPickupMixin {
         Raid raid = serverLevel.getRaidAt(self.blockPosition());
         if (raid != null && raid.isActive()) {
             serverPlayer.displayClientMessage(
-                    Component.translatable("mercantile.pickup.denied.raid")
+                    Component.translatable("notification.mercantile.pickup.denied.raid")
                             .withStyle(ChatFormatting.RED), true);
             cir.setReturnValue(InteractionResult.FAIL);
             return;
@@ -67,7 +67,7 @@ public abstract class VillagerPickupMixin {
 
         if (self.getTradingPlayer() != null && self.getTradingPlayer() != player) {
             serverPlayer.displayClientMessage(
-                    Component.translatable("mercantile.pickup.denied.trading")
+                    Component.translatable("notification.mercantile.pickup.denied.trading")
                             .withStyle(ChatFormatting.RED), true);
             cir.setReturnValue(InteractionResult.FAIL);
             return;
@@ -77,7 +77,7 @@ public abstract class VillagerPickupMixin {
         // pickup strips the UUID the pending conversion is keyed on.
         if (NitwitRehabManager.isPending(self.getUUID())) {
             serverPlayer.displayClientMessage(
-                    Component.translatable("mercantile.pickup.denied.rehab")
+                    Component.translatable("notification.mercantile.pickup.denied.rehab")
                             .withStyle(ChatFormatting.RED), true);
             cir.setReturnValue(InteractionResult.FAIL);
             return;
@@ -87,7 +87,7 @@ public abstract class VillagerPickupMixin {
             java.util.UUID followTarget = FollowManager.getFollowTarget(self);
             if (followTarget != null && !followTarget.equals(player.getUUID())) {
                 serverPlayer.displayClientMessage(
-                        Component.translatable("mercantile.pickup.denied.following")
+                        Component.translatable("notification.mercantile.pickup.denied.following")
                                 .withStyle(ChatFormatting.RED), true);
                 cir.setReturnValue(InteractionResult.FAIL);
                 return;
@@ -97,7 +97,7 @@ public abstract class VillagerPickupMixin {
 
         if (!player.getAbilities().instabuild && player.experienceLevel < config.pickupXpCost) {
             serverPlayer.displayClientMessage(
-                    Component.translatable("mercantile.pickup.not_enough_xp")
+                    Component.translatable("notification.mercantile.pickup.not_enough_xp")
                             .withStyle(ChatFormatting.RED), true);
             cir.setReturnValue(InteractionResult.FAIL);
             return;
@@ -120,7 +120,7 @@ public abstract class VillagerPickupMixin {
                 x, midY, z, 18, 0.3, 0.5, 0.3, 0.03);
 
         serverPlayer.displayClientMessage(
-                Component.translatable("mercantile.pickup.success")
+                Component.translatable("notification.mercantile.pickup.success")
                         .withStyle(ChatFormatting.GREEN), true);
 
         self.discard();

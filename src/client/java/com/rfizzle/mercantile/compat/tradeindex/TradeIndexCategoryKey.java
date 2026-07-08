@@ -67,9 +67,9 @@ public record TradeIndexCategoryKey(Type type, @Nullable ReputationTier tier) {
 
     public Component title() {
         return switch (type) {
-            case ALL -> Component.translatable("category.mercantile.villager_trades");
-            case AVAILABLE -> Component.translatable("category.mercantile.villager_trades.available");
-            case TIER -> Component.translatable("category.mercantile.villager_trades.tier", tier.displayName());
+            case ALL -> Component.translatable("gui.mercantile.trade_index.category");
+            case AVAILABLE -> Component.translatable("gui.mercantile.trade_index.category.available");
+            case TIER -> Component.translatable("gui.mercantile.trade_index.category.tier", tier.displayName());
         };
     }
 

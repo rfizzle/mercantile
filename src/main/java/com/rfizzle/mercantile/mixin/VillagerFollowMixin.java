@@ -152,7 +152,7 @@ public abstract class VillagerFollowMixin extends AbstractVillager implements Fo
             java.util.UUID currentTarget = FollowManager.getFollowTarget(self);
             if (currentTarget != null && !currentTarget.equals(player.getUUID())) {
                 serverPlayer.displayClientMessage(
-                        Component.translatable("mercantile.follow.denied.other_player")
+                        Component.translatable("notification.mercantile.follow.denied.other_player")
                                 .withStyle(ChatFormatting.RED), true);
                 cir.setReturnValue(InteractionResult.FAIL);
                 return;
@@ -161,7 +161,7 @@ public abstract class VillagerFollowMixin extends AbstractVillager implements Fo
             FollowManager.stopFollowing(self);
             self.playSound(SoundEvents.VILLAGER_AMBIENT, 1.0f, self.getVoicePitch());
             serverPlayer.displayClientMessage(
-                    Component.translatable("mercantile.follow.stop")
+                    Component.translatable("notification.mercantile.follow.stop")
                             .withStyle(ChatFormatting.YELLOW), true);
             cir.setReturnValue(InteractionResult.SUCCESS);
             return;
@@ -170,7 +170,7 @@ public abstract class VillagerFollowMixin extends AbstractVillager implements Fo
         int followerCount = FollowManager.getFollowerCount(player.getUUID());
         if (followerCount >= MercantileConfig.get().maxFollowingVillagers) {
             serverPlayer.displayClientMessage(
-                    Component.translatable("mercantile.follow.denied.max",
+                    Component.translatable("notification.mercantile.follow.denied.max",
                             MercantileConfig.get().maxFollowingVillagers)
                             .withStyle(ChatFormatting.RED), true);
             cir.setReturnValue(InteractionResult.FAIL);
@@ -179,7 +179,7 @@ public abstract class VillagerFollowMixin extends AbstractVillager implements Fo
 
         if (self.isBaby()) {
             serverPlayer.displayClientMessage(
-                    Component.translatable("mercantile.follow.denied.baby")
+                    Component.translatable("notification.mercantile.follow.denied.baby")
                             .withStyle(ChatFormatting.RED), true);
             cir.setReturnValue(InteractionResult.FAIL);
             return;
@@ -188,7 +188,7 @@ public abstract class VillagerFollowMixin extends AbstractVillager implements Fo
         boolean started = FollowManager.startFollowing(self, serverPlayer);
         if (!started) {
             serverPlayer.displayClientMessage(
-                    Component.translatable("mercantile.follow.denied.unavailable")
+                    Component.translatable("notification.mercantile.follow.denied.unavailable")
                             .withStyle(ChatFormatting.RED), true);
             cir.setReturnValue(InteractionResult.FAIL);
             return;
@@ -204,7 +204,7 @@ public abstract class VillagerFollowMixin extends AbstractVillager implements Fo
                 self.getX(), py, self.getZ(), 10, 0.3, 0.4, 0.3, 0.02);
 
         serverPlayer.displayClientMessage(
-                Component.translatable("mercantile.follow.start")
+                Component.translatable("notification.mercantile.follow.start")
                         .withStyle(ChatFormatting.GREEN), true);
 
         MercantileCriteria.FOLLOW_VILLAGER.trigger(serverPlayer);

@@ -36,7 +36,7 @@ class MoodTooltipFormatterTest {
 
     @Test
     void producesSingleMoodLine() {
-        List<Component> lines = MoodTooltipFormatter.format(tagFor("mercantile.mood.happy"));
+        List<Component> lines = MoodTooltipFormatter.format(tagFor("tooltip.mercantile.mood.happy"));
         assertEquals(1, lines.size());
         TranslatableContents contents = (TranslatableContents) lines.get(0).getContents();
         assertEquals("tooltip.mercantile.mood.label", contents.getKey());
@@ -44,7 +44,7 @@ class MoodTooltipFormatterTest {
 
     @Test
     void tierNameCarriesTierColor() {
-        List<Component> lines = MoodTooltipFormatter.format(tagFor("mercantile.mood.miserable"));
+        List<Component> lines = MoodTooltipFormatter.format(tagFor("tooltip.mercantile.mood.miserable"));
         TranslatableContents contents = (TranslatableContents) lines.get(0).getContents();
         Component tierName = (Component) contents.getArgs()[0];
         assertEquals(TextColor.fromLegacyFormat(ChatFormatting.RED), tierName.getStyle().getColor());
@@ -52,10 +52,10 @@ class MoodTooltipFormatterTest {
 
     @Test
     void colorMapping() {
-        assertEquals(ChatFormatting.GREEN, MoodTooltipFormatter.colorForTier("mercantile.mood.happy"));
-        assertEquals(ChatFormatting.WHITE, MoodTooltipFormatter.colorForTier("mercantile.mood.content"));
-        assertEquals(ChatFormatting.YELLOW, MoodTooltipFormatter.colorForTier("mercantile.mood.unhappy"));
-        assertEquals(ChatFormatting.RED, MoodTooltipFormatter.colorForTier("mercantile.mood.miserable"));
+        assertEquals(ChatFormatting.GREEN, MoodTooltipFormatter.colorForTier("tooltip.mercantile.mood.happy"));
+        assertEquals(ChatFormatting.WHITE, MoodTooltipFormatter.colorForTier("tooltip.mercantile.mood.content"));
+        assertEquals(ChatFormatting.YELLOW, MoodTooltipFormatter.colorForTier("tooltip.mercantile.mood.unhappy"));
+        assertEquals(ChatFormatting.RED, MoodTooltipFormatter.colorForTier("tooltip.mercantile.mood.miserable"));
         assertEquals(ChatFormatting.WHITE, MoodTooltipFormatter.colorForTier("unknown"));
     }
 }

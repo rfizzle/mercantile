@@ -84,7 +84,7 @@ public final class MemorialManager {
 
         ItemStack stack = new ItemStack(MercantileRegistry.MEMORIAL);
         stack.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
-        stack.set(DataComponents.CUSTOM_NAME, Component.translatable("mercantile.memorial.name", name)
+        stack.set(DataComponents.CUSTOM_NAME, Component.translatable("tooltip.mercantile.memorial.name", name)
                 .withStyle(style -> style.withColor(ChatFormatting.YELLOW).withItalic(false)));
         stack.set(DataComponents.LORE, buildLore(villager, source, professionId, level));
         return stack;
@@ -98,7 +98,7 @@ public final class MemorialManager {
         if (!villager.isBaby()
                 && profession != VillagerProfession.NONE
                 && profession != VillagerProfession.NITWIT) {
-            lines.add(Component.translatable("mercantile.memorial.lore.profession_level",
+            lines.add(Component.translatable("tooltip.mercantile.memorial.lore.profession_level",
                             VillagerHeadTextures.getDisplayName(professionId),
                             Component.translatable("merchant.level." + level))
                     .withStyle(style -> style.withColor(ChatFormatting.GRAY).withItalic(false)));
@@ -106,7 +106,7 @@ public final class MemorialManager {
 
         lines.add(source.getLocalizedDeathMessage(villager).copy()
                 .withStyle(style -> style.withColor(ChatFormatting.GRAY).withItalic(false)));
-        lines.add(Component.translatable("mercantile.memorial.lore.keepsake")
+        lines.add(Component.translatable("tooltip.mercantile.memorial.lore.keepsake")
                 .withStyle(style -> style.withColor(ChatFormatting.DARK_GRAY).withItalic(false)));
 
         return new ItemLore(lines, lines);

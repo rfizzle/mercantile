@@ -28,7 +28,7 @@ class ClientMercantileDataTest {
     private static VillagerInfoPanelS2CPayload infoFor(int entityId) {
         return new VillagerInfoPanelS2CPayload(
                 entityId, "farmer", 1, 0, 10, 0,
-                "mercantile.tier.neutral", 0, true, false, "");
+                "tooltip.mercantile.tier.neutral", 0, true, false, "");
     }
 
     private static RestockTimerS2CPayload restockFor(int entityId) {

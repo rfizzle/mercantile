@@ -27,9 +27,9 @@ public final class MoodTooltipFormatter {
 
     public static ChatFormatting colorForTier(String tierKey) {
         return switch (tierKey) {
-            case "mercantile.mood.happy" -> ChatFormatting.GREEN;
-            case "mercantile.mood.unhappy" -> ChatFormatting.YELLOW;
-            case "mercantile.mood.miserable" -> ChatFormatting.RED;
+            case "tooltip.mercantile.mood.happy" -> ChatFormatting.GREEN;
+            case "tooltip.mercantile.mood.unhappy" -> ChatFormatting.YELLOW;
+            case "tooltip.mercantile.mood.miserable" -> ChatFormatting.RED;
             default -> ChatFormatting.WHITE;
         };
     }

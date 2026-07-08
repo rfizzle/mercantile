@@ -21,13 +21,13 @@ import java.util.Locale;
 public enum ReputationTier {
     // Declared in descending minScore order so fromScore() can walk values() once.
     // minScore = lowest score in the tier's range (range extends up to the next tier's minScore - 1).
-    HONORED   (1000, "mercantile.tier.honored",   -0.15f),
-    TRUSTED   ( 300, "mercantile.tier.trusted",   -0.10f),
-    LIKED     (  75, "mercantile.tier.liked",     -0.05f),
-    NEUTRAL   (   0, "mercantile.tier.neutral",    0.00f),
+    HONORED   (1000, "tooltip.mercantile.tier.honored",   -0.15f),
+    TRUSTED   ( 300, "tooltip.mercantile.tier.trusted",   -0.10f),
+    LIKED     (  75, "tooltip.mercantile.tier.liked",     -0.05f),
+    NEUTRAL   (   0, "tooltip.mercantile.tier.neutral",    0.00f),
     // DISTRUSTED has no flat multiplier — linear markup is computed in priceModifierForScore
-    DISTRUSTED(-149, "mercantile.tier.distrusted", 0.00f),
-    REVILED   (-200, "mercantile.tier.reviled",    0.00f);
+    DISTRUSTED(-149, "tooltip.mercantile.tier.distrusted", 0.00f),
+    REVILED   (-200, "tooltip.mercantile.tier.reviled",    0.00f);
 
     private final int minScore;
     private final String translationKey;

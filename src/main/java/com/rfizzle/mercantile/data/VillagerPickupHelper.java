@@ -75,7 +75,7 @@ public class VillagerPickupHelper {
     private static Component buildDisplayName(Villager villager, ResourceLocation professionId) {
         Component suffix = professionSuffix(villager, professionId);
         MutableComponent name = villager.hasCustomName()
-                ? Component.translatable("mercantile.pickup.named_profession_villager",
+                ? Component.translatable("tooltip.mercantile.pickup.named_profession_villager",
                         villager.getCustomName(), suffix)
                 : suffix.copy();
         return name.withStyle(style -> style.withColor(ChatFormatting.YELLOW).withItalic(false));
@@ -83,19 +83,19 @@ public class VillagerPickupHelper {
 
     private static Component professionSuffix(Villager villager, ResourceLocation professionId) {
         if (villager.isBaby()) {
-            return Component.translatable("mercantile.pickup.baby_villager");
+            return Component.translatable("tooltip.mercantile.pickup.baby_villager");
         }
         if (villager.getVillagerData().getProfession() == VillagerProfession.NONE) {
-            return Component.translatable("mercantile.pickup.villager");
+            return Component.translatable("tooltip.mercantile.pickup.villager");
         }
-        return Component.translatable("mercantile.pickup.profession_villager",
+        return Component.translatable("tooltip.mercantile.pickup.profession_villager",
                 VillagerHeadTextures.getDisplayName(professionId));
     }
 
     private static ItemLore buildLore(Villager villager) {
         List<Component> lines = new ArrayList<>();
 
-        lines.add(line("mercantile.pickup.lore.instruction", ChatFormatting.DARK_GRAY));
+        lines.add(line("tooltip.mercantile.pickup.lore.instruction", ChatFormatting.DARK_GRAY));
 
         VillagerProfession profession = villager.getVillagerData().getProfession();
         int level = villager.getVillagerData().getLevel();
@@ -103,7 +103,7 @@ public class VillagerPickupHelper {
                 && profession != VillagerProfession.NITWIT
                 && !villager.isBaby()) {
             ResourceLocation profId = BuiltInRegistries.VILLAGER_PROFESSION.getKey(profession);
-            lines.add(Component.translatable("mercantile.pickup.lore.profession_level",
+            lines.add(Component.translatable("tooltip.mercantile.pickup.lore.profession_level",
                             VillagerHeadTextures.getDisplayName(profId),
                             Component.translatable("merchant.level." + level))
                     .withStyle(style -> style.withColor(ChatFormatting.GRAY).withItalic(false)));
@@ -116,9 +116,9 @@ public class VillagerPickupHelper {
     }
 
     private static Component buildTraderDisplayName(WanderingTrader trader) {
-        Component label = Component.translatable("mercantile.pickup.wandering_trader");
+        Component label = Component.translatable("tooltip.mercantile.pickup.wandering_trader");
         MutableComponent name = trader.hasCustomName()
-                ? Component.translatable("mercantile.pickup.named_trader",
+                ? Component.translatable("tooltip.mercantile.pickup.named_trader",
                         trader.getCustomName(), label)
                 : label.copy();
         return name.withStyle(style -> style.withColor(ChatFormatting.YELLOW).withItalic(false));
@@ -127,11 +127,11 @@ public class VillagerPickupHelper {
     private static ItemLore buildTraderLore(WanderingTrader trader) {
         List<Component> lines = new ArrayList<>();
 
-        lines.add(line("mercantile.pickup.lore.instruction", ChatFormatting.DARK_GRAY));
+        lines.add(line("tooltip.mercantile.pickup.lore.instruction", ChatFormatting.DARK_GRAY));
 
         int despawnTicks = trader.getDespawnDelay();
         if (despawnTicks > 0) {
-            lines.add(Component.translatable("mercantile.pickup.lore.despawn_remaining",
+            lines.add(Component.translatable("tooltip.mercantile.pickup.lore.despawn_remaining",
                             despawnTicks / 20)
                     .withStyle(style -> style.withColor(ChatFormatting.GRAY).withItalic(false)));
         }
@@ -145,7 +145,7 @@ public class VillagerPickupHelper {
         if (offers.isEmpty()) return;
 
         lines.add(Component.empty());
-        lines.add(line("mercantile.pickup.lore.trades", ChatFormatting.GRAY));
+        lines.add(line("tooltip.mercantile.pickup.lore.trades", ChatFormatting.GRAY));
 
         int lockedCount = 0;
         for (MerchantOffer offer : offers) {
@@ -156,7 +156,7 @@ public class VillagerPickupHelper {
 
         if (lockedCount > 0) {
             int unlocked = offers.size() - lockedCount;
-            lines.add(Component.translatable("mercantile.pickup.lore.trade_count",
+            lines.add(Component.translatable("tooltip.mercantile.pickup.lore.trade_count",
                             unlocked, offers.size())
                     .withStyle(style -> style.withColor(ChatFormatting.DARK_GRAY).withItalic(false)));
         }

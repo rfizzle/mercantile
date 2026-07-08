@@ -48,7 +48,7 @@ public final class VillagerPlacementHandler {
             int dataVersion = nbt.getInt("MercantileDataVersion");
             if (!VillagerPickupHelper.isReadable(dataVersion)) {
                 ((ServerPlayer) player).displayClientMessage(
-                        Component.translatable("mercantile.placement.newer_version")
+                        Component.translatable("notification.mercantile.placement.newer_version")
                                 .withStyle(ChatFormatting.RED),
                         true);
                 return InteractionResult.FAIL;
@@ -69,7 +69,7 @@ public final class VillagerPlacementHandler {
                 Mercantile.LOGGER.warn("Failed to deserialize entity from pickup item (id={}); keeping item",
                         storedId, e);
                 ((ServerPlayer) player).displayClientMessage(
-                        Component.translatable("mercantile.placement.malformed_nbt")
+                        Component.translatable("notification.mercantile.placement.malformed_nbt")
                                 .withStyle(ChatFormatting.RED),
                         true);
                 return InteractionResult.FAIL;

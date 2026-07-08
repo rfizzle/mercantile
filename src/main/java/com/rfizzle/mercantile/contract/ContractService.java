@@ -139,18 +139,18 @@ public final class ContractService {
 
     private static ItemLore buildLore(DeliveryContract contract, String villagerName, BlockPos pos) {
         List<Component> lines = new ArrayList<>();
-        lines.add(Component.translatable("mercantile.contract.lore.request",
+        lines.add(Component.translatable("tooltip.mercantile.contract.lore.request",
                         contract.count(), requestedItemName(contract), villagerName)
                 .withStyle(style -> style.withColor(ChatFormatting.GRAY).withItalic(false)));
-        lines.add(Component.translatable("mercantile.contract.lore.payment", contract.payment())
+        lines.add(Component.translatable("tooltip.mercantile.contract.lore.payment", contract.payment())
                 .withStyle(style -> style.withColor(ChatFormatting.GREEN).withItalic(false)));
-        lines.add(Component.translatable("mercantile.contract.lore.deadline",
+        lines.add(Component.translatable("tooltip.mercantile.contract.lore.deadline",
                         DeliveryContract.deadlineDay(contract.expiryGameTime()))
                 .withStyle(style -> style.withColor(ChatFormatting.GRAY).withItalic(false)));
-        lines.add(Component.translatable("mercantile.contract.lore.location",
+        lines.add(Component.translatable("tooltip.mercantile.contract.lore.location",
                         pos.getX(), pos.getY(), pos.getZ())
                 .withStyle(style -> style.withColor(ChatFormatting.DARK_GRAY).withItalic(false)));
-        lines.add(Component.translatable("mercantile.contract.lore.hint")
+        lines.add(Component.translatable("tooltip.mercantile.contract.lore.hint")
                 .withStyle(style -> style.withColor(ChatFormatting.DARK_GRAY).withItalic(false)));
         return new ItemLore(lines, lines);
     }

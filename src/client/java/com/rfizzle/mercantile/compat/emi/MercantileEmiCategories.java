@@ -15,7 +15,7 @@ public final class MercantileEmiCategories {
      * Builds the EMI category for a shared {@link TradeIndexCategoryKey}. EMI derives a
      * category's display name from an {@code emi.category.<id>} translation key by default;
      * overriding {@link EmiRecipeCategory#getName()} lets the tier categories reuse the one
-     * formatted {@code category.mercantile.villager_trades.tier} key instead of needing a
+     * formatted {@code gui.mercantile.trade_index.category.tier} key instead of needing a
      * distinct EMI key per tier.
      */
     public static EmiRecipeCategory create(TradeIndexCategoryKey key) {
