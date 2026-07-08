@@ -369,6 +369,56 @@ public class ExclusiveTradesGameTest implements FabricGameTest {
         }
     }
 
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void advancementGatedTradeGrantedWithPlayer(GameTestHelper helper) {
+        // The player-aware injectOffers overload can verify a requires_advancement gate: with the
+        // advancement granted, the gated trade is injected alongside its ungated sibling.
+        ExclusiveTrade gated = new ExclusiveTrade(
+                new ItemCost(Items.EMERALD, 20), null, new ItemStack(Items.DRAGON_BREATH),
+                4, 1, 0.05f, ReputationTier.TRUSTED.minScore(),
+                List.of(), List.of(),
+                Optional.of(net.minecraft.resources.ResourceLocation.parse("minecraft:end/kill_dragon")),
+                null);
+        ExclusiveTrade ungated = new ExclusiveTrade(
+                new ItemCost(Items.EMERALD, 24), null, new ItemStack(Items.PAPER),
+                4, 1, 0.05f, ReputationTier.TRUSTED.minScore());
+
+        ExclusiveTradesManager.setSnapshotsForTesting(
+                Map.of("librarian", List.of(gated, ungated)), List.of());
+
+        boolean savedEnableReputation = com.rfizzle.mercantile.config.MercantileConfig.get().enableReputation;
+        com.rfizzle.mercantile.config.MercantileConfig.get().enableReputation = true;
+        net.minecraft.server.level.ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        try {
+            net.minecraft.advancements.AdvancementHolder dragon = player.server.getAdvancements()
+                    .get(net.minecraft.resources.ResourceLocation.parse("minecraft:end/kill_dragon"));
+            helper.assertTrue(dragon != null, "Vanilla end/kill_dragon advancement should be loaded");
+            player.getAdvancements().award(dragon, "killed_dragon");
+            helper.assertTrue(player.getAdvancements().getOrStartProgress(dragon).isDone(),
+                    "kill_dragon advancement should be complete after awarding its criterion");
+
+            Villager librarian = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
+            librarian.setVillagerData(new VillagerData(VillagerType.PLAINS, VillagerProfession.LIBRARIAN, 1));
+
+            ExclusiveTradesManager.injectOffers(librarian, player, ReputationTier.HONORED.minScore());
+
+            boolean hasDragonBreath = librarian.getOffers().stream()
+                    .anyMatch(o -> o.getResult().is(Items.DRAGON_BREATH));
+            boolean hasPaper = librarian.getOffers().stream()
+                    .anyMatch(o -> o.getResult().is(Items.PAPER));
+            helper.assertTrue(hasDragonBreath,
+                    "Advancement-gated trade must be injected when the player holds the advancement");
+            helper.assertTrue(hasPaper, "Ungated sibling trade must also be injected");
+
+            librarian.discard();
+            helper.succeed();
+        } finally {
+            player.discard();
+            ExclusiveTradesManager.setSnapshotsForTesting(Map.of(), List.of());
+            com.rfizzle.mercantile.config.MercantileConfig.get().enableReputation = savedEnableReputation;
+        }
+    }
+
     // ---- Fabric resource-condition gating (data/mercantile/exclusive_trades) ----
 
     /** Clearly fictional mod ID for the "condition fails" branch — must never be a loaded mod. */
