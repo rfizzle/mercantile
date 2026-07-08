@@ -57,6 +57,28 @@ frontier-era in badlands. Names are always visible above the villager, persist
 across pickup and restart, and respect player-given nametags. Pools are
 datapack-driven, so you can override or extend them.
 
+### Work Orders
+
+Stop playing workstation roulette. Sneak-right-click an unemployed adult
+villager while holding a profession's workstation item — a lectern, composter,
+smithing table — and it walks to the nearest unclaimed job site of that type
+and takes the matching profession. The held item only names the job and is
+never consumed; the block must already be placed. Each order costs a small
+emerald fee (1 by default, waived in Creative); if no free workstation is in
+range the order is refused and nothing is charged. Professions resolve from the
+block's point-of-interest, so modded jobs work automatically.
+
+### Villager Mood
+
+Every villager tracks a mood from its living conditions — a claimed bed and
+workstation, recent sleep, food on hand, staying unharmed, and not witnessing a
+neighbor's death — settling into one of four tiers: Miserable, Unhappy,
+Content, or Happy. Mood is a nudge, not a gate: Happy villagers give a small
+discount and restock sooner; Miserable ones add a small markup and restock
+later. The tier shows in the info panel and Jade/WTHIT tooltips and appears as
+its own line in the price breakdown. Mood belongs to the villager — the same
+for every player — and persists across pickup and reload.
+
 ### Reputation
 
 A **single global reputation score per player** that affects every villager,
@@ -80,7 +102,32 @@ on its own, and gifting villagers speeds the climb — even a Reviled player has
 a clear path back. Exclusive trades — per-profession, cross-profession, and a
 sticky bonus offer from wandering traders at Trusted tier and up — appear in
 your trade list when you hit the right tier. Other players trading with the
-same villager see their own list at their own tier.
+same villager see their own list at their own tier. At Honored the gifting runs
+both ways — a nearby villager will occasionally walk over and toss you a small
+profession-flavored thank-you.
+
+### Delivery Contracts
+
+An employed villager occasionally posts a delivery request, a speech bubble
+floating over its head. Sneak-use paper on it to sign: the paper becomes a
+contract item naming a profession-appropriate haul (32 wheat for a farmer, coal
+for an armorer), an emerald payment, and a deadline (2 in-game days by
+default). While the contract is in hand its villager glows through walls, so
+you can find them again. Right-click the payee with the goods anywhere in your
+inventory to deliver — items and contract are consumed, emeralds paid, and you
+earn a reputation bonus that bypasses the daily cap (up to a few deliveries a
+day). Expired contracts crumble with no penalty. Request pools are
+datapack-driven per profession.
+
+### Nitwit Rehabilitation
+
+Nitwits stop being dead weight. At Trusted standing and above, use a golden
+apple on an adult nitwit and pay an emerald fee (16 by default) — after a short
+pause it sheds the green robe and becomes an unemployed villager, ready to
+claim a workstation like any other; its name and gossip carry over. The
+conversion is one-way and checked at use time: below Trusted you're told what
+standing it takes, and nothing is charged on a denied attempt. With reputation
+disabled, only the apple and emerald cost apply.
 
 ### Trade Cycling
 
@@ -88,6 +135,38 @@ A button in the merchant screen that re-rolls a villager's unlocked trades
 for 6 emeralds (configurable). Once you've purchased from a trade, that trade
 is locked and never re-rolled — so cycling becomes more efficient as you fill
 in the slots you want to keep. No cooldown; the emerald cost is the balance.
+
+### Trade Pinning
+
+Pin the trades you're waiting on. Each row in the merchant screen carries a
+small pin toggle; pinned trades are remembered per player and survive
+relogging. When a villager restocks a pinned trade that had sold out and you're
+within range (128 blocks by default), an action-bar note names the villager and
+the trade. `/mercantile pins` lists your pins with live stock status, and the
+reputation detail panel shows the same list. Pins are capped per player (10 by
+default) and pruned automatically when a villager dies or re-rolls the trade
+away.
+
+### Market Day
+
+Every 7 in-game days (configurable) the world holds a market day from dawn to
+dusk. Every trade takes a global discount (5% by default) that stacks with
+reputation and gossip, and villagers gain an extra restock cycle. The day opens
+with a bell ring, happy particles, and an action-bar announcement for everyone
+online. The schedule is world-wide and predictable, so it's easy to plan
+around.
+
+### Memorials, Mourning & Fear
+
+Villager deaths carry weight. When a named villager dies it drops a memorial
+keepsake — a custom skull whose tooltip records its name, profession, level,
+and cause of death (a keepsake, not a revive; unnamed villagers drop nothing).
+Nearby villagers mourn for a few seconds, turning toward where their neighbor
+fell and shedding grief particles — purely cosmetic. And villages remember who
+did it: kill several villagers in one village within a short window (3 in 10
+minutes by default) and its survivors fear you — a price markup (25% by
+default) that applies to the killer alone, in that village alone, fading over a
+few in-game days. It shows as its own "Fear" line in the price breakdown.
 
 ### Follow Mode
 
@@ -116,8 +195,9 @@ reflects fuel level; a redstone signal disables the pylon entirely.
   times in one action (or until your inventory fills).
 - **Restock indicator** — the merchant screen shows a `Restocks in: ~m:ss`
   estimate and remaining restocks for the day.
-- **Demand transparency** — hover the trade price to see the breakdown: base,
-  demand, reputation modifier, gossip modifier, final.
+- **Demand transparency** — hover the trade price to see the full breakdown:
+  base, demand, reputation, mood, gossip, market-day discount, fear markup,
+  final.
 - **Pathfinding fixes** — villagers properly traverse fence gates and double
   doors, multi-step staircases, ladders, and route around water instead of
   drowning. Each fix is independently toggleable.
@@ -131,6 +211,16 @@ reflects fuel level; a redstone signal disables the pylon entirely.
 - **Reputation HUD** — a compact tier readout next to nearby villagers.
 - **Sound volume slider** — separate volume for villager ambient, trade, and
   hurt sounds (0–100%).
+- **Baby feeding** — right-click a baby villager with bread, carrot, potato, or
+  beetroot to shave a percentage off its remaining growth time (10% per bread
+  by default), up to a configurable cap.
+- **Tutorial advancements** — a dedicated Mercantile advancement tab teaches the
+  mod's gestures as you play; each advancement's description spells out the
+  exact interaction that grants it, so hidden features are discoverable without
+  a wiki.
+- **In-game hints** — item and block tooltips explain the mod's gestures where
+  you'd reach for them — the sentry pylon, delivery contracts — so the how is
+  in your hand, not on a wiki.
 
 ### Visualization
 
@@ -153,6 +243,14 @@ Item lookup integrates naturally — the "Uses" and "Recipes" tabs on any
 item include matching villager trades. Works with **EMI**, **REI**, and
 **JEI**.
 
+## Commands
+
+Player commands: `/mercantile pins` lists your pinned trades (`pins remove <n>`,
+`pins clear`). Operator commands cover reputation adjustment
+(`/mercantile reputation set|add`) and hot-reloading config
+(`/mercantile reload`). Full reference:
+[mercantile.rfizzle.com/commands.html](https://mercantile.rfizzle.com/commands.html)
+
 ## Optional integrations
 
 Mercantile detects and integrates with these mods when present. **None are
@@ -166,6 +264,10 @@ bundled** — install whichever you already use.
 - [EMI](https://modrinth.com/mod/emi) / [REI](https://modrinth.com/mod/rei) /
   [JEI](https://www.curseforge.com/minecraft/mc-mods/jei) — recipe viewer
   integration for the trade index
+- [Meridian](https://meridian.rfizzle.com) — with Meridian installed,
+  high-standing librarians sell salvage tomes, shelf materials, and rolled
+  Meridian enchanted books, widening with your reputation. Pure data; nothing
+  changes when it isn't installed.
 
 ## Requirements
 
@@ -206,7 +308,7 @@ modular collection of system overhauls. Install any, combine all:
 ## License & credits
 
 Licensed under the [MIT License](https://github.com/rfizzle/mercantile/blob/master/LICENSE).
-© 2025 rfizzle. Mercantile is not affiliated with Mojang Studios or
+© 2026 rfizzle. Mercantile is not affiliated with Mojang Studios or
 Microsoft.
 
 Villager head skins are community-created textures sourced from
