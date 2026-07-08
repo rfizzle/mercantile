@@ -71,9 +71,6 @@
             "com.rfizzle.mercantile.gametest.ContractGameTest"
         ]
     },
-    "custom": {
-        "wthit:plugins": ["com.rfizzle.mercantile.compat.wthit.MercantileWthitPlugin"]
-    },
     "suggests": {
         "modmenu": "*",
         "jade": "*",

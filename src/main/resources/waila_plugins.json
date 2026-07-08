@@ -1,0 +1,12 @@
+{
+    "mercantile:wthit": {
+        "entrypoints": {
+            "common": "com.rfizzle.mercantile.compat.wthit.WthitCommonPlugin",
+            "client": "com.rfizzle.mercantile.compat.wthit.WthitClientPlugin"
+        },
+        "side": "*",
+        "required": {
+            "wthit": "*"
+        }
+    }
+}
