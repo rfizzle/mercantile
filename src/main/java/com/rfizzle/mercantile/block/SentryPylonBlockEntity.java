@@ -50,6 +50,7 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
     /** Mirror of the config clamp ceiling on {@code pylonDetectionRadius}; bounds the saved cooldown. */
     private static final int MAX_DETECTION_RADIUS = 128;
     private static final int MAX_SCAN_INTERVAL_TICKS = scanIntervalTicks(MAX_DETECTION_RADIUS);
+    /** Recheck cadence baseline — see {@link #idleHostileCheckIntervalTicks}. */
     private static final int IDLE_HOSTILE_CHECK_INTERVAL_TICKS = 10;
     private static final int BELL_RING_COOLDOWN_TICKS = 200;
 
@@ -64,7 +65,7 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
     private int scanCooldown;
     private int bellCooldown = 0;
     private int idleTicks = 0;
-    private int idleHostileCheckCooldown = IDLE_HOSTILE_CHECK_INTERVAL_TICKS;
+    private int idleHostileCheckCooldown = idleHostileCheckInterval();
     private final LinkedHashSet<UUID> sentries = new LinkedHashSet<>();
 
     public SentryPylonBlockEntity(BlockPos pos, BlockState state) {
@@ -86,6 +87,28 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
     static int scanIntervalTicks(int radius) {
         long scaled = Math.round((double) SCAN_INTERVAL_TICKS * radius / SCAN_INTERVAL_BASE_RADIUS);
         return (int) Math.max(SCAN_INTERVAL_TICKS, scaled);
+    }
+
+    /**
+     * Idle-hostile recheck cadence, scaled by detection radius exactly like {@link #scanIntervalTicks}.
+     * While a pylon holds sentries it rechecks for a threat by running the same radius-wide AABB +
+     * line-of-sight query the main scan does, so a wide-radius pylon must recheck proportionally less
+     * often rather than pay the full query on a fixed cadence: the baseline holds up to
+     * {@link #SCAN_INTERVAL_BASE_RADIUS} and stretches linearly beyond it. At the default radius the
+     * interval is the baseline, so despawn-countdown responsiveness is unchanged there.
+     */
+    static int idleHostileCheckIntervalTicks(int radius) {
+        long scaled = Math.round((double) IDLE_HOSTILE_CHECK_INTERVAL_TICKS * radius / SCAN_INTERVAL_BASE_RADIUS);
+        return (int) Math.max(IDLE_HOSTILE_CHECK_INTERVAL_TICKS, scaled);
+    }
+
+    /**
+     * The idle-hostile recheck interval at this pylon's configured detection radius. Reads the raw
+     * {@code pylonDetectionRadius} — the same radius the recheck query itself uses, and the same source
+     * {@link #scanIntervalTicks} is fed for the main scan cadence.
+     */
+    private int idleHostileCheckInterval() {
+        return idleHostileCheckIntervalTicks(MercantileConfig.get().pylonDetectionRadius);
     }
 
     /**
@@ -211,8 +234,9 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
     private void tickDespawnCountdown(ServerLevel server) {
         pruneSentries(server);
         if (sentries.isEmpty()) {
+            // No re-prime here: the cooldown isn't decremented while empty, and every path that
+            // adds a sentry (runScanCycle) or resets state (despawn, load) re-primes it fresh.
             idleTicks = 0;
-            idleHostileCheckCooldown = IDLE_HOSTILE_CHECK_INTERVAL_TICKS;
             return;
         }
 
@@ -220,7 +244,7 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
             idleHostileCheckCooldown--;
         }
         if (idleHostileCheckCooldown == 0) {
-            idleHostileCheckCooldown = IDLE_HOSTILE_CHECK_INTERVAL_TICKS;
+            idleHostileCheckCooldown = idleHostileCheckInterval();
             int radius = MercantileConfig.get().pylonDetectionRadius;
             LivingEntity threat = SentryPylonScanner.findNearestVisibleHostile(server, worldPosition, radius);
             if (threat != null) {
@@ -253,7 +277,7 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
         }
         sentries.clear();
         idleTicks = 0;
-        idleHostileCheckCooldown = IDLE_HOSTILE_CHECK_INTERVAL_TICKS;
+        idleHostileCheckCooldown = idleHostileCheckInterval();
         setChanged();
         updateVisualState();
     }
@@ -324,7 +348,7 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
 
         sentries.add(golem.getUUID());
         idleTicks = 0;
-        idleHostileCheckCooldown = IDLE_HOSTILE_CHECK_INTERVAL_TICKS;
+        idleHostileCheckCooldown = idleHostileCheckInterval();
         consumeFuel(1);
         setChanged();
         updateVisualState();
@@ -514,7 +538,7 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
         bellCooldown = Mth.clamp(tag.getInt("BellCooldown"), 0, BELL_RING_COOLDOWN_TICKS);
         int despawnThreshold = MercantileConfig.get().sentryDespawnSeconds * 20;
         idleTicks = Mth.clamp(tag.getInt("IdleTicks"), 0, despawnThreshold);
-        idleHostileCheckCooldown = IDLE_HOSTILE_CHECK_INTERVAL_TICKS;
+        idleHostileCheckCooldown = idleHostileCheckInterval();
         sentries.clear();
         ListTag sentriesTag = tag.getList("Sentries", net.minecraft.nbt.Tag.TAG_LONG);
         for (int i = 0; i + 1 < sentriesTag.size(); i += 2) {
