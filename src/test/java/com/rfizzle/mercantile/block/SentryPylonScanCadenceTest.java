@@ -45,6 +45,41 @@ class SentryPylonScanCadenceTest {
         }
     }
 
+    // --- idleHostileCheckIntervalTicks: recheck cadence stretches with radius like the main scan ---
+
+    @Test
+    void idleIntervalAtBaseRadiusIsBaseline() {
+        assertEquals(10, SentryPylonBlockEntity.idleHostileCheckIntervalTicks(32),
+                "radius 32 (the reference) keeps the 10-tick recheck baseline");
+    }
+
+    @Test
+    void idleIntervalBelowBaseRadiusFloorsAtBaseline() {
+        assertEquals(10, SentryPylonBlockEntity.idleHostileCheckIntervalTicks(4),
+                "a small-radius pylon still rechecks no faster than the baseline");
+        assertEquals(10, SentryPylonBlockEntity.idleHostileCheckIntervalTicks(16),
+                "below the reference radius the recheck interval never dips under the baseline");
+    }
+
+    @Test
+    void idleIntervalScalesLinearlyAboveBaseRadius() {
+        assertEquals(20, SentryPylonBlockEntity.idleHostileCheckIntervalTicks(64),
+                "double the radius doubles the recheck interval");
+        assertEquals(40, SentryPylonBlockEntity.idleHostileCheckIntervalTicks(128),
+                "the max radius (128) rechecks a quarter as often as the baseline");
+    }
+
+    @Test
+    void idleIntervalIsMonotonicNonDecreasing() {
+        int prev = SentryPylonBlockEntity.idleHostileCheckIntervalTicks(4);
+        for (int radius = 5; radius <= 128; radius++) {
+            int current = SentryPylonBlockEntity.idleHostileCheckIntervalTicks(radius);
+            assertTrue(current >= prev,
+                    "recheck interval must never shrink as radius grows (radius=" + radius + ")");
+            prev = current;
+        }
+    }
+
     // --- scanPhaseOffset: deterministic, in range, and well-spread ---
 
     @Test
