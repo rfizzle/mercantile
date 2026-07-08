@@ -182,11 +182,19 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         }
     }
 
+    // Single render-TAIL entry point for every screen overlay. Draw order is code
+    // order, so the z-order is explicit and local: pins/panel/overlay first, then
+    // tooltips last so they sit on top of the panels they describe. Never split these
+    // draws back across separate render-TAIL injects — two TAIL injects fire in
+    // mixin-priority order, which is not a stable z-order (see the mc-screen skill).
+    // Note mercantile$renderOverlays (this entry point) is distinct from the
+    // mercantile$renderOverlay helper it calls, which draws the pop-out overlay body.
     @Inject(method = "render", at = @At("TAIL"))
-    private void mercantile$renderInfoPanelInject(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
+    private void mercantile$renderOverlays(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
         mercantile$renderTradePins(guiGraphics, mouseX, mouseY);
         mercantile$renderInfoPanel(guiGraphics);
         mercantile$renderOverlay(guiGraphics, mouseX, mouseY, partialTick);
+        mercantile$renderTooltips(guiGraphics, mouseX, mouseY);
     }
 
     // ---- Trade pins ----
@@ -299,8 +307,8 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
 
     // ---- Tooltips ----
 
-    @Inject(method = "render", at = @At("TAIL"))
-    private void mercantile$renderTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
+    @Unique
+    private void mercantile$renderTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         VillagerInfoPanelS2CPayload info = mercantile$validInfo();
         if (info == null) return;
 
