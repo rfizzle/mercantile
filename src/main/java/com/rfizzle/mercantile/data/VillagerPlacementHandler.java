@@ -66,13 +66,17 @@ public final class VillagerPlacementHandler {
                 entity.load(nbt);
             } catch (Exception e) {
                 String storedId = nbt.contains("id") ? nbt.getString("id") : "<missing>";
-                Mercantile.LOGGER.warn("Failed to deserialize entity from pickup item (id={}); keeping item",
-                        storedId, e);
+                Mercantile.LOGGER.warn("Failed to deserialize entity from pickup item (id={}); "
+                        + "spawning a default villager", storedId, e);
+                entity = EntityType.VILLAGER.create(level);
+                if (entity == null) {
+                    Mercantile.LOGGER.error("Could not create a default villager for pickup placement");
+                    return InteractionResult.FAIL;
+                }
                 ((ServerPlayer) player).displayClientMessage(
                         Component.translatable("notification.mercantile.placement.malformed_nbt")
-                                .withStyle(ChatFormatting.RED),
+                                .withStyle(ChatFormatting.YELLOW),
                         true);
-                return InteractionResult.FAIL;
             }
 
             double dx = player.getX() - spawnVec.x;

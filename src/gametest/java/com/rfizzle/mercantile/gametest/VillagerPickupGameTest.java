@@ -107,7 +107,9 @@ public class VillagerPickupGameTest implements FabricGameTest {
     }
 
     @GameTest(template = EMPTY_STRUCTURE)
-    public void malformedNbtKeepsItem(GameTestHelper helper) {
+    public void malformedNbtSpawnsDefaultVillager(GameTestHelper helper) {
+        // A malformed body (NaN position) throws inside entity.load; per SPEC §1 the mod logs and
+        // spawns a default villager (no profession, no trades) rather than refusing and keeping the item.
         CompoundTag badNbt = new CompoundTag();
         badNbt.putInt("MercantileDataVersion", 1);
         net.minecraft.nbt.ListTag posList = new net.minecraft.nbt.ListTag();
@@ -128,12 +130,19 @@ public class VillagerPickupGameTest implements FabricGameTest {
 
         player.gameMode.useItemOn(player, helper.getLevel(), headItem, InteractionHand.MAIN_HAND, hit);
 
-        helper.assertTrue(player.getMainHandItem().is(Items.PLAYER_HEAD),
-                "Item should be kept when NBT is malformed");
-        helper.assertTrue(player.getMainHandItem().getCount() == 1,
-                "Item count should not decrease on malformed NBT");
-        helper.assertEntityNotPresent(EntityType.VILLAGER);
+        helper.assertTrue(player.getMainHandItem().isEmpty(),
+                "Item should be consumed when a default villager is placed on malformed NBT");
 
+        Villager placed = helper.getLevel().getEntitiesOfClass(Villager.class,
+                        net.minecraft.world.phys.AABB.ofSize(Vec3.atCenterOf(target), 4, 4, 4))
+                .stream().findFirst().orElse(null);
+        helper.assertTrue(placed != null, "A default villager should be spawned on malformed NBT");
+        helper.assertTrue(placed.getVillagerData().getProfession() == VillagerProfession.NONE,
+                "Fallback villager should have no profession");
+        helper.assertTrue(placed.getOffers().isEmpty(),
+                "Fallback villager should have no trades");
+
+        placed.discard();
         player.discard();
         helper.succeed();
     }

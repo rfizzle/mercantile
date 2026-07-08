@@ -210,7 +210,7 @@
     "tooltip.mercantile.pickup.lore.profession_level": "%1$s — %2$s",
     "tooltip.mercantile.pickup.lore.trade_count": "%1$s/%2$s trades unlocked",
     "notification.mercantile.placement.newer_version": "⚠ Villager data is from a newer version of Mercantile",
-    "notification.mercantile.placement.malformed_nbt": "⚠ Villager data is corrupted and cannot be restored",
+    "notification.mercantile.placement.malformed_nbt": "⚠ Villager data was corrupted — placed a plain villager",
 
     "notification.mercantile.follow.start": "✦ Villager is now following you",
     "notification.mercantile.follow.stop": "✦ Villager stopped following you",
