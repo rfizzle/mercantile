@@ -113,7 +113,7 @@ public class VillagerTradeJeiCategory implements IRecipeCategory<TradeIndexEntry
         graphics.drawString(font, levelLabel, 0, 28, 0x404040, false);
 
         if (entry.minScore().isPresent()) {
-            Component repLabel = Component.translatable("mercantile.trade_index.requires_reputation",
+            Component repLabel = Component.translatable("gui.mercantile.trade_index.requires_reputation",
                     TradeIndexLabels.tierLabel(entry.minScore().getAsInt()));
             graphics.drawString(font, repLabel, 0, 39, 0x404040, false);
         }

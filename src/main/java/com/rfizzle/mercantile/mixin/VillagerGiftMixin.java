@@ -55,7 +55,7 @@ public abstract class VillagerGiftMixin {
                     // sent its own daily-cap action-bar line, so a second message would compete.
                     if (decision == ReputationManager.CapDecision.AWARDED && player.connection != null) {
                         player.displayClientMessage(Component.translatable(
-                                "message.mercantile.gift_accepted", self.getDisplayName()), true);
+                                "notification.mercantile.gift_accepted", self.getDisplayName()), true);
                     }
                     // The villager accepted the gift regardless of the daily rep cap.
                     MercantileCriteria.GIFT_ACCEPTED.trigger(player);

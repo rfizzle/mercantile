@@ -46,7 +46,7 @@ public abstract class VillagerTradeOpenMixin {
         if (!ReputationManager.isReviled(data.getScore())) return;
 
         serverPlayer.displayClientMessage(
-                Component.translatable("mercantile.trade.denied.reviled")
+                Component.translatable("notification.mercantile.trade.denied.reviled")
                         .withStyle(ChatFormatting.RED), true);
 
         if (self.level() instanceof ServerLevel serverLevel) {

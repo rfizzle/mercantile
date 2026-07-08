@@ -81,7 +81,7 @@ public abstract class VillagerWorkOrderMixin extends AbstractVillager {
         if (!WorkOrder.canAfford(creative, EmeraldPayment.count(serverPlayer), config.workOrderEmeraldCost)) {
             self.playSound(SoundEvents.VILLAGER_NO, 1.0f, self.getVoicePitch());
             serverPlayer.displayClientMessage(
-                    Component.translatable("mercantile.workorder.denied.cost",
+                    Component.translatable("notification.mercantile.workorder.denied.cost",
                             config.workOrderEmeraldCost)
                             .withStyle(ChatFormatting.RED), true);
             cir.setReturnValue(InteractionResult.FAIL);
@@ -93,7 +93,7 @@ public abstract class VillagerWorkOrderMixin extends AbstractVillager {
         if (target.isEmpty()) {
             self.playSound(SoundEvents.VILLAGER_NO, 1.0f, self.getVoicePitch());
             serverPlayer.displayClientMessage(
-                    Component.translatable("mercantile.workorder.denied.no_workstation",
+                    Component.translatable("notification.mercantile.workorder.denied.no_workstation",
                             player.getMainHandItem().getHoverName())
                             .withStyle(ChatFormatting.RED), true);
             cir.setReturnValue(InteractionResult.FAIL);
@@ -107,7 +107,7 @@ public abstract class VillagerWorkOrderMixin extends AbstractVillager {
         // Entity event 14 = vanilla green "happy villager" particles.
         serverLevel.broadcastEntityEvent(self, (byte) 14);
         serverPlayer.displayClientMessage(
-                Component.translatable("mercantile.workorder.accepted",
+                Component.translatable("notification.mercantile.workorder.accepted",
                         player.getMainHandItem().getHoverName())
                         .withStyle(ChatFormatting.GREEN), true);
 

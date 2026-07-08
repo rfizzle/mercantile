@@ -60,8 +60,8 @@ class ReputationTierTest {
         for (ReputationTier tier : ReputationTier.values()) {
             assertFalse(tier.translationKey().isBlank(),
                     tier.name() + " has blank translation key");
-            assertTrue(tier.translationKey().startsWith("mercantile.tier."),
-                    tier.name() + " translation key should start with 'mercantile.tier.'");
+            assertTrue(tier.translationKey().startsWith("tooltip.mercantile.tier."),
+                    tier.name() + " translation key should start with 'tooltip.mercantile.tier.'");
         }
     }
 

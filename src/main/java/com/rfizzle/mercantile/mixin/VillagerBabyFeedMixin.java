@@ -71,7 +71,7 @@ public abstract class VillagerBabyFeedMixin extends AbstractVillager {
         if (reduction <= 0) {
             self.playSound(SoundEvents.VILLAGER_NO, 1.0f, self.getVoicePitch());
             player.displayClientMessage(
-                    Component.translatable("mercantile.feeding.capped")
+                    Component.translatable("notification.mercantile.feeding.capped")
                             .withStyle(ChatFormatting.RED), true);
             cir.setReturnValue(InteractionResult.FAIL);
             return;

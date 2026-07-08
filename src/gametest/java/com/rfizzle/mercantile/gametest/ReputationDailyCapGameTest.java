@@ -25,7 +25,7 @@ import net.minecraft.world.item.trading.MerchantOffers;
 
 public class ReputationDailyCapGameTest implements FabricGameTest {
 
-    private static final String CAP_MSG_KEY = "message.mercantile.reputation_daily_cap";
+    private static final String CAP_MSG_KEY = "notification.mercantile.reputation_daily_cap";
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void tradingPastDailyCapDoesNotIncreaseScore(GameTestHelper helper) {

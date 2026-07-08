@@ -109,7 +109,7 @@ public class VillagerTradeDisplayCategory implements DisplayCategory<VillagerTra
         widgets.add(Widgets.createLabel(new Point(start.x, y + 22), levelLabel).leftAligned());
 
         if (entry.minScore().isPresent()) {
-            Component repLabel = Component.translatable("mercantile.trade_index.requires_reputation",
+            Component repLabel = Component.translatable("gui.mercantile.trade_index.requires_reputation",
                     TradeIndexLabels.tierLabel(entry.minScore().getAsInt()));
             widgets.add(Widgets.createLabel(new Point(start.x, y + 33), repLabel).leftAligned());
         }

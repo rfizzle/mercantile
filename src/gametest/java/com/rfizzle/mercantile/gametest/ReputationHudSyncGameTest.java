@@ -88,8 +88,8 @@ public class ReputationHudSyncGameTest implements FabricGameTest {
 
         SyncReputationS2CPayload payload = findLastPayload(channel);
         helper.assertTrue(payload != null, "expected at least one SyncReputationS2CPayload");
-        helper.assertTrue(payload.tierKey().startsWith("mercantile.tier."),
-                "tierKey must be a translation key starting with 'mercantile.tier.', got: " + payload.tierKey());
+        helper.assertTrue(payload.tierKey().startsWith("tooltip.mercantile.tier."),
+                "tierKey must be a translation key starting with 'tooltip.mercantile.tier.', got: " + payload.tierKey());
 
         helper.succeed();
     }

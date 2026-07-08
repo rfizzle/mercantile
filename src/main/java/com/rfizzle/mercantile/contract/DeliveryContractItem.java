@@ -58,7 +58,7 @@ public class DeliveryContractItem extends Item {
         // Expired contracts simply vanish (issue #86 — no penalty at this iteration).
         stack.setCount(0);
         if (entity instanceof ServerPlayer player) {
-            player.displayClientMessage(Component.translatable("mercantile.contract.expired_vanish",
+            player.displayClientMessage(Component.translatable("notification.mercantile.contract.expired_vanish",
                             nbt.getString(ContractService.TAG_VILLAGER_NAME))
                     .withStyle(ChatFormatting.RED), true);
         }
@@ -69,26 +69,26 @@ public class DeliveryContractItem extends Item {
         BlockPos pos = BlockPos.of(nbt.getLong(ContractService.TAG_POS));
         long deadline = nbt.getLong(ContractService.TAG_DEADLINE);
 
-        player.displayClientMessage(Component.translatable("mercantile.contract.details.header")
+        player.displayClientMessage(Component.translatable("message.mercantile.contract.details.header")
                 .withStyle(ChatFormatting.GOLD), false);
-        player.displayClientMessage(Component.translatable("mercantile.contract.details.request",
+        player.displayClientMessage(Component.translatable("message.mercantile.contract.details.request",
                         nbt.getInt(ContractService.TAG_COUNT),
                         itemName(nbt.getString(ContractService.TAG_ITEM)),
                         villagerName)
                 .withStyle(ChatFormatting.WHITE), false);
-        player.displayClientMessage(Component.translatable("mercantile.contract.details.payment",
+        player.displayClientMessage(Component.translatable("message.mercantile.contract.details.payment",
                         nbt.getInt(ContractService.TAG_PAYMENT))
                 .withStyle(ChatFormatting.GREEN), false);
-        player.displayClientMessage(Component.translatable("mercantile.contract.details.location",
+        player.displayClientMessage(Component.translatable("message.mercantile.contract.details.location",
                         villagerName, pos.getX(), pos.getY(), pos.getZ())
                 .withStyle(ChatFormatting.GRAY), false);
 
         if (now >= deadline) {
-            player.displayClientMessage(Component.translatable("mercantile.contract.details.expired")
+            player.displayClientMessage(Component.translatable("message.mercantile.contract.details.expired")
                     .withStyle(ChatFormatting.RED), false);
         } else {
             long remaining = deadline - now;
-            player.displayClientMessage(Component.translatable("mercantile.contract.details.remaining",
+            player.displayClientMessage(Component.translatable("message.mercantile.contract.details.remaining",
                             remaining / 24_000L, (remaining % 24_000L) / 1_000L)
                     .withStyle(ChatFormatting.YELLOW), false);
         }

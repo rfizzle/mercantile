@@ -210,11 +210,11 @@ public final class MerchantInfoPanelRenderer {
     private static ChatFormatting colorForTier(String tierKey) {
         if (tierKey == null) return ChatFormatting.WHITE;
         return switch (tierKey) {
-            case "mercantile.tier.honored" -> ChatFormatting.GOLD;
-            case "mercantile.tier.trusted" -> ChatFormatting.GREEN;
-            case "mercantile.tier.liked" -> ChatFormatting.DARK_GREEN;
-            case "mercantile.tier.distrusted" -> ChatFormatting.YELLOW;
-            case "mercantile.tier.reviled" -> ChatFormatting.RED;
+            case "tooltip.mercantile.tier.honored" -> ChatFormatting.GOLD;
+            case "tooltip.mercantile.tier.trusted" -> ChatFormatting.GREEN;
+            case "tooltip.mercantile.tier.liked" -> ChatFormatting.DARK_GREEN;
+            case "tooltip.mercantile.tier.distrusted" -> ChatFormatting.YELLOW;
+            case "tooltip.mercantile.tier.reviled" -> ChatFormatting.RED;
             default -> ChatFormatting.WHITE;
         };
     }

@@ -12,7 +12,7 @@ import java.util.Map;
 public class ClientMercantileData {
 
     private static int reputationScore = 0;
-    private static String reputationTier = "mercantile.tier.neutral";
+    private static String reputationTier = "tooltip.mercantile.tier.neutral";
     private static int reputationDailyEarned = 0;
     private static int reputationDailyCap = 0;
     // False until the first reputation sync of the session lands; gates the
@@ -221,7 +221,7 @@ public class ClientMercantileData {
 
     public static void clear() {
         reputationScore = 0;
-        reputationTier = "mercantile.tier.neutral";
+        reputationTier = "tooltip.mercantile.tier.neutral";
         reputationDailyEarned = 0;
         reputationDailyCap = 0;
         hasReputationBaseline = false;

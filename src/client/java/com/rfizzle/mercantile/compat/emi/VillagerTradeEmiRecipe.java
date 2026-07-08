@@ -117,7 +117,7 @@ public class VillagerTradeEmiRecipe implements EmiRecipe {
         widgets.addText(levelLabel.getVisualOrderText(), 0, y + 22, 0x404040, false);
 
         if (entry.minScore().isPresent()) {
-            Component repLabel = Component.translatable("mercantile.trade_index.requires_reputation",
+            Component repLabel = Component.translatable("gui.mercantile.trade_index.requires_reputation",
                     TradeIndexLabels.tierLabel(entry.minScore().getAsInt()));
             widgets.addText(repLabel.getVisualOrderText(), 0, y + 33, 0x404040, false);
         }
