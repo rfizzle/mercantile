@@ -44,6 +44,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * preserve this invariant so no two mobInteract injections can fire for the same interaction.
  * The paper branch additionally only cancels when the villager actually holds a live offer —
  * server-only knowledge — so a paper-holding client falls through and lets the server decide.
+ * Run order is irrelevant here — this mixin keeps Mixin's default priority (1000); only
+ * {@link VillagerPickupMixin} (900) and {@link VillagerFollowMixin} (1100) deviate.
  */
 @Mixin(Villager.class)
 public abstract class VillagerContractMixin extends AbstractVillager {

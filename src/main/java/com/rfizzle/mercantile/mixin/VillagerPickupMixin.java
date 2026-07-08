@@ -34,7 +34,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * a workstation block item, and {@link VillagerContractMixin} paper or the delivery-contract
  * item. Future authors must preserve this invariant to avoid double-cancel.
  */
-@Mixin(Villager.class)
+@Mixin(value = Villager.class, priority = 900)
 public abstract class VillagerPickupMixin {
 
     @Inject(method = "mobInteract", at = @At("HEAD"), cancellable = true)

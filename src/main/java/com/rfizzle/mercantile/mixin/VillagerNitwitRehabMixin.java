@@ -38,7 +38,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * (bread/carrot/potato/beetroot — never a golden apple), {@link VillagerWorkOrderMixin} requires
  * a workstation block item, and this mixin requires a golden apple in the main hand targeting a
  * nitwit. Future authors must preserve this invariant so no two mobInteract injections can fire
- * for the same interaction.
+ * for the same interaction. Run order is irrelevant here — this mixin keeps Mixin's default
+ * priority (1000); only {@link VillagerPickupMixin} (900) and {@link VillagerFollowMixin} (1100)
+ * deviate.
  */
 @Mixin(Villager.class)
 public abstract class VillagerNitwitRehabMixin extends AbstractVillager {
