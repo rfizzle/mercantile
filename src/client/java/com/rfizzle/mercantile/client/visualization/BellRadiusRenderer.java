@@ -15,6 +15,8 @@ import org.joml.Vector3f;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.List;
+import java.util.UUID;
 
 public final class BellRadiusRenderer {
 
@@ -64,6 +66,12 @@ public final class BellRadiusRenderer {
 
         if (isHoldingBell(player)) {
             spawnRingArc(level, player);
+            // Rescan for glow targets on alternating ticks only: the hold expiry
+            // (HOLD_GLOW_DURATION_TICKS) exceeds this interval, so the outline stays continuous
+            // while halving the per-tick entity scan and its allocation.
+            if ((now & 1L) == 0L) {
+                refreshHoldGlow(level, player, now);
+            }
         }
     }
 
@@ -100,6 +108,16 @@ public final class BellRadiusRenderer {
         }
 
         angleOffset = (angleOffset + 1) % CIRCLE_SAMPLES;
+    }
+
+    // Outlines adult villagers within the gathering radius of the player while a bell is held,
+    // reusing the server's exact selection (baby filter, distance, cap). The short hold expiry is
+    // rewritten every tick, so the glow clears within a couple of ticks once the bell is stowed.
+    private static void refreshHoldGlow(ClientLevel level, LocalPlayer player, long now) {
+        List<UUID> villagerIds = BellRingService.villagersInRange(level, player.position());
+        for (UUID id : villagerIds) {
+            BellGlowTracker.markHoldGlowing(id, now);
+        }
     }
 
     private static void drainPendingBursts(ClientLevel level, LocalPlayer player) {

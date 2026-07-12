@@ -1015,7 +1015,7 @@
               "boolean",
               "true",
               "—",
-              "Render the 48-block bell radius circle while holding a bell."
+              "Render the 48-block bell radius circle while holding a bell, and outline adult villagers within it."
             ],
             [
               "<code class='text-bone whitespace-nowrap'>enableInfoPanel</code>",
