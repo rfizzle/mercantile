@@ -172,7 +172,7 @@
     "config.mercantile.enableWorkstationVis": "Workstation Visualization",
     "config.mercantile.enableWorkstationVis.tooltip": "Show particle lines between villagers and their workstations",
     "config.mercantile.enableBellRadiusVis": "Bell Radius Visualization",
-    "config.mercantile.enableBellRadiusVis.tooltip": "Show bell gathering radius when holding a bell",
+    "config.mercantile.enableBellRadiusVis.tooltip": "Show the bell gathering radius and outline nearby adult villagers while holding a bell",
     "config.mercantile.enableInfoPanel": "Info Panel",
     "config.mercantile.enableInfoPanel.tooltip": "Show extended villager info panel in the trade GUI",
     "config.mercantile.enableReputationHud": "Show Reputation HUD",
