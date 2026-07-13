@@ -64,10 +64,8 @@ public class SentryTargetHostilesGoal extends NearestAttackableTargetGoal<Mob> {
             return true;
         }
         int radius = MercantileConfig.get().pylonDetectionRadius;
-        double dx = candidate.getX() - (pylon.getX() + 0.5);
-        double dy = candidate.getY() - (pylon.getY() + 0.5);
-        double dz = candidate.getZ() - (pylon.getZ() + 0.5);
-        return dx * dx + dy * dy + dz * dz <= (double) radius * (double) radius;
+        return SentryPylonScanner.withinDefendedZone(
+                candidate.getX(), candidate.getY(), candidate.getZ(), pylon, radius);
     }
 
     @Override
