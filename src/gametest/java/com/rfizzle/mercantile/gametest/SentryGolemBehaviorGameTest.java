@@ -1,11 +1,13 @@
 package com.rfizzle.mercantile.gametest;
 
+import com.rfizzle.mercantile.block.HoldNearPylonGoal;
 import com.rfizzle.mercantile.block.ReturnToPylonGoal;
 import com.rfizzle.mercantile.block.SentryGolemTag;
 import com.rfizzle.mercantile.block.SentryPylonBlock;
 import com.rfizzle.mercantile.block.SentryPylonBlockEntity;
 import com.rfizzle.mercantile.block.SentryTargetHostilesGoal;
 import com.rfizzle.mercantile.config.MercantileConfig;
+import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.registry.MercantileRegistry;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.core.BlockPos;
@@ -15,7 +17,10 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
+import net.minecraft.world.entity.ai.goal.GolemRandomStrollInVillageGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.world.entity.ai.goal.MoveBackToVillageGoal;
+import net.minecraft.world.entity.ai.goal.OfferFlowerGoal;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.sensing.GolemSensor;
@@ -360,6 +365,166 @@ public class SentryGolemBehaviorGameTest implements FabricGameTest {
         helper.assertFalse(goal.canUse(),
                 "goal should NOT be usable when pylon block is missing");
         helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE, batch = "sentryHoldGoalAlone", timeoutTicks = 80)
+    public void holdNearPylonGoalGatesOnSentryAndTarget(GameTestHelper helper) {
+        // The idle-hold goal is what keeps an unengaged sentry near its pylon instead of village-
+        // strolling. It must engage for an in-radius sentry with no target, yield the moment a target
+        // appears (so melee takes over), and stay inert on a plain golem.
+        SentryPylonBlockEntity be = placePylonOnFloor(helper);
+        IronGolem golem = spawnSentryAt(helper, be, new BlockPos(2, 2, 2));
+
+        HoldNearPylonGoal goal = new HoldNearPylonGoal(golem);
+        helper.assertTrue(goal.canUse(),
+                "hold goal SHOULD engage for an idle sentry inside its radius");
+
+        Husk husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new BlockPos(3, 2, 2));
+        golem.setTarget(husk);
+        helper.assertFalse(goal.canUse(),
+                "hold goal must yield once the sentry has a combat target");
+
+        golem.setTarget(null);
+        helper.assertTrue(goal.canUse(),
+                "hold goal re-engages after the target clears");
+
+        IronGolem plain = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new BlockPos(5, 2, 5));
+        HoldNearPylonGoal plainGoal = new HoldNearPylonGoal(plain);
+        helper.assertFalse(plainGoal.canUse(),
+                "hold goal must stay inert on a non-sentry iron golem");
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE, timeoutTicks = 80)
+    public void ironGolemMixinAddsHoldNearPylonGoal(GameTestHelper helper) {
+        IronGolem golem = helper.spawn(EntityType.IRON_GOLEM, new BlockPos(2, 2, 2));
+        try {
+            GoalSelector selector = readGoalSelector(golem);
+            boolean hasHoldGoal = selector.getAvailableGoals().stream()
+                    .map(WrappedGoal::getGoal)
+                    .anyMatch(g -> g instanceof HoldNearPylonGoal);
+            helper.assertTrue(hasHoldGoal,
+                    "IronGolemMixin should have added HoldNearPylonGoal to goalSelector");
+            helper.succeed();
+        } catch (ReflectiveOperationException e) {
+            helper.fail("reflection failed: " + e.getMessage());
+        }
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE, timeoutTicks = 80)
+    public void holdNearPylonGoalOutranksWandering(GameTestHelper helper) {
+        // The hold goal only kills the boundary ping-pong / village-strolling if it outranks the
+        // vanilla ambient movement goals it needs to suppress.
+        IronGolem golem = helper.spawn(EntityType.IRON_GOLEM, new BlockPos(2, 2, 2));
+        try {
+            GoalSelector selector = readGoalSelector(golem);
+            WrappedGoal holdGoal = null;
+            WrappedGoal strollGoal = null;
+            WrappedGoal offerGoal = null;
+            WrappedGoal moveBackGoal = null;
+            for (WrappedGoal w : selector.getAvailableGoals()) {
+                if (w.getGoal() instanceof HoldNearPylonGoal) {
+                    holdGoal = w;
+                }
+                if (w.getGoal() instanceof GolemRandomStrollInVillageGoal
+                        && (strollGoal == null || w.getPriority() < strollGoal.getPriority())) {
+                    strollGoal = w;
+                }
+                if (w.getGoal() instanceof OfferFlowerGoal
+                        && (offerGoal == null || w.getPriority() < offerGoal.getPriority())) {
+                    offerGoal = w;
+                }
+                if (w.getGoal() instanceof MoveBackToVillageGoal
+                        && (moveBackGoal == null || w.getPriority() < moveBackGoal.getPriority())) {
+                    moveBackGoal = w;
+                }
+            }
+            helper.assertTrue(holdGoal != null, "HoldNearPylonGoal not registered");
+            helper.assertTrue(strollGoal != null, "vanilla stroll goal not found on iron golem");
+            helper.assertTrue(offerGoal != null, "vanilla offer-flower goal not found on iron golem");
+            helper.assertTrue(moveBackGoal != null, "vanilla move-back-to-village goal not found on iron golem");
+            helper.assertTrue(holdGoal.getPriority() < strollGoal.getPriority(),
+                    "HoldNearPylonGoal (" + holdGoal.getPriority() + ") must outrank the village "
+                            + "stroll goal (" + strollGoal.getPriority() + ")");
+            helper.assertTrue(holdGoal.getPriority() < offerGoal.getPriority(),
+                    "HoldNearPylonGoal (" + holdGoal.getPriority() + ") must outrank the offer-flower "
+                            + "goal (" + offerGoal.getPriority() + ")");
+            helper.assertTrue(holdGoal.getPriority() < moveBackGoal.getPriority(),
+                    "HoldNearPylonGoal (" + holdGoal.getPriority() + ") must outrank the "
+                            + "move-back-to-village goal (" + moveBackGoal.getPriority() + ")");
+            helper.succeed();
+        } catch (ReflectiveOperationException e) {
+            helper.fail("reflection failed: " + e.getMessage());
+        }
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE, batch = "sentryTelegraphAlone", timeoutTicks = 160)
+    public void despawnStageEscalatesBeforeDespawn(GameTestHelper helper) {
+        // The pylon must drive the golem's despawn-telegraph stage up over the countdown's final
+        // seconds (spec §18), then discard it. With a 3-second countdown (60 ticks) the whole span is
+        // the telegraph window, so the stage climbs from light cracks early to full cracks near expiry.
+        final int savedDespawn = MercantileConfig.get().sentryDespawnSeconds;
+        MercantileConfig.get().sentryDespawnSeconds = 3;
+        SentryPylonBlockEntity be = placePylonOnFloor(helper);
+        IronGolem golem = spawnSentryAt(helper, be, new BlockPos(2, 2, 2));
+        // Sample the stage at two points, then assert once at the end — so no assertion can throw
+        // before the config is restored, keeping sentryDespawnSeconds from leaking into later tests.
+        int[] earlyStage = {-1};
+        int[] lateStage = {-1};
+
+        helper.runAfterDelay(15, () -> earlyStage[0] = stageOf(golem));
+        helper.runAfterDelay(50, () -> lateStage[0] = stageOf(golem));
+
+        helper.runAfterDelay(75, () -> {
+            try {
+                helper.assertTrue(earlyStage[0] >= 1,
+                        "an idle sentry should be showing cracks partway into the countdown (got "
+                                + earlyStage[0] + ")");
+                helper.assertTrue(lateStage[0] == 3,
+                        "the sentry should be fully cracked just before despawn (got " + lateStage[0] + ")");
+                helper.assertTrue(lateStage[0] > earlyStage[0],
+                        "the crack stage must escalate across the countdown (" + earlyStage[0]
+                                + " -> " + lateStage[0] + ")");
+                helper.assertTrue(helper.getEntities(EntityType.IRON_GOLEM).isEmpty(),
+                        "the sentry should have despawned after the countdown");
+                helper.succeed();
+            } finally {
+                MercantileConfig.get().sentryDespawnSeconds = savedDespawn;
+            }
+        });
+    }
+
+    private static int stageOf(IronGolem golem) {
+        Integer stage = golem.getAttached(MercantileAttachments.SENTRY_DESPAWN_STAGE);
+        return stage == null ? 0 : stage;
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE, batch = "sentryBlockedDespawnAlone", timeoutTicks = 200)
+    public void blockedSentryStillDespawnsOnSchedule(GameTestHelper helper) {
+        // A sentry that can't path home (walled off from its pylon) must still despawn when the
+        // countdown expires — despawn is driven by the pylon's timer, not by the golem reaching home.
+        final int savedDespawn = MercantileConfig.get().sentryDespawnSeconds;
+        MercantileConfig.get().sentryDespawnSeconds = 1;
+        SentryPylonBlockEntity be = placePylonOnFloor(helper);
+        IronGolem golem = spawnSentryAt(helper, be, new BlockPos(6, 2, 6));
+
+        // Seal the golem's corner off from the pylon so no path home exists.
+        for (int z = 0; z <= 7; z++) {
+            for (int y = 2; y <= 6; y++) {
+                helper.setBlock(new BlockPos(4, y, z), Blocks.STONE);
+            }
+        }
+
+        helper.runAfterDelay(60, () -> {
+            try {
+                helper.assertTrue(helper.getEntities(EntityType.IRON_GOLEM).isEmpty(),
+                        "a walled-off sentry must still despawn on the countdown");
+                helper.assertTrue(be.getSentries().isEmpty(), "tracked sentries should be cleared");
+                helper.succeed();
+            } finally {
+                MercantileConfig.get().sentryDespawnSeconds = savedDespawn;
+            }
+        });
     }
 
     @GameTest(template = EMPTY_STRUCTURE, timeoutTicks = 80)
