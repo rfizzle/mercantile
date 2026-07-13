@@ -54,7 +54,7 @@ public class MercantileClient implements ClientModInitializer {
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             ClientMercantileData.clear();
             BellGlowTracker.clear();
-            BellRadiusRenderer.clearPending();
+            BellRadiusRenderer.clearState();
             ContractGlowTracker.clear();
         });
         ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {

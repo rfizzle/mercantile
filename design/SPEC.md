@@ -635,15 +635,18 @@ Configurable volume for villager ambient, trade, and hurt sounds.
 When holding or ringing a bell, show the area of effect.
 
 ### Behavior
-- **While holding a bell item:** Renders showing the bell's gathering radius (48 blocks in vanilla), centered on the player. **Holding the bell IS the opt-in** — no additional keybind needed. This is a planning tool: the player picks up a bell from their inventory to scout placement before placing it.
+- **While holding a bell item:** Renders the 48-block gathering radius (the vanilla `BellBlockEntity` search radius) as circles. **Holding the bell IS the opt-in** — no additional keybind needed.
+  - **Placed bells (actual coverage):** a **gold** circle is drawn around each nearby placed bell (the closest handful within range, under a per-tick particle budget), each centered on its bell block. The 48-block radius is measured from the bell in vanilla, so the visualization is bell-centered too; a village with two bells shows two circles, and their overlap is real coverage information. Bells are discovered client-side (bells are block entities) so no networking is added.
+  - **Player-centered preview (hypothetical coverage):** a **dim white** circle is drawn around the player as a placement-scouting tool — the coverage a bell placed where you stand *would* have. Its distinct color keeps a hypothetical from being read as a real bell's coverage.
 - **On bell ring (placed bell):** Brief particle burst at the radius boundary centered on the bell block, with villagers inside the radius briefly highlighted (glow effect or particles).
 
 ### Rendering Approach
-- Render as a **circle on the ground plane** (Y = bell height) rather than a full sphere. A flat circle is much cheaper to render and still clearly communicates the radius. Vertical range is implicit — players don't need to see a sphere to understand the area.
-- Circle rendered with `dust` particles (`DustParticleOptions`, gold/yellow color) spawned at evenly spaced points around the circumference. No custom shader or texture needed.
+- Render each ring as a **circle on the ground plane** (Y = bell height, or player height for the preview) rather than a full sphere. A flat circle is much cheaper to render and still clearly communicates the radius. Vertical range is implicit — players don't need to see a sphere to understand the area.
+- Circle rendered with `dust` particles (`DustParticleOptions`) spawned at evenly spaced points around the circumference — gold for placed bells, dim white for the player preview. No custom shader or texture needed. Emissions are forced so they clear vanilla's 32-block particle cull at the 48-block radius.
 
 ### Implementation Notes
-- Client-side rendering using world render events.
+- Client-side rendering, driven from the client tick.
+- Placed-bell discovery is a **budgeted client-side chunk sweep**: each tick scans a bounded slice of loaded chunks around the player (`ClientChunkCache.getChunkNow` → `LevelChunk.getBlockEntities()`, filtering `BellBlockEntity`) and promotes a full render-distance pass's finds wholesale, so a newly placed or broken bell is reflected within a few seconds. No per-tick full scan, no new networking. The nearest circles are drawn under a per-tick particle budget.
 - Bell ring detection via mixin on `BellBlock#onHit()` or a block entity tick observer.
 - Glow effect on villagers via the vanilla **entity glow render flag** (`setGlowingTag(true)`, short duration, client-side only). This is the same outline used by spectral arrows — no custom rendering.
 

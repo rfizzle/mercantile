@@ -392,7 +392,7 @@
               "id": "bell-radius-vis",
               "title": "Bell Radius",
               "html": [
-                "While holding a bell: a gold particle circle on the ground at the 48-block gathering radius centered on the player, and every adult villager within that radius glows with a vanilla outline for as long as the bell is held — a through-wall locator for your villagers. Ringing a placed bell instead gives a brief bell-centered glow pulse."
+                "While holding a bell: a gold particle circle is drawn around each nearby placed bell, at the 48-block gathering radius measured from that bell — so a two-bell village shows two circles and their overlap is real coverage. A dim-white circle around you is a placement preview: the coverage a bell dropped where you stand would have, kept visually distinct so a hypothetical is never mistaken for actual coverage. Every adult villager in range glows with a vanilla outline for as long as the bell is held — a through-wall locator for your villagers. Ringing a placed bell instead gives a brief bell-centered glow pulse."
               ],
               "note": "Client config: <code class='text-bone'>enableBellRadiusVis</code>"
             },

@@ -144,6 +144,52 @@ class BellRadiusGeometryTest {
 
     // --- boundaryBurst ------------------------------------------------------
 
+    // --- nearestWithinRange (placed-bell render selection) ------------------
+
+    @Test
+    void nearestWithinRange_capsToMaxNearestFirst() {
+        // Five bells strung out along +X at 10, 20, 30, 40, 50; player at origin.
+        double[] xs = {10, 20, 30, 40, 50};
+        double[] ys = {64, 64, 64, 64, 64};
+        double[] zs = {0, 0, 0, 0, 0};
+        int[] sel = BellRadiusGeometry.nearestWithinRange(xs, ys, zs, 0, 64, 0, 1.0e9, 3);
+        assertEquals(3, sel.length, "selection is capped at max");
+        // Indices 0,1,2 are the three nearest, in nearest-first order.
+        assertEquals(0, sel[0]);
+        assertEquals(1, sel[1]);
+        assertEquals(2, sel[2]);
+    }
+
+    @Test
+    void nearestWithinRange_excludesBeyondRange() {
+        double[] xs = {10, 200};
+        double[] ys = {64, 64};
+        double[] zs = {0, 0};
+        double rangeSqr = 128.0 * 128.0;
+        int[] sel = BellRadiusGeometry.nearestWithinRange(xs, ys, zs, 0, 64, 0, rangeSqr, 8);
+        assertEquals(1, sel.length, "the bell past the range is dropped");
+        assertEquals(0, sel[0], "only the in-range bell survives");
+    }
+
+    @Test
+    void nearestWithinRange_returnsFewerThanMaxWhenSparse() {
+        double[] xs = {5};
+        double[] ys = {64};
+        double[] zs = {5};
+        int[] sel = BellRadiusGeometry.nearestWithinRange(xs, ys, zs, 0, 64, 0, 1.0e9, 8);
+        assertEquals(1, sel.length, "returns only what is available, never pads to max");
+        assertEquals(0, sel[0]);
+    }
+
+    @Test
+    void nearestWithinRange_emptyWhenNoneInRange() {
+        double[] xs = {500};
+        double[] ys = {64};
+        double[] zs = {500};
+        int[] sel = BellRadiusGeometry.nearestWithinRange(xs, ys, zs, 0, 64, 0, 100.0, 8);
+        assertEquals(0, sel.length, "no bell in range yields an empty selection");
+    }
+
     @Test
     void boundaryBurst_forcesEveryParticleOnRadius() {
         List<Emit> out = new ArrayList<>();
