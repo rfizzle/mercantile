@@ -732,7 +732,7 @@ Shaped recipe (3x3 crafting grid):
 - Toggled by `enablePylonBellAlarm` (requires the pylon itself to be enabled via `enableSentryPylon`).
 
 ### Redstone Interaction
-- A redstone signal **disables** the pylon (stops scanning and spawning). Allows players to toggle defense on/off.
+- A redstone signal **disables** the pylon (stops scanning and spawning). Allows players to toggle defense on/off. A disabled pylon also winds its active sentries down: it stops holding them against the despawn countdown, so they fade out on the normal timer even while a hostile is present.
 - Comparator output reflects fuel level (0–15 signal strength proportional to iron blocks stored).
 
 ### Implementation Notes
