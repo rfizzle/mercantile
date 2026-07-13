@@ -226,7 +226,8 @@ reflects fuel level; a redstone signal disables the pylon entirely.
 
 - **Workstation links** — hold a bell to see profession-colored particle
   lines between villagers and their workstations. Unbound villagers pulse
-  with angry particles; unclaimed workstations glow yellow.
+  with angry particles; each workstation floats a status marker — a green
+  check when claimed, a white question mark when unclaimed.
 - **Bell radius** — hold a bell to see the 48-block gathering area of each
   nearby placed bell as a gold circle on the ground, plus a dim-white
   placement preview around you. Ring a placed bell to highlight every
