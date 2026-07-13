@@ -37,6 +37,8 @@ public final class WorkstationLinkRenderer {
     // 0.0 ≈ 180° cone (everything in front); negative widens further.
     private static final double VIEW_DOT_THRESHOLD = -0.35;
     private static final double UNBOUND_PULSE_PERIOD = 12.0;
+    // Only the bright half of the pulse cycle spawns a puff, so it blinks rather than streams.
+    private static final double UNBOUND_PULSE_MIN_AMPLITUDE = 0.6;
     // Status-marker lifetime must match WorkstationMarkerParticle's, so re-emission
     // lands exactly as the prior icon expires (its bob/pulse is phase-aligned).
     private static final int MARKER_LIFETIME_TICKS = 30;
@@ -124,18 +126,19 @@ public final class WorkstationLinkRenderer {
         }
 
         // Unbound villagers — pulsing angry_villager puff.
-        double pulse = Math.sin((gameTime % (long) (UNBOUND_PULSE_PERIOD * 2)) / UNBOUND_PULSE_PERIOD * Math.PI);
-        if (pulse > 0.6) {
+        if (WorkstationLinkGeometry.pulseVisible(gameTime, UNBOUND_PULSE_PERIOD, UNBOUND_PULSE_MIN_AMPLITUDE)) {
             for (UUID id : payload.unboundVillagers()) {
                 if (spawned >= MAX_PARTICLES_PER_TICK) return;
                 Villager villager = villagerByUuid.get(id);
                 if (villager == null) continue;
                 Vec3 pos = villager.position().add(0.0, villager.getBbHeight() + 0.4, 0.0);
-                if (!withinRange(pos, eye)) continue;
-                if (!inViewCone(pos, eye, view)) continue;
-                level.addParticle(ParticleTypes.ANGRY_VILLAGER,
-                        pos.x, pos.y, pos.z, 0.0, 0.0, 0.0);
-                spawned++;
+                if (WorkstationLinkGeometry.emitCulledPoint(
+                        pos.x, pos.y, pos.z, eye.x, eye.y, eye.z, view.x, view.y, view.z,
+                        RENDER_RANGE_SQR, VIEW_DOT_THRESHOLD,
+                        (force, x, y, z, dx, dy, dz) ->
+                                level.addParticle(ParticleTypes.ANGRY_VILLAGER, force, x, y, z, dx, dy, dz))) {
+                    spawned++;
+                }
             }
         }
 
@@ -168,8 +171,11 @@ public final class WorkstationLinkRenderer {
             }
             if (alreadySpawned + spawned >= MAX_PARTICLES_PER_TICK) break;
             Vec3 base = Vec3.atCenterOf(pos).add(0.0, MARKER_Y_OFFSET, 0.0);
-            if (!withinRange(base, eye) || !inViewCone(base, eye, view)) continue;
-            level.addParticle(type, base.x, base.y, base.z, 0.0, 0.0, 0.0);
+            boolean emitted = WorkstationLinkGeometry.emitCulledPoint(
+                    base.x, base.y, base.z, eye.x, eye.y, eye.z, view.x, view.y, view.z,
+                    RENDER_RANGE_SQR, VIEW_DOT_THRESHOLD,
+                    (force, x, y, z, dx, dy, dz) -> level.addParticle(type, force, x, y, z, dx, dy, dz));
+            if (!emitted) continue;
             cooldown.put(pos, MARKER_LIFETIME_TICKS);
             spawned++;
         }
@@ -177,39 +183,21 @@ public final class WorkstationLinkRenderer {
     }
 
     private static int spawnMoteLine(ClientLevel level, Vec3 from, Vec3 to, Vec3 eye, Vector3f color) {
-        Vec3 delta = to.subtract(from);
-        double length = delta.length();
-        if (length < 1.0e-3) return 0;
-        // LOD: scale step by distance from camera (midpoint).
-        Vec3 mid = from.add(delta.scale(0.5));
-        double camDist = Math.sqrt(mid.distanceToSqr(eye));
-        double step = Math.min(MAX_STEP_BLOCKS, BASE_STEP_BLOCKS * (1.0 + camDist / 16.0));
-        int count = Math.max(1, (int) Math.floor(length / step));
         LinkMoteParticleOptions opts = new LinkMoteParticleOptions(color);
-        Vec3 unit = delta.scale(1.0 / length);
-        int spawned = 0;
-        for (int i = 1; i <= count; i++) {
-            double t = i * step;
-            if (t > length) break;
-            double x = from.x + unit.x * t;
-            double y = from.y + unit.y * t;
-            double z = from.z + unit.z * t;
-            level.addParticle(opts, x, y, z, 0.0, 0.0, 0.0);
-            spawned++;
-        }
-        return spawned;
+        return WorkstationLinkGeometry.moteLine(
+                from.x, from.y, from.z, to.x, to.y, to.z, eye.x, eye.y, eye.z,
+                BASE_STEP_BLOCKS, MAX_STEP_BLOCKS,
+                (force, x, y, z, dx, dy, dz) -> level.addParticle(opts, force, x, y, z, dx, dy, dz));
     }
 
     private static boolean withinRange(Vec3 point, Vec3 eye) {
-        return point.distanceToSqr(eye) <= RENDER_RANGE_SQR;
+        return WorkstationLinkGeometry.withinRange(point.x, point.y, point.z,
+                eye.x, eye.y, eye.z, RENDER_RANGE_SQR);
     }
 
     private static boolean inViewCone(Vec3 point, Vec3 eye, Vec3 view) {
-        Vec3 to = point.subtract(eye);
-        double len = to.length();
-        if (len < 1.0e-3) return true;
-        double dot = (to.x * view.x + to.y * view.y + to.z * view.z) / len;
-        return dot > VIEW_DOT_THRESHOLD;
+        return WorkstationLinkGeometry.inViewCone(point.x, point.y, point.z,
+                eye.x, eye.y, eye.z, view.x, view.y, view.z, VIEW_DOT_THRESHOLD);
     }
 
     private static Map<UUID, Villager> indexVillagers(ClientLevel level) {
