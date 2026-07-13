@@ -636,7 +636,7 @@ When holding or ringing a bell, show the area of effect.
 
 ### Behavior
 - **While holding a bell item:** Renders the 48-block gathering radius (the vanilla `BellBlockEntity` search radius) as circles. **Holding the bell IS the opt-in** — no additional keybind needed.
-  - **Placed bells (actual coverage):** a **gold** circle is drawn around every placed bell within render distance, each centered on its bell block. The 48-block radius is measured from the bell in vanilla, so the visualization is bell-centered too; a village with two bells shows two circles, and their overlap is real coverage information. Bells are discovered client-side (bells are block entities) so no networking is added.
+  - **Placed bells (actual coverage):** a **gold** circle is drawn around each nearby placed bell (the closest handful within range, under a per-tick particle budget), each centered on its bell block. The 48-block radius is measured from the bell in vanilla, so the visualization is bell-centered too; a village with two bells shows two circles, and their overlap is real coverage information. Bells are discovered client-side (bells are block entities) so no networking is added.
   - **Player-centered preview (hypothetical coverage):** a **dim white** circle is drawn around the player as a placement-scouting tool — the coverage a bell placed where you stand *would* have. Its distinct color keeps a hypothetical from being read as a real bell's coverage.
 - **On bell ring (placed bell):** Brief particle burst at the radius boundary centered on the bell block, with villagers inside the radius briefly highlighted (glow effect or particles).
 
