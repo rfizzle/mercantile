@@ -53,6 +53,13 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
     /** Recheck cadence baseline — see {@link #idleHostileCheckIntervalTicks}. */
     private static final int IDLE_HOSTILE_CHECK_INTERVAL_TICKS = 10;
     private static final int BELL_RING_COOLDOWN_TICKS = 200;
+    /**
+     * A sentry struck by an in-zone hostile within this many ticks still counts as engaged, so the
+     * despawn countdown holds through the lull between exchanges even when the golem has no active
+     * target (e.g. taking fire it can't yet path to). Kept below vanilla's 100-tick {@code lastHurtByMob}
+     * auto-clear so the timestamp read stays meaningful.
+     */
+    private static final int RECENT_DAMAGE_WINDOW_TICKS = 60;
 
     private static final int[] ALL_SLOTS = {0};
     private static final int[] NO_SLOTS = new int[0];
@@ -240,6 +247,19 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
             return;
         }
 
+        // A sentry actively fighting — or under fire from — an in-zone threat holds the countdown
+        // open, even when the pylon itself has no line of sight to that threat (issue #164). The
+        // golem's own target/attacker is authoritative for "combat is happening here"; the pylon-LoS
+        // scan below is only the fallback for a threat that's present but not yet engaged. Cheap
+        // enough to run every tick: a bounded set of already-pruned sentries, no raycasts.
+        if (anySentryEngaged(server)) {
+            if (idleTicks != 0) {
+                idleTicks = 0;
+                setChanged();
+            }
+            return;
+        }
+
         if (idleHostileCheckCooldown > 0) {
             idleHostileCheckCooldown--;
         }
@@ -261,6 +281,37 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
         if (idleTicks >= threshold) {
             despawnAllSentries(server);
         }
+    }
+
+    /**
+     * Whether any tracked sentry is currently engaged with an in-zone threat — its target or its most
+     * recent attacker is a live hostile inside the defended sphere. Walks the (already-pruned) sentry
+     * set and reads each golem's target/attacker directly; no entity search or raycast.
+     */
+    private boolean anySentryEngaged(ServerLevel server) {
+        int radius = MercantileConfig.get().pylonDetectionRadius;
+        for (UUID uuid : sentries) {
+            if (!(server.getEntity(uuid) instanceof IronGolem golem)
+                    || !golem.isAlive() || !SentryGolemTag.isSentry(golem)) {
+                continue;
+            }
+            boolean targetInZone = isInZoneThreat(golem.getTarget(), radius);
+            boolean attackerInZone = isInZoneThreat(golem.getLastHurtByMob(), radius);
+            int ticksSinceHurt = golem.tickCount - golem.getLastHurtByMobTimestamp();
+            if (SentryPylonScanner.sentryHoldsCountdown(
+                    targetInZone, attackerInZone, ticksSinceHurt, RECENT_DAMAGE_WINDOW_TICKS)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** A live hostile within this pylon's defended sphere. {@code isHostile} already rejects the dead. */
+    private boolean isInZoneThreat(@Nullable LivingEntity entity, int radius) {
+        return entity != null
+                && SentryPylonScanner.isHostile(entity)
+                && SentryPylonScanner.withinDefendedZone(
+                        entity.getX(), entity.getY(), entity.getZ(), worldPosition, radius);
     }
 
     private void despawnAllSentries(ServerLevel server) {

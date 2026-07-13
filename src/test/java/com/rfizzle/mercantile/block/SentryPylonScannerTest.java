@@ -126,4 +126,92 @@ class SentryPylonScannerTest {
         assertTrue(SentryPylonScanner.isWithinRadius(candidate, pylon, dsq));
         assertFalse(SentryPylonScanner.isWithinRadius(candidate, pylon, dsq - 1));
     }
+
+    // --- withinDefendedZone (entity position vs. pylon center) ---
+
+    @Test
+    void defendedZone_entityAtPylonCenter() {
+        BlockPos pylon = new BlockPos(0, 0, 0);
+        // Center of the pylon block is (0.5, 0.5, 0.5); an entity sitting there is dsq 0.
+        assertTrue(SentryPylonScanner.withinDefendedZone(0.5, 0.5, 0.5, pylon, 4));
+    }
+
+    @Test
+    void defendedZone_entityOnBoundary() {
+        BlockPos pylon = new BlockPos(0, 0, 0);
+        // dx = 4.5 - 0.5 = 4 -> dsq 16 == radius^2, inclusive boundary.
+        assertTrue(SentryPylonScanner.withinDefendedZone(4.5, 0.5, 0.5, pylon, 4),
+                "boundary (dsq == radius^2) should be inside the zone");
+    }
+
+    @Test
+    void defendedZone_entityJustOutside() {
+        BlockPos pylon = new BlockPos(0, 0, 0);
+        // dx = 4.6 - 0.5 = 4.1 -> dsq 16.81 > 16.
+        assertFalse(SentryPylonScanner.withinDefendedZone(4.6, 0.5, 0.5, pylon, 4),
+                "a point past radius^2 should be outside the zone");
+    }
+
+    @Test
+    void defendedZone_threeDimensionalOffset() {
+        BlockPos pylon = new BlockPos(10, 20, 30);
+        // Deltas 2/2/2 from the (10.5, 20.5, 30.5) center -> dsq 12.
+        assertTrue(SentryPylonScanner.withinDefendedZone(12.5, 22.5, 32.5, pylon, 4));
+        assertFalse(SentryPylonScanner.withinDefendedZone(12.5, 22.5, 32.5, pylon, 3),
+                "dsq 12 is outside radius 3 (9)");
+    }
+
+    @Test
+    void defendedZone_negativePylonCoordinates() {
+        BlockPos pylon = new BlockPos(-5, 0, -5);
+        // Center (-4.5, 0.5, -4.5); entity three east -> dx 3, dsq 9.
+        assertTrue(SentryPylonScanner.withinDefendedZone(-1.5, 0.5, -4.5, pylon, 3));
+        assertFalse(SentryPylonScanner.withinDefendedZone(-1.5, 0.5, -4.5, pylon, 2));
+    }
+
+    // --- sentryHoldsCountdown ---
+
+    @Test
+    void holds_targetInZoneHoldsRegardlessOfDamage() {
+        assertTrue(SentryPylonScanner.sentryHoldsCountdown(true, false, 9999, 60),
+                "a current in-zone target holds the countdown even with no recent damage");
+    }
+
+    @Test
+    void holds_recentAttackerInZoneHolds() {
+        assertTrue(SentryPylonScanner.sentryHoldsCountdown(false, true, 0, 60),
+                "an in-zone attacker struck this very tick holds the countdown");
+    }
+
+    @Test
+    void holds_attackerAtWindowBoundaryHolds() {
+        assertTrue(SentryPylonScanner.sentryHoldsCountdown(false, true, 60, 60),
+                "damage exactly at the window edge still counts as engaged");
+    }
+
+    @Test
+    void holds_staleAttackerDoesNotHold() {
+        assertFalse(SentryPylonScanner.sentryHoldsCountdown(false, true, 61, 60),
+                "damage older than the window no longer holds the countdown");
+    }
+
+    @Test
+    void holds_negativeTicksSinceHurtDoesNotHold() {
+        assertFalse(SentryPylonScanner.sentryHoldsCountdown(false, true, -1, 60),
+                "a nonsensical negative age (reset/wrapped clock) must not hold");
+    }
+
+    @Test
+    void holds_noTargetNoAttackerDoesNotHold() {
+        assertFalse(SentryPylonScanner.sentryHoldsCountdown(false, false, 0, 60),
+                "with neither a target nor a recent attacker the countdown runs");
+    }
+
+    @Test
+    void holds_recentDamageButAttackerOutOfZoneDoesNotHold() {
+        // attackerInZone already folds in the zone + hostility test; a false flag means the last
+        // attacker was out of zone (or gone), so recency alone must not hold.
+        assertFalse(SentryPylonScanner.sentryHoldsCountdown(false, false, 3, 60),
+                "recent damage from an out-of-zone source does not hold the countdown");
+    }
 }

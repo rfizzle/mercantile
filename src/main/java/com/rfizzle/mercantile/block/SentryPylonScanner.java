@@ -104,6 +104,39 @@ public final class SentryPylonScanner {
     }
 
     /**
+     * The single definition of the pylon's defended sphere: whether an entity's precise position lies
+     * within {@code radius} of the pylon block's center. The sentry target goal filters candidates
+     * with this, and the despawn countdown reuses it to decide whether a sentry's current target or
+     * attacker still counts as an in-zone threat — so "inside the zone" means the same thing to both.
+     */
+    static boolean withinDefendedZone(double ex, double ey, double ez, BlockPos pylon, int radius) {
+        double dx = ex - (pylon.getX() + 0.5);
+        double dy = ey - (pylon.getY() + 0.5);
+        double dz = ez - (pylon.getZ() + 0.5);
+        return dx * dx + dy * dy + dz * dz <= (double) radius * (double) radius;
+    }
+
+    /**
+     * Whether a live sentry holds its pylon's despawn countdown open. A sentry counts as engaged when
+     * it currently targets an in-zone hostile, or was struck by an in-zone hostile within the recent-
+     * damage window ({@code ticksSinceHurt <= recentDamageWindowTicks}). Both cover a threat the pylon
+     * itself can't see: the golem's targeting reaches around corners, and vanilla {@code HurtByTargetGoal}
+     * reacts to fire from cover. A threat the golem can neither see nor reach never becomes its target
+     * nor lands a hit, so a fully sealed-off mob leaves both clauses false and the countdown runs out.
+     *
+     * <p>The {@code ticksSinceHurt >= 0} guard rejects a not-yet-hurt sentry, whose timestamp is 0 and
+     * whose {@code tickCount} makes the difference positive but meaningless — the {@code attackerInZone}
+     * flag already gates that, but the bound keeps a wrapped or reset clock from spuriously holding.
+     */
+    static boolean sentryHoldsCountdown(boolean targetInZone, boolean attackerInZone,
+                                        int ticksSinceHurt, int recentDamageWindowTicks) {
+        if (targetInZone) {
+            return true;
+        }
+        return attackerInZone && ticksSinceHurt >= 0 && ticksSinceHurt <= recentDamageWindowTicks;
+    }
+
+    /**
      * Require an unobstructed line from the pylon to the spawn position. A sentry can only
      * materialize where the pylon can "see" it — so a threat in a sealed cave below, or behind
      * a wall, won't conjure a golem buried underground.

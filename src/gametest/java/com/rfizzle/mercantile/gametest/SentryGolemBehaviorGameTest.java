@@ -148,6 +148,77 @@ public class SentryGolemBehaviorGameTest implements FabricGameTest {
         });
     }
 
+    @GameTest(template = EMPTY_STRUCTURE, batch = "sentryEngagedAlone", timeoutTicks = 200)
+    public void countdownHeldForEngagedSentry(GameTestHelper helper) {
+        // A sentry fighting a threat the pylon can't see (around a corner / behind cover) must not be
+        // despawned mid-combat. The pylon has no line of sight to the husk, so its LoS reset never
+        // fires; only the golem's own engagement holds the countdown open (issue #164).
+        final int savedDespawn = MercantileConfig.get().sentryDespawnSeconds;
+        MercantileConfig.get().sentryDespawnSeconds = 1;
+        SentryPylonBlockEntity be = placePylonOnFloor(helper);
+
+        // Wall at x=3 seals the threat side (x>3) off from the pylon at (1,2,1) — the pylon can't see
+        // the husk. The sentry stands on the husk's side, so it (unlike the pylon) has a clear line.
+        for (int z = 0; z <= 7; z++) {
+            for (int y = 2; y <= 6; y++) {
+                helper.setBlock(new BlockPos(3, y, z), Blocks.STONE);
+            }
+        }
+        IronGolem golem = spawnSentryAt(helper, be, new BlockPos(4, 2, 3));
+        Husk husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new BlockPos(4, 2, 1));
+        helper.assertTrue(husk.isAlive(), "husk should spawn");
+        // spawnWithNoFreeWill strips the golem's goals, so this manually-set target stands in for the
+        // combat the golem's own targeting would drive in a live game — the pylon still can't see it.
+        golem.setTarget(husk);
+
+        helper.runAfterDelay(60, () -> {
+            try {
+                helper.assertTrue(golem.isAlive(),
+                        "sentry engaged with an out-of-sight threat must not despawn mid-combat");
+                helper.assertTrue(be.getSentries().contains(golem.getUUID()),
+                        "engaged sentry should still be tracked");
+                helper.succeed();
+            } finally {
+                MercantileConfig.get().sentryDespawnSeconds = savedDespawn;
+            }
+        });
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE, batch = "sentryHurtAlone", timeoutTicks = 200)
+    public void countdownHeldForRecentlyHurtSentry(GameTestHelper helper) {
+        // A sentry taking fire from an in-zone hostile it has no current target on — vanilla
+        // HurtByTargetGoal reacts to hits with no zone/LoS filter — must not despawn while under
+        // attack, even when the pylon has no line of sight to the attacker (issue #164).
+        final int savedDespawn = MercantileConfig.get().sentryDespawnSeconds;
+        MercantileConfig.get().sentryDespawnSeconds = 1;
+        SentryPylonBlockEntity be = placePylonOnFloor(helper);
+
+        for (int z = 0; z <= 7; z++) {
+            for (int y = 2; y <= 6; y++) {
+                helper.setBlock(new BlockPos(3, y, z), Blocks.STONE);
+            }
+        }
+        IronGolem golem = spawnSentryAt(helper, be, new BlockPos(4, 2, 3));
+        Husk husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new BlockPos(4, 2, 1));
+        // Simulate a just-landed hit from the in-zone husk without applying damage: setLastHurtByMob
+        // sets both the attacker and the hurt timestamp to the golem's current tick.
+        golem.setLastHurtByMob(husk);
+        helper.assertTrue(golem.getTarget() == null,
+                "no target — the hold must come from recent damage, not targeting");
+
+        helper.runAfterDelay(40, () -> {
+            try {
+                helper.assertTrue(golem.isAlive(),
+                        "sentry under recent fire from an in-zone threat must not despawn");
+                helper.assertTrue(be.getSentries().contains(golem.getUUID()),
+                        "recently-hurt sentry should still be tracked");
+                helper.succeed();
+            } finally {
+                MercantileConfig.get().sentryDespawnSeconds = savedDespawn;
+            }
+        });
+    }
+
     @GameTest(template = EMPTY_STRUCTURE, timeoutTicks = 120)
     public void sentryDropsNothingOnKill(GameTestHelper helper) {
         SentryPylonBlockEntity be = placePylonOnFloor(helper);
