@@ -117,6 +117,29 @@ class BellSweepSchedulerTest {
     }
 
     @Test
+    void radiusChange_retainsPublishedUntilNewPassCompletes() {
+        BellSweepScheduler scheduler = new BellSweepScheduler();
+        int r1 = 1; // 9 chunks, one tick per pass at budget 9
+        // Complete a pass at r1 that finds one bell, then promote it.
+        scheduler.nextChunkIndices(r1, 9);
+        scheduler.recordBell(7L);
+        scheduler.nextChunkIndices(r1, 9); // promotes r1's find
+        assertEquals(Set.of(7L), scheduler.publishedBells());
+
+        // Switch radius: the previous published set must survive until r2 finishes a pass.
+        int r2 = 2; // 25 chunks, pass spans multiple ticks at budget 9
+        scheduler.nextChunkIndices(r2, 9); // first tick of r2's first pass — no promote yet
+        assertEquals(Set.of(7L), scheduler.publishedBells(),
+                "a radius change keeps the last published set until the new pass completes");
+        scheduler.nextChunkIndices(r2, 9);
+        scheduler.nextChunkIndices(r2, 9); // r2 pass completes here (25 chunks / 9 = 3 ticks)
+        scheduler.recordBell(8L);
+        scheduler.nextChunkIndices(r2, 9); // first tick of r2's second pass — promotes r2's finds
+        assertEquals(Set.of(8L), scheduler.publishedBells(),
+                "once the new-radius pass completes, its finds replace the retained set");
+    }
+
+    @Test
     void reset_clearsPublishedAndCursor() {
         BellSweepScheduler scheduler = new BellSweepScheduler();
         int radius = 1;

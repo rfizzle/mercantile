@@ -83,17 +83,25 @@ public final class BellSweepScheduler {
         accumulating.add(packedPos);
     }
 
-    /** The bells from the most recently completed pass — empty until the first pass finishes. */
+    /**
+     * The bells from the most recently completed pass — empty until the first pass finishes. Returns the
+     * live internal set (no copy, so this stays allocation-free in the per-tick render path); it is
+     * tick-thread-only state and callers must not mutate it or retain it across ticks.
+     */
     public Set<Long> publishedBells() {
         return published;
     }
 
-    /** Drop all sweep state (called when the feature deactivates or the player disconnects). */
+    /**
+     * Drop all sweep state (called every tick the feature is enabled but no bell is held, and on
+     * disconnect/world unload), clearing the sets in place rather than reallocating so the common idle
+     * tick allocates nothing.
+     */
     public void reset() {
         cursor = 0;
         passRadius = -1;
         sawFirstPass = false;
         accumulating.clear();
-        published = new HashSet<>();
+        published.clear();
     }
 }

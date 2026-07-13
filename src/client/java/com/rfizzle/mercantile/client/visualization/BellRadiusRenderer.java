@@ -19,7 +19,6 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
@@ -139,31 +138,36 @@ public final class BellRadiusRenderer {
         }
     }
 
-    /** Draw a gold coverage circle around each discovered placed bell — nearest first, budget-capped. */
+    /** Draw a gold coverage circle around each nearby placed bell — nearest first, budget-capped. */
     private static void spawnPlacedBellRings(ClientLevel level, LocalPlayer player) {
         var published = bellSweep.publishedBells();
         if (published.isEmpty()) return;
 
+        // Unpack the packed bell positions into primitive arrays once (bell x/z centered on the block),
+        // then let the pure selector pick the nearest few in range — no per-comparison Vec3 allocation.
+        int n = published.size();
+        double[] xs = new double[n];
+        double[] ys = new double[n];
+        double[] zs = new double[n];
+        int i = 0;
+        for (long packed : published) {
+            xs[i] = BlockPos.getX(packed) + 0.5;
+            ys[i] = BlockPos.getY(packed);
+            zs[i] = BlockPos.getZ(packed) + 0.5;
+            i++;
+        }
+
+        Vec3 playerPos = player.position();
+        int[] selected = BellRadiusGeometry.nearestWithinRange(
+                xs, ys, zs, playerPos.x, playerPos.y, playerPos.z,
+                PLACED_BELL_RENDER_RANGE_SQR, MAX_RENDERED_BELLS);
+        if (selected.length == 0) return;
+
         Vec3 eye = player.getEyePosition();
         Vec3 view = player.getViewVector(1.0f).normalize();
-        Vec3 playerPos = player.position();
-
-        List<BlockPos> inRange = new ArrayList<>();
-        for (long packed : published) {
-            BlockPos pos = BlockPos.of(packed);
-            if (Vec3.atCenterOf(pos).distanceToSqr(playerPos) <= PLACED_BELL_RENDER_RANGE_SQR) {
-                inRange.add(pos);
-            }
-        }
-        inRange.sort((a, b) -> Double.compare(
-                Vec3.atCenterOf(a).distanceToSqr(playerPos),
-                Vec3.atCenterOf(b).distanceToSqr(playerPos)));
-
-        int limit = Math.min(inRange.size(), MAX_RENDERED_BELLS);
-        for (int i = 0; i < limit; i++) {
-            BlockPos bell = inRange.get(i);
+        for (int j : selected) {
             BellRadiusGeometry.ringArc(
-                    bell.getX() + 0.5, bell.getY(), bell.getZ() + 0.5,
+                    xs[j], ys[j], zs[j],
                     eye.x, eye.y, eye.z, view.x, view.y, view.z,
                     RADIUS, CIRCLE_SAMPLES, PARTICLES_PER_TICK, angleOffset,
                     MAX_Y_DELTA, VIEW_DOT_THRESHOLD,
