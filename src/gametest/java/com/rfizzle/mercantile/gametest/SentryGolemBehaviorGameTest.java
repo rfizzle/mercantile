@@ -254,6 +254,41 @@ public class SentryGolemBehaviorGameTest implements FabricGameTest {
         });
     }
 
+    @GameTest(template = EMPTY_STRUCTURE, timeoutTicks = 80)
+    public void breakingPylonDismissesSentries(GameTestHelper helper) {
+        // Removing the pylon must dismiss its sentries — they are temporary summons, not persistent
+        // entities (spec §18, issue #166). Without the onRemove hook the golems outlive the block
+        // forever, since the only despawn path is the block-entity tick that dies with the block.
+        SentryPylonBlockEntity be = placePylonOnFloor(helper);
+        IronGolem golem = spawnSentryAt(helper, be, new BlockPos(2, 2, 2));
+        helper.assertTrue(be.getSentries().contains(golem.getUUID()), "sentry should be tracked");
+        helper.assertTrue(golem.isAlive(), "sentry should be alive before the pylon is broken");
+
+        helper.destroyBlock(PYLON);
+
+        // onRemove discards the golem synchronously within destroyBlock's setBlockState call.
+        helper.assertFalse(golem.isAlive(), "breaking the pylon must dismiss its sentry");
+        helper.assertTrue(be.getSentries().isEmpty(), "tracked sentries should be cleared on removal");
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE, timeoutTicks = 80)
+    public void pylonStateFlipKeepsSentries(GameTestHelper helper) {
+        // The removal hook keys off a genuine block change (!state.is(newState.getBlock())). A POWERED
+        // flip is the same block, so it routes through onRemove but must NOT dismiss — otherwise every
+        // redstone toggle would instantly vaporize the sentries instead of winding them down (issue #166).
+        SentryPylonBlockEntity be = placePylonOnFloor(helper);
+        IronGolem golem = spawnSentryAt(helper, be, new BlockPos(2, 2, 2));
+
+        helper.setBlock(PYLON, helper.getBlockState(PYLON).setValue(SentryPylonBlock.POWERED, true));
+
+        helper.assertTrue(golem.isAlive(),
+                "a POWERED property flip must not dismiss sentries — only real removal does");
+        helper.assertTrue(be.getSentries().contains(golem.getUUID()),
+                "sentry should still be tracked after a state flip");
+        helper.succeed();
+    }
+
     @GameTest(template = EMPTY_STRUCTURE, timeoutTicks = 120)
     public void sentryDropsNothingOnKill(GameTestHelper helper) {
         SentryPylonBlockEntity be = placePylonOnFloor(helper);
