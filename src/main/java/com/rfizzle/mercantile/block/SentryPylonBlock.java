@@ -142,7 +142,7 @@ public class SentryPylonBlock extends BaseEntityBlock {
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState,
                             boolean movedByPiston) {
-        // Fire only on genuine removal/replacement — mining, explosion, piston, /setblock — not on a
+        // Fire only on genuine removal/replacement — mining, explosion, /setblock — not on a
         // POWERED/STATE property flip (same block) and never on chunk unload (which doesn't route
         // through onRemove at all). Dismiss the pylon's sentries before super removes the block entity,
         // so temporary summons don't outlive their pylon (issue #166).
