@@ -324,6 +324,30 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
             idleTicks = 0;
             return;
         }
+        dismissSentries(server);
+        setChanged();
+        updateVisualState();
+    }
+
+    /**
+     * Called from {@link SentryPylonBlock#onRemove} when the pylon block is genuinely removed — mined,
+     * blown up, pushed, or {@code /setblock}'d away — so its sentries don't outlive it (spec §18: they
+     * are temporary summons, not persistent entities). Dismisses them without touching block state or
+     * the dirty flag: the block is mid-removal, so {@link #updateVisualState} would re-enter a
+     * {@code setBlock} on a position that's already gone, and the block entity is discarded right after.
+     */
+    void onPylonRemoved(ServerLevel server) {
+        if (sentries.isEmpty()) return;
+        dismissSentries(server);
+    }
+
+    /**
+     * Discards every tracked sentry with the standard {@link #despawnSentry} crack-and-fade presentation
+     * and clears the tracked set, resetting the idle counters. Touches no block state and raises no dirty
+     * flag — the callers own that: {@link #despawnAllSentries} follows with {@code setChanged()} +
+     * {@link #updateVisualState}, while {@link #onPylonRemoved} must not (its block is being removed).
+     */
+    private void dismissSentries(ServerLevel server) {
         List<UUID> snapshot = new ArrayList<>(sentries);
         for (UUID uuid : snapshot) {
             Entity entity = server.getEntity(uuid);
@@ -334,8 +358,6 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
         sentries.clear();
         idleTicks = 0;
         idleHostileCheckCooldown = idleHostileCheckInterval();
-        setChanged();
-        updateVisualState();
     }
 
     private void despawnSentry(ServerLevel server, IronGolem golem) {

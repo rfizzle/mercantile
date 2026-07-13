@@ -699,8 +699,9 @@ A crafted block placed in a village (or anywhere). Visually distinct — iron-an
 ### Despawning
 - Once no in-sight hostile remains within the pylon's radius — every threat dead, gone, or sealed out of line of sight — sentry golems begin a **despawn countdown** (default 30 seconds / 600 ticks, configurable).
 - If an in-sight threat appears during the countdown, the timer resets and the golem re-engages.
-r- Despawn is visual: the golem slowly fades/cracks (reuse iron golem damage texture stages) over the last few seconds, then disappears with iron particles and the iron golem damage sound. See Sound Design section for all sound mappings.
+- Despawn is visual: the golem slowly fades/cracks (reuse iron golem damage texture stages) over the last few seconds, then disappears with iron particles and the iron golem damage sound. See Sound Design section for all sound mappings.
 - If a sentry golem is killed in combat, no despawn sequence — it simply dies (no drops).
+- Removing the pylon — mined, blown up, or `/setblock`'d away — immediately dismisses all of its sentries with the same crack-and-fade effect. They are temporary summons tied to their pylon, so none is left stranded once the block is gone.
 
 ### Crafting
 

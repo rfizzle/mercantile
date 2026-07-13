@@ -7,6 +7,7 @@ import com.rfizzle.mercantile.particle.MercantileParticles;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
@@ -136,6 +137,20 @@ public class SentryPylonBlock extends BaseEntityBlock {
                 pylon.updateVisualState();
             }
         }
+    }
+
+    @Override
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState,
+                            boolean movedByPiston) {
+        // Fire only on genuine removal/replacement — mining, explosion, /setblock — not on a
+        // POWERED/STATE property flip (same block) and never on chunk unload (which doesn't route
+        // through onRemove at all). Dismiss the pylon's sentries before super removes the block entity,
+        // so temporary summons don't outlive their pylon (issue #166).
+        if (!state.is(newState.getBlock()) && level instanceof ServerLevel server
+                && level.getBlockEntity(pos) instanceof SentryPylonBlockEntity pylon) {
+            pylon.onPylonRemoved(server);
+        }
+        super.onRemove(state, level, pos, newState, movedByPiston);
     }
 
     @Override
