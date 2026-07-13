@@ -693,6 +693,7 @@ A crafted block placed in a village (or anywhere). Visually distinct — iron-an
 - Sentry golems target and attack hostile mobs, including **creepers** — which vanilla iron golems pointedly ignore. A creeper that is fighting a sentry is prevented from priming, so the golem can dispatch it without an explosion levelling what the pylon defends.
 - Their aggro range matches the pylon's detection radius (they don't wander beyond it).
 - Sentry golems have a **leash range** to their parent pylon — if pushed or pathing beyond the detection radius, they return.
+- **Idle sentries return home.** While a sentry has no combat target — which is exactly when its pylon's despawn countdown is running — it walks back toward the pylon and holds within a few blocks of it, rather than running vanilla village goals (strolling wherever the village leads, offering poppies to villagers) or pacing the radius edge. The summon visibly waits out its countdown at its source. A hostile appearing hands the golem a target again and the hold releases so it re-engages.
 - Sentry golems do **not** drop iron ingots or poppies on death.
 - Sentry golems do **not** count toward iron farm mechanics or mob caps. Implemented by tagging sentry golems with `MercantileSentry` and mixin into the mob spawning cap counter to exclude entities with this tag. This is a targeted check (only affects `IronGolem` entity type counting), not a broad mob cap override.
 
@@ -739,9 +740,9 @@ Shaped recipe (3x3 crafting grid):
 ### Implementation Notes
 - Custom block + block entity (`SentryPylonBlock` / `SentryPylonBlockEntity`).
 - Block entity handles: fuel storage (simple `int` count), scan tick, golem tracking (list of sentry golem UUIDs), spawn logic.
-- Sentry golems are vanilla `IronGolem` entities with an injected NBT tag and added AI goals: `SentryTargetHostilesGoal` (creeper-inclusive target acquisition, gated on the sentry tag) and `ReturnToPylonGoal` (leash back inside the detection radius). A `Creeper` mixin suppresses swell while the creeper's target is a sentry.
+- Sentry golems are vanilla `IronGolem` entities with an injected NBT tag and added AI goals: `SentryTargetHostilesGoal` (creeper-inclusive target acquisition, gated on the sentry tag), `ReturnToPylonGoal` (leash back inside the detection radius when pushed out mid-fight), and `HoldNearPylonGoal` (idle return-and-hold near the pylon while unengaged, suppressing vanilla wandering). A `Creeper` mixin suppresses swell while the creeper's target is a sentry.
 - Mixin or subclass to prevent sentry golems from dropping loot.
-- Despawn logic runs on the block entity tick — checks tracked golem UUIDs, if no hostiles in range, starts countdown per golem.
+- Despawn logic runs on the block entity tick: a single **shared per-pylon countdown** (`idleTicks`) governs all of a pylon's sentries at once. It resets whenever an in-sight hostile is found or any sentry is engaged, and advances otherwise; when it expires every tracked sentry is dismissed together. Over the countdown's final seconds the pylon writes an escalating crack-stage (a synced attachment) to each sentry, which a client mixin on `IronGolem.getCrackiness()` feeds into the vanilla crackiness render layer for the fade/crack telegraph. Despawn is driven by this timer, not by a golem reaching home, so a sentry that can't path back still expires on schedule wherever it stands.
 - Golem spawn position: find valid spawn pos within detection radius near the closest hostile, using `SpawnPlacements` logic.
 
 ---
