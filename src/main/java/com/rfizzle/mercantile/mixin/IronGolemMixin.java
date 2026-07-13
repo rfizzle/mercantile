@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.mixin;
 
+import com.rfizzle.mercantile.block.HoldNearPylonGoal;
 import com.rfizzle.mercantile.block.ReturnToPylonGoal;
 import com.rfizzle.mercantile.block.SentryGolemTag;
 import com.rfizzle.mercantile.block.SentryTargetHostilesGoal;
@@ -29,6 +30,12 @@ public abstract class IronGolemMixin extends AbstractGolem {
         // on non-sentry golems and while a sentry is inside its radius, so it never disturbs normal
         // iron-golem combat.
         this.goalSelector.addGoal(0, new ReturnToPylonGoal(self));
+        // Priority 1 — above vanilla's MoveBackToVillageGoal (2), stroll (4) and OfferFlowerGoal (5),
+        // so an idle sentry holds near its pylon and winds the countdown down there instead of
+        // wandering the village or pacing the radius edge. Shares priority 1 with MeleeAttackGoal but
+        // never contends: this goal is inert with a target, melee is inert without one. Inert on
+        // non-sentry golems (canUse false), so plain iron-golem movement is untouched.
+        this.goalSelector.addGoal(1, new HoldNearPylonGoal(self));
         // Higher priority (lower number) than vanilla's creeper-excluding target goal at slot 3,
         // so sentries acquire creepers; the goal is inert on non-sentry golems.
         this.targetSelector.addGoal(2, new SentryTargetHostilesGoal(self));

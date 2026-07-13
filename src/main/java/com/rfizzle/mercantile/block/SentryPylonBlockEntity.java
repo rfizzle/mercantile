@@ -2,6 +2,7 @@ package com.rfizzle.mercantile.block;
 
 import com.rfizzle.mercantile.compat.tribulation.TribulationCompat;
 import com.rfizzle.mercantile.config.MercantileConfig;
+import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.particle.MercantileParticles;
 import com.rfizzle.mercantile.registry.MercantileRegistry;
 import net.minecraft.core.BlockPos;
@@ -60,6 +61,12 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
      * auto-clear so the timestamp read stays meaningful.
      */
     private static final int RECENT_DAMAGE_WINDOW_TICKS = 60;
+    /**
+     * Length of the despawn telegraph — the trailing window of the countdown over which a sentry
+     * escalates its crack stages (spec §18). Capped at the countdown itself when a short
+     * {@code sentryDespawnSeconds} leaves less runway (see {@link #despawnStageFor}).
+     */
+    private static final int DESPAWN_TELEGRAPH_TICKS = 60;
 
     private static final int[] ALL_SLOTS = {0};
     private static final int[] NO_SLOTS = new int[0];
@@ -116,6 +123,32 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
      */
     private int idleHostileCheckInterval() {
         return idleHostileCheckIntervalTicks(MercantileConfig.get().pylonDetectionRadius);
+    }
+
+    /**
+     * The despawn-telegraph crack stage for a sentry, from the shared per-pylon countdown. Returns 0
+     * (no cracks) until the countdown enters its trailing telegraph window, then escalates 1 → 2 → 3
+     * over even thirds of that window, reaching 3 as the timer expires. The window is
+     * {@code min(telegraphTicks, thresholdTicks)}, so a short {@code sentryDespawnSeconds} still gets a
+     * full escalation across whatever runway it has rather than a truncated one. Pure integer math —
+     * unit-tested in {@code SentryDespawnStageTest}.
+     *
+     * @param idleTicks     ticks elapsed on the countdown so far
+     * @param thresholdTicks total countdown length in ticks
+     * @param telegraphTicks preferred telegraph-window length in ticks
+     * @return a crack stage in {@code [0, 3]}
+     */
+    static int despawnStageFor(int idleTicks, int thresholdTicks, int telegraphTicks) {
+        if (thresholdTicks <= 0) return 0;
+        int window = Math.min(telegraphTicks, thresholdTicks);
+        if (window <= 0) return 0;
+        int remaining = thresholdTicks - idleTicks;
+        if (remaining <= 0) return 3;
+        if (remaining >= window) return 0;
+        // remaining is in (0, window): split into thirds, fewer ticks left = more cracked.
+        if (remaining * 3 <= window) return 3;
+        if (remaining * 3 <= window * 2) return 2;
+        return 1;
     }
 
     /**
@@ -253,38 +286,63 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
         // holds: a sentry fighting — or under fire from — an in-zone threat keeps the countdown open
         // even when the pylon itself has no line of sight to that threat (issue #164), and the
         // pylon-LoS recheck is the fallback for a threat that's present but not yet engaged.
+        boolean held = false;
         if (!isPowered()) {
             // The golem's own target/attacker is authoritative for "combat is happening here". Cheap
             // enough to run every tick: a bounded set of already-pruned sentries, no raycasts.
             if (anySentryEngaged(server)) {
-                if (idleTicks != 0) {
-                    idleTicks = 0;
-                    setChanged();
+                held = true;
+            } else {
+                if (idleHostileCheckCooldown > 0) {
+                    idleHostileCheckCooldown--;
                 }
-                return;
-            }
-
-            if (idleHostileCheckCooldown > 0) {
-                idleHostileCheckCooldown--;
-            }
-            if (idleHostileCheckCooldown == 0) {
-                idleHostileCheckCooldown = idleHostileCheckInterval();
-                int radius = MercantileConfig.get().pylonDetectionRadius;
-                LivingEntity threat = SentryPylonScanner.findNearestVisibleHostile(server, worldPosition, radius);
-                if (threat != null) {
-                    if (idleTicks != 0) {
-                        idleTicks = 0;
-                        setChanged();
+                if (idleHostileCheckCooldown == 0) {
+                    idleHostileCheckCooldown = idleHostileCheckInterval();
+                    int radius = MercantileConfig.get().pylonDetectionRadius;
+                    LivingEntity threat = SentryPylonScanner.findNearestVisibleHostile(server, worldPosition, radius);
+                    if (threat != null) {
+                        held = true;
                     }
-                    return;
                 }
             }
         }
 
+        if (held) {
+            if (idleTicks != 0) {
+                idleTicks = 0;
+                setChanged();
+            }
+            // Reset the telegraph — a threat re-engaged, so any cracks the golems were showing clear.
+            updateDespawnStages(server);
+            return;
+        }
+
         idleTicks++;
+        updateDespawnStages(server);
         int threshold = MercantileConfig.get().sentryDespawnSeconds * 20;
         if (idleTicks >= threshold) {
             despawnAllSentries(server);
+        }
+    }
+
+    /**
+     * Pushes the current despawn-telegraph crack stage — derived from the shared per-pylon countdown
+     * ({@link #despawnStageFor}) — to every tracked sentry, so the client render layer escalates the
+     * golem's cracks over the countdown's final seconds. The value is a synced attachment; writes are
+     * guarded on change so a steady stage costs no per-tick sync traffic.
+     */
+    private void updateDespawnStages(ServerLevel server) {
+        if (sentries.isEmpty()) return;
+        int threshold = MercantileConfig.get().sentryDespawnSeconds * 20;
+        int stage = despawnStageFor(idleTicks, threshold, DESPAWN_TELEGRAPH_TICKS);
+        for (UUID uuid : sentries) {
+            if (server.getEntity(uuid) instanceof IronGolem golem && SentryGolemTag.isSentry(golem)) {
+                Integer current = golem.getAttached(MercantileAttachments.SENTRY_DESPAWN_STAGE);
+                int currentStage = current == null ? 0 : current;
+                if (currentStage != stage) {
+                    golem.setAttached(MercantileAttachments.SENTRY_DESPAWN_STAGE, stage);
+                }
+            }
         }
     }
 
