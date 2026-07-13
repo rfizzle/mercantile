@@ -384,7 +384,7 @@
               "id": "workstation-vis",
               "title": "Workstation Links",
               "html": [
-                "While holding a bell: profession-colored dust-particle lines connect each villager to their claimed workstation within 64 blocks. Unemployed villagers get a pulsing angry-villager particle. Unclaimed workstations get a yellow particle orbit."
+                "While holding a bell: profession-colored dust-particle lines connect each villager to their claimed workstation within 64 blocks. Unemployed villagers get a pulsing angry-villager particle. Each workstation floats a status marker — a green check when it's claimed, a white question mark when it's unclaimed."
               ],
               "note": "Client config: <code class='text-bone'>enableWorkstationVis</code>"
             },
