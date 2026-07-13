@@ -247,32 +247,37 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
             return;
         }
 
-        // A sentry actively fighting — or under fire from — an in-zone threat holds the countdown
-        // open, even when the pylon itself has no line of sight to that threat (issue #164). The
-        // golem's own target/attacker is authoritative for "combat is happening here"; the pylon-LoS
-        // scan below is only the fallback for a threat that's present but not yet engaged. Cheap
-        // enough to run every tick: a bounded set of already-pruned sentries, no raycasts.
-        if (anySentryEngaged(server)) {
-            if (idleTicks != 0) {
-                idleTicks = 0;
-                setChanged();
-            }
-            return;
-        }
-
-        if (idleHostileCheckCooldown > 0) {
-            idleHostileCheckCooldown--;
-        }
-        if (idleHostileCheckCooldown == 0) {
-            idleHostileCheckCooldown = idleHostileCheckInterval();
-            int radius = MercantileConfig.get().pylonDetectionRadius;
-            LivingEntity threat = SentryPylonScanner.findNearestVisibleHostile(server, worldPosition, radius);
-            if (threat != null) {
+        // A redstone-disabled pylon stops scanning and winds its summons down (spec §18): while
+        // POWERED it skips both hold checks below, so no scan cost is paid and idleTicks accrues
+        // unconditionally — its sentries despawn on the normal countdown. An enabled pylon runs the
+        // holds: a sentry fighting — or under fire from — an in-zone threat keeps the countdown open
+        // even when the pylon itself has no line of sight to that threat (issue #164), and the
+        // pylon-LoS recheck is the fallback for a threat that's present but not yet engaged.
+        if (!isPowered()) {
+            // The golem's own target/attacker is authoritative for "combat is happening here". Cheap
+            // enough to run every tick: a bounded set of already-pruned sentries, no raycasts.
+            if (anySentryEngaged(server)) {
                 if (idleTicks != 0) {
                     idleTicks = 0;
                     setChanged();
                 }
                 return;
+            }
+
+            if (idleHostileCheckCooldown > 0) {
+                idleHostileCheckCooldown--;
+            }
+            if (idleHostileCheckCooldown == 0) {
+                idleHostileCheckCooldown = idleHostileCheckInterval();
+                int radius = MercantileConfig.get().pylonDetectionRadius;
+                LivingEntity threat = SentryPylonScanner.findNearestVisibleHostile(server, worldPosition, radius);
+                if (threat != null) {
+                    if (idleTicks != 0) {
+                        idleTicks = 0;
+                        setChanged();
+                    }
+                    return;
+                }
             }
         }
 
@@ -347,8 +352,7 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
         if (!MercantileConfig.get().enableSentryPylon) {
             return;
         }
-        BlockState current = getBlockState();
-        if (current.hasProperty(SentryPylonBlock.POWERED) && current.getValue(SentryPylonBlock.POWERED)) {
+        if (isPowered()) {
             return;
         }
 
@@ -432,6 +436,16 @@ public class SentryPylonBlockEntity extends BlockEntity implements WorldlyContai
                 it.remove();
             }
         }
+    }
+
+    /**
+     * Whether the pylon is redstone-disabled. A powered pylon neither scans/spawns
+     * ({@link #runScanCycle}) nor holds its sentries against the despawn countdown
+     * ({@link #tickDespawnCountdown}) — the single read both paths share.
+     */
+    private boolean isPowered() {
+        BlockState current = getBlockState();
+        return current.hasProperty(SentryPylonBlock.POWERED) && current.getValue(SentryPylonBlock.POWERED);
     }
 
     public void updateVisualState() {
