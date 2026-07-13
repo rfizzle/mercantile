@@ -2,6 +2,7 @@ package com.rfizzle.mercantile.gametest;
 
 import com.rfizzle.mercantile.block.ReturnToPylonGoal;
 import com.rfizzle.mercantile.block.SentryGolemTag;
+import com.rfizzle.mercantile.block.SentryPylonBlock;
 import com.rfizzle.mercantile.block.SentryPylonBlockEntity;
 import com.rfizzle.mercantile.block.SentryTargetHostilesGoal;
 import com.rfizzle.mercantile.config.MercantileConfig;
@@ -212,6 +213,40 @@ public class SentryGolemBehaviorGameTest implements FabricGameTest {
                         "sentry under recent fire from an in-zone threat must not despawn");
                 helper.assertTrue(be.getSentries().contains(golem.getUUID()),
                         "recently-hurt sentry should still be tracked");
+                helper.succeed();
+            } finally {
+                MercantileConfig.get().sentryDespawnSeconds = savedDespawn;
+            }
+        });
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE, batch = "sentryPoweredAlone", timeoutTicks = 200)
+    public void poweredPylonWindsDownSentries(GameTestHelper helper) {
+        // A redstone-disabled pylon stops caring: it winds its summons down on the normal countdown
+        // even with a threat present that would otherwise hold them (issue #165). The husk sits in the
+        // open — visible to the pylon (would fire the LoS recheck reset) — and is set as the golem's
+        // target (would fire the engaged hold); powering the pylon must bypass both.
+        final int savedDespawn = MercantileConfig.get().sentryDespawnSeconds;
+        MercantileConfig.get().sentryDespawnSeconds = 1;
+        SentryPylonBlockEntity be = placePylonOnFloor(helper);
+        be.setFuel(4);
+        IronGolem golem = spawnSentryAt(helper, be, new BlockPos(2, 2, 2));
+
+        helper.setBlock(new BlockPos(2, 2, 1), Blocks.REDSTONE_BLOCK);
+        Husk husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new BlockPos(3, 2, 3));
+        helper.assertTrue(husk.isAlive(), "husk should spawn");
+        golem.setTarget(husk);
+
+        helper.runAfterDelay(60, () -> {
+            try {
+                helper.assertTrue(helper.getBlockState(PYLON).getValue(SentryPylonBlock.POWERED),
+                        "pylon should be powered");
+                List<IronGolem> golems = helper.getEntities(EntityType.IRON_GOLEM);
+                helper.assertTrue(golems.isEmpty(),
+                        "a powered pylon must wind its sentries down despite a visible, engaged threat "
+                                + "(got " + golems.size() + ")");
+                helper.assertTrue(be.getSentries().isEmpty(),
+                        "tracked sentries should be cleared");
                 helper.succeed();
             } finally {
                 MercantileConfig.get().sentryDespawnSeconds = savedDespawn;
