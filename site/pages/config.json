@@ -1015,7 +1015,7 @@
               "boolean",
               "true",
               "—",
-              "Render the 48-block bell radius circle while holding a bell, and outline adult villagers within it."
+              "Render the 48-block bell radius circle while holding a bell — a gold circle around every placed bell in range plus a dim-white placement preview around you — and outline adult villagers within it."
             ],
             [
               "<code class='text-bone whitespace-nowrap'>enableInfoPanel</code>",

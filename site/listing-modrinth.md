@@ -227,8 +227,9 @@ reflects fuel level; a redstone signal disables the pylon entirely.
 - **Workstation links** — hold a bell to see profession-colored particle
   lines between villagers and their workstations. Unbound villagers pulse
   with angry particles; unclaimed workstations glow yellow.
-- **Bell radius** — hold a bell to see its 48-block gathering area as a
-  particle circle on the ground. Ring a placed bell to highlight every
+- **Bell radius** — hold a bell to see the 48-block gathering area of every
+  placed bell in range as a gold circle on the ground, plus a dim-white
+  placement preview around you. Ring a placed bell to highlight every
   villager in range.
 
 ### Trade Index (EMI / REI / JEI)
