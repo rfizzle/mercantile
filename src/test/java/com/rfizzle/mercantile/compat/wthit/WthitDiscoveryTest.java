@@ -2,6 +2,7 @@ package com.rfizzle.mercantile.compat.wthit;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.rfizzle.mercantile.ManifestTestSupport;
 import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
@@ -20,6 +21,12 @@ class WthitDiscoveryTest {
     private static final Gson GSON = new Gson();
     private static final String PKG = "com.rfizzle.mercantile.compat.wthit.";
 
+    /**
+     * Safe for {@code waila_plugins.json}: {@code wthit} is {@code modCompileOnly} and absent from
+     * the test runtime classpath, so Mercantile ships the only copy of that name. A resource whose
+     * name a dependency also ships — {@code fabric.mod.json} — must go through
+     * {@link com.rfizzle.mercantile.ManifestTestSupport} instead.
+     */
     private static JsonObject readResource(String path) {
         try (InputStream stream = WthitDiscoveryTest.class.getResourceAsStream(path)) {
             assertNotNull(stream, "missing resource: " + path);
@@ -44,12 +51,18 @@ class WthitDiscoveryTest {
                 "manifest must gate loading on the wthit requirement");
     }
 
+    /**
+     * The shipped manifest carries no {@code custom} block, so the absence of the legacy key is
+     * asserted as one unconditional expression — a {@code has("custom")} guard would make the
+     * assertion unreachable. The contract holds whether the block is missing or merely lacks the key.
+     */
     @Test
     void fabricModJsonHasNoLegacyWthitCustomKey() {
-        JsonObject fabricModJson = readResource("/fabric.mod.json");
-        if (fabricModJson.has("custom")) {
-            assertFalse(fabricModJson.getAsJsonObject("custom").has("wthit:plugins"),
-                    "fabric.mod.json must not discover WTHIT via the legacy custom.wthit:plugins key");
-        }
+        JsonObject fabricModJson = ManifestTestSupport.readMercantileManifest();
+        boolean declaresLegacyKey = fabricModJson.has("custom")
+                && fabricModJson.getAsJsonObject("custom").has("wthit:plugins");
+        assertFalse(declaresLegacyKey,
+                "fabric.mod.json must not discover WTHIT via the legacy custom.wthit:plugins key — "
+                        + "discovery goes through waila_plugins.json");
     }
 }
