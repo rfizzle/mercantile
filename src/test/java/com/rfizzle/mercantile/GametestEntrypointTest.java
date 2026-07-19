@@ -5,14 +5,10 @@ import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Enumeration;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -33,35 +29,9 @@ class GametestEntrypointTest {
     private static final Gson GSON = new Gson();
     private static final String GAMETEST_PKG = "com.rfizzle.mercantile.gametest.";
 
-    /**
-     * The test classpath carries a {@code fabric.mod.json} for every Fabric API submodule,
-     * so a plain {@code getResourceAsStream} returns an arbitrary one. Enumerate them all and
-     * select Mercantile's own manifest by mod id.
-     */
-    private static JsonObject readMercantileManifest() {
-        try {
-            Enumeration<URL> urls = GametestEntrypointTest.class.getClassLoader()
-                    .getResources("fabric.mod.json");
-            while (urls.hasMoreElements()) {
-                URL url = urls.nextElement();
-                try (InputStream stream = url.openStream()) {
-                    JsonObject manifest = GSON.fromJson(
-                            new InputStreamReader(stream, StandardCharsets.UTF_8), JsonObject.class);
-                    if (manifest != null && manifest.has("id")
-                            && Mercantile.MOD_ID.equals(manifest.get("id").getAsString())) {
-                        return manifest;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            throw new AssertionError("failed to scan the classpath for fabric.mod.json", e);
-        }
-        throw new AssertionError("no fabric.mod.json with id '" + Mercantile.MOD_ID + "' on the test classpath");
-    }
-
     @Test
     void shippedManifestDeclaresNoGametestEntrypoints() {
-        JsonObject manifest = readMercantileManifest();
+        JsonObject manifest = ManifestTestSupport.readMercantileManifest();
         JsonObject entrypoints = manifest.getAsJsonObject("entrypoints");
         assertNotNull(entrypoints, "fabric.mod.json must declare entrypoints");
         assertFalse(entrypoints.has("fabric-gametest"),
@@ -112,7 +82,7 @@ class GametestEntrypointTest {
 
     @Test
     void shippedManifestKeepsItsRuntimeEntrypoints() {
-        JsonObject entrypoints = readMercantileManifest().getAsJsonObject("entrypoints");
+        JsonObject entrypoints = ManifestTestSupport.readMercantileManifest().getAsJsonObject("entrypoints");
         assertEquals("com.rfizzle.mercantile.Mercantile",
                 entrypoints.getAsJsonArray("main").get(0).getAsString());
         assertEquals("com.rfizzle.mercantile.client.MercantileClient",
