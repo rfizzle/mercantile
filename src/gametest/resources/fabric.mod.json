@@ -63,7 +63,9 @@
             "com.rfizzle.mercantile.gametest.FearMarkupGameTest",
             "com.rfizzle.mercantile.gametest.TradePinGameTest",
             "com.rfizzle.mercantile.gametest.WorkOrderGameTest",
-            "com.rfizzle.mercantile.gametest.ContractGameTest"
+            "com.rfizzle.mercantile.gametest.ContractGameTest",
+            "com.rfizzle.mercantile.gametest.MarketDayGameTest",
+            "com.rfizzle.mercantile.gametest.MoodGameTest"
         ]
     },
     "depends": {

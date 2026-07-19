@@ -32,6 +32,15 @@ import java.util.UUID;
 
 public class MoodGameTest implements FabricGameTest {
 
+    /**
+     * Recalc interval the convergence tests run under. Paired with a {@code lastMoodUpdateTime}
+     * of 0 it makes the elapsed span the world's whole game time, so the drift takes one step
+     * per tick and settles on the target in a single read. Backdating from the current game
+     * time instead would go negative in a young world and trip the {@code < 0} sentinel
+     * {@code MoodManager#getMood} reads as "never evaluated", returning the mood undrifted.
+     */
+    private static final int CONVERGENCE_INTERVAL = 1;
+
     @GameTest(template = EMPTY_STRUCTURE)
     public void freshVillagerStartsContent(GameTestHelper helper) {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
@@ -46,17 +55,23 @@ public class MoodGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void goodConditionsReachTopTierOverTime(GameTestHelper helper) {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
-        ServerLevel level = helper.getLevel();
         giveGoodConditions(helper, villager);
 
-        // Backdate the last evaluation far enough that the drift fully converges.
-        MercantileVillagerData data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
-        data.setLastMoodUpdateTime(level.getGameTime() - 1_000_000L);
+        int saved = MercantileConfig.get().moodRecalcIntervalTicks;
+        MercantileConfig.get().moodRecalcIntervalTicks = CONVERGENCE_INTERVAL;
+        try {
+            MercantileVillagerData data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
+            data.setMood(MoodMath.DEFAULT_MOOD);
+            data.setLastMoodUpdateTime(0L);
 
-        helper.assertTrue(MoodManager.getMood(villager) == MoodMath.MAX_MOOD,
-                "bed + workstation + sleep + food should converge to 100; got " + MoodManager.getMood(villager));
-        helper.assertTrue(MoodManager.tier(villager) == MoodTier.HAPPY,
-                "villager with all conditions met should be Happy");
+            int mood = MoodManager.getMood(villager);
+            helper.assertTrue(mood == MoodMath.MAX_MOOD,
+                    "bed + workstation + sleep + food should converge to 100; got " + mood);
+            helper.assertTrue(MoodManager.tier(villager) == MoodTier.HAPPY,
+                    "villager with all conditions met should be Happy");
+        } finally {
+            MercantileConfig.get().moodRecalcIntervalTicks = saved;
+        }
 
         villager.discard();
         helper.succeed();
@@ -65,18 +80,23 @@ public class MoodGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void strippedConditionsDropTowardBottomTier(GameTestHelper helper) {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
-        ServerLevel level = helper.getLevel();
 
-        // No bed/workstation/sleep/food target is 20 (Miserable) once fully drifted.
-        MercantileVillagerData data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
-        data.setMood(MoodMath.MAX_MOOD);
-        data.setLastMoodUpdateTime(level.getGameTime() - 1_000_000L);
+        int saved = MercantileConfig.get().moodRecalcIntervalTicks;
+        MercantileConfig.get().moodRecalcIntervalTicks = CONVERGENCE_INTERVAL;
+        try {
+            // No bed, workstation, sleep, or food — the target bottoms out at 20 (Miserable).
+            MercantileVillagerData data = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
+            data.setMood(MoodMath.DEFAULT_MOOD);
+            data.setLastMoodUpdateTime(0L);
 
-        int mood = MoodManager.getMood(villager);
-        helper.assertTrue(mood == 20,
-                "with no conditions met mood should converge to 20; got " + mood);
-        helper.assertTrue(MoodManager.tier(villager) == MoodTier.MISERABLE,
-                "villager with nothing should end up Miserable");
+            int mood = MoodManager.getMood(villager);
+            helper.assertTrue(mood == 20,
+                    "with no conditions met mood should converge to 20; got " + mood);
+            helper.assertTrue(MoodManager.tier(villager) == MoodTier.MISERABLE,
+                    "villager with nothing should end up Miserable");
+        } finally {
+            MercantileConfig.get().moodRecalcIntervalTicks = saved;
+        }
 
         villager.discard();
         helper.succeed();
