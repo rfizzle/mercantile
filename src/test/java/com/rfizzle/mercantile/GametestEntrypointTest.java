@@ -87,10 +87,14 @@ class GametestEntrypointTest {
     /**
      * Every entrypoint the shipped manifest declares, mapped to the class it must name.
      * The compat entries are as load-bearing as {@code main} and {@code client}: Jade,
-     * Mod Menu, EMI, and REI are all discovered <em>through</em> this manifest, so dropping
+     * Mod Menu, EMI, REI, and JEI are all discovered <em>through</em> this manifest, so dropping
      * an entry disables that integration without a crash, a warning, or a red test. (WTHIT
      * is the exception — it is discovered through {@code waila_plugins.json} at the resource
      * root, guarded separately by {@code WthitDiscoveryTest}.)
+     *
+     * <p>JEI is discovered by {@code jei_mod_plugin} on Fabric, not by the {@code @JeiPlugin}
+     * annotation, which is load-bearing on Forge/NeoForge only — {@code FabricPluginFinder}
+     * resolves plugins solely through this entrypoint key.
      */
     private static final Map<String, String> RUNTIME_ENTRYPOINTS = Map.of(
             "main", "com.rfizzle.mercantile.Mercantile",
@@ -98,6 +102,7 @@ class GametestEntrypointTest {
             "modmenu", "com.rfizzle.mercantile.compat.modmenu.ModMenuIntegration",
             "emi", "com.rfizzle.mercantile.compat.emi.MercantileEmiPlugin",
             "rei_client", "com.rfizzle.mercantile.compat.rei.MercantileReiClientPlugin",
+            "jei_mod_plugin", "com.rfizzle.mercantile.compat.jei.MercantileJeiPlugin",
             "jade", "com.rfizzle.mercantile.compat.jade.MercantileJadePlugin");
 
     @Test
