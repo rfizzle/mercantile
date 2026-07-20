@@ -216,6 +216,14 @@ test {
     // task stays UP-TO-DATE and the check silently skips when registration drifts.
     inputs.files(fileTree('src/gametest/java'), file('src/gametest/resources/fabric.mod.json'))
             .withPropertyName('gametestRegistration')
+            .withPathSensitivity(PathSensitivity.RELATIVE)
+
+    // JeiDiscoveryTest reads the JEI plugin source off disk to assert it still carries
+    // @JeiPlugin for cross-loader parity. Compiled client classes are on the test classpath but
+    // the source is not, so without this the task stays UP-TO-DATE when the annotation is dropped.
+    inputs.files(file('src/client/java/com/rfizzle/mercantile/compat/jei/MercantileJeiPlugin.java'))
+            .withPropertyName('jeiPluginDiscovery')
+            .withPathSensitivity(PathSensitivity.RELATIVE)
 }
 
 jacocoTestReport {
