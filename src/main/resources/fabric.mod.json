@@ -19,6 +19,7 @@
         "modmenu": ["com.rfizzle.mercantile.compat.modmenu.ModMenuIntegration"],
         "emi": ["com.rfizzle.mercantile.compat.emi.MercantileEmiPlugin"],
         "rei_client": ["com.rfizzle.mercantile.compat.rei.MercantileReiClientPlugin"],
+        "jei_mod_plugin": ["com.rfizzle.mercantile.compat.jei.MercantileJeiPlugin"],
         "jade": ["com.rfizzle.mercantile.compat.jade.MercantileJadePlugin"]
     },
     "suggests": {
