@@ -234,6 +234,55 @@ jacocoTestReport {
     }
 }
 
+// Attach the JaCoCo agent to the gametest server so code only exercised in-game
+// (event handlers, trade logic, commands, registration) counts toward coverage. The
+// includes filter keeps the agent from instrumenting Minecraft/Fabric classes.
+tasks.named('runGametest') {
+    jacoco.applyTo(it)
+    it.jacoco.destinationFile = layout.buildDirectory.file('jacoco/runGametest.exec').get().asFile
+    it.jacoco.includes = ['com.rfizzle.mercantile.*']
+    // The agent's exec file is an @OutputFile, which would otherwise make this
+    // JavaExec up-to-date-checkable and silently skip the whole in-world suite on
+    // a repeat run — re-emitting the previous coverage number as if it were fresh.
+    // A gametest sweep must always execute.
+    it.outputs.upToDateWhen { false }
+}
+
+// Single source of coverage truth: unit tests + gametests merged over src/main.
+// fileTree only picks up exec files that exist, so the report still runs when
+// one of the two sweeps hasn't.
+tasks.register('jacocoMergedReport', JacocoReport) {
+    // Ordering only — not dependsOn, so the report can run from existing exec
+    // data without forcing a gametest server spin-up.
+    mustRunAfter test, tasks.named('runGametest')
+    // Partial exec data reports a number that looks whole, so say so out loud.
+    doFirst {
+        ['test.exec', 'runGametest.exec'].each { name ->
+            def exec = layout.buildDirectory.file("jacoco/$name").get().asFile
+            if (!exec.isFile() || exec.length() == 0) {
+                logger.warn("jacocoMergedReport: $name missing or empty — coverage is partial. Run: make coverage")
+            }
+        }
+    }
+    executionData fileTree(layout.buildDirectory.dir('jacoco')) {
+        include 'test.exec', 'runGametest.exec'
+    }
+    sourceSets sourceSets.main
+    // Mixin bodies execute inside the transformed vanilla classes, so the agent
+    // can never attribute coverage to the mixin class files — excluding them keeps
+    // the denominator honest. Mixins stay thin (delegate to handlers) so nothing
+    // measurable hides here. Kept lazy: resolving classDirectories eagerly would
+    // drop the implicit dependency on `classes` and let the report run against
+    // class dirs that do not exist yet.
+    classDirectories.setFrom(files(sourceSets.main.output).asFileTree.matching {
+        exclude 'com/rfizzle/mercantile/mixin/**'
+    })
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
 processResources {
     inputs.property "version", project.version
 

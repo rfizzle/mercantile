@@ -31,11 +31,16 @@ in the local workspace. Normative for this repo:
 ./gradlew runClient      # launch dev client
 ./gradlew runServer      # launch dev server
 ./gradlew genSources     # decompile MC sources for IDE nav
+
+# The mod's real coverage number — unit tests and gametests merged over src/main.
+# build/reports/jacoco/test/ is unit-only and undercounts everything
+# exercised in-game; never read coverage from it.
+./gradlew test runGametest jacocoMergedReport
 ```
 
-A `Makefile` wraps these (`make build`, `make test`, `make run-client`, etc.)
-and adds `make release VERSION=X.Y.Z` (tags `vX.Y.Z` and pushes it to trigger
-the release).
+A `Makefile` wraps these (`make build`, `make test`, `make coverage`,
+`make run-client`, etc.) and adds `make release VERSION=X.Y.Z` (tags `vX.Y.Z`
+and pushes it to trigger the release).
 
 Run a single JUnit test:
 `./gradlew test --tests "com.rfizzle.mercantile.SomeTest"`
