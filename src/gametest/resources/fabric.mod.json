@@ -69,10 +69,6 @@
         ]
     },
     "depends": {
-        "fabricloader": ">=0.16.10",
-        "minecraft": "~1.21.1",
-        "java": ">=21",
-        "fabric-api": "*",
         "mercantile": "*"
     }
 }

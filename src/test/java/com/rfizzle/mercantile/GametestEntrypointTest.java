@@ -61,13 +61,7 @@ class GametestEntrypointTest {
                     .collect(Collectors.toCollection(TreeSet::new));
         }
 
-        Path manifestPath = Path.of("src/gametest/resources/fabric.mod.json");
-        assertTrue(Files.isRegularFile(manifestPath), "missing gametest manifest: " + manifestPath.toAbsolutePath());
-
-        JsonObject manifest;
-        try (Reader reader = Files.newBufferedReader(manifestPath, StandardCharsets.UTF_8)) {
-            manifest = GSON.fromJson(reader, JsonObject.class);
-        }
+        JsonObject manifest = readGametestManifest();
 
         Set<String> declared = new TreeSet<>();
         manifest.getAsJsonObject("entrypoints").getAsJsonArray("fabric-gametest")
@@ -82,6 +76,30 @@ class GametestEntrypointTest {
         dangling.removeAll(onDisk);
         assertTrue(dangling.isEmpty(),
                 "the gametest manifest names classes that no longer exist: " + dangling);
+    }
+
+    /**
+     * The companion manifest depends only on the main mod. The loader, Minecraft, Java, and
+     * Fabric API floors are enforced transitively — {@code mercantile-gametest} cannot load
+     * unless {@code mercantile} did, and the shipped manifest carries the floors — so restating
+     * them here creates a second edit site on every toolchain bump, where a missed one fails
+     * only in the gametest run as a confusing load error instead of an obvious version mismatch.
+     */
+    @Test
+    void gametestManifestDependsOnlyOnTheMainMod() throws IOException {
+        JsonObject depends = readGametestManifest().getAsJsonObject("depends");
+        assertNotNull(depends, "the gametest manifest must declare depends");
+        assertEquals(Set.of(Mercantile.MOD_ID), depends.keySet(),
+                "the gametest manifest depends only on the main mod — every other floor is "
+                        + "enforced transitively through it");
+    }
+
+    private static JsonObject readGametestManifest() throws IOException {
+        Path manifestPath = Path.of("src/gametest/resources/fabric.mod.json");
+        assertTrue(Files.isRegularFile(manifestPath), "missing gametest manifest: " + manifestPath.toAbsolutePath());
+        try (Reader reader = Files.newBufferedReader(manifestPath, StandardCharsets.UTF_8)) {
+            return GSON.fromJson(reader, JsonObject.class);
+        }
     }
 
     /**
