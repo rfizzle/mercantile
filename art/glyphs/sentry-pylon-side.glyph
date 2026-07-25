@@ -1,5 +1,6 @@
 # mercantile — sentry-pylon-side (faithful reproduction of the shipped 16x16 texture)
 size: 16
+kind: block
 
 legend:
   . transparent

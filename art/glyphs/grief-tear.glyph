@@ -2,6 +2,7 @@
 # A single pale-blue teardrop shed by mourning villagers. Soft-edged — no ink
 # outline — because the particle renders on the translucent sheet and fades out.
 size: 8
+kind: sprite
 
 legend:
   . transparent

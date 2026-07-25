@@ -1,5 +1,6 @@
 # mercantile — pylon-mote (faithful reproduction of the shipped 4x4 texture)
 size: 4
+kind: sprite
 
 legend:
   . transparent

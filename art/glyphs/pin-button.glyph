@@ -2,6 +2,7 @@
 # match the lock/info/close button family. Filled map-pin: round head tapering
 # to a point, sheen on the upper-left of the head.
 size: 11
+kind: sprite
 
 legend:
   . transparent

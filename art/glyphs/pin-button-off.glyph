@@ -2,6 +2,7 @@
 # pin-button: same map-pin silhouette, emerald inner rim, transparent core, so
 # the pinned/unpinned states read at a glance as filled vs empty.
 size: 11
+kind: sprite
 
 legend:
   . transparent

@@ -1,5 +1,6 @@
 # mercantile — close-button (faithful reproduction of the shipped 32x32 texture)
 size: 32
+kind: sprite
 
 legend:
   . transparent

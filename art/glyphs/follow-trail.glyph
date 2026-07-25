@@ -1,5 +1,6 @@
 # mercantile — follow-trail (faithful reproduction of the shipped 8x8 texture)
 size: 8
+kind: sprite
 
 legend:
   . transparent

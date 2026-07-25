@@ -2,6 +2,7 @@
 # to match the custom info/close buttons. Replaces minecraft:widget/locked_button.
 # Closed shackle seated into the lock body; centered keyhole.
 size: 11
+kind: sprite
 
 legend:
   . transparent

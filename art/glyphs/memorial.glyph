@@ -4,6 +4,7 @@
 # the jaw. Long villager nose slab down the center; each dark socket holds an
 # emerald glint on its inner edge — the memory that lives on.
 size: 32
+kind: sprite
 
 legend:
   . transparent

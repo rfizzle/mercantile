@@ -2,6 +2,7 @@
 # (status = villager assigned). Mercantile emerald body, emerald-bright top edge,
 # ink outline. Pairs with the white "?" unclaimed marker.
 size: 16
+kind: sprite
 
 legend:
   . transparent

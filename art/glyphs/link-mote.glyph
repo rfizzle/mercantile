@@ -3,6 +3,7 @@
 # per-profession color (set via TextureSheetParticle#setColor) multiplies through
 # cleanly — a glowing dot reads better than the square dust pixel.
 size: 8
+kind: sprite
 
 legend:
   . transparent

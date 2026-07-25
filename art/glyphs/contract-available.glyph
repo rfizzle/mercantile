@@ -5,6 +5,7 @@
 # volume, and three emerald ellipsis dots (bright top row, base bottom) —
 # the villager has something to ask.
 size: 16
+kind: sprite
 
 legend:
   . transparent

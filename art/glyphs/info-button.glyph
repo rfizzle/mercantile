@@ -1,5 +1,6 @@
 # mercantile — info-button (faithful reproduction of the shipped 48x48 texture)
 size: 48
+kind: sprite
 
 legend:
   . transparent
