@@ -1,5 +1,8 @@
 # mercantile — pickup-sparkle (faithful reproduction of the shipped 8x8 texture)
 size: 8
+kind: sprite
+palette: free
+ships: src/main/resources/assets/mercantile/textures/particle/pickup_sparkle.png
 
 legend:
   . transparent

@@ -4,6 +4,8 @@
 # at draw time, so the body is authored neutral-emerald. Palette: DESIGN.md
 # §1 emerald accents + a gold pivot.
 size: 32
+kind: sprite
+ships: src/main/resources/assets/mercantile/textures/gui/reputation_detail_icon.png
 
 legend:
   . transparent

@@ -1,5 +1,8 @@
 # mercantile — sentry-pylon-side (faithful reproduction of the shipped 16x16 texture)
 size: 16
+kind: block
+palette: free
+ships: src/main/resources/assets/mercantile/textures/block/sentry_pylon_side.png
 
 legend:
   . transparent

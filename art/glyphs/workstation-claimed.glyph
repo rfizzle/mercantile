@@ -2,6 +2,8 @@
 # (status = villager assigned). Mercantile emerald body, emerald-bright top edge,
 # ink outline. Pairs with the white "?" unclaimed marker.
 size: 16
+kind: sprite
+ships: src/main/resources/assets/mercantile/textures/particle/workstation_claimed.png
 
 legend:
   . transparent

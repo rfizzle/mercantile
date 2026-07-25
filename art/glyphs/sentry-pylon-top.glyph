@@ -1,5 +1,8 @@
 # mercantile — sentry-pylon-top (faithful reproduction of the shipped 16x16 texture)
 size: 16
+kind: cap
+palette: free
+ships: src/main/resources/assets/mercantile/textures/block/sentry_pylon_top.png
 
 legend:
   . transparent

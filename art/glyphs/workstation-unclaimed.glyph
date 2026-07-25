@@ -2,6 +2,8 @@
 # (status = no villager assigned), replacing the yellow orbit dust. Neutral bone
 # white with an ink outline so it reads against any block/sky background.
 size: 16
+kind: sprite
+ships: src/main/resources/assets/mercantile/textures/particle/workstation_unclaimed.png
 
 legend:
   . transparent

@@ -5,6 +5,8 @@
 # volume, and three emerald ellipsis dots (bright top row, base bottom) —
 # the villager has something to ask.
 size: 16
+kind: sprite
+ships: src/main/resources/assets/mercantile/textures/particle/contract_available.png
 
 legend:
   . transparent
