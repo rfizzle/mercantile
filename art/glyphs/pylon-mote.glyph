@@ -1,6 +1,7 @@
 # mercantile — pylon-mote (faithful reproduction of the shipped 4x4 texture)
 size: 4
 kind: sprite
+palette: free
 ships: src/main/resources/assets/mercantile/textures/particle/pylon_mote.png
 
 legend:
