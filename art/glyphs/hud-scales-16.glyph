@@ -4,6 +4,8 @@
 # DESIGN.md §1 emerald accents + a gold pivot.
 size: 16
 kind: sprite
+ships: art/hud-icon-16.png
+ships: src/main/resources/assets/mercantile/textures/gui/sprites/reputation_badge.png
 
 legend:
   . transparent

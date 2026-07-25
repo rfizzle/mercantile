@@ -5,6 +5,7 @@
 # emerald glint on its inner edge — the memory that lives on.
 size: 32
 kind: sprite
+ships: src/main/resources/assets/mercantile/textures/item/memorial.png
 
 legend:
   . transparent

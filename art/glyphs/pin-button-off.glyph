@@ -3,6 +3,7 @@
 # the pinned/unpinned states read at a glance as filled vs empty.
 size: 11
 kind: sprite
+ships: src/main/resources/assets/mercantile/textures/gui/sprites/pin_button_off.png
 
 legend:
   . transparent

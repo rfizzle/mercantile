@@ -1,6 +1,7 @@
 # mercantile — close-button (faithful reproduction of the shipped 32x32 texture)
 size: 32
 kind: sprite
+ships: src/main/resources/assets/mercantile/textures/gui/sprites/close_button.png
 
 legend:
   . transparent

@@ -3,6 +3,7 @@
 # outline — because the particle renders on the translucent sheet and fades out.
 size: 8
 kind: sprite
+ships: src/main/resources/assets/mercantile/textures/particle/grief_tear.png
 
 legend:
   . transparent

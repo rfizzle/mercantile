@@ -1,6 +1,7 @@
 # mercantile — pylon-spark (faithful reproduction of the shipped 8x8 texture)
 size: 8
 kind: sprite
+ships: src/main/resources/assets/mercantile/textures/particle/pylon_spark.png
 
 legend:
   . transparent

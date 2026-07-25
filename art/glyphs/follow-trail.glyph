@@ -1,6 +1,7 @@
 # mercantile — follow-trail (faithful reproduction of the shipped 8x8 texture)
 size: 8
 kind: sprite
+ships: src/main/resources/assets/mercantile/textures/particle/follow_trail.png
 
 legend:
   . transparent

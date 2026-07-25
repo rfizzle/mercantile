@@ -7,6 +7,7 @@
 # deep emerald to a dark rim where it presses into the paper.
 size: 32
 kind: sprite
+ships: src/main/resources/assets/mercantile/textures/item/delivery_contract.png
 
 legend:
   . transparent

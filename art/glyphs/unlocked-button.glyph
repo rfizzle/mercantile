@@ -3,6 +3,7 @@
 # open: left leg seated, right leg lifted clear of the body (the open cue).
 size: 11
 kind: sprite
+ships: src/main/resources/assets/mercantile/textures/gui/sprites/unlocked_button.png
 
 legend:
   . transparent
