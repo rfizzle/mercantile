@@ -14,7 +14,7 @@ CX = CY = (N - 1) / 2.0
 
 # ---- palette (Mercantile emerald/gold over green-stone neutrals) -----------
 COL = {
-    'ink':       '#0a0a0a',
+    'ink':       'ink',        # #0a0a0a
     # emerald rim glow (alpha falloff)
     'glow1':     '#6ddb94cc',
     'glow2':     '#50c878a0',
@@ -32,12 +32,12 @@ COL = {
     'mortar':    '#081610',
     'vig':       '#06120c',     # inner-edge vignette
     # balance scale — emerald ramp (matches hud-scales)
-    'em_bri':    '#6ddb94',     # mercantile.emerald-bright — highlight
-    'em':        '#50c878',     # mercantile.emerald — body
+    'em_bri':    'mercantile.emerald-bright',   # #6ddb94 highlight
+    'em':        'mercantile.emerald',          # #50c878 body
     'em_dk':     '#2c8a57',     # deeper emerald — facet shadow
     'em_dp':     '#1f6b41',     # deepest emerald — underside
     # gold pivot
-    'gold':      '#ffd700',
+    'gold':      'gold',       # #ffd700
     'gold_dk':   '#b8860b',
     'gold_glo':  '#fff3c0',
 }
