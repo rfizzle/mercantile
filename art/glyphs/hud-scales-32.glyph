@@ -9,12 +9,12 @@ ships: src/main/resources/assets/mercantile/textures/gui/reputation_detail_icon.
 
 legend:
   . transparent
-  K #0a0a0a                       # ink outline
-  E #50c878                       # mercantile.emerald — body
-  e #6ddb94                       # mercantile.emerald-bright — highlight
+  K ink                           # #0a0a0a outline
+  E mercantile.emerald            # #50c878 body
+  e mercantile.emerald-bright     # #6ddb94 highlight
   d #2c8a57                       # deeper emerald — facet shadow
   s #1f6b41                       # deepest emerald — underside
-  o #ffd700                       # gold — pivot
+  o gold                          # #ffd700 pivot
   g #b8860b                       # deep gold — pivot shadow
 
 frame:
