@@ -11,7 +11,7 @@ legend:
   @ #50c87850
   $ #50c878a0
   % #6ddb94cc
-  & #0a0a0a
+  & ink
   * #565e48
   + #79836a
   = #3a4030
@@ -22,9 +22,9 @@ legend:
   0 #b8860b
   1 #19402b
   2 #fff3c0
-  3 #ffd700
-  4 #6ddb94
-  5 #50c878
+  3 gold
+  4 mercantile.emerald-bright
+  5 mercantile.emerald
   6 #2c8a57
   7 #1f6b41
   8 #262a1f

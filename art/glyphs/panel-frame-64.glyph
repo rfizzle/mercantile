@@ -7,7 +7,7 @@ kind: ui
 ships: src/main/resources/assets/mercantile/textures/gui/reputation_detail_panel.png
 
 legend:
-  K #0a0a0a
+  K ink
   H #5a5448
   h #48433a
   S #171511
@@ -16,7 +16,7 @@ legend:
   n #2b2823
   L #100f0c
   b #12151ef2
-  R #50c878
+  R mercantile.emerald
   r #2c8a57
   q #1f6b41
 
