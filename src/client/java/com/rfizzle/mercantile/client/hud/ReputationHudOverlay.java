@@ -209,18 +209,14 @@ public final class ReputationHudOverlay {
      * accessors per HUD-STANDARD §6 — hardcoded sibling heights go stale the
      * moment the user disables or moves the sibling's HUD.
      *
-     * <p>Graceful degradation: {@code TribulationAPI.isHudVisible()} /
-     * {@code getHudHeight()} are being added to Tribulation in a parallel
-     * change and do not exist in its current releases. When the class or
-     * methods are absent (older Tribulation), we fall back to the legacy
-     * fixed 22px reservation so behavior with current releases is unchanged.
-     * When Tribulation is absent entirely the offset is 0.
+     * <p>Every Tribulation release from 1.0.0 (the floor {@code build.gradle}
+     * compiles against) exposes both accessors, so the pre-accessor fixed
+     * reservation HUD-STANDARD §6 allows has been retired. When Tribulation is
+     * absent, or its API class or methods cannot be resolved, the offset is 0.
      */
     static final class TribulationOffset {
         private static final String TRIBULATION_MOD_ID = "tribulation";
         private static final String TRIBULATION_API_CLASS = "com.rfizzle.tribulation.api.TribulationAPI";
-        /** Pre-accessor behavior: reserve a fixed strip whenever Tribulation is loaded. */
-        private static final int LEGACY_FIXED_OFFSET = 22;
 
         // Render-thread only, resolved once on first render pass.
         private static boolean resolveAttempted;
@@ -234,16 +230,14 @@ public final class ReputationHudOverlay {
         static int current() {
             if (!FabricLoader.getInstance().isModLoaded(TRIBULATION_MOD_ID)) return 0;
             resolveOnce();
-            if (isHudVisibleHandle == null || getHudHeightHandle == null) {
-                return LEGACY_FIXED_OFFSET;
-            }
+            if (isHudVisibleHandle == null || getHudHeightHandle == null) return 0;
             try {
                 if (!(boolean) isHudVisibleHandle.invokeExact()) return 0;
                 return Math.max(0, (int) getHudHeightHandle.invokeExact());
             } catch (Throwable t) {
-                // Accessor misbehaving — degrade to the legacy reservation
-                // rather than overlapping slot 1.
-                return LEGACY_FIXED_OFFSET;
+                // Accessor misbehaving — treat the sibling as hidden rather than
+                // guessing at a height.
+                return 0;
             }
         }
 
@@ -256,12 +250,10 @@ public final class ReputationHudOverlay {
                 isHudVisibleHandle = lookup.findStatic(api, "isHudVisible", MethodType.methodType(boolean.class));
                 getHudHeightHandle = lookup.findStatic(api, "getHudHeight", MethodType.methodType(int.class));
             } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException e) {
-                // Older Tribulation without the coordination accessors.
                 isHudVisibleHandle = null;
                 getHudHeightHandle = null;
-                Mercantile.LOGGER.info(
-                        "Tribulation present without HUD accessors; using the legacy fixed {}px HUD offset",
-                        LEGACY_FIXED_OFFSET);
+                Mercantile.LOGGER.warn(
+                        "Tribulation is loaded but its HUD accessors could not be resolved; not reserving slot 1", e);
             }
         }
     }

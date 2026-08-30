@@ -3,6 +3,7 @@ package com.rfizzle.mercantile.gametest;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.follow.FollowManager;
 import com.rfizzle.mercantile.follow.FollowableVillager;
+import com.rfizzle.mercantile.gametest.util.MockPlayers;
 import com.rfizzle.mercantile.network.FollowCountS2CPayload;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.core.BlockPos;
@@ -50,9 +51,9 @@ public class FollowModeGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void followCountPushedToOwnerOnStartAndStop(GameTestHelper helper) {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
-        io.netty.channel.embedded.EmbeddedChannel channel =
-                GametestNetUtil.extractEmbeddedChannel(helper, player);
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer player = connected.player();
+        io.netty.channel.embedded.EmbeddedChannel channel = connected.channel();
         int before = GametestNetUtil.countPayloads(channel, FollowCountS2CPayload.class);
 
         helper.assertTrue(FollowManager.startFollowing(villager, player),

@@ -43,10 +43,38 @@ public class ApiEventsGameTest implements FabricGameTest {
     private static final List<TradeExecution> TRADE_EVENTS = new CopyOnWriteArrayList<>();
 
     static {
+        // Registered ahead of the recorders: every capture below is therefore also proof that
+        // a throwing listener is isolated inside the invoker and the listeners after it still
+        // fire (API-STANDARD §3.1) — a fire-site wrap would abandon the recorders.
+        ReputationChangedCallback.EVENT.register((player, oldScore, newScore) -> {
+            throw new IllegalStateException("gametest: misbehaving ReputationChangedCallback listener");
+        });
+        TradeExecutedCallback.EVENT.register((player, merchant, offer) -> {
+            throw new IllegalStateException("gametest: misbehaving TradeExecutedCallback listener");
+        });
         ReputationChangedCallback.EVENT.register((player, oldScore, newScore) ->
                 REP_EVENTS.add(new ReputationChange(player.getUUID(), oldScore, newScore)));
         TradeExecutedCallback.EVENT.register((player, merchant, offer) ->
                 TRADE_EVENTS.add(new TradeExecution(player.getUUID(), merchant.getUUID(), offer)));
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void throwingListenerIsSkippedAndLoggedOnce(GameTestHelper helper) {
+        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
+        data.setReputationMigrated(true);
+        data.setScore(0);
+
+        // The thrower registered first must neither escape here nor starve the recorder.
+        ReputationManager.modifyScore(player, 3);
+
+        helper.assertTrue(repEventsFor(player).size() == 1,
+                "the listener registered after the thrower must still see the change");
+        helper.assertTrue(ReputationChangedCallback.LISTENER_FAILURE_LOGGED.get(),
+                "the invoker must record the first listener failure so it logs exactly once");
+
+        player.discard();
+        helper.succeed();
     }
 
     @GameTest(template = EMPTY_STRUCTURE)

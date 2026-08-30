@@ -1,5 +1,7 @@
 package com.rfizzle.mercantile.api;
 
+import com.rfizzle.mercantile.Mercantile;
+import java.util.concurrent.atomic.AtomicBoolean;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.server.level.ServerPlayer;
@@ -24,17 +26,32 @@ import net.minecraft.server.level.ServerPlayer;
  * <p>Not fired by the one-shot legacy save-format score migration (a 10x
  * rescale of pre-release saves, not a gameplay change).
  *
- * <p>A listener that throws is caught and logged by Mercantile; it cannot
- * corrupt the reputation flow, but it may prevent listeners registered after
- * it from seeing that change.
+ * <p>A listener that throws is caught, logged once at {@code WARN} naming the
+ * listener class, and skipped — it can never break the reputation flow or the
+ * listeners registered after it (API-STANDARD §3.1).
  */
 @Stable
 public interface ReputationChangedCallback {
 
+    /** One-shot gate so a listener that throws on every change logs its stack trace once. */
+    AtomicBoolean LISTENER_FAILURE_LOGGED = new AtomicBoolean(false);
+
     Event<ReputationChangedCallback> EVENT = EventFactory.createArrayBacked(ReputationChangedCallback.class,
             listeners -> (player, oldScore, newScore) -> {
                 for (ReputationChangedCallback listener : listeners) {
-                    listener.onReputationChanged(player, oldScore, newScore);
+                    try {
+                        listener.onReputationChanged(player, oldScore, newScore);
+                    } catch (VirtualMachineError e) {
+                        throw e; // OOME/SOE: the JVM is gone, not the guest
+                    } catch (Throwable t) {
+                        // Throwable, not Exception: a listener compiled against an older
+                        // signature throws Error (AbstractMethodError, NoClassDefFoundError),
+                        // which an Exception catch would let escape and kill the server tick.
+                        if (LISTENER_FAILURE_LOGGED.compareAndSet(false, true)) {
+                            Mercantile.LOGGER.warn("A ReputationChangedCallback listener {} threw; skipping",
+                                    listener.getClass().getName(), t);
+                        }
+                    }
                 }
             });
 

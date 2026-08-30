@@ -3,6 +3,7 @@ package com.rfizzle.mercantile.gametest;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
+import com.rfizzle.mercantile.gametest.util.MockPlayers;
 import com.rfizzle.mercantile.reputation.ReputationManager;
 import io.netty.channel.embedded.EmbeddedChannel;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
@@ -180,7 +181,9 @@ public class ReputationDailyCapGameTest implements FabricGameTest {
             MercantileConfig config = MercantileConfig.get();
             MerchantOffer offer = farmerOffer();
             Villager villager = spawnTrader(helper, offer);
-            ServerPlayer player = makePreparedPlayer(helper);
+            MockPlayers.Connected connected = makePreparedConnected(helper);
+            ServerPlayer player = connected.player();
+            EmbeddedChannel channel = connected.channel();
 
             // Saturate trade sub-cap (defaults: 2 * 5 = 10 trades).
             villager.setTradingPlayer(player);
@@ -189,7 +192,6 @@ public class ReputationDailyCapGameTest implements FabricGameTest {
             }
 
             // Clear channel AFTER cap is hit so the next packet is unambiguous.
-            EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
             channel.outboundMessages().clear();
 
             // Run one more 5-trade window — final trade must hit SUBCAP_HIT and send action bar.
@@ -216,7 +218,9 @@ public class ReputationDailyCapGameTest implements FabricGameTest {
             config.reputationDailyCap = 1;
             config.reputationDailyMaxCycleRep = 5;
 
-            ServerPlayer player = makePreparedPlayer(helper);
+            MockPlayers.Connected connected = makePreparedConnected(helper);
+            ServerPlayer player = connected.player();
+            EmbeddedChannel channel = connected.channel();
             PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
             data.setScore(50);
 
@@ -226,7 +230,6 @@ public class ReputationDailyCapGameTest implements FabricGameTest {
                     "expected daily total cap saturated after first cycle; got "
                             + data.getDailyReputationEarned() + "/" + config.reputationDailyCap);
 
-            EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
             channel.outboundMessages().clear();
 
             ReputationManager.tryGainCycleRep(player); // must hit TOTAL_CAP_HIT and send action bar
@@ -247,9 +250,10 @@ public class ReputationDailyCapGameTest implements FabricGameTest {
             MercantileConfig config = MercantileConfig.get();
             MerchantOffer offer = farmerOffer();
             Villager villager = spawnTrader(helper, offer);
-            ServerPlayer player = makePreparedPlayer(helper);
+            MockPlayers.Connected connected = makePreparedConnected(helper);
+            ServerPlayer player = connected.player();
+            EmbeddedChannel channel = connected.channel();
 
-            EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
             channel.outboundMessages().clear();
 
             villager.setTradingPlayer(player);
@@ -310,7 +314,9 @@ public class ReputationDailyCapGameTest implements FabricGameTest {
             MercantileConfig config = MercantileConfig.get();
             MerchantOffer offer = farmerOffer();
             Villager villager = spawnTrader(helper, offer);
-            ServerPlayer player = makePreparedPlayer(helper);
+            MockPlayers.Connected connected = makePreparedConnected(helper);
+            ServerPlayer player = connected.player();
+            EmbeddedChannel channel = connected.channel();
 
             // Saturate trade sub-cap and trigger the first sub-cap hit so dailyCapNotified=true.
             villager.setTradingPlayer(player);
@@ -320,7 +326,6 @@ public class ReputationDailyCapGameTest implements FabricGameTest {
                 villager.notifyTrade(offer);
             }
 
-            EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
             channel.outboundMessages().clear();
 
             // Two more pulse windows of trades — each pulse would hit SUBCAP_HIT again, but
@@ -348,7 +353,9 @@ public class ReputationDailyCapGameTest implements FabricGameTest {
             config.reputationDailyCap = 1;
             config.reputationDailyMaxCycleRep = 5;
 
-            ServerPlayer player = makePreparedPlayer(helper);
+            MockPlayers.Connected connected = makePreparedConnected(helper);
+            ServerPlayer player = connected.player();
+            EmbeddedChannel channel = connected.channel();
             PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
             data.setScore(50);
 
@@ -362,7 +369,6 @@ public class ReputationDailyCapGameTest implements FabricGameTest {
             long currentDay = player.serverLevel().getGameTime() / 24_000L;
             data.resetDailyCounters(currentDay - 1);
 
-            EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
             channel.outboundMessages().clear();
 
             // Day N+1 effective: re-saturate and re-hit the cap; message MUST fire again.
@@ -446,7 +452,17 @@ public class ReputationDailyCapGameTest implements FabricGameTest {
      * seeded counters mid-test).
      */
     private static ServerPlayer makePreparedPlayer(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        return prepare(helper.makeMockServerPlayerInLevel());
+    }
+
+    /** Same preparation, on a connected mock whose outbound channel is exposed for packet assertions. */
+    private static MockPlayers.Connected makePreparedConnected(GameTestHelper helper) {
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        prepare(connected.player());
+        return connected;
+    }
+
+    private static ServerPlayer prepare(ServerPlayer player) {
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         data.setReputationMigrated(true);
         long currentDay = player.serverLevel().getGameTime() / 24_000L;

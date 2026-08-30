@@ -3,7 +3,8 @@ package com.rfizzle.mercantile.gametest;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
-import com.rfizzle.mercantile.network.ConfigSyncS2CPayload;
+import com.rfizzle.mercantile.gametest.util.MockPlayers;
+import com.rfizzle.mercantile.network.ConfigSyncPayload;
 import com.rfizzle.mercantile.network.FollowCountS2CPayload;
 import com.rfizzle.mercantile.network.MercantileNetworking;
 import com.rfizzle.mercantile.network.SyncReputationS2CPayload;
@@ -18,18 +19,19 @@ public class PlayerJoinSyncGameTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void joinSendsConfigSyncPayload(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
-        EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
-        int before = GametestNetUtil.countPayloads(channel, ConfigSyncS2CPayload.class);
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer player = connected.player();
+        EmbeddedChannel channel = connected.channel();
+        int before = GametestNetUtil.countPayloads(channel, ConfigSyncPayload.class);
 
         MercantileNetworking.sendJoinSync(player);
 
-        int after = GametestNetUtil.countPayloads(channel, ConfigSyncS2CPayload.class);
+        int after = GametestNetUtil.countPayloads(channel, ConfigSyncPayload.class);
         helper.assertTrue(after - before == 1,
-                "sendJoinSync must send exactly 1 ConfigSyncS2CPayload; saw delta " + (after - before));
+                "sendJoinSync must send exactly 1 ConfigSyncPayload; saw delta " + (after - before));
 
-        ConfigSyncS2CPayload payload = findLastConfigPayload(channel);
-        helper.assertTrue(payload != null, "expected at least one ConfigSyncS2CPayload");
+        ConfigSyncPayload payload = findLastConfigPayload(channel);
+        helper.assertTrue(payload != null, "expected at least one ConfigSyncPayload");
         helper.assertTrue(payload.configJson() != null && !payload.configJson().isEmpty(),
                 "config JSON must not be empty");
         helper.assertTrue(payload.configJson().equals(MercantileConfig.get().toJson()),
@@ -40,12 +42,13 @@ public class PlayerJoinSyncGameTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void joinSendsReputationSyncPayload(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer player = connected.player();
+        EmbeddedChannel channel = connected.channel();
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         data.setReputationMigrated(true);
         data.setScore(42);
 
-        EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
         int before = GametestNetUtil.countPayloads(channel, SyncReputationS2CPayload.class);
 
         MercantileNetworking.sendJoinSync(player);
@@ -64,17 +67,18 @@ public class PlayerJoinSyncGameTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void joinSendsBothPayloads(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
-        EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
-        int configBefore = GametestNetUtil.countPayloads(channel, ConfigSyncS2CPayload.class);
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer player = connected.player();
+        EmbeddedChannel channel = connected.channel();
+        int configBefore = GametestNetUtil.countPayloads(channel, ConfigSyncPayload.class);
         int repBefore = GametestNetUtil.countPayloads(channel, SyncReputationS2CPayload.class);
 
         MercantileNetworking.sendJoinSync(player);
 
-        int configAfter = GametestNetUtil.countPayloads(channel, ConfigSyncS2CPayload.class);
+        int configAfter = GametestNetUtil.countPayloads(channel, ConfigSyncPayload.class);
         int repAfter = GametestNetUtil.countPayloads(channel, SyncReputationS2CPayload.class);
         helper.assertTrue(configAfter - configBefore == 1,
-                "sendJoinSync must send exactly 1 ConfigSyncS2CPayload");
+                "sendJoinSync must send exactly 1 ConfigSyncPayload");
         helper.assertTrue(repAfter - repBefore == 1,
                 "sendJoinSync must send exactly 1 SyncReputationS2CPayload");
 
@@ -83,8 +87,9 @@ public class PlayerJoinSyncGameTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void joinSendsFollowCountPayload(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
-        EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer player = connected.player();
+        EmbeddedChannel channel = connected.channel();
         int before = GametestNetUtil.countPayloads(channel, FollowCountS2CPayload.class);
 
         MercantileNetworking.sendJoinSync(player);
@@ -118,11 +123,11 @@ public class PlayerJoinSyncGameTest implements FabricGameTest {
         helper.succeed();
     }
 
-    private static ConfigSyncS2CPayload findLastConfigPayload(EmbeddedChannel channel) {
-        ConfigSyncS2CPayload last = null;
+    private static ConfigSyncPayload findLastConfigPayload(EmbeddedChannel channel) {
+        ConfigSyncPayload last = null;
         for (Object msg : channel.outboundMessages()) {
             if (msg instanceof ClientboundCustomPayloadPacket custom
-                    && custom.payload() instanceof ConfigSyncS2CPayload config) {
+                    && custom.payload() instanceof ConfigSyncPayload config) {
                 last = config;
             }
         }

@@ -78,7 +78,7 @@ public class MercantileNetworking {
         PayloadTypeRegistry.playS2C().register(VillagerInfoPanelS2CPayload.TYPE, VillagerInfoPanelS2CPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(WorkstationMapS2CPayload.TYPE, WorkstationMapS2CPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(BellRingS2CPayload.TYPE, BellRingS2CPayload.CODEC);
-        PayloadTypeRegistry.playS2C().register(ConfigSyncS2CPayload.TYPE, ConfigSyncS2CPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(ConfigSyncPayload.TYPE, ConfigSyncPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(TradeIndexS2CPayload.TYPE, TradeIndexS2CPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(TradePinsS2CPayload.TYPE, TradePinsS2CPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(PinnedTradesSummaryS2CPayload.TYPE, PinnedTradesSummaryS2CPayload.CODEC);
@@ -135,7 +135,7 @@ public class MercantileNetworking {
         // Send config first — the client uses config gates when interpreting subsequent
         // payloads (e.g. enableReputationHud), so landing config before rep avoids a
         // one-frame mismatch on the HUD at login.
-        ServerPlayNetworking.send(player, new ConfigSyncS2CPayload(MercantileConfig.get().toJson()));
+        ServerPlayNetworking.send(player, new ConfigSyncPayload(MercantileConfig.get().toJson()));
         ReputationManager.syncToClient(player);
         TradePinManager.syncPinsSummary(player);
         ServerPlayNetworking.send(player, new FollowCountS2CPayload(FollowManager.getFollowerCount(player.getUUID())));

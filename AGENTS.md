@@ -31,6 +31,8 @@ in the local workspace. Normative for this repo:
 ./gradlew runClient      # launch dev client
 ./gradlew runServer      # launch dev server
 ./gradlew genSources     # decompile MC sources for IDE nav
+./gradlew runDatagen     # regenerate src/main/generated (Sentry Pylon recipe/loot/tags)
+./gradlew verifyDatagenIdempotent   # CI gate: datagen output is committed and current
 
 # The mod's real coverage number — unit tests and gametests merged over src/main.
 # build/reports/jacoco/test/ is unit-only and undercounts everything
@@ -55,7 +57,7 @@ Loom's `splitEnvironmentSourceSets()` is enabled — three source sets:
 
 | Source set | Root | Purpose |
 |---|---|---|
-| `main` | `src/main/java` | Server + common logic. Entrypoint: `Mercantile.java` |
+| `main` | `src/main/java` | Server + common logic. Entrypoint: `Mercantile.java`. Resources: `src/main/resources` (hand-authored) plus `src/main/generated` (datagen output — never hand-edit; `make run-datagen`) |
 | `client` | `src/client/java` | Client-only code. Entrypoint: `MercantileClient.java` |
 | `gametest` | `src/gametest/java`, `src/gametest/resources` | Fabric gametests (run with `runGametest`). Has `main` on its classpath but is NOT included in the jar. |
 
@@ -65,7 +67,7 @@ shipped `src/main/resources/fabric.mod.json`. `fabric-gametest-api-v1` is a
 dev-only Fabric module whose initializer is ungated: it instantiates every
 declared `fabric-gametest` entrypoint on any dev launch, so an entry in the
 shipped manifest crashes `runServer`, whose run set does not carry the gametest
-source set. `GametestEntrypointTest` guards both halves of this — that the
+source set. `GametestRegistrationTest` guards both halves of this — that the
 shipped manifest stays clean, and that every suite on disk is registered.
 
 JUnit tests go in the standard `src/test/java` directory. The test classpath

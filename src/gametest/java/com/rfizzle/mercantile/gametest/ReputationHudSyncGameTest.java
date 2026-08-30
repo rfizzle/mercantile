@@ -3,6 +3,7 @@ package com.rfizzle.mercantile.gametest;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
+import com.rfizzle.mercantile.gametest.util.MockPlayers;
 import com.rfizzle.mercantile.network.SyncReputationS2CPayload;
 import com.rfizzle.mercantile.reputation.ReputationManager;
 import com.rfizzle.mercantile.api.ReputationTier;
@@ -27,11 +28,12 @@ public class ReputationHudSyncGameTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void reputationChangeSendsSyncPayload(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer player = connected.player();
+        EmbeddedChannel channel = connected.channel();
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         data.setScore(0);
 
-        EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
         int before = GametestNetUtil.countPayloads(channel, SyncReputationS2CPayload.class);
 
         ReputationManager.modifyScore(player, 5);
@@ -53,11 +55,12 @@ public class ReputationHudSyncGameTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void explicitSyncToClientSendsCurrentState(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer player = connected.player();
+        EmbeddedChannel channel = connected.channel();
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         data.setScore(60);
 
-        EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
         int before = GametestNetUtil.countPayloads(channel, SyncReputationS2CPayload.class);
 
         ReputationManager.syncToClient(player);
@@ -79,11 +82,12 @@ public class ReputationHudSyncGameTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void syncPayloadContainsTranslationKey(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer player = connected.player();
+        EmbeddedChannel channel = connected.channel();
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         data.setScore(0);
 
-        EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
         ReputationManager.syncToClient(player);
 
         SyncReputationS2CPayload payload = findLastPayload(channel);
@@ -96,11 +100,12 @@ public class ReputationHudSyncGameTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void noSyncWhenReputationDisabled(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer player = connected.player();
+        EmbeddedChannel channel = connected.channel();
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         data.setScore(0);
 
-        EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
         int before = GametestNetUtil.countPayloads(channel, SyncReputationS2CPayload.class);
 
         boolean saved = MercantileConfig.get().enableReputation;
@@ -126,7 +131,9 @@ public class ReputationHudSyncGameTest implements FabricGameTest {
                 new ItemCost(Items.EMERALD, 1), new ItemStack(Items.APPLE, 1), 16, 1, 0.0f);
         Villager villager = spawnTrader(helper, offer);
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer player = connected.player();
+        EmbeddedChannel channel = connected.channel();
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         // S-040 introduced pulse-based gain: only every Nth trade awards rep + sync. Pre-align
         // the day so the implicit rollover in tryGainTradeRep doesn't reset our seeded state.
@@ -135,7 +142,6 @@ public class ReputationHudSyncGameTest implements FabricGameTest {
         data.setReputationMigrated(true);
         data.setScore(0);
 
-        EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
         int before = GametestNetUtil.countPayloads(channel, SyncReputationS2CPayload.class);
 
         villager.setTradingPlayer(player);

@@ -4,6 +4,7 @@ import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.MercantileVillagerData;
 import com.rfizzle.mercantile.data.PlayerData;
+import com.rfizzle.mercantile.gametest.util.MockPlayers;
 import com.rfizzle.mercantile.network.VillagerInfoPanelS2CPayload;
 import io.netty.channel.embedded.EmbeddedChannel;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
@@ -122,7 +123,9 @@ public class InfoPanelGameTest implements FabricGameTest {
         villager.getBrain().setMemory(MemoryModuleType.JOB_SITE,
                 GlobalPos.of(level.dimension(), workstationAbs));
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer player = connected.player();
+        EmbeddedChannel channel = connected.channel();
         player.teleportTo(villager.getX(), villager.getY(), villager.getZ());
 
         // Seed history so we can assert that totalTrades reads PlayerData, not getOffers().size().
@@ -133,7 +136,6 @@ public class InfoPanelGameTest implements FabricGameTest {
         // Lock the profession so we can assert the lock bit propagates.
         villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA).setProfessionLocked(true);
 
-        EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
         channel.outboundMessages().clear();
 
         try {
@@ -167,10 +169,11 @@ public class InfoPanelGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void featureDisabledSendsNoPayload(GameTestHelper helper) {
         Villager villager = spawnTrader(helper);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer player = connected.player();
+        EmbeddedChannel channel = connected.channel();
         player.teleportTo(villager.getX(), villager.getY(), villager.getZ());
 
-        EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
         channel.outboundMessages().clear();
 
         MercantileConfig config = MercantileConfig.get();

@@ -5,6 +5,7 @@ import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PinnedTrade;
 import com.rfizzle.mercantile.data.PlayerData;
+import com.rfizzle.mercantile.gametest.util.MockPlayers;
 import com.rfizzle.mercantile.network.TradePinsS2CPayload;
 import com.rfizzle.mercantile.trade.OfferIdentityHash;
 import com.rfizzle.mercantile.trade.TradePinManager;
@@ -102,7 +103,9 @@ public class TradePinGameTest implements FabricGameTest {
         int savedRange = config.pinRestockNotifyRange;
         Villager villager = spawnTrader(helper,
                 new MerchantOffer(new ItemCost(Items.EMERALD, 3), new ItemStack(Items.APPLE, 1), 16, 1, 0.0f));
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer player = connected.player();
+        EmbeddedChannel channel = connected.channel();
 
         try {
             config.enableTradePinning = true;
@@ -115,7 +118,6 @@ public class TradePinGameTest implements FabricGameTest {
                     "Test Villager", "3 Emerald -> Apple"));
 
             offer.setToOutOfStock();
-            EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
             channel.outboundMessages().clear();
 
             villager.restock();
@@ -143,7 +145,9 @@ public class TradePinGameTest implements FabricGameTest {
         int savedRange = config.pinRestockNotifyRange;
         Villager villager = spawnTrader(helper,
                 new MerchantOffer(new ItemCost(Items.EMERALD, 3), new ItemStack(Items.APPLE, 1), 16, 1, 0.0f));
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer player = connected.player();
+        EmbeddedChannel channel = connected.channel();
 
         try {
             config.enableTradePinning = true;
@@ -156,7 +160,6 @@ public class TradePinGameTest implements FabricGameTest {
                     "Test Villager", "3 Emerald -> Apple"));
 
             offer.setToOutOfStock();
-            EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
             channel.outboundMessages().clear();
 
             villager.restock();
@@ -240,7 +243,9 @@ public class TradePinGameTest implements FabricGameTest {
                     new ItemStack(Items.APPLE, 1), 16, 1, 0.0f);
         }
         Villager villager = spawnTrader(helper, many);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer player = connected.player();
+        EmbeddedChannel channel = connected.channel();
 
         try {
             config.enableTradePinning = true;
@@ -249,7 +254,6 @@ public class TradePinGameTest implements FabricGameTest {
                     villager.getOffers().get(TradePinsS2CPayload.MAX_OFFERS + 1));
             data.addPinnedTrade(new PinnedTrade(villager.getUUID(), beyondCapHash, "V", ""));
 
-            EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
             channel.outboundMessages().clear();
             TradePinManager.sendPinsTo(player, villager);
 

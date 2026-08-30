@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
+import com.rfizzle.mercantile.gametest.util.MockPlayers;
 import com.rfizzle.mercantile.mixin.MerchantOfferDemandAccessor;
 import com.rfizzle.mercantile.network.DemandPriceS2CPayload;
 import com.rfizzle.mercantile.trade.PriceBreakdownBuilder;
@@ -166,10 +167,11 @@ public class DemandTransparencyGameTest implements FabricGameTest {
                 new ItemCost(Items.EMERALD, 1), new ItemStack(Items.APPLE, 1), 16, 1, 0.0f);
         Villager villager = spawnTrader(helper, offer);
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer player = connected.player();
+        EmbeddedChannel channel = connected.channel();
         player.teleportTo(villager.getX(), villager.getY(), villager.getZ());
 
-        EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
         channel.outboundMessages().clear();
 
         try {
@@ -195,10 +197,11 @@ public class DemandTransparencyGameTest implements FabricGameTest {
                 new ItemCost(Items.EMERALD, 1), new ItemStack(Items.APPLE, 1), 16, 1, 0.0f);
         Villager villager = spawnTrader(helper, offer);
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer player = connected.player();
+        EmbeddedChannel channel = connected.channel();
         player.teleportTo(villager.getX(), villager.getY(), villager.getZ());
 
-        EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
         channel.outboundMessages().clear();
 
         MercantileConfig config = MercantileConfig.get();

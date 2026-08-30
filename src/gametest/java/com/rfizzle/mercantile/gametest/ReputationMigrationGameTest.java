@@ -3,6 +3,7 @@ package com.rfizzle.mercantile.gametest;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
+import com.rfizzle.mercantile.gametest.util.MockPlayers;
 import com.rfizzle.mercantile.network.SyncReputationS2CPayload;
 import com.rfizzle.mercantile.reputation.ReputationManager;
 import io.netty.channel.embedded.EmbeddedChannel;
@@ -35,7 +36,9 @@ public class ReputationMigrationGameTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void migratedPlayerSyncPayloadCarriesDailyFields(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer player = connected.player();
+        EmbeddedChannel channel = connected.channel();
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         data.setReputationMigrated(true);
         data.setScore(305);
@@ -45,7 +48,6 @@ public class ReputationMigrationGameTest implements FabricGameTest {
         data.resetDailyCounters(currentDay);
         data.addDailyTradeRep(2);  // dailyReputationEarned += 2
 
-        EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
         channel.outboundMessages().clear();
 
         ReputationManager.syncToClient(player);

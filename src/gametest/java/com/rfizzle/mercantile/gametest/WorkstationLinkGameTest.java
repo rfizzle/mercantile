@@ -1,6 +1,7 @@
 package com.rfizzle.mercantile.gametest;
 
 import com.rfizzle.mercantile.config.MercantileConfig;
+import com.rfizzle.mercantile.gametest.util.MockPlayers;
 import com.rfizzle.mercantile.network.MercantileNetworking;
 import com.rfizzle.mercantile.network.WorkstationMapS2CPayload;
 import com.rfizzle.mercantile.visualization.WorkstationMapService;
@@ -10,7 +11,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.network.Connection;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,7 +21,6 @@ import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -169,10 +168,11 @@ public class WorkstationLinkGameTest implements FabricGameTest {
         // Spawn a villager so the service WOULD produce a non-empty payload if invoked.
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer player = connected.player();
+        EmbeddedChannel channel = connected.channel();
         player.teleportTo(villager.getX(), villager.getY(), villager.getZ());
 
-        EmbeddedChannel channel = extractEmbeddedChannel(helper, player);
         // Drain anything that may have queued during placeNewPlayer.
         channel.outboundMessages().clear();
 
@@ -252,36 +252,4 @@ public class WorkstationLinkGameTest implements FabricGameTest {
         }
     }
 
-    private static EmbeddedChannel extractEmbeddedChannel(GameTestHelper helper, ServerPlayer player) {
-        Connection connection;
-        try {
-            Field connField = net.minecraft.server.network.ServerCommonPacketListenerImpl.class
-                    .getDeclaredField("connection");
-            connField.setAccessible(true);
-            connection = (Connection) connField.get(player.connection);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            helper.fail("ServerCommonPacketListenerImpl.connection field not accessible — mapping changed? " + e);
-            throw new AssertionError(e);
-        }
-        Field channelField;
-        try {
-            channelField = Connection.class.getDeclaredField("channel");
-            channelField.setAccessible(true);
-        } catch (NoSuchFieldException e) {
-            helper.fail("Connection.channel field not found — mapping or field renamed? " + e);
-            throw new AssertionError(e);
-        }
-        try {
-            Object channel = channelField.get(connection);
-            if (!(channel instanceof EmbeddedChannel embedded)) {
-                helper.fail("Mock player connection channel is not EmbeddedChannel; got "
-                        + (channel == null ? "null" : channel.getClass().getName()));
-                throw new AssertionError("not embedded");
-            }
-            return embedded;
-        } catch (IllegalAccessException e) {
-            helper.fail("Could not access Connection.channel: " + e);
-            throw new AssertionError(e);
-        }
-    }
 }

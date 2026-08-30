@@ -14,16 +14,16 @@ public class ModMenuIntegration implements ModMenuApi {
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
         return parent -> {
-            MercantileConfig config = MercantileConfig.get();
+            // The screen edits a deep working copy, never the live singleton: Cloth's save
+            // consumers write field-at-a-time, and publish() clamps, persists, and swaps the
+            // finished copy in with one store (mc-config, "Reloadable singleton").
+            MercantileConfig config = MercantileConfig.get().copy();
             MercantileConfig defaults = new MercantileConfig();
 
             ConfigBuilder builder = ConfigBuilder.create()
                     .setParentScreen(parent)
                     .setTitle(Component.translatable("config.mercantile.title"))
-                    .setSavingRunnable(() -> {
-                        config.clamp();
-                        config.save();
-                    });
+                    .setSavingRunnable(() -> MercantileConfig.publish(config));
 
             ConfigEntryBuilder entry = builder.entryBuilder();
 

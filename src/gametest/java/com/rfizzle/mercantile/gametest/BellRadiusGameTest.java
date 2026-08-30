@@ -2,6 +2,7 @@ package com.rfizzle.mercantile.gametest;
 
 import com.rfizzle.mercantile.Mercantile;
 import com.rfizzle.mercantile.config.MercantileConfig;
+import com.rfizzle.mercantile.gametest.util.MockPlayers;
 import com.rfizzle.mercantile.network.BellRingS2CPayload;
 import com.rfizzle.mercantile.visualization.BellRingService;
 import io.netty.channel.embedded.EmbeddedChannel;
@@ -10,7 +11,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.server.level.ServerLevel;
@@ -23,7 +23,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.UUID;
 
@@ -195,10 +194,11 @@ public class BellRadiusGameTest implements FabricGameTest {
 
         Villager v = helper.spawn(EntityType.VILLAGER, 1, 1, 1);
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer player = connected.player();
+        EmbeddedChannel channel = connected.channel();
         player.teleportTo(bellAbs.getX() + 0.5, bellAbs.getY() + 1, bellAbs.getZ() + 0.5);
 
-        EmbeddedChannel channel = extractEmbeddedChannel(helper, player);
         channel.outboundMessages().clear();
 
         boolean saved = MercantileConfig.get().enableBellRadiusVis;
@@ -239,10 +239,11 @@ public class BellRadiusGameTest implements FabricGameTest {
         Villager far = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
         far.teleportTo(bellAbs.getX() + BellRingService.RING_RADIUS + 5, bellAbs.getY(), bellAbs.getZ());
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer player = connected.player();
+        EmbeddedChannel channel = connected.channel();
         player.teleportTo(bellAbs.getX() + 0.5, bellAbs.getY() + 1, bellAbs.getZ() + 0.5);
 
-        EmbeddedChannel channel = extractEmbeddedChannel(helper, player);
         channel.outboundMessages().clear();
 
         boolean saved = MercantileConfig.get().enableBellRadiusVis;
@@ -346,36 +347,4 @@ public class BellRadiusGameTest implements FabricGameTest {
         }
     }
 
-    private static EmbeddedChannel extractEmbeddedChannel(GameTestHelper helper, ServerPlayer player) {
-        Connection connection;
-        try {
-            Field connField = net.minecraft.server.network.ServerCommonPacketListenerImpl.class
-                    .getDeclaredField("connection");
-            connField.setAccessible(true);
-            connection = (Connection) connField.get(player.connection);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            helper.fail("ServerCommonPacketListenerImpl.connection field not accessible — mapping changed? " + e);
-            throw new AssertionError(e);
-        }
-        Field channelField;
-        try {
-            channelField = Connection.class.getDeclaredField("channel");
-            channelField.setAccessible(true);
-        } catch (NoSuchFieldException e) {
-            helper.fail("Connection.channel field not found — mapping or field renamed? " + e);
-            throw new AssertionError(e);
-        }
-        try {
-            Object channel = channelField.get(connection);
-            if (!(channel instanceof EmbeddedChannel embedded)) {
-                helper.fail("Mock player connection channel is not EmbeddedChannel; got "
-                        + (channel == null ? "null" : channel.getClass().getName()));
-                throw new AssertionError("not embedded");
-            }
-            return embedded;
-        } catch (IllegalAccessException e) {
-            helper.fail("Could not access Connection.channel: " + e);
-            throw new AssertionError(e);
-        }
-    }
 }

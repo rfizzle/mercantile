@@ -102,7 +102,7 @@
               "suffix": "(op 2)",
               "body": [
                 { "type": "code", "code": "/mercantile reload" },
-                { "type": "prose", "html": "Op-restricted. Re-reads <code class='text-bone'>.minecraft/config/mercantile.json</code> on the server and broadcasts the new config to every connected client via the <code class='text-bone'>ConfigSyncS2CPayload</code>. No restart required." },
+                { "type": "prose", "html": "Op-restricted. Re-reads <code class='text-bone'>.minecraft/config/mercantile.json</code> on the server and broadcasts the new config to every connected client via the <code class='text-bone'>ConfigSyncPayload</code>. No restart required." },
                 { "type": "prose", "html": "Out-of-range numeric values are clamped on load — hand-edited typos are silently corrected to safe values." },
                 { "type": "prose", "html": "<span class='text-smoke text-xs'><strong class='text-bone'>Example:</strong> <code>/mercantile reload</code> → broadcasts \"Mercantile config reloaded.\"</span>" }
               ]

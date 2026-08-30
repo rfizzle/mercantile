@@ -5,7 +5,7 @@
 > hi-res art) and the final file it ships as. **`MISSING`** in the source
 > column flags a pixel asset that has no `.glyph` source yet — a candidate for
 > the glyph pipeline (concord
-> [`design/DESIGN-SYSTEM.md`](../../concord/design/DESIGN-SYSTEM.md) §8).
+> [`design/DESIGN-SYSTEM.md`](https://github.com/rfizzle/concord/blob/master/design/DESIGN-SYSTEM.md) §8).
 > [`DESIGN.md`](DESIGN.md) covers *why* each asset exists; this file covers *where* it lives.
 >
 > Final paths are under `src/main/resources/` unless noted. A separate report sweeps

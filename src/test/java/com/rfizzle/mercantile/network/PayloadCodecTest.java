@@ -246,10 +246,10 @@ class PayloadCodecTest {
     }
 
     @Test
-    void configSyncS2C() {
-        var original = new ConfigSyncS2CPayload(
+    void configSync() {
+        var original = new ConfigSyncPayload(
                 "{\"enableTradeCycling\":true,\"tradeCycleEmeraldCost\":6}");
-        assertEquals(original, roundTrip(ConfigSyncS2CPayload.CODEC, original));
+        assertEquals(original, roundTrip(ConfigSyncPayload.CODEC, original));
     }
 
     // --- Payload type identity ---
@@ -257,10 +257,10 @@ class PayloadCodecTest {
     // --- Size guards ---
 
     @Test
-    void configSyncS2CAcceptsAtBoundary() {
-        String exact = "a".repeat(ConfigSyncS2CPayload.MAX_CONFIG_JSON_CHARS);
-        var original = new ConfigSyncS2CPayload(exact);
-        assertEquals(original, roundTrip(ConfigSyncS2CPayload.CODEC, original));
+    void configSyncAcceptsAtBoundary() {
+        String exact = "a".repeat(ConfigSyncPayload.MAX_CONFIG_JSON_CHARS);
+        var original = new ConfigSyncPayload(exact);
+        assertEquals(original, roundTrip(ConfigSyncPayload.CODEC, original));
     }
 
     @Test
@@ -268,16 +268,16 @@ class PayloadCodecTest {
         // The join sync sends the whole config as JSON. Keep at least half the cap free so
         // config growth and non-default values can't push a real payload past the limit.
         int length = new com.rfizzle.mercantile.config.MercantileConfig().toJson().length();
-        assertTrue(length <= ConfigSyncS2CPayload.MAX_CONFIG_JSON_CHARS / 2,
+        assertTrue(length <= ConfigSyncPayload.MAX_CONFIG_JSON_CHARS / 2,
                 "default config JSON is " + length + " chars; raise MAX_CONFIG_JSON_CHARS before it outgrows the sync payload");
     }
 
     @Test
-    void configSyncS2CRejectsOversizedString() {
-        String oversized = "a".repeat(ConfigSyncS2CPayload.MAX_CONFIG_JSON_CHARS + 1);
-        var payload = new ConfigSyncS2CPayload(oversized);
+    void configSyncRejectsOversizedString() {
+        String oversized = "a".repeat(ConfigSyncPayload.MAX_CONFIG_JSON_CHARS + 1);
+        var payload = new ConfigSyncPayload(oversized);
         FriendlyByteBuf buf = buf();
-        assertThrows(EncoderException.class, () -> ConfigSyncS2CPayload.CODEC.encode(buf, payload));
+        assertThrows(EncoderException.class, () -> ConfigSyncPayload.CODEC.encode(buf, payload));
     }
 
     @Test
@@ -349,7 +349,7 @@ class PayloadCodecTest {
         assertEquals(VillagerInfoPanelS2CPayload.TYPE,
                 new VillagerInfoPanelS2CPayload(0, "", 0, 0, 0, 0, "", 0, false, false, "").type());
         assertEquals(WorkstationMapS2CPayload.TYPE, new WorkstationMapS2CPayload(Map.of(), List.of(), List.of()).type());
-        assertEquals(ConfigSyncS2CPayload.TYPE, new ConfigSyncS2CPayload("").type());
+        assertEquals(ConfigSyncPayload.TYPE, new ConfigSyncPayload("").type());
         assertEquals(TradeIndexS2CPayload.TYPE, new TradeIndexS2CPayload(List.of()).type());
     }
 }
