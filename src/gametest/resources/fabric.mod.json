@@ -17,6 +17,7 @@
     "entrypoints": {
         "fabric-gametest": [
             "com.rfizzle.mercantile.gametest.ApiEventsGameTest",
+            "com.rfizzle.mercantile.gametest.MockPlayersGameTest",
             "com.rfizzle.mercantile.gametest.HudAccessorsGameTest",
             "com.rfizzle.mercantile.gametest.AttachmentGameTest",
             "com.rfizzle.mercantile.gametest.NetworkingGameTest",

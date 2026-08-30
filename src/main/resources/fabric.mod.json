@@ -20,7 +20,8 @@
         "emi": ["com.rfizzle.mercantile.compat.emi.MercantileEmiPlugin"],
         "rei_client": ["com.rfizzle.mercantile.compat.rei.MercantileReiClientPlugin"],
         "jei_mod_plugin": ["com.rfizzle.mercantile.compat.jei.MercantileJeiPlugin"],
-        "jade": ["com.rfizzle.mercantile.compat.jade.MercantileJadePlugin"]
+        "jade": ["com.rfizzle.mercantile.compat.jade.MercantileJadePlugin"],
+        "fabric-datagen": ["com.rfizzle.mercantile.data.MercantileDataGenerator"]
     },
     "suggests": {
         "modmenu": "*",

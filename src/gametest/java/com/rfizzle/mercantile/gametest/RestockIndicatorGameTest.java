@@ -1,6 +1,7 @@
 package com.rfizzle.mercantile.gametest;
 
 import com.rfizzle.mercantile.config.MercantileConfig;
+import com.rfizzle.mercantile.gametest.util.MockPlayers;
 import com.rfizzle.mercantile.mixin.VillagerRestockAccessor;
 import com.rfizzle.mercantile.network.RestockTimerS2CPayload;
 import io.netty.buffer.Unpooled;
@@ -123,10 +124,11 @@ public class RestockIndicatorGameTest implements FabricGameTest {
         villager.getBrain().setMemory(MemoryModuleType.JOB_SITE,
                 GlobalPos.of(level.dimension(), workstationAbs));
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer player = connected.player();
+        EmbeddedChannel channel = connected.channel();
         player.teleportTo(villager.getX(), villager.getY(), villager.getZ());
 
-        EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
         channel.outboundMessages().clear();
 
         try {
@@ -157,10 +159,11 @@ public class RestockIndicatorGameTest implements FabricGameTest {
         Villager villager = spawnTrader(helper);
         villager.getBrain().eraseMemory(MemoryModuleType.JOB_SITE);
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer player = connected.player();
+        EmbeddedChannel channel = connected.channel();
         player.teleportTo(villager.getX(), villager.getY(), villager.getZ());
 
-        EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
         channel.outboundMessages().clear();
 
         try {
@@ -181,10 +184,11 @@ public class RestockIndicatorGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void featureDisabledSendsNoPayload(GameTestHelper helper) {
         Villager villager = spawnTrader(helper);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer player = connected.player();
+        EmbeddedChannel channel = connected.channel();
         player.teleportTo(villager.getX(), villager.getY(), villager.getZ());
 
-        EmbeddedChannel channel = GametestNetUtil.extractEmbeddedChannel(helper, player);
         channel.outboundMessages().clear();
 
         MercantileConfig config = MercantileConfig.get();

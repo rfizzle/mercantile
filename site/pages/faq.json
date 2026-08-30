@@ -35,7 +35,7 @@
             },
             {
               "q": "Does it work in singleplayer? On a server?",
-              "a": "Both. In singleplayer (which runs an integrated server), everything works out of the box. On a dedicated server, install Mercantile on both server and client — server config syncs to every connected client at join time and after <code class='text-bone'>/mercantile reload</code> via the <code class='text-bone'>ConfigSyncS2CPayload</code>. Client-only settings (volume, visualizations, info panel, reputation HUD) stay local to each client."
+              "a": "Both. In singleplayer (which runs an integrated server), everything works out of the box. On a dedicated server, install Mercantile on both server and client — server config syncs to every connected client at join time and after <code class='text-bone'>/mercantile reload</code> via the <code class='text-bone'>ConfigSyncPayload</code>. Client-only settings (volume, visualizations, info panel, reputation HUD) stay local to each client."
             },
             {
               "q": "Where's the config file?",

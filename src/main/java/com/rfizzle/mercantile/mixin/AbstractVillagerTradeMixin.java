@@ -1,6 +1,5 @@
 package com.rfizzle.mercantile.mixin;
 
-import com.rfizzle.mercantile.Mercantile;
 import com.rfizzle.mercantile.api.TradeExecutedCallback;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
@@ -35,13 +34,8 @@ public abstract class AbstractVillagerTradeMixin {
         // AbstractVillager, but guard anyway for safety.
         if (!self.level().isClientSide()
                 && self.getTradingPlayer() instanceof ServerPlayer tradingServerPlayer) {
-            try {
-                TradeExecutedCallback.EVENT.invoker().onTradeExecuted(tradingServerPlayer, self, offer);
-            } catch (Exception e) {
-                // Error isolation per Concord API-STANDARD §3: a misbehaving
-                // listener must never corrupt the trade.
-                Mercantile.LOGGER.warn("TradeExecutedCallback listener threw", e);
-            }
+            // Listener isolation lives inside the callback's invoker (API-STANDARD §3.1).
+            TradeExecutedCallback.EVENT.invoker().onTradeExecuted(tradingServerPlayer, self, offer);
         }
 
         if (!((Object) this instanceof Villager villager)) return;

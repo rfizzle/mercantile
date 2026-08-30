@@ -2,6 +2,8 @@
 
 Minecraft 1.21.1 Fabric mod. Villager and trade overhaul.
 
+**Architectural philosophy:** Mercantile layers onto vanilla villagers, never replaces them. Every villager stays a vanilla `Villager`/`WanderingTrader` with vanilla trades, gossip, and AI; Mercantile's state rides on Fabric attachments and data components, its behavior on thin mixins that delegate to handlers, and its content on datapack JSON under `data/mercantile/`. Removing the mod leaves a world of ordinary villagers with nothing broken. Sibling integration is soft — reflection-backed accessors and `modCompileOnly` — so no feature may hard-depend on another Concord member.
+
 **Asset philosophy:** Custom pixel-art textures for mod-specific visuals (authored through Concord's glyph pipeline — `/glyph`, `mc-textures` skill, concord `design/DESIGN-SYSTEM.md` §8 — with `.glyph` sources kept beside the masters), and vanilla assets where one is genuinely already right. Sounds stay vanilla where the cue is organic (villager voices, bells, anvil, iron-golem foley — which vanilla already nails); custom synthesized cues would be added through the `/sfx` pipeline where a sound benefits from its own identity (concord `design/DESIGN-SYSTEM.md` §9). Custom particle textures are used for mod-specific effects (pickup, trade cycling, follow mode, sentry pylon) to give each feature a distinct visual identity. Visualization features (workstation links, bell radius) use vanilla `dust` particles since they are functional overlays, not themed effects. The sentry pylon has custom block textures (top/side/bottom). Villager pickup items use **player heads** with pre-existing skin textures sourced from minecraft-heads.com and hosted permanently on Mojang's CDN.
 
 ---

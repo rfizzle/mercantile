@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.gametest;
 
+import com.rfizzle.mercantile.gametest.util.MockPlayers;
 import com.rfizzle.mercantile.network.MercantileNetworking;
 import com.rfizzle.mercantile.network.WorkstationMapS2CPayload;
 import io.netty.channel.embedded.EmbeddedChannel;
@@ -8,7 +9,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.server.level.ServerLevel;
@@ -19,7 +19,6 @@ import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.level.block.Blocks;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -57,11 +56,12 @@ public class WorkstationLinkClientGameTest implements FabricGameTest {
         helper.setBlock(unclaimedRel, Blocks.COMPOSTER);
 
         // Mock player, teleported into the test region so the service queries the right area.
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer player = connected.player();
+        EmbeddedChannel channel = connected.channel();
         BlockPos centerAbs = helper.absolutePos(new BlockPos(2, 1, 2));
         player.teleportTo(centerAbs.getX() + 0.5, centerAbs.getY(), centerAbs.getZ() + 0.5);
 
-        EmbeddedChannel channel = extractEmbeddedChannel(helper, player);
         channel.outboundMessages().clear();
 
         invokeHandler(helper, locateHandler(helper), player);
@@ -110,39 +110,6 @@ public class WorkstationLinkClientGameTest implements FabricGameTest {
             throw new AssertionError(e.getCause());
         } catch (IllegalAccessException e) {
             helper.fail("Could not invoke handleRequestWorkstationMap: " + e);
-            throw new AssertionError(e);
-        }
-    }
-
-    private static EmbeddedChannel extractEmbeddedChannel(GameTestHelper helper, ServerPlayer player) {
-        Connection connection;
-        try {
-            Field connField = net.minecraft.server.network.ServerCommonPacketListenerImpl.class
-                    .getDeclaredField("connection");
-            connField.setAccessible(true);
-            connection = (Connection) connField.get(player.connection);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            helper.fail("ServerCommonPacketListenerImpl.connection field not accessible — mapping changed? " + e);
-            throw new AssertionError(e);
-        }
-        Field channelField;
-        try {
-            channelField = Connection.class.getDeclaredField("channel");
-            channelField.setAccessible(true);
-        } catch (NoSuchFieldException e) {
-            helper.fail("Connection.channel field not found — mapping or field renamed? " + e);
-            throw new AssertionError(e);
-        }
-        try {
-            Object channel = channelField.get(connection);
-            if (!(channel instanceof EmbeddedChannel embedded)) {
-                helper.fail("Mock player connection channel is not EmbeddedChannel; got "
-                        + (channel == null ? "null" : channel.getClass().getName()));
-                throw new AssertionError("not embedded");
-            }
-            return embedded;
-        } catch (IllegalAccessException e) {
-            helper.fail("Could not access Connection.channel: " + e);
             throw new AssertionError(e);
         }
     }

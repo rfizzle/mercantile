@@ -73,7 +73,7 @@ hot-linked as `tokens.css`); the signature pair is Mercantile's per `VISION.md` 
 > while siblings layer a tinted dark pair (Meridian violet `#1a0a3e`/`#2a1a6e`,
 > Tribulation crimson, Prosperity bronze). `VISION.md` §3.1 recommends
 > Mercantile adopt deep emerald-blacks (suggested `#0a140d` / `#10241a`) to
-> match its siblings' depth. This pair is proposed but not chosen — see §4.
+> match its siblings' depth. This pair is proposed but not chosen — see Open Decisions.
 
 Accent-pairing rule (`VISION.md` §3.1): accents never leave Mercantile
 surfaces; no sibling may share *both* accents. Emerald-with-emerald is
@@ -90,39 +90,40 @@ against it.
 
 ---
 
-## 2. Assets
-
-The full asset manifest — every `.glyph` source under `art/`, the final
-resource/site path it ships as, and what is still `MISSING` a glyph source —
-lives in [`ASSETS.md`](ASSETS.md).
-
----
-
-## 3. HUD
+## 2. HUD
 
 Mercantile **holds slot 2** in the Concord HUD stack — the full visual and
-coordination spec is [`concord/HUD-STANDARD.md`](../../concord/HUD-STANDARD.md)
+coordination spec is
+[`HUD-STANDARD.md`](https://github.com/rfizzle/concord/blob/master/HUD-STANDARD.md)
 (normative; this section records only Mercantile's decisions and status).
 
-**Slot 2 content:** reputation tier label (e.g. `Trusted`) beside the 16×16
-glyph, in the standard semi-transparent box. Mercantile qualifies for a slot
-because reputation is *persistent ambient state* the player carries while
-walking around — exactly the standard's admission test.
+**Why a slot:** reputation is *persistent ambient state* the player carries
+while walking around — exactly the standard's admission test. Trade-screen
+information (demand, restock timers, the villager info panel) lives in the
+merchant screen and never on the HUD.
+
+**Slot 2 content:** the 16×16 `reputation_badge` balance-scale glyph with a
+2px bar beneath it, tinted by reputation tier (emerald ramp for the positive
+tiers, white at neutral, the shared orange/red state ramp below it). No text —
+the tier name is on the hold-to-peek detail panel and in chat on tier change,
+not in the badge.
 
 **Mercantile-specific behavior:** the element renders only when a villager is
 within proximity radius (periodic client-side scan), and respects both the
 client toggle (`enableReputationHud`) and the server's synced
-`enableReputation` config. Hidden during F1, open screens, and the death
-screen per the standard's visibility rules.
+`enableReputation` config. Hidden under all four of the standard's visibility
+rules — F1, any open screen, spectator mode, and the death screen.
 
 **Conformance status** (each item conforms to `HUD-STANDARD.md`):
 
-1. **Sibling stacking offset.** `ReputationHudOverlay` reserves space for a
-   higher-priority sibling through the reflection-backed `isHudVisible()` /
-   `getHudHeight()` accessors (`HUD-STANDARD.md` §6), applied only at the
-   default TOP_LEFT anchor — not a hardcoded height.
-2. **`api` package.** The coordination accessors are consumed through
-   `com.rfizzle.mercantile.api` (`MercantileAPI`), which exposes the
+1. **Sibling stacking offset.** `ReputationHudOverlay` reserves space for
+   Tribulation's slot 1 through the reflection-backed `isHudVisible()` /
+   `getHudHeight()` accessors (§6), applied only at the default TOP_LEFT
+   anchor — never a hardcoded height. Every Tribulation release from 1.0.0
+   exposes the accessors, so the pre-accessor fixed reservation §6 allowed has
+   been retired; an unresolvable accessor reserves nothing.
+2. **`api` package.** The coordination accessors are exposed through
+   `com.rfizzle.mercantile.api` (`MercantileAPI`), which presents the
    `isHudVisible()` / `getHudHeight()` facade per `API-STANDARD.md`.
 3. **Glyph.** Slot 2 blits the custom `mercantile:reputation_badge` balance-scale
    sprite (master `art/hud-icon-16.png`; see [`ASSETS.md`](ASSETS.md)).
@@ -132,13 +133,67 @@ screen per the standard's visibility rules.
 
 ---
 
-## 4. Open Decisions
+## 3. Assets
 
-Recorded so they read as *undecided*, not as omissions:
+The full asset manifest — every `.glyph` source under `art/`, the final
+resource/site path it ships as, and what is still `MISSING` a glyph source —
+lives in [`ASSETS.md`](ASSETS.md). This document owns the *why and the look*
+of each asset family:
 
-1. **Tinted surface pair.** Adopt deep emerald-black surfaces
-   (suggested `#0a140d` / `#10241a`, `VISION.md` §3.1) or stay on pure
-   neutrals? Recommendation in VISION is to adopt; no pair has been chosen.
+- **Brand masters** (`art/logo.png`, `art/icon-*.png`, `art/glyphs/icon.glyph`)
+  — the market-stall medallion and the balance-scale icon described in §1.
+- **HUD glyph** (`art/hud-icon-16.png` → `reputation_badge`) — the balance
+  scale again, at 16px, full-color rather than a tintable mask, so the tier
+  state lives in the bar beneath it and the emerald reads at every tier.
+- **In-game textures and particles** — custom pixel art where a vanilla asset
+  cannot carry the meaning (the Sentry Pylon block, the pickup sparkle,
+  the trade-screen indicators); vanilla where vanilla is genuinely right
+  (villager heads for the pickup item are vanilla player-head skins).
+
+---
+
+## 4. Website & Listing Brand Notes
+
+How the brand lands on Mercantile's public surfaces. The content itself lives
+elsewhere — page copy under `site/`, store copy in `site/listing-*.md` — so
+this section carries only the brand direction, not the copy.
+
+### Where the content lives
+
+- **Website** — `site/site.json` (identity, nav order, theme accents) plus one
+  `site/pages/<slug>.json` per page (home, features, config, commands, guide,
+  faq, api, changelog), rendered and deployed by the shared Concord Eleventy
+  template at `mercantile.rfizzle.com`. The template owns surfaces, neutrals,
+  the SEO/OG scaffolding, and the cross-mod footer; the mod supplies only its
+  content and accent colors.
+- **Store listings** — `site/listing-curseforge.md` and
+  `site/listing-modrinth.md` (plus `listing-summary.txt` and
+  `github-description.txt`), authored per the `mc-listing` skill.
+- **Release notes** — `changelogs/<version>.md` when curated, otherwise
+  generated from the merged PRs (the `mc-changelog` skill).
+
+### Accent usage
+
+Emerald (`#50C878`) and Emerald Bright (`#6DDB94`) carry every branded moment:
+hero glow, headings, links, card borders, and the reputation ramp in-game. The
+heading gradient runs Emerald → Trade Green (`#00C853`). Base surfaces and
+body text stay on the shared Concord neutrals (bone/ash/smoke over
+ink/card/elevated) until the tinted pair below is decided. The accents are
+declared once in `site.json`'s `theme` block; the full token set lives in
+`design/DESIGN-SYSTEM.md`.
+
+### Hero & gallery art direction
+
+The hero leads with the full logo over the green-brickwork field. Gallery
+shots (1920×1080, vanilla or a light shader for clarity) should show villagers
+as people: a named villager's info panel mid-trade, a picked-up villager in
+hand, the reputation badge beside a market, a Sentry Pylon with its golems
+at dusk.
+
+### OG image
+
+The full logo on the dark field (`site/assets/og-image.png`), served from an
+absolute URL; social cards use the large-summary format.
 
 ---
 
@@ -155,17 +210,31 @@ luck and reputation → enchant discounts are explicitly rejected,
 | Mod | Verb | Color Signature | Motif | HUD |
 |-----|------|----------------|-------|-----|
 | Tribulation | Survive | Crimson / Ember | Hourglass, skulls | Slot 1 |
-| Meridian | Enchant | Arcane Purple / Gold | Compass rose | No slot |
 | **Mercantile** | **Trade** | **Emerald / Emerald Bright** | **Market stall, scales, bell, emeralds** | **Slot 2** |
-| Prosperity | Discover | Gold / Diamond Cyan | Chalice, keys | Slot 3 |
+| Prosperity | Discover | Gold / Diamond Cyan | Treasure chest, key | Slot 3 |
+| Meridian | Enchant | Arcane Purple / Gold | Compass rose | No slot |
+| Respite | Rest | Moonlight Indigo / Candleglow | Hanging lantern | No slot |
+| Distillation | Brew | Potion Magenta / Copper | Alchemist's still | No slot |
+| Cultivation | Grow | Wheat Amber / Leaf Green | Wheat sheaf, scythe and hoe | No slot |
+| Instinct | Raise | Heart Rose / Hide Russet | Paw print | No slot |
 
 Suite-level standards live in the concord repo and are never copied here:
-[`VISION.md`](../../concord/VISION.md),
-[`API-STANDARD.md`](../../concord/API-STANDARD.md),
-[`HUD-STANDARD.md`](../../concord/HUD-STANDARD.md),
-[`REPO-LAYOUT.md`](../../concord/REPO-LAYOUT.md),
-`design/DESIGN-SYSTEM.md` + `docs/tokens.css`.
+[`VISION.md`](https://github.com/rfizzle/concord/blob/master/VISION.md),
+[`API-STANDARD.md`](https://github.com/rfizzle/concord/blob/master/API-STANDARD.md),
+[`HUD-STANDARD.md`](https://github.com/rfizzle/concord/blob/master/HUD-STANDARD.md),
+[`REPO-LAYOUT.md`](https://github.com/rfizzle/concord/blob/master/REPO-LAYOUT.md),
+[`design/DESIGN-SYSTEM.md`](https://github.com/rfizzle/concord/blob/master/design/DESIGN-SYSTEM.md).
 
-All four mods share: Minecraft 1.21.1 · Java 21 · Fabric · MIT · the dark
+All members share: Minecraft 1.21.1 · Java 21 · Fabric · MIT · the dark
 neutral web theme · monospace stack · pixel-art logo style · optional
 Jade/WTHIT, EMI/REI/JEI, Mod Menu, Cloth Config integrations.
+
+---
+
+## Open Decisions
+
+Recorded so they read as *undecided*, not as omissions:
+
+1. **Tinted surface pair.** Adopt deep emerald-black surfaces
+   (suggested `#0a140d` / `#10241a`, `VISION.md` §3.1) or stay on pure
+   neutrals? Recommendation in VISION is to adopt; no pair has been chosen.

@@ -67,3 +67,6 @@ art/audio/**/*.ogg
 art/audio/**/*.wav
 art/audio/**/*.report.png
 # concord:gitignore:end
+
+# Fabric datagen provider-hash cache; cleared by cleanDatagenCache before every verify run.
+src/main/generated/.cache/

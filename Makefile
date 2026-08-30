@@ -2,7 +2,7 @@ GRADLE := ./gradlew
 BASE_VERSION := $(shell awk -F= '/^mod_version/ {gsub(/ /,"",$$2); print $$2}' gradle.properties)
 CONCORD_DIR ?= ../concord
 
-.PHONY: help build clean test coverage jar run-client run-server gen-sources refresh-deps version release site site-serve sync
+.PHONY: help build clean test coverage jar run-client run-server run-datagen gen-sources refresh-deps version release site site-serve sync
 
 help:
 	@echo "Targets:"
@@ -12,6 +12,7 @@ help:
 	@echo "  coverage     Run unit tests + gametests and build the merged JaCoCo report"
 	@echo "  run-client   Launch a dev Minecraft client with the mod loaded"
 	@echo "  run-server   Launch a dev Minecraft server with the mod loaded"
+	@echo "  run-datagen  Run Fabric data generation into src/main/generated"
 	@echo "  gen-sources  Generate Minecraft sources for IDE navigation"
 	@echo "  refresh-deps Refresh Gradle dependencies"
 	@echo "  clean        Remove build outputs"
@@ -40,6 +41,9 @@ run-client:
 
 run-server:
 	$(GRADLE) runServer
+
+run-datagen:
+	$(GRADLE) runDatagen
 
 gen-sources:
 	$(GRADLE) genSources

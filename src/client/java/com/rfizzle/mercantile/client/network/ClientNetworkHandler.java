@@ -47,7 +47,7 @@ public class ClientNetworkHandler {
                     ClientMercantileData.setWorkstationMap(payload));
         });
 
-        ClientPlayNetworking.registerGlobalReceiver(ConfigSyncS2CPayload.TYPE, (payload, context) -> {
+        ClientPlayNetworking.registerGlobalReceiver(ConfigSyncPayload.TYPE, (payload, context) -> {
             context.client().execute(() ->
                     ClientMercantileData.setServerConfig(MercantileConfig.fromJson(payload.configJson())));
         });

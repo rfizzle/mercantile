@@ -556,4 +556,65 @@ class MercantileConfigTest {
         assertFalse(loaded.enableReputationHud,
                 "explicit false must survive file-load + clamp pipeline");
     }
+
+    // --- Non-finite floats (mc-config: NaN/Infinity must never reach a float field) ---
+
+    @Test
+    void nanHealingMultiplierFoldsToMinimumOnLoad(@TempDir Path tempDir) throws IOException {
+        Path configFile = tempDir.resolve("mercantile.json");
+        Files.writeString(configFile, """
+                {
+                  "healingMultiplier": NaN
+                }
+                """);
+
+        MercantileConfig loaded = MercantileConfig.load(configFile);
+        assertEquals(1.0f, loaded.healingMultiplier,
+                "Math.clamp passes NaN through; the helper must fold it to the minimum");
+    }
+
+    @Test
+    void infiniteVillagerSoundVolumeFoldsToMinimum() {
+        MercantileConfig config = new MercantileConfig();
+        config.villagerSoundVolume = Float.POSITIVE_INFINITY;
+        config.healingMultiplier = Float.NEGATIVE_INFINITY;
+        config.clamp();
+        assertEquals(0.0f, config.villagerSoundVolume);
+        assertEquals(1.0f, config.healingMultiplier);
+    }
+
+    @Test
+    void overflowingFloatLiteralFoldsToMinimum() {
+        // A legal-JSON overflow like 1e400 parses to Infinity, not an error.
+        MercantileConfig loaded = MercantileConfig.fromJson("{\"villagerSoundVolume\": 1e400}");
+        assertEquals(0.0f, loaded.villagerSoundVolume);
+    }
+
+    @Test
+    void pylonTribulationMaxGolemsClampedBelowOne() {
+        MercantileConfig config = new MercantileConfig();
+        config.pylonMaxGolems = 1;
+        config.pylonTribulationMaxGolems = -4;
+        config.clamp();
+        assertEquals(1, config.pylonTribulationMaxGolems);
+    }
+
+    // --- copy(): the ModMenu working copy must be independent of the live instance ---
+
+    @Test
+    void copyIsDeepAndIndependent() {
+        MercantileConfig original = new MercantileConfig();
+        original.tradeCycleEmeraldCost = 9;
+        original.hudAnchor = MercantileConfig.Anchor.BOTTOM_RIGHT;
+
+        MercantileConfig copy = original.copy();
+        assertNotSame(original, copy);
+        assertEquals(original.toJson(), copy.toJson());
+
+        copy.tradeCycleEmeraldCost = 2;
+        copy.hudAnchor = MercantileConfig.Anchor.TOP_LEFT;
+        assertEquals(9, original.tradeCycleEmeraldCost, "editing the copy must not leak into the original");
+        assertEquals(MercantileConfig.Anchor.BOTTOM_RIGHT, original.hudAnchor);
+        assertEquals(ConfigMigrator.CURRENT_VERSION, copy.configVersion);
+    }
 }

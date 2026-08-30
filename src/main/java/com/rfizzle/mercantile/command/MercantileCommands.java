@@ -7,7 +7,7 @@ import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PinnedTrade;
 import com.rfizzle.mercantile.data.PlayerData;
-import com.rfizzle.mercantile.network.ConfigSyncS2CPayload;
+import com.rfizzle.mercantile.network.ConfigSyncPayload;
 import com.rfizzle.mercantile.reputation.ReputationManager;
 import com.rfizzle.mercantile.trade.TradePinManager;
 import com.rfizzle.mercantile.trade.TradePinManager.PinStock;
@@ -212,7 +212,7 @@ public final class MercantileCommands {
     private static int reloadConfig(CommandSourceStack source) {
         MercantileConfig.reload();
         String configJson = MercantileConfig.get().toJson();
-        ConfigSyncS2CPayload payload = new ConfigSyncS2CPayload(configJson);
+        ConfigSyncPayload payload = new ConfigSyncPayload(configJson);
         for (ServerPlayer player : source.getServer().getPlayerList().getPlayers()) {
             ServerPlayNetworking.send(player, payload);
             // Re-push the pins summary so a flipped enableTradePinning is reflected right away

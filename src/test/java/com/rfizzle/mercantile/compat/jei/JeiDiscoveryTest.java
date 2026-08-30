@@ -15,14 +15,14 @@ import static org.junit.jupiter.api.Assertions.*;
  * On Fabric, JEI resolves plugins solely through the {@code jei_mod_plugin} entrypoint —
  * {@code FabricPluginFinder} reads that key and nothing else, and JEI registers its own
  * built-in plugins the same way. That entrypoint is the load-bearing half, pinned by
- * {@link com.rfizzle.mercantile.GametestEntrypointTest} alongside the other viewers.
+ * {@link com.rfizzle.mercantile.ShippedEntrypointTest} alongside the other viewers.
  *
  * <p>The annotation is what a Forge or NeoForge port would be discovered by, so it is kept and
  * guarded here: dropping it costs nothing today and silently breaks that port later.
  *
  * <p>The contract is asserted against the source text rather than by reflection: {@code jei} is
  * {@code modCompileOnly} and absent from the test runtime classpath, so loading the class would
- * fail on its supertype for the wrong reason. {@code GametestEntrypointTest} resolves the
+ * fail on its supertype for the wrong reason. {@code ShippedEntrypointTest} resolves the
  * manifest entrypoints against the source tree for the same reason.
  */
 class JeiDiscoveryTest {

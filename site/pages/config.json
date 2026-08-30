@@ -36,7 +36,7 @@
     {
       "id": "server-config",
       "title": "Server Config",
-      "intro": "Server-side settings that affect gameplay rules. Synced to clients via the <code class='text-bone'>ConfigSyncS2CPayload</code> on join and after <code class='text-bone'>/mercantile reload</code>.",
+      "intro": "Server-side settings that affect gameplay rules. Synced to clients via the <code class='text-bone'>ConfigSyncPayload</code> on join and after <code class='text-bone'>/mercantile reload</code>.",
       "blocks": [
         {
           "type": "sub",

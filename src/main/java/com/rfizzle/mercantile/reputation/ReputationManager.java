@@ -1,6 +1,5 @@
 package com.rfizzle.mercantile.reputation;
 
-import com.rfizzle.mercantile.Mercantile;
 import com.rfizzle.mercantile.api.ReputationChangedCallback;
 import com.rfizzle.mercantile.api.ReputationTier;
 import com.rfizzle.mercantile.config.MercantileConfig;
@@ -142,13 +141,8 @@ public final class ReputationManager {
         data.setScore(newScore);
         int applied = data.getScore();
         if (applied == oldScore) return;
-        try {
-            ReputationChangedCallback.EVENT.invoker().onReputationChanged(player, oldScore, applied);
-        } catch (Exception e) {
-            // Error isolation per Concord API-STANDARD §3: a misbehaving
-            // listener must never corrupt the reputation flow.
-            Mercantile.LOGGER.warn("ReputationChangedCallback listener threw", e);
-        }
+        // Listener isolation lives inside the callback's invoker (API-STANDARD §3.1).
+        ReputationChangedCallback.EVENT.invoker().onReputationChanged(player, oldScore, applied);
     }
 
     public enum CapDecision {

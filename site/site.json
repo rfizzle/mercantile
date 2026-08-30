@@ -22,6 +22,7 @@
   ],
   "theme": {
     "accent": "#50C878",
+    "accentDark": "#2E7D4F",
     "accent2": "#00C853",
     "accent2Bright": "#6DDB94",
     "glowRgb": "80, 200, 120"

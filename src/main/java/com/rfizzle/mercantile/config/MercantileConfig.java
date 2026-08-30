@@ -200,6 +200,7 @@ public class MercantileConfig {
         sentryDespawnSeconds = clampInt("sentryDespawnSeconds", sentryDespawnSeconds, 5, Integer.MAX_VALUE);
         pylonTribulationGolemBonusPerTier = clampInt("pylonTribulationGolemBonusPerTier", pylonTribulationGolemBonusPerTier, 0, Integer.MAX_VALUE);
         pylonTribulationRadiusBonusPerTier = clampInt("pylonTribulationRadiusBonusPerTier", pylonTribulationRadiusBonusPerTier, 0, Integer.MAX_VALUE);
+        pylonTribulationMaxGolems = clampInt("pylonTribulationMaxGolems", pylonTribulationMaxGolems, 1, Integer.MAX_VALUE);
         // The Tribulation cap can never sit below the un-integrated golem cap it extends.
         if (pylonTribulationMaxGolems < pylonMaxGolems) {
             Mercantile.LOGGER.warn("Config 'pylonTribulationMaxGolems' value {} is below pylonMaxGolems {}; raised to {}",
@@ -247,8 +248,18 @@ public class MercantileConfig {
         return clamped;
     }
 
-    /** Float counterpart of {@link #clampInt}. */
+    /**
+     * Float counterpart of {@link #clampInt}. Gson parses a bare {@code NaN} or
+     * {@code Infinity} token (and an overflow like {@code 1e400}) into a float, and
+     * {@code Math.clamp} passes {@code NaN} straight through because it fails every
+     * ordering comparison — so non-finite input is folded to {@code min} explicitly
+     * (mc-config, "Warn-and-clamp validation").
+     */
     private static float clampFloat(String name, float value, float min, float max) {
+        if (!Float.isFinite(value)) {
+            Mercantile.LOGGER.warn("Config '{}' value {} is not finite; clamped to {}", name, value, min);
+            return min;
+        }
         float clamped = Math.clamp(value, min, max);
         if (clamped != value) {
             Mercantile.LOGGER.warn("Config '{}' value {} out of range [{}, {}]; clamped to {}",
@@ -285,6 +296,29 @@ public class MercantileConfig {
     public static void reload() {
         synchronized (MercantileConfig.class) {
             INSTANCE = load();
+        }
+    }
+
+    /**
+     * Deep working copy for the ModMenu screen. Built from this instance's JSON, so it is
+     * already at {@link ConfigMigrator#CURRENT_VERSION} and must never be re-migrated.
+     */
+    public MercantileConfig copy() {
+        return GSON.fromJson(GSON.toJson(this), MercantileConfig.class);
+    }
+
+    /**
+     * Publishes an edited working copy as the active config — clamped, persisted, then
+     * swapped in with one store, so readers only ever observe a fully-applied edit rather
+     * than the field-at-a-time writes an in-place edit of {@link #get()} would leak. The
+     * ModMenu screen's save seam; mirrors {@link #reload()} as the other path that assigns
+     * {@link #INSTANCE}.
+     */
+    public static void publish(MercantileConfig next) {
+        next.clamp();
+        next.save();
+        synchronized (MercantileConfig.class) {
+            INSTANCE = next;
         }
     }
 
