@@ -27,8 +27,8 @@ hosted on Mojang's CDN.
 ## At a glance
 
 - Minecraft **1.21.1**, **Fabric** loader (0.16.10+), **Fabric API** required.
-- Required on the **server**. The reputation HUD is the only client-only
-  feature — install it client-side too if you want the readout.
+- Required on **both the client and the server** — Mercantile adds items,
+  blocks, and network payloads, so every player and the server need it.
 - Every feature is **individually toggleable** through Mod Menu / Cloth Config
   or `config/mercantile.json`.
 - MIT licensed.
@@ -277,8 +277,8 @@ bundled** — install whichever you already use.
 - Fabric Loader **0.16.10+**
 - Fabric API
 - Java **21+**
-- Required on the **server**. Install on the client as well if you want the
-  reputation HUD.
+- Required on **both client and server** (it registers items, blocks, and
+  network payloads). Singleplayer works out of the box.
 
 ## Installation
 
