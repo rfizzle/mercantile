@@ -22,6 +22,7 @@ public abstract class WanderingTraderTradeOpenMixin {
                                                                CallbackInfoReturnable<InteractionResult> cir) {
         WanderingTrader self = (WanderingTrader) (Object) this;
         ExclusiveTradesManager.stripInjectedOffers(self);
+        ExclusiveTradesManager.purgeLeakedOffers(self);
     }
 
     @Inject(method = "mobInteract", at = @At("HEAD"))

@@ -37,6 +37,7 @@ public abstract class VillagerTradeOpenMixin {
     private void mercantile$denyReviledTrading(Player player, CallbackInfo ci) {
         Villager self = (Villager) (Object) this;
         ExclusiveTradesManager.stripInjectedOffers(self);
+        ExclusiveTradesManager.purgeLeakedOffers(self);
 
         if (!MercantileConfig.get().enableReputation) return;
         if (!(player instanceof ServerPlayer serverPlayer)) return;

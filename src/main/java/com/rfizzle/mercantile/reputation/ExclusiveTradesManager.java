@@ -92,6 +92,83 @@ public final class ExclusiveTradesManager {
     }
 
     /**
+     * Removes the offers injected for the current trade session and returns where each one sat, so
+     * {@link #reattachInjected} can put them back. Called around serialization so a save that lands
+     * mid-session never writes an injected (reputation-gated) offer into the merchant's persisted
+     * offers. Returns an empty list (without touching the offer list) when nothing is injected.
+     */
+    public static List<Map.Entry<Integer, MerchantOffer>> detachInjected(AbstractVillager merchant) {
+        List<MerchantOffer> injected = INJECTED_OFFERS.get(merchant);
+        if (injected == null || injected.isEmpty()) return List.of();
+
+        var offers = merchant.getOffers();
+        List<Map.Entry<Integer, MerchantOffer>> detached = new ArrayList<>();
+        for (int i = 0; i < offers.size(); i++) {
+            MerchantOffer offer = offers.get(i);
+            for (MerchantOffer candidate : injected) {
+                if (candidate == offer) {
+                    detached.add(Map.entry(i, offer));
+                    break;
+                }
+            }
+        }
+        for (int i = detached.size() - 1; i >= 0; i--) {
+            offers.remove((int) detached.get(i).getKey());
+        }
+        return detached;
+    }
+
+    public static void reattachInjected(AbstractVillager merchant, List<Map.Entry<Integer, MerchantOffer>> detached) {
+        if (detached.isEmpty()) return;
+        var offers = merchant.getOffers();
+        for (Map.Entry<Integer, MerchantOffer> entry : detached) {
+            offers.add(Math.min(entry.getKey(), offers.size()), entry.getValue());
+        }
+    }
+
+    /**
+     * Removes exclusive offers that an earlier release (1.1.0) leaked into the merchant's persisted
+     * offers: any offer whose identity hash (costs + result) matches an exclusive trade that applies to
+     * this merchant. Must run after {@link #stripInjectedOffers} so the current session's own injected
+     * offers are not the subject. Villagers match their profession pool plus the cross-profession pool;
+     * wandering traders match the {@code wandering_trader} pool.
+     */
+    public static void purgeLeakedOffers(AbstractVillager merchant) {
+        var offers = merchant.getOffers();
+        if (offers.isEmpty()) return;
+
+        List<ExclusiveTrade> candidates = new ArrayList<>();
+        if (merchant instanceof Villager villager) {
+            String profession = BuiltInRegistries.VILLAGER_PROFESSION
+                    .getKey(villager.getVillagerData().getProfession()).getPath();
+            List<ExclusiveTrade> pool = PROFESSION_TRADES.get(profession);
+            if (pool != null) candidates.addAll(pool);
+            candidates.addAll(CROSS_PROFESSION_TRADES);
+        } else if (merchant instanceof WanderingTrader) {
+            List<ExclusiveTrade> pool = PROFESSION_TRADES.get("wandering_trader");
+            if (pool != null) candidates.addAll(pool);
+        }
+        if (candidates.isEmpty()) return;
+
+        RegistryAccess registries = merchant.level().registryAccess();
+        MercantileVillagerData data = merchant.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
+        Set<String> exclusiveHashes = new HashSet<>();
+        for (ExclusiveTrade trade : candidates) {
+            addInaccessibleHash(exclusiveHashes, trade, registries, data);
+        }
+        if (merchant instanceof WanderingTrader) {
+            CompoundTag stored = data.getWanderingTraderOfferTag();
+            if (stored != null) {
+                MerchantOffer parsed = MerchantOffer.CODEC.parse(registries.createSerializationContext(NbtOps.INSTANCE), stored)
+                        .resultOrPartial(Mercantile.LOGGER::error).orElse(null);
+                if (parsed != null) exclusiveHashes.add(OfferIdentityHash.compute(parsed));
+            }
+        }
+
+        offers.removeIf(offer -> exclusiveHashes.contains(OfferIdentityHash.compute(offer)));
+    }
+
+    /**
      * Injects exclusive offers without a player context. Advancement-gated trades
      * ({@code requires_advancement}) cannot be verified here and are skipped. Prefer
      * {@link #injectOffers(Villager, ServerPlayer, int)} whenever the opening player is known.
