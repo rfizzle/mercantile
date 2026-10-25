@@ -66,8 +66,8 @@ the website for every behavior, tuning knob, and edge case.
    [Cloth Config](https://modrinth.com/mod/cloth-config) to access the in-game
    settings screen.
 
-Mercantile is required on the server. The HUD overlay is the only client-side
-feature; install it on the client for the readout to appear.
+Mercantile is required on both the client and the server: it registers items,
+blocks, and network payloads, so every player and the server must install it.
 
 ## Controls
 
