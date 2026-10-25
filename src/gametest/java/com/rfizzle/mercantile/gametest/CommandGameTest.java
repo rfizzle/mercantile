@@ -1,6 +1,7 @@
 package com.rfizzle.mercantile.gametest;
 
 import com.mojang.authlib.GameProfile;
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
@@ -162,7 +163,7 @@ public class CommandGameTest implements FabricGameTest {
     public void reputationCommandIncludesDailyEarnedAndCap(GameTestHelper helper) {
         var server = helper.getLevel().getServer();
         var dispatcher = server.getCommands().getDispatcher();
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = MockPlayers.serverPlayerInLevel(helper);
 
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         // Pre-align rollover so subsequent rolloverIfNewDay calls don't wipe our preset count.

@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.gametest;
 
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
@@ -15,7 +16,7 @@ public class RaidReputationGameTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void raidWinReputationGain(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         data.setScore(0);
         data.setReputationMigrated(true);
@@ -33,7 +34,7 @@ public class RaidReputationGameTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void raidWinExemptFromDailyCap(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         data.setScore(0);
         data.setReputationMigrated(true);
@@ -55,7 +56,7 @@ public class RaidReputationGameTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void raidWinDisabledToggle(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         data.setScore(0);
         data.setReputationMigrated(true);
@@ -74,7 +75,7 @@ public class RaidReputationGameTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void raidMixinHook(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         data.setScore(0);
         data.setReputationMigrated(true);

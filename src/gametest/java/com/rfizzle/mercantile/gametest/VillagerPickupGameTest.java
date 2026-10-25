@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.gametest;
 
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.MercantileVillagerData;
 import com.rfizzle.mercantile.data.VillagerPickupHelper;
@@ -86,7 +87,7 @@ public class VillagerPickupGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void pickupDeductsXp(GameTestHelper helper) {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         player.getAbilities().instabuild = false;
         player.experienceLevel = 10;
         player.setShiftKeyDown(true);
@@ -121,7 +122,7 @@ public class VillagerPickupGameTest implements FabricGameTest {
         ItemStack headItem = new ItemStack(Items.PLAYER_HEAD);
         headItem.set(DataComponents.CUSTOM_DATA, CustomData.of(badNbt));
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         player.setItemInHand(InteractionHand.MAIN_HAND, headItem);
 
         BlockPos target = helper.absolutePos(new BlockPos(0, 0, 0));
@@ -180,7 +181,7 @@ public class VillagerPickupGameTest implements FabricGameTest {
         ItemStack headItem = new ItemStack(Items.PLAYER_HEAD);
         headItem.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         player.setItemInHand(InteractionHand.MAIN_HAND, headItem);
 
         BlockPos target = helper.absolutePos(new BlockPos(0, 0, 0));

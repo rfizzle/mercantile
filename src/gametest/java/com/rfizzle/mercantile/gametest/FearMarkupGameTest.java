@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.gametest;
 
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.memorial.FearManager;
 import com.rfizzle.mercantile.network.DemandPriceS2CPayload;
@@ -44,7 +45,7 @@ public class FearMarkupGameTest implements FabricGameTest {
         MercantileConfig config = MercantileConfig.get();
         placeBell(helper);
         Villager survivor = helper.spawn(EntityType.VILLAGER, 3, 1, 3);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
 
         killVillagers(helper, player, config.fearKillThreshold);
 
@@ -63,7 +64,7 @@ public class FearMarkupGameTest implements FabricGameTest {
         MercantileConfig config = MercantileConfig.get();
         placeBell(helper);
         Villager survivor = helper.spawn(EntityType.VILLAGER, 3, 1, 3);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
 
         killVillagers(helper, player, config.fearKillThreshold - 1);
 
@@ -80,8 +81,8 @@ public class FearMarkupGameTest implements FabricGameTest {
         MercantileConfig config = MercantileConfig.get();
         placeBell(helper);
         Villager survivor = helper.spawn(EntityType.VILLAGER, 3, 1, 3);
-        ServerPlayer killer = helper.makeMockServerPlayerInLevel();
-        ServerPlayer bystander = helper.makeMockServerPlayerInLevel();
+        ServerPlayer killer = MockPlayers.serverPlayerInLevel(helper);
+        ServerPlayer bystander = MockPlayers.serverPlayerInLevel(helper);
 
         killVillagers(helper, killer, config.fearKillThreshold);
 
@@ -100,7 +101,7 @@ public class FearMarkupGameTest implements FabricGameTest {
         MercantileConfig config = MercantileConfig.get();
         placeBell(helper);
         Villager trader = helper.spawn(EntityType.VILLAGER, 3, 1, 3);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         player.teleportTo(trader.getX() + 1, trader.getY(), trader.getZ());
 
         killVillagers(helper, player, config.fearKillThreshold);
@@ -187,7 +188,7 @@ public class FearMarkupGameTest implements FabricGameTest {
         MercantileConfig config = MercantileConfig.get();
         placeBell(helper);
         Villager survivor = helper.spawn(EntityType.VILLAGER, 3, 1, 3);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
 
         boolean saved = config.enableFearMarkup;
         config.enableFearMarkup = false;

@@ -2,7 +2,7 @@ package com.rfizzle.mercantile.gametest;
 
 import com.rfizzle.mercantile.api.ReputationTier;
 import com.rfizzle.mercantile.config.MercantileConfig;
-import com.rfizzle.mercantile.gametest.util.MockPlayers;
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.reputation.ExclusiveTradesManager;
 import com.rfizzle.mercantile.reputation.ExclusiveTradesManager.ExclusiveTrade;
 import com.rfizzle.mercantile.reputation.ReputationManager;

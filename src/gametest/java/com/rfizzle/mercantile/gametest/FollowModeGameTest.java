@@ -3,7 +3,7 @@ package com.rfizzle.mercantile.gametest;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.follow.FollowManager;
 import com.rfizzle.mercantile.follow.FollowableVillager;
-import com.rfizzle.mercantile.gametest.util.MockPlayers;
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.network.FollowCountS2CPayload;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.core.BlockPos;
@@ -26,7 +26,7 @@ public class FollowModeGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void followStart(GameTestHelper helper) {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         // Mock server players default to creative, where instabuild skips the emerald shrink;
         // force survival so the emerald is actually consumed.
         player.getAbilities().instabuild = false;
@@ -90,7 +90,7 @@ public class FollowModeGameTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void maxCapRejection(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         MercantileConfig config = MercantileConfig.get();
         int max = config.maxFollowingVillagers;
 
@@ -124,7 +124,7 @@ public class FollowModeGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void distanceRelease(GameTestHelper helper) {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         player.moveTo(villager.position().add(1, 0, 0));
 
         FollowManager.startFollowing(villager, player);
@@ -154,7 +154,7 @@ public class FollowModeGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void saveReloadClear(GameTestHelper helper) {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
 
         FollowManager.startFollowing(villager, player);
         helper.assertTrue(FollowManager.isFollowing(villager),
@@ -174,8 +174,8 @@ public class FollowModeGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void exclusiveFollow(GameTestHelper helper) {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
-        ServerPlayer playerA = helper.makeMockServerPlayerInLevel();
-        ServerPlayer playerB = helper.makeMockServerPlayerInLevel();
+        ServerPlayer playerA = MockPlayers.serverPlayerInLevel(helper);
+        ServerPlayer playerB = MockPlayers.serverPlayerInLevel(helper);
 
         boolean startedA = FollowManager.startFollowing(villager, playerA);
         helper.assertTrue(startedA, "Player A should start following");
@@ -195,7 +195,7 @@ public class FollowModeGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void scheduleSuppression(GameTestHelper helper) {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         player.moveTo(villager.position().add(1, 0, 0));
 
         FollowManager.startFollowing(villager, player);
@@ -232,8 +232,8 @@ public class FollowModeGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void emeraldNotConsumedOnRejection(GameTestHelper helper) {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
-        ServerPlayer playerA = helper.makeMockServerPlayerInLevel();
-        ServerPlayer playerB = helper.makeMockServerPlayerInLevel();
+        ServerPlayer playerA = MockPlayers.serverPlayerInLevel(helper);
+        ServerPlayer playerB = MockPlayers.serverPlayerInLevel(helper);
         playerB.setShiftKeyDown(true);
         playerB.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.EMERALD, 5));
         playerB.moveTo(villager.position().add(1, 0, 0));
@@ -262,7 +262,7 @@ public class FollowModeGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void stopFollowingClearsSyncedData(GameTestHelper helper) {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
 
         FollowManager.startFollowing(villager, player);
         helper.assertTrue(FollowManager.isFollowing(villager),
@@ -294,7 +294,7 @@ public class FollowModeGameTest implements FabricGameTest {
     public void returnHomeToBed(GameTestHelper helper) {
         buildFloor(helper);
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         BlockPos bedPos = helper.absolutePos(new BlockPos(5, 1, 5));
         villager.getBrain().setMemory(MemoryModuleType.HOME, GlobalPos.of(villager.level().dimension(), bedPos));
 
@@ -321,7 +321,7 @@ public class FollowModeGameTest implements FabricGameTest {
     public void returnHomeToWorkstationFallback(GameTestHelper helper) {
         buildFloor(helper);
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         BlockPos jobPos = helper.absolutePos(new BlockPos(5, 1, 0));
         villager.getBrain().setMemory(MemoryModuleType.JOB_SITE, GlobalPos.of(villager.level().dimension(), jobPos));
 
@@ -347,7 +347,7 @@ public class FollowModeGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void noClaimNoReturn(GameTestHelper helper) {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
 
         FollowManager.startFollowing(villager, player);
         FollowManager.stopFollowing(villager);
@@ -362,7 +362,7 @@ public class FollowModeGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void cancelReturnOnHurt(GameTestHelper helper) {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         BlockPos bedPos = helper.absolutePos(new BlockPos(5, 1, 5));
         villager.getBrain().setMemory(MemoryModuleType.HOME, GlobalPos.of(villager.level().dimension(), bedPos));
 
@@ -384,7 +384,7 @@ public class FollowModeGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void cancelReturnOnReEngage(GameTestHelper helper) {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         BlockPos bedPos = helper.absolutePos(new BlockPos(5, 1, 5));
         villager.getBrain().setMemory(MemoryModuleType.HOME, GlobalPos.of(villager.level().dimension(), bedPos));
 

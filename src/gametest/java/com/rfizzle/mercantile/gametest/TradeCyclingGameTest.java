@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.gametest;
 
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.MercantileVillagerData;
@@ -33,7 +34,7 @@ public class TradeCyclingGameTest implements FabricGameTest {
                 new ItemCost(Items.EMERALD, 3), new ItemStack(Items.CARROT, 1), 16, 1, 0.0f);
 
         Villager villager = spawnTraderWithOffers(helper, lockedOffer, unlocked1, unlocked2);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         player.getInventory().add(new ItemStack(Items.EMERALD, 64));
 
         villager.setTradingPlayer(player);
@@ -64,7 +65,7 @@ public class TradeCyclingGameTest implements FabricGameTest {
         MerchantOffer offer = new MerchantOffer(
                 new ItemCost(Items.EMERALD, 1), new ItemStack(Items.APPLE, 1), 16, 1, 0.0f);
         Villager villager = spawnTraderWithOffers(helper, offer);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         // Mock server players default to creative, which waives the emerald cost (SPEC §3/§21);
         // force survival so the deduction path runs.
         player.getAbilities().instabuild = false;
@@ -87,7 +88,7 @@ public class TradeCyclingGameTest implements FabricGameTest {
         MerchantOffer offer = new MerchantOffer(
                 new ItemCost(Items.EMERALD, 1), new ItemStack(Items.APPLE, 1), 16, 1, 0.0f);
         Villager villager = spawnTraderWithOffers(helper, offer);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         player.getInventory().add(new ItemStack(Items.EMERALD, 64));
 
         MercantileVillagerData vd = villager.getAttachedOrCreate(MercantileAttachments.VILLAGER_DATA);
@@ -103,7 +104,7 @@ public class TradeCyclingGameTest implements FabricGameTest {
         MerchantOffer offer = new MerchantOffer(
                 new ItemCost(Items.EMERALD, 1), new ItemStack(Items.APPLE, 1), 16, 1, 0.0f);
         Villager villager = spawnTraderWithOffers(helper, offer);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         // Force survival — creative would waive the emerald requirement (SPEC §3/§21).
         player.getAbilities().instabuild = false;
 
@@ -117,7 +118,7 @@ public class TradeCyclingGameTest implements FabricGameTest {
         MerchantOffer offer = new MerchantOffer(
                 new ItemCost(Items.EMERALD, 1), new ItemStack(Items.APPLE, 1), 16, 1, 0.0f);
         Villager villager = spawnTraderWithOffers(helper, offer);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         player.getInventory().add(new ItemStack(Items.EMERALD, 64));
 
         MercantileConfig config = MercantileConfig.get();
@@ -137,7 +138,7 @@ public class TradeCyclingGameTest implements FabricGameTest {
         MerchantOffer offer = new MerchantOffer(
                 new ItemCost(Items.EMERALD, 1), new ItemStack(Items.APPLE, 1), 16, 1, 0.0f);
         Villager villager = spawnTraderWithOffers(helper, offer);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         // Force survival — creative would waive the emerald requirement (SPEC §3/§21).
         player.getAbilities().instabuild = false;
 
@@ -159,7 +160,7 @@ public class TradeCyclingGameTest implements FabricGameTest {
         MerchantOffer offer = new MerchantOffer(
                 new ItemCost(Items.EMERALD, 1), new ItemStack(Items.APPLE, 1), 16, 1, 0.0f);
         Villager villager = spawnTraderWithOffers(helper, offer);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
 
         int cost = MercantileConfig.get().tradeCycleEmeraldCost;
         player.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(Items.EMERALD, cost));
@@ -174,7 +175,7 @@ public class TradeCyclingGameTest implements FabricGameTest {
         MerchantOffer offer = new MerchantOffer(
                 new ItemCost(Items.EMERALD, 1), new ItemStack(Items.APPLE, 1), 16, 1, 0.0f);
         Villager villager = spawnTraderWithOffers(helper, offer);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         player.getInventory().add(new ItemStack(Items.EMERALD, 64));
         villager.setTradingPlayer(player);
 
@@ -215,7 +216,7 @@ public class TradeCyclingGameTest implements FabricGameTest {
         MerchantOffer offer = new MerchantOffer(
                 new ItemCost(Items.EMERALD, 1), new ItemStack(Items.APPLE, 1), 16, 1, 0.0f);
         Villager villager = spawnTraderWithOffers(helper, offer);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         player.getInventory().add(new ItemStack(Items.EMERALD, 64));
         villager.setTradingPlayer(player);
 

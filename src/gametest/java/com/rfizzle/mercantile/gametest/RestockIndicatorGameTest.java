@@ -1,7 +1,7 @@
 package com.rfizzle.mercantile.gametest;
 
 import com.rfizzle.mercantile.config.MercantileConfig;
-import com.rfizzle.mercantile.gametest.util.MockPlayers;
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.mixin.VillagerRestockAccessor;
 import com.rfizzle.mercantile.network.RestockTimerS2CPayload;
 import io.netty.buffer.Unpooled;

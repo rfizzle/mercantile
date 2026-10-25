@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.gametest;
 
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.contract.ContractService;
 import com.rfizzle.mercantile.contract.DeliveryContract;
@@ -49,7 +50,7 @@ public class ContractGameTest implements FabricGameTest {
 
     /** Survival mock player standing next to the villager with the given main-hand stack. */
     private static ServerPlayer interactingPlayer(GameTestHelper helper, Villager villager, ItemStack held) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         player.getAbilities().instabuild = false;
         player.setItemInHand(InteractionHand.MAIN_HAND, held);
         player.moveTo(villager.position().add(1, 0, 0));

@@ -1,7 +1,7 @@
 package com.rfizzle.mercantile.gametest;
 
 import com.rfizzle.mercantile.config.MercantileConfig;
-import com.rfizzle.mercantile.gametest.util.MockPlayers;
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.network.MercantileNetworking;
 import com.rfizzle.mercantile.network.WorkstationMapS2CPayload;
 import com.rfizzle.mercantile.visualization.WorkstationMapService;

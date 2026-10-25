@@ -41,8 +41,12 @@ in the local workspace. Normative for this repo:
 ```
 
 A `Makefile` wraps these (`make build`, `make test`, `make coverage`,
-`make run-client`, etc.) and adds `make release VERSION=X.Y.Z` (tags `vX.Y.Z`
-and pushes it to trigger the release).
+`make run-client`, `make ci`, `make release VERSION=X.Y.Z`, etc.); the targets
+come from the hub-owned `concord.mk`, and the shared Gradle wiring (version,
+base repositories, gametest/datagen runs, JaCoCo, packaging) from the hub-owned
+`gradle/concord-common.gradle`. Both are synced verbatim from the concord hub —
+never edit them here; `build.gradle` keeps only plugins, dependencies,
+mercantile's own repositories, and its `test` inputs.
 
 Run a single JUnit test:
 `./gradlew test --tests "com.rfizzle.mercantile.SomeTest"`

@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.gametest;
 
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.VillagerPickupHelper;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
@@ -40,7 +41,7 @@ public class WanderingTraderPickupGameTest implements FabricGameTest {
 
         int leadsBefore = mercantile$countLeadItems(helper);
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         player.getAbilities().instabuild = false;
         player.experienceLevel = 10;
         player.setShiftKeyDown(true);
@@ -79,7 +80,7 @@ public class WanderingTraderPickupGameTest implements FabricGameTest {
 
         int leadsBefore = mercantile$countLeadItems(helper);
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         player.getAbilities().instabuild = false;
         player.experienceLevel = 10;
         player.setShiftKeyDown(true);
@@ -114,7 +115,7 @@ public class WanderingTraderPickupGameTest implements FabricGameTest {
 
         int leadsBefore = mercantile$countLeadItems(helper);
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         player.getAbilities().instabuild = false;
         player.experienceLevel = 10;
         player.setShiftKeyDown(true);
@@ -145,7 +146,7 @@ public class WanderingTraderPickupGameTest implements FabricGameTest {
         helper.assertTrue(llama.getLeashHolder() == otherTrader,
                 "Precondition: llama leashed to the other trader");
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         player.getAbilities().instabuild = false;
         player.experienceLevel = 10;
         player.setShiftKeyDown(true);
@@ -249,7 +250,7 @@ public class WanderingTraderPickupGameTest implements FabricGameTest {
             int startXp = xpCost + 5;
 
             WanderingTrader trader = helper.spawn(EntityType.WANDERING_TRADER, 0, 1, 0);
-            ServerPlayer player = helper.makeMockServerPlayerInLevel();
+            ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
             player.getAbilities().instabuild = false;
             player.experienceLevel = startXp;
             player.setShiftKeyDown(true);
@@ -282,7 +283,7 @@ public class WanderingTraderPickupGameTest implements FabricGameTest {
             MercantileConfig.get().enableVillagerPickup = false;
 
             WanderingTrader trader = helper.spawn(EntityType.WANDERING_TRADER, 0, 1, 0);
-            ServerPlayer player = helper.makeMockServerPlayerInLevel();
+            ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
             player.getAbilities().instabuild = false;
             player.experienceLevel = 10;
             player.setShiftKeyDown(true);
@@ -325,7 +326,7 @@ public class WanderingTraderPickupGameTest implements FabricGameTest {
         ItemStack headItem = VillagerPickupHelper.createHeadItem(original);
         original.discard();
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         player.setItemInHand(InteractionHand.MAIN_HAND, headItem);
 
         // Click UP on the floor at (0,0,0) — same pattern as malformedNbtKeepsItem.
@@ -447,7 +448,7 @@ public class WanderingTraderPickupGameTest implements FabricGameTest {
                     "Despawn delay should have ticked down while in world (was "
                             + liveDespawnBeforePickup + ", initial 4242)");
 
-            ServerPlayer player = helper.makeMockServerPlayerInLevel();
+            ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
             player.getAbilities().instabuild = false;
             player.experienceLevel = 10;
             player.setShiftKeyDown(true);

@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.gametest;
 
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.GratitudeGiftTables;
 import com.rfizzle.mercantile.data.MercantileAttachments;
@@ -139,7 +140,7 @@ public class GratitudeGiftGameTest implements FabricGameTest {
     }
 
     private static ServerPlayer makePreparedPlayer(GameTestHelper helper, int score) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         data.setReputationMigrated(true);
         data.setScore(score);

@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.gametest;
 
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
@@ -31,7 +32,7 @@ public class ReputationGameTest implements FabricGameTest {
                 new ItemCost(Items.EMERALD, 1), new ItemStack(Items.APPLE, 1), 16, 1, 0.0f);
         Villager villager = spawnTrader(helper, offer);
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         // S-040 introduced pulse-based gain: only every Nth trade awards rep. Pre-align the
         // day so the implicit rollover in tryGainTradeRep doesn't reset our seeded state.
@@ -61,7 +62,7 @@ public class ReputationGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void attackLosesReputation(GameTestHelper helper) {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         data.setScore(0);
 
@@ -77,7 +78,7 @@ public class ReputationGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void killLosesReputation(GameTestHelper helper) {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         data.setScore(0);
 
@@ -170,7 +171,7 @@ public class ReputationGameTest implements FabricGameTest {
                 new ItemCost(Items.EMERALD, 20), new ItemStack(Items.APPLE, 1), 16, 1, 0.0f);
         Villager villager = spawnTrader(helper, offer);
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         data.setScore(100); // HONORED tier — produces negative modifier (discount)
 
@@ -215,7 +216,7 @@ public class ReputationGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void killingVillagerAppliesOnlyKillLoss(GameTestHelper helper) {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         data.setScore(0);
 
@@ -233,7 +234,7 @@ public class ReputationGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void nonLethalAttackStillAppliesAttackLoss(GameTestHelper helper) {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         data.setScore(0);
 
@@ -277,7 +278,7 @@ public class ReputationGameTest implements FabricGameTest {
 
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         // Teleport player to the villager so it falls within PROXIMITY_RANGE (16 blocks)
         player.teleportTo(villager.getX(), villager.getY(), villager.getZ());
 

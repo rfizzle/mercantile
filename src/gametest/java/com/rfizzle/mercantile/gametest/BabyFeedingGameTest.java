@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.gametest;
 
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.breeding.BabyFeeding;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
@@ -19,7 +20,7 @@ public class BabyFeedingGameTest implements FabricGameTest {
     private static final int START_AGE = -BabyFeeding.FULL_GROWTH_TICKS;
 
     private static ServerPlayer feedingPlayer(GameTestHelper helper, Villager villager, ItemStack stack) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         // Mock server players default to creative, where instabuild skips the item shrink;
         // force survival so the food is actually consumed.
         player.getAbilities().instabuild = false;
