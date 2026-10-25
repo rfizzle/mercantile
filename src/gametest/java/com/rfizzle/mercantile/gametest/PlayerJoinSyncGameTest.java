@@ -3,7 +3,7 @@ package com.rfizzle.mercantile.gametest;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
-import com.rfizzle.mercantile.gametest.util.MockPlayers;
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.network.ConfigSyncPayload;
 import com.rfizzle.mercantile.network.FollowCountS2CPayload;
 import com.rfizzle.mercantile.network.MercantileNetworking;
@@ -107,7 +107,7 @@ public class PlayerJoinSyncGameTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void joinTriggersReputationMigration(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         // Simulate legacy save: score on the pre-S-040 1x scale, not yet migrated.
         data.setReputationMigrated(false);

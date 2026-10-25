@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.gametest;
 
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.block.SentryPylonBlock;
 import com.rfizzle.mercantile.block.SentryPylonBlockEntity;
 import com.rfizzle.mercantile.registry.MercantileRegistry;
@@ -42,7 +43,7 @@ public class SentryPylonFuelGameTest implements FabricGameTest {
         SentryPylonBlockEntity be = (SentryPylonBlockEntity) helper.getBlockEntity(pos);
         helper.assertTrue(be != null, "block entity should exist");
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         player.getAbilities().instabuild = false;
         BlockPos abs = helper.absolutePos(pos);
         player.teleportTo(abs.getX() + 0.5, abs.getY(), abs.getZ() + 0.5);
@@ -70,7 +71,7 @@ public class SentryPylonFuelGameTest implements FabricGameTest {
         int max = be.getMaxFuel();
         be.setFuel(max);
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         player.getAbilities().instabuild = false;
         BlockPos abs = helper.absolutePos(pos);
         player.teleportTo(abs.getX() + 0.5, abs.getY(), abs.getZ() + 0.5);
@@ -95,7 +96,7 @@ public class SentryPylonFuelGameTest implements FabricGameTest {
         SentryPylonBlockEntity be = (SentryPylonBlockEntity) helper.getBlockEntity(pos);
         helper.assertTrue(be != null, "block entity should exist");
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         player.getAbilities().instabuild = true;
         BlockPos abs = helper.absolutePos(pos);
         player.teleportTo(abs.getX() + 0.5, abs.getY(), abs.getZ() + 0.5);
@@ -118,7 +119,7 @@ public class SentryPylonFuelGameTest implements FabricGameTest {
         SentryPylonBlockEntity be = (SentryPylonBlockEntity) helper.getBlockEntity(pos);
         helper.assertTrue(be != null, "block entity should exist");
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         player.getAbilities().instabuild = false;
         BlockPos abs = helper.absolutePos(pos);
         player.teleportTo(abs.getX() + 0.5, abs.getY(), abs.getZ() + 0.5);

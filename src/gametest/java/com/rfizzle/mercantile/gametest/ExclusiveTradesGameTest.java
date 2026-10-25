@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.gametest;
 
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.Mercantile;
 import com.rfizzle.mercantile.api.ReputationTier;
 import com.rfizzle.mercantile.reputation.ExclusiveTradesManager;
@@ -388,7 +389,7 @@ public class ExclusiveTradesGameTest implements FabricGameTest {
 
         boolean savedEnableReputation = com.rfizzle.mercantile.config.MercantileConfig.get().enableReputation;
         com.rfizzle.mercantile.config.MercantileConfig.get().enableReputation = true;
-        net.minecraft.server.level.ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        net.minecraft.server.level.ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         try {
             net.minecraft.advancements.AdvancementHolder dragon = player.server.getAdvancements()
                     .get(net.minecraft.resources.ResourceLocation.parse("minecraft:end/kill_dragon"));

@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.gametest;
 
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.compat.shared.StateIndicatorData;
 import com.rfizzle.mercantile.contract.DeliveryContract;
 import com.rfizzle.mercantile.data.MercantileAttachments;
@@ -101,7 +102,7 @@ public class StateIndicatorGameTest implements FabricGameTest {
         villager.setVillagerData(villager.getVillagerData().setProfession(VillagerProfession.FARMER));
         villager.getBrain().eraseMemory(MemoryModuleType.JOB_SITE);
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         villager.setTradingPlayer(player);
 
         CompoundTag tag = new CompoundTag();

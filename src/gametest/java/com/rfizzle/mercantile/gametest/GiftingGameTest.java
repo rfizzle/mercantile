@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.gametest;
 
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
@@ -26,7 +27,7 @@ public class GiftingGameTest implements FabricGameTest {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
         villager.setVillagerData(new VillagerData(VillagerType.PLAINS, VillagerProfession.FARMER, 1));
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         data.setScore(0);
         data.setReputationMigrated(true);
@@ -50,7 +51,7 @@ public class GiftingGameTest implements FabricGameTest {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
         villager.setVillagerData(new VillagerData(VillagerType.PLAINS, VillagerProfession.FARMER, 1));
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         data.setScore(0);
         data.setReputationMigrated(true);
@@ -78,7 +79,7 @@ public class GiftingGameTest implements FabricGameTest {
         Villager villager = helper.spawn(EntityType.VILLAGER, 0, 1, 0);
         villager.setVillagerData(new VillagerData(VillagerType.PLAINS, VillagerProfession.ARMORER, 1));
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         data.setScore(0);
         data.setReputationMigrated(true);
@@ -96,7 +97,7 @@ public class GiftingGameTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void reputationDecay(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         data.setScore(-10);
         data.setReputationMigrated(true);

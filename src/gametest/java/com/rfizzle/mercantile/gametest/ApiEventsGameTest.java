@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.gametest;
 
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.api.ReputationChangedCallback;
 import com.rfizzle.mercantile.api.TradeExecutedCallback;
 import com.rfizzle.mercantile.data.MercantileAttachments;
@@ -60,7 +61,7 @@ public class ApiEventsGameTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void throwingListenerIsSkippedAndLoggedOnce(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         data.setReputationMigrated(true);
         data.setScore(0);
@@ -79,7 +80,7 @@ public class ApiEventsGameTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void reputationChangedFiresOnManagerChange(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         data.setReputationMigrated(true);
         data.setScore(0);
@@ -99,7 +100,7 @@ public class ApiEventsGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void reputationChangedFiresOnCommandPath(GameTestHelper helper) {
         // /mercantile reputation set|add delegate to ReputationManager.setScore/addScore.
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         data.setReputationMigrated(true);
         data.setScore(0);
@@ -121,7 +122,7 @@ public class ApiEventsGameTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void reputationChangedNotFiredWhenClampAbsorbsChange(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         data.setReputationMigrated(true);
         data.setScore(PlayerData.MAX_SCORE);
@@ -146,7 +147,7 @@ public class ApiEventsGameTest implements FabricGameTest {
         offers.add(offer);
         villager.overrideOffers(offers);
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         villager.setTradingPlayer(player);
         villager.notifyTrade(offer);
         villager.setTradingPlayer(null);
@@ -172,7 +173,7 @@ public class ApiEventsGameTest implements FabricGameTest {
         offers.add(offer);
         trader.overrideOffers(offers);
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         trader.setTradingPlayer(player);
         trader.notifyTrade(offer);
         trader.setTradingPlayer(null);

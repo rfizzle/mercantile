@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.gametest;
 
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.api.ReputationTier;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.reputation.ExclusiveTradesManager;
@@ -30,7 +31,7 @@ public class WanderingTraderReputationGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void neutralPlayerSeesNoExtraOffer(GameTestHelper helper) {
         WanderingTrader trader = helper.spawn(EntityType.WANDERING_TRADER, 0, 1, 0);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
 
         // Ensure reputation is NEUTRAL (0)
         ReputationManager.setScore(player, 0);
@@ -60,7 +61,7 @@ public class WanderingTraderReputationGameTest implements FabricGameTest {
                 List.of());
         try {
             WanderingTrader trader = helper.spawn(EntityType.WANDERING_TRADER, 0, 1, 0);
-            ServerPlayer player = helper.makeMockServerPlayerInLevel();
+            ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
 
             // Set reputation to TRUSTED (300)
             ReputationManager.setScore(player, 300);
@@ -83,7 +84,7 @@ public class WanderingTraderReputationGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void offerStabilityAcrossScreenOpens(GameTestHelper helper) {
         WanderingTrader trader = helper.spawn(EntityType.WANDERING_TRADER, 0, 1, 0);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
 
         ReputationManager.setScore(player, 300);
 
@@ -108,7 +109,7 @@ public class WanderingTraderReputationGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void offerStabilityAcrossPickup(GameTestHelper helper) {
         WanderingTrader trader = helper.spawn(EntityType.WANDERING_TRADER, 0, 1, 0);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
 
         ReputationManager.setScore(player, 300);
 
@@ -153,7 +154,7 @@ public class WanderingTraderReputationGameTest implements FabricGameTest {
             MercantileConfig.get().enableWanderingTraderRep = false;
 
             WanderingTrader trader = helper.spawn(EntityType.WANDERING_TRADER, 0, 1, 0);
-            ServerPlayer player = helper.makeMockServerPlayerInLevel();
+            ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
 
             ReputationManager.setScore(player, 300);
 

@@ -4,7 +4,7 @@ import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.MercantileVillagerData;
 import com.rfizzle.mercantile.data.PlayerData;
-import com.rfizzle.mercantile.gametest.util.MockPlayers;
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.network.VillagerInfoPanelS2CPayload;
 import io.netty.channel.embedded.EmbeddedChannel;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
@@ -79,7 +79,7 @@ public class InfoPanelGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void totalTradesReflectsPlayerVillagerHistory(GameTestHelper helper) {
         Villager villager = spawnTrader(helper);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         player.teleportTo(villager.getX(), villager.getY(), villager.getZ());
 
         try {

@@ -3,7 +3,7 @@ package com.rfizzle.mercantile.gametest;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
-import com.rfizzle.mercantile.gametest.util.MockPlayers;
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.network.SyncReputationS2CPayload;
 import com.rfizzle.mercantile.reputation.ReputationManager;
 import io.netty.channel.embedded.EmbeddedChannel;
@@ -18,7 +18,7 @@ public class ReputationMigrationGameTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
     public void legacyPlayerDataMigratesOnAccess(GameTestHelper helper) {
         // Mock players don't fire ServerPlayConnectionEvents.JOIN, so drive migration directly.
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         data.setScore(80);
         data.setReputationMigrated(false);
@@ -69,7 +69,7 @@ public class ReputationMigrationGameTest implements FabricGameTest {
     public void migrationIsIdempotentWhenCalledFromGainHelpers(GameTestHelper helper) {
         // modifyScore calls migrateIfNeeded defensively; a player who's already been migrated
         // must NOT have their score multiplied again on subsequent modify calls.
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
         data.setScore(50);
         data.setReputationMigrated(false);

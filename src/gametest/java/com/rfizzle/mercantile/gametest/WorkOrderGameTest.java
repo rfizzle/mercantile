@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.gametest;
 
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.trade.EmeraldPayment;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
@@ -55,7 +56,7 @@ public class WorkOrderGameTest implements FabricGameTest {
 
     /** Survival mock player sneaking with the given workstation item, standing next to the villager. */
     private static ServerPlayer orderingPlayer(GameTestHelper helper, Villager villager, Item held, int emeralds) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         // Mock server players default to creative, where instabuild waives the fee; force
         // survival so the emeralds are actually charged.
         player.getAbilities().instabuild = false;

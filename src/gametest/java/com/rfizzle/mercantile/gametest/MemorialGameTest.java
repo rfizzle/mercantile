@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.gametest;
 
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.memorial.MemorialManager;
 import com.rfizzle.mercantile.memorial.MourningManager;
@@ -27,7 +28,7 @@ public class MemorialGameTest implements FabricGameTest {
     }
 
     private static ServerPlayer killWithPlayer(GameTestHelper helper, Villager villager) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         player.moveTo(villager.position().add(1, 0, 0));
         villager.hurt(helper.getLevel().damageSources().playerAttack(player), 1_000.0f);
         return player;
@@ -88,7 +89,7 @@ public class MemorialGameTest implements FabricGameTest {
         villager.setCustomName(Component.literal("Elowen"));
         villager.setVillagerData(villager.getVillagerData()
                 .setProfession(VillagerProfession.FARMER).setLevel(3));
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
 
         ItemStack memorial = MemorialManager.createMemorialItem(
                 villager, helper.getLevel().damageSources().playerAttack(player));

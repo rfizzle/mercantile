@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.gametest;
 
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
@@ -212,7 +213,7 @@ public class BulkTradingGameTest implements FabricGameTest {
                     new ItemCost(Items.EMERALD, 1), new ItemStack(Items.APPLE, 1), 16, 1, 0.0f);
             Villager villager = spawnTrader(helper, offer);
 
-            ServerPlayer player = helper.makeMockServerPlayerInLevel();
+            ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
             PlayerData data = player.getAttachedOrCreate(MercantileAttachments.PLAYER_DATA);
             data.setScore(0);
 

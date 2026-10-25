@@ -3,7 +3,7 @@ package com.rfizzle.mercantile.gametest;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PlayerData;
-import com.rfizzle.mercantile.gametest.util.MockPlayers;
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.reputation.ReputationManager;
 import io.netty.channel.embedded.EmbeddedChannel;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
@@ -452,7 +452,7 @@ public class ReputationDailyCapGameTest implements FabricGameTest {
      * seeded counters mid-test).
      */
     private static ServerPlayer makePreparedPlayer(GameTestHelper helper) {
-        return prepare(helper.makeMockServerPlayerInLevel());
+        return prepare(MockPlayers.serverPlayerInLevel(helper));
     }
 
     /** Same preparation, on a connected mock whose outbound channel is exposed for packet assertions. */

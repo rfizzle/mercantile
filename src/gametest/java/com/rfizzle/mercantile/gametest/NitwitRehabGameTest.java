@@ -1,5 +1,6 @@
 package com.rfizzle.mercantile.gametest;
 
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.api.ReputationTier;
 import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
@@ -30,7 +31,7 @@ public class NitwitRehabGameTest implements FabricGameTest {
     }
 
     private static ServerPlayer rehabPlayer(GameTestHelper helper, Villager villager, int emeralds) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         // Mock server players default to creative, where instabuild skips the cost;
         // force survival so the apple and emeralds are actually consumed.
         player.getAbilities().instabuild = false;

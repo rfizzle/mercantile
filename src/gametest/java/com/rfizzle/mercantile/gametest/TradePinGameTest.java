@@ -5,7 +5,7 @@ import com.rfizzle.mercantile.config.MercantileConfig;
 import com.rfizzle.mercantile.data.MercantileAttachments;
 import com.rfizzle.mercantile.data.PinnedTrade;
 import com.rfizzle.mercantile.data.PlayerData;
-import com.rfizzle.mercantile.gametest.util.MockPlayers;
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.mercantile.network.TradePinsS2CPayload;
 import com.rfizzle.mercantile.trade.OfferIdentityHash;
 import com.rfizzle.mercantile.trade.TradePinManager;
@@ -180,7 +180,7 @@ public class TradePinGameTest implements FabricGameTest {
         boolean savedEnable = config.enableTradePinning;
         Villager villager = spawnTrader(helper,
                 new MerchantOffer(new ItemCost(Items.EMERALD, 3), new ItemStack(Items.APPLE, 1), 16, 1, 0.0f));
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
 
         try {
             config.enableTradePinning = true;
@@ -210,7 +210,7 @@ public class TradePinGameTest implements FabricGameTest {
         boolean savedEnable = config.enableTradePinning;
         Villager villager = spawnTrader(helper,
                 new MerchantOffer(new ItemCost(Items.EMERALD, 3), new ItemStack(Items.APPLE, 1), 16, 1, 0.0f));
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
 
         try {
             config.enableTradePinning = true;
