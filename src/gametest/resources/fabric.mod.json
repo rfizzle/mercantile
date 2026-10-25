@@ -50,6 +50,7 @@
             "com.rfizzle.mercantile.gametest.TradeIndexGameTest",
             "com.rfizzle.mercantile.gametest.SentryPylonHopperGameTest",
             "com.rfizzle.mercantile.gametest.ExclusiveTradesGameTest",
+            "com.rfizzle.mercantile.gametest.ExclusiveTradesPersistenceGameTest",
             "com.rfizzle.mercantile.gametest.BulkTradingGameTest",
             "com.rfizzle.mercantile.gametest.TradeCyclingGameTest",
             "com.rfizzle.mercantile.gametest.FollowModeGameTest",
